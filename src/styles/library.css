@@ -1,0 +1,292 @@
+/*
+ * Library: a restrained editorial masthead over a shelf of picture-book covers.
+ * Mobile-first single column; the "Tonight's pick" leads and widens on larger
+ * screens into a horizontal feature. No dashboard chrome, filters, or search.
+ */
+
+.library {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 1rem + 4vw, 3.5rem) clamp(1.15rem, 0.7rem + 3vw, 3rem)
+    clamp(3rem, 2rem + 5vw, 5rem);
+}
+
+/* ------------------------------------------------------------------ hero -- */
+
+.library__hero {
+  max-width: 48ch;
+  margin: 0 auto clamp(2rem, 1rem + 5vw, 3.5rem);
+  padding-top: clamp(0.5rem, 0.2rem + 2vw, 2rem);
+  text-align: center;
+}
+
+.library__eyebrow {
+  margin-bottom: var(--space-4);
+  color: var(--c-moon);
+  font-size: var(--step--1);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.library__title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: var(--step-4);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.library__lede {
+  margin-top: var(--space-4);
+  color: var(--c-ink-soft);
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ grid -- */
+
+.library__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 0.8rem + 2.5vw, 2.25rem);
+}
+
+.library__grid-item {
+  display: flex;
+}
+
+@media (min-width: 46rem) {
+  .library__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .library__grid-item:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 68rem) {
+  .library__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .library__grid-item:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ------------------------------------------------------------------ card -- */
+
+.story-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--c-surface-raised) 0%,
+    var(--c-surface) 100%
+  );
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Instant hover/focus feedback only — no transition, no transform — so the
+   motion-off default never animates. The lift transform is gated at the foot of
+   this file behind [data-motion="on"] + prefers-reduced-motion: no-preference. */
+.story-card:hover,
+.story-card:focus-within {
+  box-shadow: var(--shadow-lift);
+  border-color: var(--c-line-strong);
+}
+
+.story-card__cover {
+  position: relative;
+  background: var(--c-night-700);
+}
+
+.story-card__cover .scene {
+  border-radius: 0;
+}
+
+.story-card__eyebrow {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: var(--c-moon);
+  color: var(--c-moon-ink);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.7);
+}
+
+.story-card__badge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(13, 15, 24, 0.72);
+  border: 1px solid var(--c-line-strong);
+  color: var(--c-moon-soft);
+  font-size: var(--step--1);
+  backdrop-filter: blur(4px);
+}
+
+.story-card__badge-mark {
+  color: var(--c-moon);
+  font-weight: 700;
+}
+
+.story-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: clamp(1.1rem, 0.8rem + 1.5vw, 1.75rem);
+}
+
+.story-card__title {
+  font-family: var(--font-serif);
+  font-size: var(--step-2);
+  line-height: 1.12;
+}
+
+.story-card__subtitle {
+  color: var(--c-ink-soft);
+  font-size: var(--step-0);
+  line-height: 1.5;
+}
+
+.story-card__context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  margin-top: var(--space-1);
+}
+
+.story-card__context-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.story-card__context-item--heart {
+  flex-basis: 100%;
+}
+
+.story-card__context-label {
+  color: var(--c-ink-faint);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.story-card__context-value {
+  color: var(--c-ink);
+  font-size: var(--step-0);
+}
+
+.story-card__context-item--heart .story-card__context-value {
+  color: var(--c-ink-soft);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.story-card__cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--touch);
+  margin-top: var(--space-2);
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--c-moon);
+  color: var(--c-moon-ink);
+  font-size: var(--step-0);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.story-card__cta:hover {
+  background: var(--c-moon-soft);
+}
+
+.story-card__cta-icon {
+  font-size: 0.78em;
+}
+
+/* Completed treatment: a soft gold edge and a calmer cover. */
+.story-card[data-completed='true'] {
+  border-color: rgba(240, 198, 122, 0.38);
+}
+
+.story-card[data-completed='true'] .story-card__cover .scene {
+  opacity: 0.92;
+}
+
+/* Featured "Tonight's pick": a grand horizontal hero on wide screens only.
+   Below 60rem it stays stacked — a full-width cover reads better on phones and
+   tablets than a cramped, portrait side-by-side that strands a dark void under
+   the art. The cover keeps its 3:2 ratio (never cropped) and is centred beside
+   the text so the two panels balance with no empty rectangle beneath it. */
+@media (min-width: 60rem) {
+  .story-card--featured {
+    flex-direction: row;
+    align-items: center;
+  }
+  .story-card--featured .story-card__cover {
+    flex: 1 1 58%;
+  }
+  .story-card--featured .story-card__cover .scene {
+    width: 100%;
+  }
+  .story-card--featured .story-card__body {
+    flex: 1 1 42%;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  }
+  .story-card--featured .story-card__title {
+    font-size: var(--step-3);
+  }
+  .story-card--featured .story-card__subtitle {
+    font-size: var(--step-1);
+  }
+}
+
+/* ------------------------------------------------------- gated card motion -- */
+
+/*
+ * Hover/focus lift transitions and transforms are applied ONLY when a card is
+ * explicitly opted into motion (data-motion="on", threaded from `motionEnabled`)
+ * AND the reader has expressed no reduced-motion preference. By default
+ * (data-motion="off") cards give instant colour/shadow feedback and never move.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .story-card[data-motion='on'] {
+    transition:
+      transform 220ms var(--turn-ease),
+      box-shadow 220ms var(--turn-ease),
+      border-color 220ms var(--turn-ease);
+  }
+  .story-card[data-motion='on']:hover,
+  .story-card[data-motion='on']:focus-within {
+    transform: translateY(-4px);
+  }
+  .story-card[data-motion='on'] .story-card__cta {
+    transition:
+      transform 160ms var(--turn-ease),
+      background 160ms var(--turn-ease);
+  }
+  .story-card[data-motion='on'] .story-card__cta:hover {
+    transform: translateY(-1px);
+  }
+}
