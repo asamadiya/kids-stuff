@@ -1,0 +1,261 @@
+/*
+ * Illustration styling.
+ *
+ * The artwork is complete and attractive as a static image — every rule here is
+ * about layout, crispness and stable hooks. There is deliberately NO running
+ * animation or motion state in this task; Task 5 owns motion. The `.scene`
+ * element carries `data-motion="on|off"` and children carry stable class hooks
+ * (e.g. `.scene-star`, `.scene-kite`) so motion can be layered on later without
+ * touching the drawings.
+ */
+
+.scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: 18px;
+  overflow: hidden;
+  /* Keep edges soft so the picture sits calmly on any card background. */
+  background: #10131f;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Never let the browser smooth away the crisp vector edges. */
+.scene * {
+  shape-rendering: geometricPrecision;
+}
+
+/* Grain and vignette are finishing washes; they must never catch pointers. */
+.scene-grain,
+.scene-vignette {
+  pointer-events: none;
+}
+
+/*
+ * Stable hooks reserved for Task 5. They intentionally set no animation here;
+ * they only mark the elements a future motion layer will target. Honouring a
+ * reader's reduced-motion preference is wired now so it is impossible to forget.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .scene[data-motion='on'] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Ambient, story-specific motion (Task 5).                                   */
+/*                                                                            */
+/* Every rule below is gated by BOTH `.scene[data-motion="on"]` (flipped on   */
+/* only after an explicit "Make it move" press) AND                           */
+/* `@media (prefers-reduced-motion: no-preference)`. Motion is calm and       */
+/* ambient — slow transform/opacity loops on decorative atoms only, never a   */
+/* pop, bounce, or anything essential to understanding. The static artwork is */
+/* complete and byte-for-byte identical when motion is off. Only elements     */
+/* that carry no conflicting `transform`/`opacity` attribute are animated, so  */
+/* the drawings never shift out of place.                                     */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The Tallest Sunflower — the bloom and stem sway like a slow breath. */
+  .scene[data-motion='on'] .scene-sunflower-head,
+  .scene[data-motion='on'] .scene-sunflower-stem {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: scene-sway 11s ease-in-out infinite;
+  }
+
+  /* Pip's Pattern Parade — buttons, fireflies and the porch lamp glimmer. */
+  .scene[data-motion='on'] .scene-button,
+  .scene[data-motion='on'] .scene-firefly,
+  .scene[data-motion='on'] .scene-porch-lamp {
+    animation: scene-glimmer 6.5s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-porch-lamp {
+    animation-duration: 8.5s;
+  }
+
+  /* The Echo in the Canyon — voice arcs breathe outward; the campfire flickers. */
+  .scene[data-motion='on'] .scene-sound {
+    animation: scene-breathe 7s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-campfire {
+    animation: scene-flicker 4.5s ease-in-out infinite;
+  }
+
+  /* Nadia's Kite and the Wind — wind streaks and leaves drift on the breeze. */
+  .scene[data-motion='on'] .scene-wind-streaks,
+  .scene[data-motion='on'] .scene-wind-leaves {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: scene-drift 8s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-wind-leaves {
+    animation-duration: 9.5s;
+  }
+
+  /* The Little Bean Seed — the leafed stem sways toward the light. */
+  .scene[data-motion='on'] .scene-vine {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: scene-sway 12s ease-in-out infinite;
+  }
+
+  /* Chasing My Shadow — the garden border sways gently at dusk. */
+  .scene[data-motion='on'] .scene-flower-bed {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: scene-sway 13s ease-in-out infinite;
+  }
+
+  /* Following the North Star — the star field and Polaris twinkle. */
+  .scene[data-motion='on'] .scene-starfield,
+  .scene[data-motion='on'] .scene-north-star {
+    animation: scene-twinkle 6s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-north-star {
+    animation-duration: 4.5s;
+  }
+
+  /* The Ramp to the Treehouse — the canopy and rope ladder settle gently. */
+  .scene[data-motion='on'] .scene-canopy {
+    transform-box: fill-box;
+    transform-origin: 50% 40%;
+    animation: scene-sway 12s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-rope-ladder {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: scene-drift 7.5s ease-in-out infinite;
+  }
+
+  /*
+   * Pip's Pattern Parade — the lit firefly drifts on the evening air. The
+   * outer `.scene-firefly` keeps its positioning translate (and its glimmer
+   * above); the drift rides an inner hook that owns no transform, so the two
+   * never fight and the firefly stays exactly where it was drawn.
+   */
+  .scene[data-motion='on'] .scene-firefly-drift {
+    animation: scene-firefly-float 10.5s ease-in-out infinite;
+  }
+
+  /* The Echo in the Canyon & Following the North Star — water ripples softly. */
+  .scene[data-motion='on'] .scene-ripple {
+    animation: scene-ripple 7.5s ease-in-out infinite;
+  }
+
+  /*
+   * Nadia's Kite and the Wind — the kite tugs gently against its string. The
+   * animation rides an OUTER wrapper that owns no transform, composing with
+   * (never overwriting) the inner `.scene-kite` translate/rotate that anchors
+   * the kite and carries its semantic motif hooks.
+   */
+  .scene[data-motion='on'] .scene-kite-tug {
+    transform-box: fill-box;
+    transform-origin: 50% 45%;
+    animation: scene-tug 6.5s ease-in-out infinite;
+  }
+}
+
+@keyframes scene-sway {
+  0%,
+  100% {
+    transform: rotate(-1.1deg);
+  }
+  50% {
+    transform: rotate(1.1deg);
+  }
+}
+
+@keyframes scene-drift {
+  0%,
+  100% {
+    transform: translate(-6px, 0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translate(6px, 2px) rotate(0.6deg);
+  }
+}
+
+@keyframes scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes scene-glimmer {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-flicker {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  25% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.86;
+  }
+}
+
+/* A firefly wandering slowly on the evening air (low-amplitude drift). */
+@keyframes scene-firefly-float {
+  0%,
+  100% {
+    transform: translate(-4px, 1px);
+  }
+  33% {
+    transform: translate(3px, -3px);
+  }
+  66% {
+    transform: translate(4px, 2px);
+  }
+}
+
+/* Water glinting as a shallow ripple travels across it (subtle drift + shimmer). */
+@keyframes scene-ripple {
+  0%,
+  100% {
+    transform: translate(-2px, 0);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translate(2px, -1px);
+    opacity: 1;
+  }
+}
+
+/* A kite tugging gently on its string (small rock plus a soft bob). */
+@keyframes scene-tug {
+  0%,
+  100% {
+    transform: rotate(-1.1deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.1deg) translateY(-2px);
+  }
+}
