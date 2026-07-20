@@ -13,7 +13,7 @@ import { STORIES } from '../src/stories/index';
  * library render, story reading, keyboard paging, the motion opt-in/lockout
  * contract, skip-link route preservation, persistence across reloads,
  * malformed-storage resilience, deep links, the public base path, and every one
- * of the 8 stories x 7 pages (56 spreads) for clean SVG/text rendering with no
+ * of the 9 stories x 7 pages (63 spreads) for clean SVG/text rendering with no
  * horizontal overflow or clipped controls. It also captures durable screenshots
  * for visual QA.
  */
@@ -167,7 +167,7 @@ async function animationName(locator: Locator): Promise<string> {
 // --------------------------------------------------------------------------
 
 test.describe('Library', () => {
-  test('renders the masthead and all eight covers, clean and unclipped', async ({
+  test('renders the masthead and all nine covers, clean and unclipped', async ({
     page,
   }, testInfo) => {
     const diagnostics = watchDiagnostics(page);
@@ -645,7 +645,7 @@ test.describe('Public base path', () => {
 });
 
 // --------------------------------------------------------------------------
-// Full matrix — all 8 stories x 7 pages (56 spreads)
+// Full matrix — all 9 stories x 7 pages (63 spreads)
 // --------------------------------------------------------------------------
 
 test.describe('Every story renders every spread cleanly', () => {
