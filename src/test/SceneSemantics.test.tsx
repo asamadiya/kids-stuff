@@ -53,8 +53,8 @@ const num = (el: Element | null, attr: string): number => Number(el?.getAttribut
 /* -------------------------------------------------------------------------- */
 
 describe('Scene mapping is exhaustive and fails clearly for unknown inputs (finding 1)', () => {
-  it('resolves every one of the 56 production pages without throwing', () => {
-    expect(allPages).toHaveLength(56);
+  it('resolves every one of the 63 production pages without throwing', () => {
+    expect(allPages).toHaveLength(63);
     for (const { story, page } of allPages) {
       expect(
         () =>
@@ -197,6 +197,14 @@ const EXPECTED_MOTIFS: Record<string, readonly string[]> = {
   'machines-05-pulley-lift': ['pulley-wheel', 'rope', 'basket'],
   'machines-06-cozy-treehouse': ['basket'],
   'machines-07-bedtime-sleep': ['treehouse'],
+  // The Sneaky Golden Crown — displacement told through crown, scale and bowls.
+  'crown-01-workshop-dusk': ['crown'],
+  'crown-02-balance-scale': ['crown', 'balance'],
+  'crown-03-practice-bowl': ['bowl', 'waterline'],
+  'crown-04-crown-test': ['crown', 'bowl'],
+  'crown-05-displacement-compare': ['bowl', 'waterline'],
+  'crown-06-honest-reveal': ['crown'],
+  'crown-07-moonlit-quiet': ['moon', 'sleep-cue'],
 };
 
 describe('Each page shows motifs tied to its story/scene metadata (finding 2)', () => {
@@ -341,6 +349,52 @@ describe('Page-specific motif relationships (finding 2)', () => {
 
     const bigSmall = buttons('pattern-03-big-small-curve');
     expect(new Set(bigSmall.map((b) => b.r)).size).toBeGreaterThanOrEqual(2);
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/* The Sneaky Golden Crown — displacement motif relationships                  */
+/* -------------------------------------------------------------------------- */
+
+describe('The Sneaky Golden Crown shows displacement through its motifs', () => {
+  it('balances the scale level (tilt 0) for the equal-weight crown and gold lump', () => {
+    const art = artBySceneId('crown-02-balance-scale');
+    const balance = art.querySelector('[data-motif="balance"]');
+    expect(balance, 'the scale beam must be a balance motif').not.toBeNull();
+    // Equal weights read as a perfectly level beam.
+    expect(balance!.getAttribute('data-tilt')).toBe('0');
+    expect(art.querySelector('[data-motif="crown"]')).not.toBeNull();
+  });
+
+  it('marks a risen waterline in the practice bowl', () => {
+    const art = artBySceneId('crown-03-practice-bowl');
+    expect(art.querySelector('[data-motif="bowl"]')).not.toBeNull();
+    const line = art.querySelector('[data-motif="waterline"]');
+    expect(line, 'the practice bowl must show a marked waterline').not.toBeNull();
+    expect(Number(line!.getAttribute('data-level'))).toBeGreaterThan(0);
+  });
+
+  it('raises the crown\u2019s waterline above the equal-weight gold\u2019s on the compare page', () => {
+    const art = artBySceneId('crown-05-displacement-compare');
+    expect(motifCount(art, 'bowl')).toBeGreaterThanOrEqual(2);
+    const gold = art.querySelector('[data-motif="waterline"][data-side="gold"]');
+    const crown = art.querySelector('[data-motif="waterline"][data-side="crown"]');
+    expect(gold, 'a gold-side waterline').not.toBeNull();
+    expect(crown, 'a crown-side waterline').not.toBeNull();
+    // Smaller y is higher on screen: the crown displaces more, so its water is higher.
+    expect(num(crown, 'data-level')).toBeLessThan(num(gold, 'data-level'));
+  });
+
+  it('settles on a quiet moonlit ending with a non-letter sleep cue and no crown', () => {
+    const art = artBySceneId('crown-07-moonlit-quiet');
+    expect(art.querySelector('[data-motif="moon"]')).not.toBeNull();
+    const cue = art.querySelector('[data-motif="sleep-cue"]');
+    expect(cue, 'the calm ending must show a soft sleep cue').not.toBeNull();
+    expect(cue!.querySelectorAll('circle, ellipse').length).toBeGreaterThan(0);
+    expect(cue!.querySelector('path')).toBeNull();
+    expect(cue!.querySelector('text')).toBeNull();
+    // The crown puzzle is behind us; the landing page carries no crown.
+    expect(art.querySelector('[data-motif="crown"]')).toBeNull();
   });
 });
 

@@ -1,0 +1,62 @@
+{
+  "slug": "the-sneaky-golden-crown",
+  "title": "The Sneaky Golden Crown",
+  "concept": "Water rises when something takes up room; equal-weight objects can displace different amounts of water.",
+  "legendStatus": "The crown-and-bath episode is a legend. It is first recorded by Vitruvius about two centuries after Archimedes and does not appear in Archimedes' own surviving writings.",
+  "grownUpFactSupport": [
+    {
+      "claim": "The golden-crown story is known only from Vitruvius, not from Archimedes himself.",
+      "detail": "Vitruvius tells it in the preface to Book 9 of De architectura; no earlier account survives.",
+      "sourceId": "vitruvius"
+    },
+    {
+      "claim": "Vitruvius wrote roughly two hundred years after Archimedes.",
+      "detail": "Archimedes lived c. 287-212 BCE; De architectura was written c. 27-23 BCE.",
+      "sourceId": "britannica-archimedes"
+    },
+    {
+      "claim": "Pure gold is far denser than pure silver.",
+      "detail": "Gold is about 19.3 g/cm3 (19.30) and silver about 10.5 g/cm3 (10.49) near room temperature.",
+      "sourceId": "rsc-gold"
+    },
+    {
+      "claim": "So an equal-weight crown mixed with silver displaces more water than pure gold.",
+      "detail": "Lower density means more volume for the same weight, which raises the waterline higher.",
+      "sourceId": "rsc-silver"
+    }
+  ],
+  "numbers": {
+    "goldDensity_g_per_cm3": 19.3,
+    "silverDensity_g_per_cm3": 10.5,
+    "archimedesLived": "c. 287-212 BCE",
+    "vitruviusWrote": "c. 27-23 BCE",
+    "gapYearsApprox": 200
+  },
+  "sources": [
+    {
+      "id": "vitruvius",
+      "title": "Vitruvius, De architectura (On Architecture), Book IX, preface (English translation, LacusCurtius)",
+      "date": "c. 27-23 BCE",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Vitruvius/9*.html",
+      "note": "Earliest surviving source for the golden-crown displacement story."
+    },
+    {
+      "id": "rsc-gold",
+      "title": "Royal Society of Chemistry, Periodic Table: Gold",
+      "url": "https://www.rsc.org/periodic-table/element/79/gold",
+      "note": "Density of gold about 19.30 g/cm3."
+    },
+    {
+      "id": "rsc-silver",
+      "title": "Royal Society of Chemistry, Periodic Table: Silver",
+      "url": "https://www.rsc.org/periodic-table/element/47/silver",
+      "note": "Density of silver about 10.49 g/cm3."
+    },
+    {
+      "id": "britannica-archimedes",
+      "title": "Encyclopaedia Britannica: Archimedes",
+      "url": "https://www.britannica.com/biography/Archimedes",
+      "note": "Life dates c. 287-212 BCE; crown anecdote attributed via Vitruvius."
+    }
+  ]
+}

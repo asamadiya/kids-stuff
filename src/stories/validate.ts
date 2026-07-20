@@ -3,7 +3,7 @@ import { STORY_DOMAINS } from '../types';
 
 /** Structural and editorial thresholds every published story must satisfy. */
 export const STORY_RULES = {
-  storyCount: 8,
+  storyCount: 9,
   minPages: 6,
   maxPages: 8,
   minWords: 500,
@@ -35,6 +35,7 @@ export const DOMAIN_EVIDENCE: Record<StoryDomain, readonly string[]> = {
   shadows: ['shadow', 'light', 'sun'],
   navigation: ['star', 'north', 'still'],
   'simple-machines': ['ramp', 'pulley', 'wheel'],
+  displacement: ['water', 'rise', 'room'],
 };
 
 /** Soothing words; the final page of every story must contain at least one. */

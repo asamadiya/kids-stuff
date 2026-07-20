@@ -118,6 +118,22 @@ describe('Library', () => {
   });
 });
 
+describe('Library reflects the nine-story shelf', () => {
+  it('leads with a "Nine gentle stories" invitation', () => {
+    renderLibrary();
+    expect(screen.getByText(/nine gentle stories/i)).toBeInTheDocument();
+  });
+
+  it('shows the Golden Crown cover with its water-rising domain label', () => {
+    const crown = getStory('the-sneaky-golden-crown');
+    expect(crown, 'the crown story must be published').toBeDefined();
+    renderLibrary();
+    const card = cardFor(crown!.title);
+    expect(within(card).getByText(/water rising/i)).toBeInTheDocument();
+    expect(within(card).getByText(crown!.heartTakeaway)).toBeInTheDocument();
+  });
+});
+
 describe('Library motion contract', () => {
   it('marks every story card motion-off by default (no hover animation)', () => {
     render(

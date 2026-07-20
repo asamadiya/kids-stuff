@@ -132,6 +132,18 @@
   }
 
   /*
+   * The Sneaky Golden Crown — the gold glints, the palace lamp glows, and the
+   * bowls ripple (via the shared `.scene-ripple` loop above). Each hook owns no
+   * inline transform/opacity, so these calm loops never shift the artwork.
+   */
+  .scene[data-motion='on'] .scene-crown-glint {
+    animation: scene-glint 5.5s ease-in-out infinite;
+  }
+  .scene[data-motion='on'] .scene-lamp-glow {
+    animation: scene-glow 7s ease-in-out infinite;
+  }
+
+  /*
    * Pip's Pattern Parade — the lit firefly drifts on the evening air. The
    * outer `.scene-firefly` keeps its positioning translate (and its glimmer
    * above); the drift rides an inner hook that owns no transform, so the two
@@ -257,5 +269,27 @@
   }
   50% {
     transform: rotate(1.1deg) translateY(-2px);
+  }
+}
+
+/* Gold catching the dusk light as it glints (a slow brighten and settle). */
+@keyframes scene-glint {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A palace lamp breathing a warm glow (gentle opacity swell). */
+@keyframes scene-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
   }
 }

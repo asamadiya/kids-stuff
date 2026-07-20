@@ -561,6 +561,7 @@ const MOTION_HOOK_BY_STORY: Record<string, string> = {
   'chasing-my-shadow': 'scene-flower-bed',
   'following-the-north-star': 'scene-starfield',
   'the-ramp-to-the-treehouse': 'scene-canopy',
+  'the-sneaky-golden-crown': 'scene-crown-glint',
 };
 
 describe('story-specific ambient-motion hooks exist', () => {
@@ -580,6 +581,34 @@ describe('story-specific ambient-motion hooks exist', () => {
       expect(present, `${story.slug} should render .${hook} somewhere`).toBe(true);
     });
   }
+});
+
+describe('The Sneaky Golden Crown exposes its ambient-motion hooks', () => {
+  afterEach(cleanup);
+
+  it('renders a motion-safe .scene-crown-glint and .scene-ripple on its crown/water pages', () => {
+    const crown = getStory('the-sneaky-golden-crown');
+    expect(crown, 'the crown story must be published').toBeDefined();
+    let glint = 0;
+    let ripple = 0;
+    for (const page of crown!.pages) {
+      const { container } = render(<Scene story={crown!} page={page} motionEnabled />);
+      for (const el of Array.from(container.querySelectorAll('.scene-crown-glint'))) {
+        glint += 1;
+        // Motion-safe: no inline transform/opacity that a CSS loop would fight.
+        expect(el.getAttribute('transform')).toBeNull();
+        expect(el.getAttribute('opacity')).toBeNull();
+      }
+      for (const el of Array.from(container.querySelectorAll('.scene-ripple'))) {
+        ripple += 1;
+        expect(el.getAttribute('transform')).toBeNull();
+        expect(el.getAttribute('opacity')).toBeNull();
+      }
+      cleanup();
+    }
+    expect(glint, 'crown glint should appear on at least one page').toBeGreaterThan(0);
+    expect(ripple, 'a water ripple should appear on at least one page').toBeGreaterThan(0);
+  });
 });
 
 /* -------------------------------------------------------------------------- */

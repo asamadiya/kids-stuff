@@ -7,6 +7,7 @@ import { theLittleBeanSeed } from './the-little-bean-seed';
 import { chasingMyShadow } from './chasing-my-shadow';
 import { followingTheNorthStar } from './following-the-north-star';
 import { theRampToTheTreehouse } from './the-ramp-to-the-treehouse';
+import { theSneakyGoldenCrown } from './the-sneaky-golden-crown';
 
 export const STORIES: readonly Story[] = [
   theTallestSunflower,
@@ -17,6 +18,7 @@ export const STORIES: readonly Story[] = [
   chasingMyShadow,
   followingTheNorthStar,
   theRampToTheTreehouse,
+  theSneakyGoldenCrown,
 ];
 
 export function getStory(slug: string): Story | undefined {

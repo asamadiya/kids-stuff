@@ -9,6 +9,7 @@ import { beanWorld } from './scenes/the-little-bean-seed';
 import { shadowWorld } from './scenes/chasing-my-shadow';
 import { starWorld } from './scenes/following-the-north-star';
 import { machinesWorld } from './scenes/the-ramp-to-the-treehouse';
+import { crownWorld } from './scenes/the-sneaky-golden-crown';
 import '../styles/illustrations.css';
 
 /** Each story slug draws its own bespoke visual world. */
@@ -21,6 +22,7 @@ const WORLDS: Record<string, SceneWorld> = {
   'chasing-my-shadow': shadowWorld,
   'following-the-north-star': starWorld,
   'the-ramp-to-the-treehouse': machinesWorld,
+  'the-sneaky-golden-crown': crownWorld,
 };
 
 export interface SceneProps {

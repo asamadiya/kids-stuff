@@ -42,9 +42,9 @@ const renderScene = (story: Story, page: StoryPage, motionEnabled = false) => {
 };
 
 describe('Scene illustration contract', () => {
-  it('covers all eight stories and every one of the 56 pages', () => {
-    expect(STORIES).toHaveLength(8);
-    expect(allPages).toHaveLength(56);
+  it('covers all nine stories and every one of the 63 pages', () => {
+    expect(STORIES).toHaveLength(9);
+    expect(allPages).toHaveLength(63);
   });
 
   describe.each(allPages)('$story.slug — page $index', ({ story, page }) => {
@@ -145,7 +145,7 @@ describe('Scene illustration contract', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('renders a visually distinct composition for all 56 pages', () => {
+  it('renders a visually distinct composition for all 63 pages', () => {
     const seen = new Map<string, string>();
     for (const { story, page } of allPages) {
       const { svg } = renderScene(story, page);
@@ -159,7 +159,7 @@ describe('Scene illustration contract', () => {
       seen.set(fingerprint, `${story.slug}/${page.scene.id}`);
       cleanup();
     }
-    expect(seen.size).toBe(56);
+    expect(seen.size).toBe(63);
   });
 
   it('treats motionEnabled as a stable hook without changing the artwork', () => {

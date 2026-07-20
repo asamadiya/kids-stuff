@@ -39,7 +39,7 @@ export function Library({
         <p className="library__eyebrow">A calm bedtime library</p>
         <h1 className="library__title">Moonlit Storybook</h1>
         <p className="library__lede">
-          Eight gentle stories for winding down. Choose one, dim the lights, and
+          Nine gentle stories for winding down. Choose one, dim the lights, and
           read it together.
         </p>
       </header>

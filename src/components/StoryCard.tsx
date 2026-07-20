@@ -11,6 +11,7 @@ const DOMAIN_LABEL: Record<StoryDomain, string> = {
   shadows: 'Shadows',
   navigation: 'Finding the way',
   'simple-machines': 'Simple machines',
+  displacement: 'Water rising',
 };
 
 export interface StoryCardProps {

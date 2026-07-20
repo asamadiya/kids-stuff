@@ -131,9 +131,9 @@ describe('validateStories', () => {
     expect(validateStories(STORIES)).toEqual([]);
   });
 
-  it('flags a library that does not hold exactly eight stories', () => {
+  it('flags a library that does not hold exactly nine stories', () => {
     const errors = validateStories(STORIES.slice(0, 7));
-    expect(errors).toContain('Library must contain exactly 8 stories (found 7).');
+    expect(errors).toContain('Library must contain exactly 9 stories (found 7).');
   });
 
   it('flags duplicate slugs', () => {
@@ -233,6 +233,7 @@ const PROTAGONISTS: Record<string, readonly string[]> = {
   'chasing-my-shadow': ['Leo'],
   'following-the-north-star': ['Mira', 'Ben'],
   'the-ramp-to-the-treehouse': ['Kwame', 'Ana'],
+  'the-sneaky-golden-crown': ['Delia'],
 };
 
 describe('character-name consistency', () => {
