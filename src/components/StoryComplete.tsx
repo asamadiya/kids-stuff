@@ -22,6 +22,8 @@ const CONVERSATION_PROMPT: Record<StoryDomain, string> = {
     'Before you sleep, wonder together: if we needed to find our way home in the dark, what could we look for to guide us?',
   'simple-machines':
     'Tomorrow, look around together: what heavy thing could we move more easily with a ramp, a wheel, or a little pulley?',
+  displacement:
+    'At bath time, try it together: fill a cup to the brim, then lower in a toy. Where does the water go, and why does it climb?',
 };
 
 export interface StoryCompleteProps {

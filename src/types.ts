@@ -7,6 +7,7 @@ export const STORY_DOMAINS = [
   'shadows',
   'navigation',
   'simple-machines',
+  'displacement',
 ] as const;
 
 export type StoryDomain = (typeof STORY_DOMAINS)[number];
