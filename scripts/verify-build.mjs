@@ -11,10 +11,12 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const root = resolve(__dirname, '..');
 const distDir = join(root, 'dist');
 const indexPath = join(distDir, 'index.html');
+const robotsPath = join(distDir, 'robots.txt');
 
 const BASE = '/kids-stuff/';
 const CANONICAL_ORIGIN = 'https://asamadiya.github.io';
 const CANONICAL_BASE = `${CANONICAL_ORIGIN}${BASE}`;
+const EXPECTED_ROBOTS_TXT = 'User-agent: *\nDisallow: /\n';
 
 let errors = 0;
 
@@ -89,6 +91,20 @@ if (metaFailures.length === 0) {
   pass('All metadata present with correct exact values');
 } else {
   for (const f of metaFailures) fail(f);
+}
+
+// --- Crawler policy: public site, but block crawling and indexing ---
+if (!existsSync(robotsPath)) {
+  fail('dist/robots.txt does not exist');
+} else {
+  const robotsTxt = readFileSync(robotsPath, 'utf-8');
+  if (robotsTxt !== EXPECTED_ROBOTS_TXT) {
+    fail(
+      `dist/robots.txt content: expected ${JSON.stringify(EXPECTED_ROBOTS_TXT)}, got ${JSON.stringify(robotsTxt)}`
+    );
+  } else {
+    pass('dist/robots.txt contains the exact crawler block');
+  }
 }
 
 // Final result
