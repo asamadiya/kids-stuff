@@ -8,6 +8,9 @@ export const EXPECTED = {
   description:
     'Illustrated bedtime stories for children \u2014 read at your own pace, bookmark your place, and return any night.',
   themeColor: '#0f0c29',
+  robots: 'noindex, nofollow, noarchive, nosnippet',
+  googlebot: 'noindex, nofollow, noarchive, nosnippet',
+  bingbot: 'noindex, nofollow, noarchive, nosnippet',
   ogType: 'website',
   ogTitle: 'Moonlit Storybook',
   ogDescription:
@@ -89,6 +92,9 @@ export function verifyMetadata(html) {
   check('canonical href', linkHref(html, 'canonical'), EXPECTED.canonical);
   check('description content', metaContent(html, 'name', 'description'), EXPECTED.description);
   check('theme-color content', metaContent(html, 'name', 'theme-color'), EXPECTED.themeColor);
+  check('robots content', metaContent(html, 'name', 'robots'), EXPECTED.robots);
+  check('googlebot content', metaContent(html, 'name', 'googlebot'), EXPECTED.googlebot);
+  check('bingbot content', metaContent(html, 'name', 'bingbot'), EXPECTED.bingbot);
   check('og:type content', metaContent(html, 'property', 'og:type'), EXPECTED.ogType);
   check('og:title content', metaContent(html, 'property', 'og:title'), EXPECTED.ogTitle);
   check('og:description content', metaContent(html, 'property', 'og:description'), EXPECTED.ogDescription);

@@ -9,8 +9,20 @@
  * and pass in GREEN (attribute-level regex parsing).
  */
 
-import { describe, test, expect } from 'vitest';
+import { afterEach, describe, test, expect } from 'vitest';
+import {
+  copyFileSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { verifyMetadata, EXPECTED } from '../../../scripts/verify-metadata.mjs';
+
+const ROBOTS_DIRECTIVES = 'noindex, nofollow, noarchive, nosnippet';
+const ROBOTS_TXT = 'User-agent: *\nDisallow: /\n';
+const verifierRoot = resolve('.test-work/verify-build');
 
 /** Build a complete valid HTML fixture, merging field overrides. */
 function buildHtml(overrides = {}) {
@@ -21,6 +33,10 @@ function buildHtml(overrides = {}) {
   <meta charset="UTF-8" />
   <meta name="description" content="${v.description}" />
   <meta name="theme-color" content="${v.themeColor}" />
+  <meta name="robots" content="${v.robots ?? ROBOTS_DIRECTIVES}" />
+  <meta name="googlebot" content="${v.googlebot ?? ROBOTS_DIRECTIVES}" />
+  <meta name="bingbot" content="${v.bingbot ?? ROBOTS_DIRECTIVES}" />
+  <link rel="icon" href="/kids-stuff/favicon.svg" />
   <link rel="canonical" href="${v.canonical}" />
   <meta property="og:type" content="${v.ogType}" />
   <meta property="og:title" content="${v.ogTitle}" />
@@ -36,9 +52,83 @@ function buildHtml(overrides = {}) {
 </html>`;
 }
 
+function runBuildVerifier(robotsTxt) {
+  const scriptsDir = resolve(verifierRoot, 'scripts');
+  const distDir = resolve(verifierRoot, 'dist');
+  mkdirSync(scriptsDir, { recursive: true });
+  mkdirSync(distDir, { recursive: true });
+  copyFileSync(resolve('scripts/verify-build.mjs'), resolve(scriptsDir, 'verify-build.mjs'));
+  copyFileSync(resolve('scripts/verify-metadata.mjs'), resolve(scriptsDir, 'verify-metadata.mjs'));
+  writeFileSync(resolve(distDir, 'index.html'), buildHtml());
+  writeFileSync(resolve(distDir, 'favicon.svg'), '<svg></svg>');
+  writeFileSync(resolve(distDir, 'social-card.svg'), '<svg></svg>');
+  if (robotsTxt !== undefined) {
+    writeFileSync(resolve(distDir, 'robots.txt'), robotsTxt);
+  }
+  return spawnSync(process.execPath, [resolve(scriptsDir, 'verify-build.mjs')], {
+    encoding: 'utf8',
+  });
+}
+
+afterEach(() => {
+  rmSync(verifierRoot, { recursive: true, force: true });
+});
+
 describe('verifyMetadata — baseline (passes in RED and GREEN)', () => {
   test('fully valid HTML produces zero failures', () => {
     expect(verifyMetadata(buildHtml())).toHaveLength(0);
+  });
+});
+
+describe('verifyMetadata — exact crawler directives', () => {
+  test('exports the single exact directive value used for every crawler', () => {
+    expect(EXPECTED.robots).toBe(ROBOTS_DIRECTIVES);
+    expect(EXPECTED.googlebot).toBe(ROBOTS_DIRECTIVES);
+    expect(EXPECTED.bingbot).toBe(ROBOTS_DIRECTIVES);
+  });
+
+  test.each([
+    ['robots', 'robots'],
+    ['googlebot', 'googlebot'],
+    ['bingbot', 'bingbot'],
+  ])('rejects a wrong %s meta content value', (field, label) => {
+    const failures = verifyMetadata(buildHtml({ [field]: 'noindex' }));
+    expect(failures.some(f => f.includes(label))).toBe(true);
+  });
+
+  test.each(['robots', 'googlebot', 'bingbot'])(
+    'rejects a missing %s meta tag',
+    field => {
+      const html = buildHtml().replace(
+        new RegExp(`\\s*<meta name="${field}"[^>]*\\/>`),
+        ''
+      );
+      const failures = verifyMetadata(html);
+      expect(failures.some(f => f.includes(field))).toBe(true);
+    }
+  );
+});
+
+describe('verify-build — dist/robots.txt', () => {
+  test('rejects a missing dist/robots.txt', () => {
+    const result = runBuildVerifier();
+    expect(`${result.stdout}\n${result.stderr}`).toContain(
+      'dist/robots.txt does not exist'
+    );
+    expect(result.status).toBe(1);
+  });
+
+  test('rejects robots.txt with non-exact directives', () => {
+    const result = runBuildVerifier('User-agent: *\nDisallow:\n');
+    expect(`${result.stdout}\n${result.stderr}`).toContain(
+      'dist/robots.txt content'
+    );
+    expect(result.status).toBe(1);
+  });
+
+  test('accepts the exact public crawler block', () => {
+    const result = runBuildVerifier(ROBOTS_TXT);
+    expect(result.status).toBe(0);
   });
 });
 
