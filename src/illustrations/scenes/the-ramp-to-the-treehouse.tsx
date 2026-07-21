@@ -1,23 +1,8 @@
 import type { ReactNode } from 'react';
 import {
-  Blush,
-  Capsule,
-  ClosedEye,
-  Cloud,
-  Eye,
-  GrainFilter,
-  GrainWash,
-  GrassRow,
-  Ground,
-  Leaf,
   LinearGradient,
-  Moon,
-  OpenMouth,
   RadialGradient,
-  Smile,
   StarField,
-  SunGlow,
-  Tree,
   VIEW_H,
   VIEW_W,
   Vignette,
@@ -27,544 +12,1159 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
-/*
- * WORLD: The Ramp to the Treehouse — simple machines in a leafy backyard.
- * Motifs: an overstuffed basket, red wagon, plank ramp, grooved pulley wheel,
- * warm treehouse, rope ladder, grandfather's lamp, and a bedtime window.
- */
+type Paint = SceneWorldProps['paint'];
+type SceneId = keyof typeof PAGES;
 
-const KWAME_SKIN = '#8b5138';
-const ANA_SKIN = '#b86f45';
-const GRANDPA_SKIN = '#7b4935';
-const KWAME_HAIR = '#241713';
-const ANA_HAIR = '#2b1714';
-const GRANDPA_HAIR = '#d8d0bf';
-const KWAME_SHIRT = '#f0b64f';
-const KWAME_SHORTS = '#496e95';
-const ANA_SHIRT = '#d66d78';
-const ANA_DRESS = '#5f8f6a';
-const GRANDPA_ROBE = '#52678d';
-const ROPE = '#c49a5b';
-const DARK_WOOD = '#5d3d25';
-const LEAF_MID = '#3d7a43';
-const WAGON_RED = '#d94739';
-const WAGON_DARK = '#9f2f2b';
+const KWAME: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#8b5138', shadow: '#563124', highlight: '#bd7955' },
+  face: { shape: 'round', brow: '#241713', mouth: '#65333b' },
+  hair: { style: 'short', base: '#241713', highlight: '#503027', volume: 0.64 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#d89c3d',
+    shadow: '#8f5c28',
+    trim: '#f4ce72',
+    hemline: 0.45,
+  },
+  footwear: { style: 'boot', base: '#392922' },
+  secondaryShapes: [{ kind: 'belt', color: '#5a4534', accent: '#d9a861' }],
+};
+
+const ANA: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#b86f45', shadow: '#78452f', highlight: '#e1a078' },
+  face: { shape: 'heart', brow: '#2b1714', mouth: '#783b44' },
+  hair: { style: 'long', base: '#2b1714', highlight: '#63372a', volume: 0.72 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#557f63',
+    shadow: '#34533e',
+    trim: '#d97875',
+    hemline: 0.66,
+  },
+  footwear: { style: 'boot', base: '#453028' },
+  secondaryShapes: [{ kind: 'sash', color: '#b6535d', accent: '#ef9c9d' }],
+};
+
+const GRANDPA: CharacterAppearance = {
+  ...defaultAppearance('elder'),
+  skin: { base: '#7b4935', shadow: '#4e2c24', highlight: '#aa7356' },
+  face: { shape: 'oval', brow: '#d8d0bf', mouth: '#62363a' },
+  hair: { style: 'wispy', base: '#d8d0bf', highlight: '#fff7e5', volume: 0.38 },
+  wardrobe: {
+    garment: 'robe',
+    base: '#485d83',
+    shadow: '#2c3c60',
+    trim: '#9cb0ca',
+    hemline: 0.88,
+  },
+  footwear: { style: 'slipper', base: '#2e2d3f' },
+  secondaryShapes: [],
+};
+
+const MATERIALS: readonly MaterialInstance[] = [
+  {
+    id: 'tree-timber',
+    preset: 'timber',
+    base: '#6f4429',
+    shadow: '#30231e',
+    highlight: '#b47a45',
+    textureScale: 1.2,
+    roughness: 0.66,
+  },
+  {
+    id: 'basket-weave',
+    preset: 'timber',
+    base: '#ad7642',
+    shadow: '#624126',
+    highlight: '#ddb474',
+    textureScale: 0.82,
+    roughness: 0.58,
+  },
+  {
+    id: 'soft-cloth',
+    preset: 'cloth',
+    base: '#817bb0',
+    shadow: '#4a476f',
+    highlight: '#d1c8e8',
+    textureScale: 0.9,
+    roughness: 0.74,
+  },
+  {
+    id: 'pulley-metal',
+    preset: 'metal',
+    base: '#80786c',
+    shadow: '#36363b',
+    highlight: '#e4d8b8',
+    textureScale: 0.48,
+    roughness: 0.34,
+  },
+];
+
+const LIGHTING: Record<string, LightingRig> = {
+  'dusk-1': {
+    key: { azimuth: -34, elevation: 42, color: '#ffd39a', intensity: 0.76 },
+    fill: { color: '#7995a8', intensity: 0.2 },
+    rim: { azimuth: 148, elevation: 26, color: '#f0b873', intensity: 0.28 },
+    practicals: [{ id: 'ramp-practical', x: 1080, y: 128, radius: 360, color: '#ffc36d', intensity: 0.42 }],
+  },
+  'dusk-2': {
+    key: { azimuth: -38, elevation: 40, color: '#ffd092', intensity: 0.72 },
+    fill: { color: '#718fa7', intensity: 0.22 },
+    rim: { azimuth: 146, elevation: 26, color: '#efae69', intensity: 0.26 },
+    practicals: [{ id: 'ramp-practical', x: 1020, y: 150, radius: 350, color: '#ffba67', intensity: 0.4 }],
+  },
+  'gloaming-3': {
+    key: { azimuth: -28, elevation: 36, color: '#ffc27b', intensity: 0.7 },
+    fill: { color: '#617f9b', intensity: 0.23 },
+    rim: { azimuth: 154, elevation: 24, color: '#e9a562', intensity: 0.28 },
+    practicals: [{ id: 'ramp-practical', x: 1050, y: 156, radius: 330, color: '#f7aa5b', intensity: 0.38 }],
+  },
+  'gloaming-4': {
+    key: { azimuth: -22, elevation: 34, color: '#f5b56e', intensity: 0.64 },
+    fill: { color: '#65839f', intensity: 0.25 },
+    rim: { azimuth: 158, elevation: 24, color: '#e6a05e', intensity: 0.3 },
+    practicals: [{ id: 'ramp-practical', x: 870, y: 184, radius: 290, color: '#f2aa61', intensity: 0.36 }],
+  },
+  'sunset-5': {
+    key: { azimuth: -18, elevation: 30, color: '#f2aa62', intensity: 0.62 },
+    fill: { color: '#5d7899', intensity: 0.26 },
+    rim: { azimuth: 160, elevation: 22, color: '#eab36f', intensity: 0.32 },
+    practicals: [{ id: 'ramp-practical', x: 160, y: 150, radius: 330, color: '#ffb55f', intensity: 0.44 }],
+  },
+  'night-6': {
+    key: { azimuth: -42, elevation: 38, color: '#ffc77f', intensity: 0.58 },
+    fill: { color: '#56738b', intensity: 0.22 },
+    rim: { azimuth: 138, elevation: 30, color: '#e4b876', intensity: 0.22 },
+    practicals: [{ id: 'ramp-practical', x: 614, y: 286, radius: 310, color: '#ffc36f', intensity: 0.58 }],
+  },
+  'night-7': {
+    key: { azimuth: -58, elevation: 44, color: '#a9c4dd', intensity: 0.38 },
+    fill: { color: '#4b6280', intensity: 0.16 },
+    rim: { azimuth: 132, elevation: 28, color: '#d8a867', intensity: 0.16 },
+    practicals: [{ id: 'ramp-practical', x: 1010, y: 570, radius: 220, color: '#efb46f', intensity: 0.32 }],
+  },
+};
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
     <defs>
-      <LinearGradient
-        id={id('lateSky')}
-        stops={[
-          { offset: 0, color: '#c9e4b4' },
-          { offset: 0.5, color: '#f2d99b' },
-          { offset: 1, color: '#f6c98b' },
-        ]}
-      />
-      <LinearGradient
-        id={id('brightSky')}
-        stops={[
-          { offset: 0, color: '#b9dfad' },
-          { offset: 0.62, color: '#e8d98c' },
-          { offset: 1, color: '#f7bd74' },
-        ]}
-      />
-      <LinearGradient
-        id={id('goldSky')}
-        stops={[
-          { offset: 0, color: '#567b63' },
-          { offset: 0.4, color: '#d8ab55' },
-          { offset: 1, color: '#f7d484' },
-        ]}
-      />
-      <LinearGradient
-        id={id('sunsetSky')}
-        stops={[
-          { offset: 0, color: '#5f6e72' },
-          { offset: 0.5, color: '#db884e' },
-          { offset: 1, color: '#f8c86a' },
-        ]}
-      />
-      <LinearGradient
-        id={id('nightSky')}
-        stops={[
-          { offset: 0, color: '#131c3c' },
-          { offset: 0.55, color: '#202a55' },
-          { offset: 1, color: '#374063' },
-        ]}
-      />
-      <LinearGradient
-        id={id('plank')}
-        x1={0}
-        y1={0}
-        x2={1}
-        y2={0}
-        stops={[
-          { offset: 0, color: '#7f4d2b' },
-          { offset: 0.45, color: '#bf7d40' },
-          { offset: 1, color: '#8c5831' },
-        ]}
-      />
-      <RadialGradient
-        id={id('lampGlow')}
-        cx={0.45}
-        cy={0.42}
-        r={0.55}
-        stops={[
-          { offset: 0, color: '#ffe2a0', opacity: 0.95 },
-          { offset: 0.58, color: '#d9883f', opacity: 0.45 },
-          { offset: 1, color: '#7b3f27', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('leafGlow')}
-        cx={0.52}
-        cy={0.34}
-        r={0.6}
-        stops={[
-          { offset: 0, color: '#f8d36f', opacity: 0.72 },
-          { offset: 0.7, color: '#6a8a44', opacity: 0.25 },
-          { offset: 1, color: '#244c31', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('moonGlow')}
-        stops={[
-          { offset: 0, color: '#eaf1ff', opacity: 0.8 },
-          { offset: 1, color: '#eaf1ff', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('vignette')}
-        stops={[
-          { offset: 0.58, color: '#000000', opacity: 0 },
-          { offset: 1, color: '#1e1520', opacity: 0.36 },
-        ]}
-      />
-      <GrainFilter id={id('grain')} opacity={0.048} />
+      <LinearGradient id={id('sky-dusk-1')} stops={[
+        { offset: 0, color: '#557785' },
+        { offset: 0.48, color: '#d49b68' },
+        { offset: 1, color: '#f5ca82' },
+      ]} />
+      <LinearGradient id={id('sky-dusk-2')} stops={[
+        { offset: 0, color: '#526c7d' },
+        { offset: 0.5, color: '#c98962' },
+        { offset: 1, color: '#efbc75' },
+      ]} />
+      <LinearGradient id={id('sky-gloaming-3')} stops={[
+        { offset: 0, color: '#455a72' },
+        { offset: 0.55, color: '#b76f57' },
+        { offset: 1, color: '#e6a962' },
+      ]} />
+      <LinearGradient id={id('sky-gloaming-4')} stops={[
+        { offset: 0, color: '#394b66' },
+        { offset: 0.56, color: '#9f6559' },
+        { offset: 1, color: '#d99359' },
+      ]} />
+      <LinearGradient id={id('sky-sunset-5')} stops={[
+        { offset: 0, color: '#293c59' },
+        { offset: 0.5, color: '#86525b' },
+        { offset: 1, color: '#d57d4e' },
+      ]} />
+      <LinearGradient id={id('sky-night-6')} stops={[
+        { offset: 0, color: '#17243d' },
+        { offset: 0.62, color: '#293c58' },
+        { offset: 1, color: '#5a4c59' },
+      ]} />
+      <LinearGradient id={id('sky-night-7')} stops={[
+        { offset: 0, color: '#0d1831' },
+        { offset: 0.62, color: '#1c2a4a' },
+        { offset: 1, color: '#323b61' },
+      ]} />
+      <LinearGradient id={id('leaf-dusk')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#426e4b' },
+        { offset: 0.5, color: '#28523c' },
+        { offset: 1, color: '#17382f' },
+      ]} />
+      <LinearGradient id={id('leaf-night')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#233b43' },
+        { offset: 1, color: '#101d2c' },
+      ]} />
+      <LinearGradient id={id('wood-face')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#a46a38' },
+        { offset: 0.54, color: '#754524' },
+        { offset: 1, color: '#40291f' },
+      ]} />
+      <LinearGradient id={id('wagon-red')} x1={0} y1={0} x2={0} y2={1} stops={[
+        { offset: 0, color: '#ed6a4d' },
+        { offset: 0.45, color: '#c84436' },
+        { offset: 1, color: '#752d2c' },
+      ]} />
+      <LinearGradient id={id('blanket')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#9ca6d0' },
+        { offset: 0.55, color: '#686f9f' },
+        { offset: 1, color: '#464d79' },
+      ]} />
+      <RadialGradient id={id('vignette')} stops={[
+        { offset: 0.56, color: '#000000', opacity: 0 },
+        { offset: 1, color: '#110f1d', opacity: 0.4 },
+      ]} />
+      <RadialGradient id={id('moon-glow')} stops={[
+        { offset: 0, color: '#e8f0ff', opacity: 0.76 },
+        { offset: 1, color: '#e8f0ff', opacity: 0 },
+      ]} />
     </defs>
   );
 }
 
-const sky = (fill: string) => <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />;
+function performance(
+  pose: CharacterPerformance['pose'],
+  gazeTarget: CharacterPerformance['gazeTarget'],
+  expression: CharacterPerformance['expression'],
+  options: Partial<CharacterPerformance> = {},
+): CharacterPerformance {
+  return {
+    pose,
+    lineOfAction: options.lineOfAction ?? 0,
+    shoulderTilt: options.shoulderTilt ?? -8,
+    pelvisTilt: options.pelvisTilt ?? 6,
+    weightFoot: options.weightFoot ?? 'center',
+    gazeTarget,
+    headTurn: options.headTurn ?? 0,
+    expression,
+    leftHand: options.leftHand ?? 'rest',
+    rightHand: options.rightHand ?? 'rest',
+    leftHandTarget: options.leftHandTarget,
+    rightHandTarget: options.rightHandTarget,
+  };
+}
 
-const finish = (paint: SceneWorldProps['paint']) => (
-  <>
-    <GrainWash filter={paint('grain')} />
-    <Vignette paint={paint('vignette')} />
-  </>
-);
-
-function Treehouse({ x, y, scale = 1, lit = false }: { x: number; y: number; scale?: number; lit?: boolean }) {
+function Character({
+  id,
+  kind,
+  x,
+  y,
+  scale,
+  performance: scenePerformance,
+}: {
+  readonly id: SceneWorldProps['id'];
+  readonly kind: 'kwame' | 'ana' | 'grandpa';
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly performance: CharacterPerformance;
+}) {
+  const appearance = kind === 'kwame' ? KWAME : kind === 'ana' ? ANA : GRANDPA;
   return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} className="scene-treehouse" data-motif="treehouse">
-      <rect x={-118} y={-6} width={236} height={126} rx={12} fill={DARK_WOOD} />
-      <rect x={-100} y={12} width={200} height={92} rx={8} fill="#936039" />
-      {range(5).map((i) => (
-        <rect key={i} x={n(-100 + i * 40)} y={15} width={8} height={88} fill="#754725" opacity={0.55} />
-      ))}
-      <path d="M-142,-6 L0,-92 L142,-6 Z" fill="#704222" />
-      <path d="M-116,-8 L0,-72 L116,-8" stroke="#b16f36" strokeWidth={10} fill="none" strokeLinecap="round" />
-      <rect x={-80} y={38} width={50} height={66} rx={5} fill="#4b3325" />
-      <rect x={32} y={32} width={48} height={42} rx={5} fill={lit ? '#ffd481' : '#394d56'} />
-      <rect x={53} y={32} width={5} height={42} fill="#6c4327" />
-      <rect x={32} y={51} width={48} height={5} fill="#6c4327" />
-      <rect x={-132} y={104} width={264} height={18} rx={6} fill="#6c4327" />
+    <CinematicCharacter
+      id={(part) => id(`${kind}-${part}`)}
+      x={x}
+      y={y}
+      scale={scale}
+      appearance={appearance}
+      performance={scenePerformance}
+      className={`scene-${kind}`}
+    />
+  );
+}
+
+function ContactShadow({
+  paint,
+  cx,
+  cy,
+  rx,
+  ry,
+}: {
+  readonly paint: Paint;
+  readonly cx: number;
+  readonly cy: number;
+  readonly rx: number;
+  readonly ry: number;
+}) {
+  return (
+    <ellipse
+      cx={cx}
+      cy={cy}
+      rx={rx}
+      ry={ry}
+      fill={paint('contact-ao')}
+      data-lighting="contact-shadow"
+    />
+  );
+}
+
+function Canopy({
+  seed,
+  night = false,
+  y = 95,
+}: {
+  readonly seed: number;
+  readonly night?: boolean;
+  readonly y?: number;
+}) {
+  const fill = night ? '#142536' : '#28543b';
+  const light = night ? '#263e4a' : '#4d7b48';
+  return (
+    <g className="scene-canopy" data-motif="canopy">
+      <path
+        d={`M-30,${n(y + 48)} C118,${n(y - 82)} 284,${n(y + 4)} 410,${n(y - 54)}
+          C548,${n(y - 112)} 702,${n(y - 12)} 832,${n(y - 66)}
+          C982,${n(y - 126)} 1110,${n(y - 46)} 1238,${n(y - 82)}
+          L1238,0 L-30,0 Z`}
+        fill={fill}
+      />
+      {range(9).map((i) => {
+        const cx = 70 + i * 142 + ((seed >>> (i % 8)) % 34);
+        const cy = y + (i % 3) * 34 - ((seed + i * 31) % 28);
+        return (
+          <path
+            key={i}
+            d={`M${n(cx - 78)},${n(cy + 18)} Q${n(cx - 42)},${n(cy - 48)} ${n(cx + 6)},${n(cy - 34)}
+              Q${n(cx + 68)},${n(cy - 54)} ${n(cx + 90)},${n(cy + 14)}
+              Q${n(cx + 22)},${n(cy + 62)} ${n(cx - 78)},${n(cy + 18)} Z`}
+            fill={i % 2 === 0 ? light : fill}
+            opacity={n(0.62 + (i % 3) * 0.1)}
+          />
+        );
+      })}
+      <path
+        d={`M42,${n(y + 10)} C244,${n(y - 32)} 402,${n(y + 16)} 604,${n(y - 26)}
+          M684,${n(y - 18)} C846,${n(y - 58)} 1034,${n(y - 4)} 1190,${n(y - 36)}`}
+        stroke={night ? '#405363' : '#758b52'}
+        strokeWidth={5}
+        fill="none"
+        opacity={0.34}
+        data-lighting="key"
+      />
     </g>
   );
 }
 
-function RopeLadder({ x, y, h = 220 }: { x: number; y: number; h?: number }) {
+function OakTree({
+  paint,
+  house = true,
+  night = false,
+  compact = false,
+}: {
+  readonly paint: Paint;
+  readonly house?: boolean;
+  readonly night?: boolean;
+  readonly compact?: boolean;
+}) {
+  const trunk = night ? '#172231' : '#4b3225';
+  const scale = compact ? 0.72 : 1;
   return (
-    <g className="scene-rope-ladder">
-      <Capsule x1={n(x - 28)} y1={y} x2={n(x - 44)} y2={n(y + h)} width={7} fill={ROPE} />
-      <Capsule x1={n(x + 28)} y1={y} x2={n(x + 20)} y2={n(y + h)} width={7} fill={ROPE} />
-      {range(6).map((i) => (
-        <Capsule
-          key={i}
-          x1={n(x - 32 - i * 2.2)}
-          y1={n(y + 28 + i * 32)}
-          x2={n(x + 25 - i * 1.2)}
-          y2={n(y + 31 + i * 32)}
-          width={9}
-          fill="#c38a4a"
+    <g
+      transform={`translate(${compact ? 720 : 0} ${compact ? 188 : 0}) scale(${scale})`}
+      data-landform="treehouse-oak"
+      data-cover-parity="identity"
+    >
+      <g data-material="timber" filter={paint('tree-timber')}>
+        <path
+          d="M804,800 C742,666 764,528 806,398 C838,300 850,204 832,92
+             C892,176 902,278 886,380 C876,446 896,532 952,618
+             C1000,690 1018,748 1026,800 Z"
+          fill={trunk}
         />
-      ))}
+        <path
+          d="M838,408 C704,350 584,314 430,292 C572,266 722,286 872,342 Z"
+          fill={trunk}
+        />
+        <path
+          d="M870,326 C970,252 1060,222 1192,230 C1084,258 1000,304 902,380 Z"
+          fill={trunk}
+        />
+        <path
+          d="M806,620 C850,536 864,448 856,366"
+          stroke={night ? '#334050' : '#8e5c35'}
+          strokeWidth={18}
+          fill="none"
+          opacity={0.62}
+        />
+      </g>
+      {house ? <Treehouse x={760} y={260} scale={compact ? 0.86 : 1} paint={paint} night={night} /> : null}
     </g>
   );
 }
 
-function Basket({ x, y, scale = 1, full = true, tilt = 0 }: { x: number; y: number; scale?: number; full?: boolean; tilt?: number }) {
+function Treehouse({
+  x,
+  y,
+  scale = 1,
+  paint,
+  night = false,
+  lit = false,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale?: number;
+  readonly paint: Paint;
+  readonly night?: boolean;
+  readonly lit?: boolean;
+}) {
   return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(tilt)}) scale(${n(scale)})`} className="scene-basket" data-motif="basket">
-      {full ? (
-        <>
-          <rect x={-76} y={-86} width={54} height={42} rx={12} fill="#f08e9a" transform="rotate(-9 -49 -65)" />
-          <rect x={-20} y={-92} width={58} height={46} rx={10} fill="#6ea5d8" transform="rotate(7 9 -69)" />
-          <path d="M26,-88 q36,8 54,44 q-44,18 -80,-8 q10,-22 26,-36 Z" fill="#f0c96b" />
-          <rect x={-52} y={-104} width={22} height={54} rx={4} fill="#8f5d46" transform="rotate(-18 -41 -77)" />
-          <rect x={-16} y={-112} width={23} height={58} rx={4} fill="#6b71a6" transform="rotate(-5 -4 -83)" />
-          <rect x={18} y={-106} width={23} height={54} rx={4} fill="#c75446" transform="rotate(13 29 -79)" />
-        </>
-      ) : null}
-      <path d="M-104,-32 q104,-50 208,0" stroke="#c58b4c" strokeWidth={16} fill="none" strokeLinecap="round" />
-      <path d="M-104,-28 L104,-28 L78,74 Q0,96 -78,74 Z" fill="#bf8046" />
-      <path d="M-88,-16 L88,-16 L68,62 Q0,78 -68,62 Z" fill="#d89b5a" opacity={0.62} />
-      {range(6).map((i) => (
-        <path key={i} d={`M${n(-78 + i * 31)},-20 q${n(-10 + i * 4)},42 ${n(-6 + i * 2)},86`} stroke="#81512d" strokeWidth={4} fill="none" opacity={0.45} />
-      ))}
-      {range(4).map((i) => (
-        <path key={i} d={`M${n(-92)},${n(-2 + i * 20)} q${n(92)},${n(20 - i * 4)} ${n(184)},${n(0)}`} stroke="#8b5b31" strokeWidth={4} fill="none" opacity={0.38} />
-      ))}
+    <g
+      className="scene-treehouse"
+      data-motif="treehouse"
+      transform={`translate(${x} ${y}) scale(${scale})`}
+    >
+      <path d="M-170,-34 L8,-126 L176,-28 L142,2 L-142,0 Z" fill={night ? '#182333' : '#4b3022'} />
+      <g data-material="timber" filter={paint('tree-timber')}>
+        <path d="M-142,-2 L142,-2 L126,144 Q0,170 -126,144 Z" fill={night ? '#243344' : '#81502c'} />
+        <path d="M-126,22 Q0,8 126,22" stroke={night ? '#3a4a59' : '#b87942'} strokeWidth={10} fill="none" />
+        <path d="M-94,28 L-98,138 M-48,18 L-48,152 M4,14 L6,158 M58,18 L62,150 M108,26 L114,138" stroke={night ? '#172532' : '#55321f'} strokeWidth={8} opacity={0.68} />
+      </g>
+      <path d="M-70,64 L-12,58 L-14,150 L-74,144 Z" fill="#2d231f" />
+      <path d="M38,42 L104,44 L102,104 L38,100 Z" fill={lit ? '#f3bf6c' : night ? '#2b4055' : '#52727b'} />
+      {lit ? <path d="M44,48 L96,50 L94,96 L46,94 Z" fill="#ffd992" opacity={0.72} data-lighting="practical" /> : null}
+      <path d="M70,44 L70,102 M38,72 L104,74" stroke="#493021" strokeWidth={6} />
+      <path d="M-166,144 Q0,174 164,144" stroke="#3e2a20" strokeWidth={22} fill="none" strokeLinecap="round" />
     </g>
   );
 }
 
-function Wagon({ x, y, scale = 1, angle = 0 }: { x: number; y: number; scale?: number; angle?: number }) {
+function RopeLadder({ x, y, height = 230 }: { readonly x: number; readonly y: number; readonly height?: number }) {
   return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`} className="scene-wagon" data-motif="wagon">
-      <Capsule x1={80} y1={-32} x2={138} y2={-78} width={8} fill="#5a3c2b" />
-      <circle cx={146} cy={-84} r={10} fill="#5a3c2b" />
-      <path d="M-104,-86 L104,-86 L80,0 L-84,0 Z" fill={WAGON_RED} />
-      <path d="M-88,-72 L86,-72 L70,-14 L-72,-14 Z" fill="#f0604c" opacity={0.45} />
-      <rect x={-112} y={-94} width={224} height={18} rx={7} fill={WAGON_DARK} />
-      <Capsule x1={-84} y1={8} x2={84} y2={8} width={9} fill="#51392f" />
-      <circle cx={-72} cy={18} r={28} fill="#2e2e34" data-motif="wheel" />
-      <circle cx={72} cy={18} r={28} fill="#2e2e34" data-motif="wheel" />
-      <circle cx={-72} cy={18} r={13} fill="#c9c1ae" />
-      <circle cx={72} cy={18} r={13} fill="#c9c1ae" />
-    </g>
-  );
-}
-
-function Pulley({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} className="scene-pulley" data-motif="pulley-wheel" data-grooved="true">
-      <path d="M0,-72 q-18,12 -18,34" stroke="#4d3728" strokeWidth={12} fill="none" strokeLinecap="round" />
-      <Capsule x1={-62} y1={-8} x2={62} y2={-8} width={12} fill={ROPE} motif="rope" />
-      <circle cx={0} cy={0} r={56} fill="#5a4639" />
-      <circle cx={0} cy={0} r={44} fill="#d1a66a" />
-      <circle cx={0} cy={0} r={31} fill="#87613e" />
-      <circle cx={0} cy={0} r={12} fill="#3d3029" />
-      <path d="M-42,0 a42,42 0 0 1 84,0" stroke="#f0d19a" strokeWidth={10} fill="none" strokeLinecap="round" opacity={0.65} />
-      <path d="M-44,0 a44,44 0 0 0 88,0" stroke="#704d34" strokeWidth={9} fill="none" strokeLinecap="round" opacity={0.65} />
-    </g>
-  );
-}
-
-function Kwame({ x, y, scale = 1, pose = 'strain' }: { x: number; y: number; scale?: number; pose?: 'strain' | 'cheer' | 'reach' | 'sit' | 'sleep' }) {
-  const open = pose === 'strain' || pose === 'cheer' || pose === 'reach';
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} className="scene-kwame">
-      {pose === 'sleep' ? (
-        <>
-          <ellipse cx={-10} cy={12} rx={58} ry={32} fill="#f2efe2" />
-          <circle cx={-4} cy={-5} r={34} fill={KWAME_SKIN} />
-          <path d="M-38,-16 Q-8,-60 32,-24 Q18,-48 -2,-48 Q-28,-42 -38,-16 Z" fill={KWAME_HAIR} />
-          <ClosedEye cx={-17} cy={-3} w={14} />
-          <ClosedEye cx={10} cy={-3} w={14} />
-          <Smile cx={-4} cy={16} w={18} curve={6} />
-        </>
-      ) : (
-        <>
-          <Capsule x1={0} y1={0} x2={0} y2={88} width={48} fill={KWAME_SHIRT} />
-          <rect x={-24} y={48} width={48} height={48} rx={10} fill={KWAME_SHORTS} />
-          {pose === 'cheer' ? (
-            <>
-              <Capsule x1={-16} y1={10} x2={-54} y2={-58} width={15} fill={KWAME_SHIRT} />
-              <Capsule x1={16} y1={10} x2={58} y2={-60} width={15} fill={KWAME_SHIRT} />
-              <ellipse cx={-58} cy={-64} rx={13} ry={11} fill={KWAME_SKIN} />
-              <ellipse cx={62} cy={-66} rx={13} ry={11} fill={KWAME_SKIN} />
-            </>
-          ) : pose === 'reach' ? (
-            <>
-              <Capsule x1={-12} y1={16} x2={-88} y2={12} width={15} fill={KWAME_SHIRT} />
-              <Capsule x1={16} y1={18} x2={86} y2={-16} width={15} fill={KWAME_SHIRT} />
-              <ellipse cx={-92} cy={12} rx={13} ry={10} fill={KWAME_SKIN} />
-              <ellipse cx={92} cy={-19} rx={13} ry={10} fill={KWAME_SKIN} />
-            </>
-          ) : pose === 'sit' ? (
-            <>
-              <Capsule x1={-14} y1={18} x2={-66} y2={48} width={16} fill={KWAME_SHIRT} />
-              <Capsule x1={14} y1={18} x2={62} y2={52} width={16} fill={KWAME_SHIRT} />
-              <ellipse cx={-70} cy={51} rx={13} ry={10} fill={KWAME_SKIN} />
-              <ellipse cx={66} cy={55} rx={13} ry={10} fill={KWAME_SKIN} />
-            </>
-          ) : (
-            <>
-              <Capsule x1={-12} y1={16} x2={-86} y2={32} width={17} fill={KWAME_SHIRT} />
-              <Capsule x1={12} y1={16} x2={84} y2={32} width={17} fill={KWAME_SHIRT} />
-              <ellipse cx={-92} cy={34} rx={14} ry={11} fill={KWAME_SKIN} />
-              <ellipse cx={90} cy={34} rx={14} ry={11} fill={KWAME_SKIN} />
-            </>
-          )}
-          <Capsule x1={-12} y1={86} x2={-22} y2={138} width={16} fill={KWAME_SHORTS} />
-          <Capsule x1={12} y1={86} x2={22} y2={138} width={16} fill={KWAME_SHORTS} />
-          <ellipse cx={-28} cy={144} rx={15} ry={8} fill="#3a2c27" />
-          <ellipse cx={28} cy={144} rx={15} ry={8} fill="#3a2c27" />
-          <circle cx={0} cy={-40} r={35} fill={KWAME_SKIN} />
-          <path d="M-35,-47 Q-4,-90 35,-48 Q18,-76 -2,-76 Q-25,-70 -35,-47 Z" fill={KWAME_HAIR} />
-          <Eye cx={-12} cy={-42} r={4.5} />
-          <Eye cx={12} cy={-42} r={4.5} />
-          <Blush cx={-21} cy={-25} r={5} />
-          <Blush cx={21} cy={-25} r={5} />
-          {open ? <OpenMouth cx={0} cy={-21} rx={7} ry={9} /> : <Smile cx={0} cy={-22} w={20} curve={9} />}
-        </>
-      )}
-    </g>
-  );
-}
-
-function Ana({ x, y, scale = 1, pose = 'push' }: { x: number; y: number; scale?: number; pose?: 'push' | 'pull' | 'strain' | 'look' | 'cozy' }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} className="scene-ana">
-      <Capsule x1={0} y1={0} x2={0} y2={94} width={52} fill={ANA_SHIRT} />
-      <path d="M-32,44 L32,44 L54,108 L-54,108 Z" fill={ANA_DRESS} />
-      {pose === 'pull' ? (
-        <>
-          <Capsule x1={-12} y1={14} x2={-54} y2={80} width={16} fill={ANA_SHIRT} />
-          <Capsule x1={14} y1={16} x2={58} y2={92} width={16} fill={ANA_SHIRT} />
-          <ellipse cx={-58} cy={84} rx={13} ry={10} fill={ANA_SKIN} />
-          <ellipse cx={62} cy={96} rx={13} ry={10} fill={ANA_SKIN} />
-        </>
-      ) : pose === 'strain' ? (
-        <>
-          <Capsule x1={-14} y1={16} x2={-84} y2={28} width={16} fill={ANA_SHIRT} />
-          <Capsule x1={14} y1={16} x2={84} y2={28} width={16} fill={ANA_SHIRT} />
-          <ellipse cx={-90} cy={30} rx={13} ry={10} fill={ANA_SKIN} />
-          <ellipse cx={90} cy={30} rx={13} ry={10} fill={ANA_SKIN} />
-        </>
-      ) : pose === 'look' ? (
-        <>
-          <Capsule x1={-16} y1={18} x2={-50} y2={66} width={16} fill={ANA_SHIRT} />
-          <Capsule x1={16} y1={18} x2={44} y2={70} width={16} fill={ANA_SHIRT} />
-        </>
-      ) : pose === 'cozy' ? (
-        <>
-          <Capsule x1={-14} y1={18} x2={-58} y2={-18} width={16} fill={ANA_SHIRT} />
-          <Capsule x1={14} y1={18} x2={52} y2={-16} width={16} fill={ANA_SHIRT} />
-          <ellipse cx={-62} cy={-21} rx={13} ry={10} fill={ANA_SKIN} />
-          <ellipse cx={56} cy={-19} rx={13} ry={10} fill={ANA_SKIN} />
-        </>
-      ) : (
-        <>
-          <Capsule x1={-10} y1={20} x2={-92} y2={-4} width={16} fill={ANA_SHIRT} />
-          <Capsule x1={10} y1={20} x2={-78} y2={42} width={16} fill={ANA_SHIRT} />
-          <ellipse cx={-98} cy={-6} rx={13} ry={10} fill={ANA_SKIN} />
-          <ellipse cx={-84} cy={44} rx={13} ry={10} fill={ANA_SKIN} />
-        </>
-      )}
-      <Capsule x1={-14} y1={106} x2={-28} y2={150} width={15} fill="#3f6a4e" />
-      <Capsule x1={16} y1={106} x2={30} y2={150} width={15} fill="#3f6a4e" />
-      <ellipse cx={-32} cy={155} rx={14} ry={8} fill="#3a2c27" />
-      <ellipse cx={34} cy={155} rx={14} ry={8} fill="#3a2c27" />
-      <circle cx={0} cy={-42} r={35} fill={ANA_SKIN} />
-      <path d="M-37,-47 Q0,-92 38,-47 Q30,-78 1,-78 Q-27,-76 -37,-47 Z" fill={ANA_HAIR} />
-      <path d="M34,-46 q30,30 14,84" stroke={ANA_HAIR} strokeWidth={14} fill="none" strokeLinecap="round" />
-      <Eye cx={-12} cy={-43} r={4.4} />
-      <Eye cx={12} cy={-43} r={4.4} />
-      <Blush cx={-22} cy={-25} r={5} />
-      <Blush cx={22} cy={-25} r={5} />
-      {pose === 'strain' || pose === 'pull' ? <OpenMouth cx={0} cy={-21} rx={7} ry={8} /> : <Smile cx={0} cy={-22} w={20} curve={9} />}
-    </g>
-  );
-}
-
-function Grandpa({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} className="scene-grandpa">
-      <Capsule x1={0} y1={0} x2={0} y2={132} width={72} fill={GRANDPA_ROBE} />
-      <Capsule x1={-20} y1={20} x2={-70} y2={74} width={19} fill={GRANDPA_ROBE} />
-      <Capsule x1={20} y1={20} x2={84} y2={-8} width={19} fill={GRANDPA_ROBE} />
-      <ellipse cx={-74} cy={78} rx={14} ry={11} fill={GRANDPA_SKIN} />
-      <ellipse cx={90} cy={-10} rx={14} ry={11} fill={GRANDPA_SKIN} />
-      <circle cx={0} cy={-48} r={38} fill={GRANDPA_SKIN} />
-      <path d="M-38,-55 Q0,-96 38,-55 Q16,-72 0,-72 Q-18,-72 -38,-55 Z" fill={GRANDPA_HAIR} />
-      <path d="M-22,-28 q22,30 44,0" stroke={GRANDPA_HAIR} strokeWidth={9} fill="none" strokeLinecap="round" />
-      <ClosedEye cx={-13} cy={-50} w={11} />
-      <ClosedEye cx={13} cy={-50} w={11} />
-      <Smile cx={0} cy={-30} w={20} curve={8} />
-    </g>
-  );
-}
-
-function LeavesCanopy({ y = 120, seed = 1 }: { y?: number; seed?: number }) {
-  const tones = ['#2e6637', '#3e7c42', '#5e8e46', '#2a5534'];
-  return (
-    <g className="scene-canopy">
-      {range(18).map((i) => {
-        const row = Math.floor(i / 6);
-        const col = i % 6;
-        const cx = n(70 + col * 210 + ((seed + i * 31) % 50));
-        const cy = n(y + row * 72 + ((seed + i * 17) % 34));
-        return <circle key={i} cx={cx} cy={cy} r={n(76 + ((seed + i * 13) % 32))} fill={tones[i % tones.length]} opacity={0.92} />;
+    <g className="scene-rope-ladder" data-motif="rope-ladder">
+      <path d={`M${x - 30},${y} C${x - 38},${y + 80} ${x - 48},${y + 150} ${x - 54},${y + height}`} stroke="#b98b53" strokeWidth={9} fill="none" />
+      <path d={`M${x + 30},${y} C${x + 24},${y + 80} ${x + 18},${y + 150} ${x + 12},${y + height}`} stroke="#b98b53" strokeWidth={9} fill="none" />
+      {range(6).map((i) => {
+        const yy = y + 34 + i * 34;
+        return <path key={i} d={`M${x - 34 - i * 3},${yy} L${x + 28 - i * 3},${yy + 3}`} stroke="#7e5634" strokeWidth={10} strokeLinecap="round" />;
       })}
     </g>
   );
 }
 
-function BackyardBase({ paint, seed, skyPaint = 'lateSky' }: { paint: SceneWorldProps['paint']; seed: number; skyPaint?: string }) {
+function Basket({
+  x,
+  y,
+  scale = 1,
+  paint,
+  full = true,
+  tilt = 0,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale?: number;
+  readonly paint: Paint;
+  readonly full?: boolean;
+  readonly tilt?: number;
+}) {
   return (
-    <>
-      {sky(paint(skyPaint))}
-      <SunGlow cx={n(VIEW_W * 0.83)} cy={n(VIEW_H * 0.16)} r={56} core="#fff0bf" halo="#ffe3a4" />
-      <Cloud x={n(VIEW_W * 0.22)} y={n(VIEW_H * 0.18)} scale={0.82} fill="#fff7df" opacity={0.58} />
-      <Tree x={n(VIEW_W * 0.74)} baseY={n(VIEW_H * 0.86)} height={390} spread={185} canopy={LEAF_MID} trunk={DARK_WOOD} />
-      <Ground topY={n(VIEW_H * 0.74)} fill="#619449" wobble={18} />
-      <GrassRow seed={seed} baseY={n(VIEW_H * 0.92)} blades={44} height={48} lean={6} fill="#77aa55" />
-      <GrassRow seed={seed + 12} baseY={VIEW_H} blades={42} height={62} lean={3} fill="#4f7f3f" />
-    </>
+    <g
+      className="scene-basket"
+      data-motif="basket"
+      transform={`translate(${x} ${y}) rotate(${tilt}) scale(${scale})`}
+    >
+      {full ? (
+        <g data-material="cloth" filter={paint('soft-cloth')}>
+          <path d="M-86,-96 Q-42,-140 12,-92 L-8,-32 L-92,-40 Z" fill="#b76e7a" />
+          <path d="M-14,-108 Q48,-144 84,-72 L58,-24 L-18,-42 Z" fill="#718db4" />
+          <path d="M28,-116 Q82,-96 104,-42 L58,-18 L8,-54 Z" fill="#d3ad60" />
+          <path d="M-58,-132 L-28,-126 L-18,-52 L-54,-50 Z M-12,-146 L18,-140 L22,-58 L-12,-60 Z" fill="#73594c" />
+        </g>
+      ) : null}
+      <g data-material="wicker" filter={paint('basket-weave')}>
+        <path d="M-116,-42 Q0,-92 116,-42" stroke="#c18b4e" strokeWidth={18} fill="none" strokeLinecap="round" />
+        <path d="M-112,-34 L112,-34 L82,88 Q0,118 -82,88 Z" fill="#a86c38" />
+        <path d="M-94,-18 L94,-18 L68,72 Q0,94 -68,72 Z" fill="#ce9553" opacity={0.72} />
+      </g>
+      {range(7).map((i) => (
+        <path key={`v-${i}`} d={`M${-78 + i * 26},-22 Q${-88 + i * 29},34 ${-64 + i * 22},84`} stroke="#704522" strokeWidth={4} fill="none" opacity={0.48} />
+      ))}
+      {range(4).map((i) => (
+        <path key={`h-${i}`} d={`M-92,${2 + i * 20} Q0,${24 + i * 17} 92,${2 + i * 20}`} stroke="#76502e" strokeWidth={4} fill="none" opacity={0.48} />
+      ))}
+      <path d="M-86,-20 Q0,-58 86,-20" stroke="#e0b477" strokeWidth={6} fill="none" opacity={0.66} data-lighting="rim" />
+    </g>
   );
 }
 
-function Cushion({ x, y, fill, tilt = 0 }: { x: number; y: number; fill: string; tilt?: number }) {
-  return <rect x={n(x)} y={n(y)} width={72} height={48} rx={14} fill={fill} transform={`rotate(${n(tilt)} ${n(x + 36)} ${n(y + 24)})`} />;
+function Cushion({ x, y, fill, tilt = 0, paint }: { readonly x: number; readonly y: number; readonly fill: string; readonly tilt?: number; readonly paint: Paint }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${tilt})`} filter={paint('soft-cloth')}>
+      <path d="M-58,-30 Q0,-48 58,-30 Q74,0 58,30 Q0,48 -58,30 Q-74,0 -58,-30 Z" fill={fill} />
+      <path d="M-48,-24 Q0,-34 48,-24" stroke="#f7dfbd" strokeWidth={4} opacity={0.38} fill="none" />
+    </g>
+  );
 }
 
-const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'machines-01-heavy-basket': ({ paint, seed }) => (
-    <g data-scene-art>
-      <BackyardBase paint={paint} seed={seed} skyPaint="lateSky" />
-      <Treehouse x={n(VIEW_W * 0.75)} y={n(VIEW_H * 0.24)} scale={0.9} />
-      <RopeLadder x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.34)} h={275} />
-      <Basket x={n(VIEW_W * 0.39)} y={n(VIEW_H * 0.68)} scale={1.15} full />
-      <Kwame x={n(VIEW_W * 0.18)} y={n(VIEW_H * 0.62)} scale={1.12} pose="strain" />
-      <Capsule x1={n(VIEW_W * 0.25)} y1={n(VIEW_H * 0.65)} x2={n(VIEW_W * 0.31)} y2={n(VIEW_H * 0.65)} width={9} fill={DARK_WOOD} />
-      <Leaf x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.46)} length={120} width={76} angle={-36} fill="#4d8846" />
-      <Leaf x={n(VIEW_W * 0.9)} y={n(VIEW_H * 0.34)} length={100} width={64} angle={52} fill="#346d3b" />
-      {finish(paint)}
+function Wagon({ x, y, scale, paint, angle = 0 }: { readonly x: number; readonly y: number; readonly scale: number; readonly paint: Paint; readonly angle?: number }) {
+  return (
+    <g className="scene-wagon" data-motif="wagon" transform={`translate(${x} ${y}) rotate(${angle}) scale(${scale})`}>
+      <ContactShadow paint={paint} cx={0} cy={58} rx={132} ry={24} />
+      <path d="M-122,-76 L118,-76 L88,18 L-92,18 Z" fill={paint('wagon-red')} />
+      <path d="M-108,-62 L98,-62 L78,-4 L-82,-4 Z" fill="#f07a58" opacity={0.34} data-lighting="key" />
+      <path d="M92,-42 L164,-92" stroke="#51372d" strokeWidth={12} strokeLinecap="round" />
+      <circle cx={-76} cy={32} r={34} fill="#252a31" data-motif="wheel" />
+      <circle cx={76} cy={32} r={34} fill="#252a31" data-motif="wheel" />
+      <g data-material="metal" filter={paint('pulley-metal')}>
+        <circle cx={-76} cy={32} r={16} fill="#aaa394" />
+        <circle cx={76} cy={32} r={16} fill="#aaa394" />
+      </g>
     </g>
-  ),
+  );
+}
 
-  'machines-02-together-fail': ({ paint, seed }) => (
-    <g data-scene-art>
-      <BackyardBase paint={paint} seed={seed + 20} skyPaint="brightSky" />
-      <Treehouse x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.22)} scale={0.72} />
-      <RopeLadder x={n(VIEW_W * 0.74)} y={n(VIEW_H * 0.31)} h={230} />
-      <Basket x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.66)} scale={1.05} full tilt={-3} />
-      <Kwame x={n(VIEW_W * 0.25)} y={n(VIEW_H * 0.62)} scale={1.02} pose="strain" />
-      <Ana x={n(VIEW_W * 0.76)} y={n(VIEW_H * 0.6)} scale={1} pose="strain" />
-      <Cushion x={n(VIEW_W * 0.49)} y={n(VIEW_H * 0.78)} fill="#70a6db" tilt={18} />
-      <Cushion x={n(VIEW_W * 0.58)} y={n(VIEW_H * 0.76)} fill="#f0c35c" tilt={-11} />
-      <path d={`M${n(VIEW_W * 0.4)},${n(VIEW_H * 0.73)} q${n(110)},${n(28)} ${n(222)},${n(0)}`} stroke="#3f6b3e" strokeWidth={6} fill="none" opacity={0.45} />
-      {finish(paint)}
+function RampPlank({ paint }: { readonly paint: Paint }) {
+  return (
+    <g data-motif="ramp">
+      <ContactShadow paint={paint} cx={606} cy={670} rx={390} ry={44} />
+      <g data-material="timber" filter={paint('tree-timber')}>
+        <path d="M112,688 L986,344 L1028,424 L148,754 Z" fill="#82502d" />
+        <path d="M142,690 L986,364 L1002,398 L160,726 Z" fill="#b8763d" opacity={0.64} />
+      </g>
+      {range(8).map((i) => (
+        <path key={i} d={`M${198 + i * 102},${n(666 - i * 40)} l54,62`} stroke="#4c3021" strokeWidth={5} opacity={0.48} />
+      ))}
+      <path d="M132,681 L987,346" stroke="#e1a45c" strokeWidth={7} opacity={0.54} data-lighting="rim" />
     </g>
-  ),
+  );
+}
 
-  'machines-03-ramp-wagon': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('brightSky'))}
-      <Cloud x={n(VIEW_W * 0.75)} y={n(VIEW_H * 0.16)} scale={0.78} fill="#fff4dd" opacity={0.62} />
-      <Ground topY={n(VIEW_H * 0.72)} fill="#6b9349" wobble={14} />
-      <GrassRow seed={seed + 30} baseY={n(VIEW_H * 0.93)} blades={36} height={44} lean={7} fill="#6da44f" />
-      <Tree x={n(VIEW_W * 0.88)} baseY={n(VIEW_H * 0.82)} height={320} spread={150} canopy="#3e7640" trunk={DARK_WOOD} />
-      <ellipse cx={n(VIEW_W * 0.8)} cy={n(VIEW_H * 0.68)} rx={102} ry={52} fill="#7b4f31" />
-      <rect x={n(VIEW_W * 0.73)} y={n(VIEW_H * 0.56)} width={154} height={95} rx={32} fill="#8c5d38" />
-      <g transform={`rotate(-18 ${n(VIEW_W * 0.51)} ${n(VIEW_H * 0.6)})`} data-motif="ramp">
-        <rect x={n(VIEW_W * 0.2)} y={n(VIEW_H * 0.54)} width={n(VIEW_W * 0.56)} height={70} rx={12} fill={paint('plank')} />
-        {range(6).map((i) => (
-          <path key={i} d={`M${n(VIEW_W * 0.23 + i * 98)},${n(VIEW_H * 0.55)} l${n(42)},${n(65)}`} stroke="#704422" strokeWidth={3} opacity={0.42} />
+function PulleyWheel({
+  x,
+  y,
+  scale,
+  paint,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly paint: Paint;
+}) {
+  return (
+    <g
+      className="scene-pulley"
+      data-motif="pulley-wheel"
+      data-grooved="true"
+      transform={`translate(${x} ${y}) scale(${scale})`}
+    >
+      <path d="M0,-84 L0,-54" stroke="#332821" strokeWidth={16} strokeLinecap="round" />
+      <g data-material="metal" filter={paint('pulley-metal')}>
+        <circle cx={0} cy={0} r={58} fill="#6f6b65" />
+        <circle cx={0} cy={0} r={44} fill="#b6a988" />
+        <circle cx={0} cy={0} r={29} fill="#5f5a54" />
+        <circle cx={0} cy={0} r={12} fill="#29282a" />
+      </g>
+      <path d="M-42,-8 A44,44 0 0 1 42,-8" stroke="#f3d8a1" strokeWidth={8} fill="none" opacity={0.74} data-lighting="rim" />
+      <path d="M-40,12 A42,42 0 0 0 40,12" stroke="#34333a" strokeWidth={9} fill="none" opacity={0.82} />
+    </g>
+  );
+}
+
+function PulleyLift({ paint }: { readonly paint: Paint }) {
+  return (
+    <g data-system="fixed-pulley">
+      <PulleyWheel x={708} y={198} scale={0.92} paint={paint} />
+      <path
+        d="M660,208 C668,164 748,164 756,210 L824,706"
+        stroke="#c3985b"
+        strokeWidth={11}
+        fill="none"
+        strokeLinecap="round"
+        data-motif="rope"
+      />
+      <path d="M660,208 L594,468" stroke="#c3985b" strokeWidth={11} fill="none" strokeLinecap="round" data-motif="rope" />
+      <path d="M646,202 C670,180 738,176 764,208" stroke="#f1d095" strokeWidth={3} fill="none" opacity={0.56} data-lighting="key" />
+    </g>
+  );
+}
+
+function InteriorTreehouse({ paint }: { readonly paint: Paint }) {
+  return (
+    <g data-landform="treehouse-interior" data-cover-parity="identity">
+      <path d="M0,130 L600,22 L1200,132 L1200,800 L0,800 Z" fill="#4b3024" />
+      <g data-material="timber" filter={paint('tree-timber')}>
+        <path d="M54,150 L1146,150 L1100,754 L96,754 Z" fill="#75482a" />
+        {range(8).map((i) => (
+          <path key={i} d={`M${116 + i * 132},146 L${98 + i * 138},754`} stroke="#4d2d20" strokeWidth={12} opacity={0.56} />
         ))}
       </g>
-      <Wagon x={n(VIEW_W * 0.48)} y={n(VIEW_H * 0.56)} scale={0.86} angle={-18} />
-      <Basket x={n(VIEW_W * 0.48)} y={n(VIEW_H * 0.43)} scale={0.62} full />
-      <Ana x={n(VIEW_W * 0.25)} y={n(VIEW_H * 0.56)} scale={0.94} pose="push" />
-      <Kwame x={n(VIEW_W * 0.74)} y={n(VIEW_H * 0.55)} scale={0.9} pose="cheer" />
-      {finish(paint)}
+      <path d="M780,214 L1054,222 L1044,474 L774,464 Z" fill="#15243a" />
+      <path d="M796,230 L1038,236 L1028,450 L792,444 Z" fill="#263b55" />
+      <path d="M914,230 L910,448 M792,338 L1030,344" stroke="#5d3d29" strokeWidth={12} />
+      <path d="M0,674 Q306,610 602,650 T1200,630 L1200,800 L0,800 Z" fill="#593723" />
     </g>
+  );
+}
+
+function SceneFrame({
+  id,
+  paint,
+  seed,
+  sceneId,
+  stage,
+  far,
+  mid,
+  focus,
+  near,
+  calm = false,
+}: {
+  readonly id: SceneWorldProps['id'];
+  readonly paint: Paint;
+  readonly seed: number;
+  readonly sceneId: SceneId;
+  readonly stage: keyof typeof LIGHTING;
+  readonly far: ReactNode;
+  readonly mid: ReactNode;
+  readonly focus: ReactNode;
+  readonly near: ReactNode;
+  readonly calm?: boolean;
+}) {
+  return (
+    <g
+      data-scene-art
+      data-cinematic-scene={sceneId}
+      data-time-stage={stage}
+      data-calm-landing={calm ? 'true' : undefined}
+    >
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={LIGHTING[stage]} materials={MATERIALS} />
+      </defs>
+      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={paint(`sky-${stage}`)} />
+      <ellipse
+        cx={LIGHTING[stage].practicals[0].x}
+        cy={LIGHTING[stage].practicals[0].y}
+        rx={LIGHTING[stage].practicals[0].radius}
+        ry={n(LIGHTING[stage].practicals[0].radius * 0.74)}
+        fill={paint('ramp-practical')}
+        data-lighting="practical"
+      />
+      <DepthLayer depth="far" id={id} treatment={{ opacity: calm ? 0.62 : 0.76, blur: calm ? 2.4 : 1.4, saturation: calm ? 0.7 : 0.82 }}>
+        {far}
+      </DepthLayer>
+      <DepthLayer depth="mid">{mid}</DepthLayer>
+      <DepthLayer depth="focus">{focus}</DepthLayer>
+      <DepthLayer depth="near">{near}</DepthLayer>
+      <Vignette paint={paint('vignette')} />
+    </g>
+  );
+}
+
+const PAGES: Record<string, (props: SceneWorldProps) => ReactNode> = {
+  'machines-01-heavy-basket': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-01-heavy-basket"
+      stage="dusk-1"
+      far={
+        <>
+          <path d="M0,514 C186,448 364,486 530,440 C728,384 912,432 1200,342 L1200,800 L0,800 Z" fill="#49694d" />
+          <OakTree paint={paint} compact />
+          <RopeLadder x={930} y={334} height={238} />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,624 C214,548 430,598 618,552 C828,500 1024,544 1200,504 L1200,800 L0,800 Z" fill="#365a42" data-cover-parity="identity" />
+          <path d="M80,614 C298,570 512,600 690,562" stroke={paint('fill-light')} strokeWidth={70} fill="none" opacity={0.5} data-lighting="fill" />
+          <path d="M820,410 C938,372 1056,370 1168,332" stroke="#efb471" strokeWidth={8} fill="none" opacity={0.46} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={558} cy={714} rx={242} ry={50} />
+          <Basket x={566} y={636} scale={1.28} paint={paint} />
+          <Character
+            id={id}
+            kind="kwame"
+            x={250}
+            y={742}
+            scale={1.02}
+            performance={performance('reach', { x: 470, y: 608 }, 'concerned', {
+              lineOfAction: 22,
+              shoulderTilt: 18,
+              pelvisTilt: -10,
+              weightFoot: 'left',
+              headTurn: 0.62,
+              leftHand: 'hold',
+              rightHand: 'hold',
+              leftHandTarget: { x: 454, y: 628 },
+              rightHandTarget: { x: 488, y: 582 },
+            })}
+          />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,706 Q104,660 208,720 L268,800 Z" fill="#1e352d" />
+          <path d="M1200,800 L1200,676 Q1128,642 1050,700 L1000,800 Z" fill="#1b302b" />
+          <path d="M24,720 Q112,674 200,724" stroke="#65804a" strokeWidth={12} fill="none" opacity={0.42} />
+        </>
+      }
+    />
   ),
 
-  'machines-04-look-up': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('goldSky'))}
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={paint('leafGlow')} />
-      <LeavesCanopy y={12} seed={seed + 40} />
-      <Capsule x1={n(VIEW_W * 0.16)} y1={n(VIEW_H * 0.22)} x2={n(VIEW_W * 0.9)} y2={n(VIEW_H * 0.13)} width={46} fill={DARK_WOOD} />
-      <Capsule x1={n(VIEW_W * 0.61)} y1={n(VIEW_H * 0.14)} x2={n(VIEW_W * 0.57)} y2={n(VIEW_H * 0.3)} width={12} fill="#493326" />
-      <Capsule x1={n(VIEW_W * 0.57)} y1={n(VIEW_H * 0.28)} x2={n(VIEW_W * 0.57)} y2={n(VIEW_H * 0.56)} width={9} fill={ROPE} />
-      <Capsule x1={n(VIEW_W * 0.47)} y1={n(VIEW_H * 0.31)} x2={n(VIEW_W * 0.47)} y2={n(VIEW_H * 0.58)} width={9} fill={ROPE} />
-      <Pulley x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.3)} scale={0.88} />
-      <Treehouse x={n(VIEW_W * 0.74)} y={n(VIEW_H * 0.42)} scale={0.72} lit />
-      <ellipse cx={n(VIEW_W * 0.52)} cy={n(VIEW_H * 0.84)} rx={220} ry={76} fill="#7c5434" />
-      <Kwame x={n(VIEW_W * 0.37)} y={n(VIEW_H * 0.72)} scale={0.8} pose="sit" />
-      <Ana x={n(VIEW_W * 0.6)} y={n(VIEW_H * 0.71)} scale={0.78} pose="look" />
-      <Leaf x={n(VIEW_W * 0.2)} y={n(VIEW_H * 0.18)} length={132} width={84} angle={-80} fill="#557f3f" />
-      <Leaf x={n(VIEW_W * 0.9)} y={n(VIEW_H * 0.24)} length={128} width={78} angle={70} fill="#315c35" />
-      {finish(paint)}
-    </g>
+  'machines-02-together-fail': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-02-together-fail"
+      stage="dusk-2"
+      far={
+        <>
+          <Canopy seed={seed} y={88} />
+          <Treehouse x={892} y={258} scale={0.66} paint={paint} />
+          <path d="M0,536 C206,470 394,512 574,464 C760,414 970,460 1200,388 L1200,800 L0,800 Z" fill="#456148" />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,634 C174,576 400,612 618,574 C828,538 1012,560 1200,526 L1200,800 L0,800 Z" fill="#31533e" data-cover-parity="identity" />
+          <path d="M188,620 C396,566 620,594 810,552" stroke={paint('fill-light')} strokeWidth={64} fill="none" opacity={0.48} data-lighting="fill" />
+          <Cushion x={604} y={430} fill="#d87380" tilt={24} paint={paint} />
+          <path d="M560,438 Q602,392 648,424" stroke="#ffd49a" strokeWidth={6} fill="none" opacity={0.52} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={600} cy={730} rx={258} ry={48} />
+          <Basket x={600} y={654} scale={1.16} paint={paint} tilt={-2} />
+          <Character
+            id={id}
+            kind="kwame"
+            x={286}
+            y={748}
+            scale={0.91}
+            performance={performance('reach', { x: 520, y: 620 }, 'concerned', {
+              lineOfAction: 18,
+              shoulderTilt: 14,
+              pelvisTilt: -9,
+              weightFoot: 'left',
+              headTurn: 0.58,
+              leftHand: 'hold',
+              rightHand: 'hold',
+              leftHandTarget: { x: 478, y: 634 },
+              rightHandTarget: { x: 510, y: 592 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="ana"
+            x={924}
+            y={748}
+            scale={0.9}
+            performance={performance('reach', { x: 686, y: 620 }, 'concerned', {
+              lineOfAction: -20,
+              shoulderTilt: -16,
+              pelvisTilt: 10,
+              weightFoot: 'right',
+              headTurn: -0.62,
+              leftHand: 'hold',
+              rightHand: 'hold',
+              leftHandTarget: { x: 706, y: 590 },
+              rightHandTarget: { x: 730, y: 638 },
+            })}
+          />
+          <path d="M494,626 Q602,596 712,626" stroke="#f0b977" strokeWidth={5} fill="none" opacity={0.54} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <Cushion x={130} y={746} fill="#708fba" tilt={-12} paint={paint} />
+          <path d="M1040,800 Q1114,704 1200,724 L1200,800 Z" fill="#1d312c" />
+        </>
+      }
+    />
   ),
 
-  'machines-05-pulley-lift': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('sunsetSky'))}
-      <SunGlow cx={n(VIEW_W * 0.17)} cy={n(VIEW_H * 0.17)} r={74} core="#ffe19b" halo="#f6b46b" />
-      <Tree x={n(VIEW_W * 0.55)} baseY={n(VIEW_H * 0.95)} height={520} spread={230} canopy="#2f6639" trunk={DARK_WOOD} />
-      <LeavesCanopy y={-18} seed={seed + 50} />
-      <Treehouse x={n(VIEW_W * 0.62)} y={n(VIEW_H * 0.21)} scale={0.82} lit />
-      <Capsule x1={n(VIEW_W * 0.32)} y1={n(VIEW_H * 0.2)} x2={n(VIEW_W * 0.84)} y2={n(VIEW_H * 0.16)} width={42} fill={DARK_WOOD} />
-      <Capsule x1={n(VIEW_W * 0.56)} y1={n(VIEW_H * 0.18)} x2={n(VIEW_W * 0.56)} y2={n(VIEW_H * 0.74)} width={10} fill={ROPE} motif="rope" />
-      <Capsule x1={n(VIEW_W * 0.67)} y1={n(VIEW_H * 0.19)} x2={n(VIEW_W * 0.78)} y2={n(VIEW_H * 0.74)} width={10} fill={ROPE} motif="rope" />
-      <Pulley x={n(VIEW_W * 0.615)} y={n(VIEW_H * 0.2)} scale={0.82} />
-      <Basket x={n(VIEW_W * 0.56)} y={n(VIEW_H * 0.53)} scale={0.78} full />
-      <Capsule x1={n(VIEW_W * 0.51)} y1={n(VIEW_H * 0.47)} x2={n(VIEW_W * 0.56)} y2={n(VIEW_H * 0.42)} width={9} fill={ROPE} motif="rope" />
-      <Kwame x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.32)} scale={0.72} pose="reach" />
-      <Ana x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.61)} scale={0.9} pose="pull" />
-      <Ground topY={n(VIEW_H * 0.82)} fill="#3f6d3e" wobble={20} />
-      <GrassRow seed={seed + 54} baseY={VIEW_H} blades={42} height={58} lean={12} fill="#4d7b3e" />
-      {finish(paint)}
-    </g>
+  'machines-03-ramp-wagon': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-03-ramp-wagon"
+      stage="gloaming-3"
+      far={
+        <>
+          <path d="M0,512 C188,450 356,492 542,438 C736,382 968,420 1200,346 L1200,800 L0,800 Z" fill="#3c5948" />
+          <Canopy seed={seed + 12} y={72} />
+          <OakTree paint={paint} compact />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,670 C206,598 420,626 642,590 C842,558 1034,562 1200,532 L1200,800 L0,800 Z" fill="#2c4939" data-cover-parity="identity" />
+          <path d="M126,640 C328,580 524,604 704,568" stroke={paint('fill-light')} strokeWidth={72} fill="none" opacity={0.42} data-lighting="fill" />
+          <path d="M896,468 Q1016,432 1146,374" stroke="#eda45e" strokeWidth={9} fill="none" opacity={0.52} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <RampPlank paint={paint} />
+          <Wagon x={642} y={516} scale={0.76} paint={paint} angle={-21} />
+          <Basket x={642} y={416} scale={0.56} paint={paint} tilt={-21} />
+          <Character
+            id={id}
+            kind="ana"
+            x={282}
+            y={744}
+            scale={0.94}
+            performance={performance('reach', { x: 510, y: 546 }, 'curious', {
+              lineOfAction: 18,
+              shoulderTilt: 15,
+              pelvisTilt: -8,
+              weightFoot: 'left',
+              headTurn: 0.64,
+              leftHand: 'open',
+              rightHand: 'hold',
+              rightHandTarget: { x: 508, y: 566 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="kwame"
+            x={1002}
+            y={522}
+            scale={0.72}
+            performance={performance('point', { x: 646, y: 472 }, 'delighted', {
+              lineOfAction: -8,
+              shoulderTilt: -12,
+              pelvisTilt: 7,
+              weightFoot: 'right',
+              headTurn: -0.72,
+              leftHand: 'open',
+              rightHand: 'point',
+              rightHandTarget: { x: 784, y: 456 },
+            })}
+          />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,690 Q92,660 180,714 L238,800 Z" fill="#1b3029" />
+          <path d="M1200,800 L1200,694 Q1120,658 1046,720 L1002,800 Z" fill="#182b27" />
+        </>
+      }
+    />
   ),
 
-  'machines-06-cozy-treehouse': ({ paint }) => (
-    <g data-scene-art>
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#2d4d31" />
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={paint('lampGlow')} />
-      {range(18).map((i) => (
-        <circle key={i} cx={n(20 + (i % 6) * 230)} cy={n(20 + Math.floor(i / 6) * 108)} r={n(64 + (i % 4) * 12)} fill={i % 2 === 0 ? '#2f6338' : '#3f783f'} opacity={0.62} />
-      ))}
-      <rect x={n(VIEW_W * 0.12)} y={n(VIEW_H * 0.16)} width={n(VIEW_W * 0.76)} height={n(VIEW_H * 0.68)} rx={28} fill="#875433" />
-      {range(7).map((i) => (
-        <rect key={i} x={n(VIEW_W * 0.13 + i * 126)} y={n(VIEW_H * 0.16)} width={12} height={n(VIEW_H * 0.68)} fill="#6b3f27" opacity={0.45} />
-      ))}
-      <path d={`M${n(VIEW_W * 0.08)},${n(VIEW_H * 0.16)} L${n(VIEW_W * 0.5)},${n(VIEW_H * 0.02)} L${n(VIEW_W * 0.92)},${n(VIEW_H * 0.16)} Z`} fill="#5d351f" />
-      <rect x={n(VIEW_W * 0.64)} y={n(VIEW_H * 0.27)} width={150} height={108} rx={10} fill="#f0b45e" />
-      <rect x={n(VIEW_W * 0.71)} y={n(VIEW_H * 0.27)} width={8} height={108} fill="#74472b" />
-      <rect x={n(VIEW_W * 0.64)} y={n(VIEW_H * 0.32)} width={150} height={8} fill="#74472b" />
-      <Cushion x={n(VIEW_W * 0.28)} y={n(VIEW_H * 0.62)} fill="#f08e9a" tilt={-8} />
-      <Cushion x={n(VIEW_W * 0.39)} y={n(VIEW_H * 0.6)} fill="#6ea5d8" tilt={6} />
-      <path d={`M${n(VIEW_W * 0.24)},${n(VIEW_H * 0.72)} q${n(210)},${n(-46)} ${n(430)},${n(0)} v${n(64)} H${n(VIEW_W * 0.23)} Z`} fill="#f0c96b" />
-      <Basket x={n(VIEW_W * 0.71)} y={n(VIEW_H * 0.66)} scale={0.62} full={false} tilt={20} />
-      <Ana x={n(VIEW_W * 0.38)} y={n(VIEW_H * 0.49)} scale={0.76} pose="cozy" />
-      <Kwame x={n(VIEW_W * 0.54)} y={n(VIEW_H * 0.5)} scale={0.76} pose="cheer" />
-      <rect x={n(VIEW_W * 0.55)} y={n(VIEW_H * 0.34)} width={44} height={78} rx={18} fill="#ffd478" />
-      <ellipse cx={n(VIEW_W * 0.572)} cy={n(VIEW_H * 0.34)} rx={34} ry={18} fill="#ffe1a1" opacity={0.72} />
-      {finish(paint)}
-    </g>
+  'machines-04-look-up': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-04-look-up"
+      stage="gloaming-4"
+      far={
+        <>
+          <path d="M0,548 C172,476 362,510 526,466 C740,410 950,446 1200,364 L1200,800 L0,800 Z" fill="#334d44" />
+          <Treehouse x={846} y={338} scale={0.74} paint={paint} lit />
+          <path d="M0,424 C284,360 564,392 848,336" stroke={paint('fill-light')} strokeWidth={96} opacity={0.34} fill="none" data-lighting="fill" />
+        </>
+      }
+      mid={
+        <>
+          <g data-landform="pulley-branch" data-cover-parity="identity" filter={paint('tree-timber')}>
+            <path d="M-40,178 C244,102 514,136 760,92 C916,64 1062,64 1240,26" stroke="#3f2d24" strokeWidth={72} fill="none" strokeLinecap="round" />
+            <path d="M90,154 C332,96 548,120 754,82" stroke="#93603a" strokeWidth={15} fill="none" opacity={0.48} data-lighting="key" />
+          </g>
+          <path d="M0,650 C214,590 410,620 608,586 C846,548 1026,564 1200,530 L1200,800 L0,800 Z" fill="#284238" />
+        </>
+      }
+      focus={
+        <>
+          <PulleyWheel x={690} y={208} scale={1.18} paint={paint} />
+          <path d="M632,208 L620,548 M748,208 L784,548" stroke="#c49a60" strokeWidth={10} fill="none" data-motif="rope" />
+          <ContactShadow paint={paint} cx={596} cy={752} rx={226} ry={40} />
+          <Character
+            id={id}
+            kind="kwame"
+            x={430}
+            y={752}
+            scale={0.82}
+            performance={performance('point', { x: 690, y: 208 }, 'curious', {
+              lineOfAction: 8,
+              shoulderTilt: -13,
+              pelvisTilt: 8,
+              weightFoot: 'left',
+              headTurn: 0.78,
+              rightHand: 'point',
+              rightHandTarget: { x: 586, y: 452 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="ana"
+            x={754}
+            y={752}
+            scale={0.8}
+            performance={performance('point', { x: 690, y: 208 }, 'delighted', {
+              lineOfAction: -7,
+              shoulderTilt: 12,
+              pelvisTilt: -7,
+              weightFoot: 'right',
+              headTurn: -0.72,
+              leftHand: 'point',
+              leftHandTarget: { x: 700, y: 434 },
+            })}
+          />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,724 Q84,680 170,726 L222,800 Z" fill="#172b27" />
+          <path d="M1200,800 L1200,690 Q1120,660 1050,720 L1018,800 Z" fill="#172825" />
+        </>
+      }
+    />
   ),
 
-  'machines-07-bedtime-sleep': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('nightSky'))}
-      <StarField seed={seed + 70} count={44} x={n(VIEW_W * 0.46)} y={20} width={n(VIEW_W * 0.48)} height={n(VIEW_H * 0.42)} color="#dce8ff" />
-      <rect x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.1)} width={n(VIEW_W * 0.42)} height={n(VIEW_H * 0.48)} rx={16} fill="#101833" />
-      <rect x={n(VIEW_W * 0.53)} y={n(VIEW_H * 0.13)} width={n(VIEW_W * 0.36)} height={n(VIEW_H * 0.42)} fill="#1f2b50" />
-      <Moon cx={n(VIEW_W * 0.82)} cy={n(VIEW_H * 0.2)} r={42} glow={paint('moonGlow')} />
-      <Treehouse x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.34)} scale={0.38} />
-      <Tree x={n(VIEW_W * 0.67)} baseY={n(VIEW_H * 0.56)} height={210} spread={95} canopy="#101a2e" trunk="#0f1426" />
-      <rect x={n(VIEW_W * 0.49)} y={n(VIEW_H * 0.08)} width={15} height={n(VIEW_H * 0.52)} fill="#4a4d6e" />
-      <rect x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.33)} width={n(VIEW_W * 0.42)} height={12} fill="#4a4d6e" />
-      <rect x={0} y={n(VIEW_H * 0.62)} width={VIEW_W} height={n(VIEW_H * 0.38)} fill="#2c315b" />
-      <rect x={n(VIEW_W * 0.06)} y={n(VIEW_H * 0.64)} width={n(VIEW_W * 0.43)} height={n(VIEW_H * 0.18)} rx={22} fill="#6e6fa3" />
-      <ellipse cx={n(VIEW_W * 0.17)} cy={n(VIEW_H * 0.66)} rx={82} ry={42} fill="#eff0f4" />
-      <Kwame x={n(VIEW_W * 0.18)} y={n(VIEW_H * 0.63)} scale={0.9} pose="sleep" />
-      <path d={`M${n(VIEW_W * 0.06)},${n(VIEW_H * 0.83)} L${n(VIEW_W * 0.06)},${n(VIEW_H * 0.72)} Q${n(VIEW_W * 0.28)},${n(VIEW_H * 0.63)} ${n(VIEW_W * 0.51)},${n(VIEW_H * 0.74)} L${n(VIEW_W * 0.51)},${n(VIEW_H * 0.88)} Z`} fill="#8d8ac4" />
-      <rect x={n(VIEW_W * 0.75)} y={n(VIEW_H * 0.59)} width={34} height={120} rx={14} fill="#3d3151" />
-      <rect x={n(VIEW_W * 0.72)} y={n(VIEW_H * 0.54)} width={92} height={40} rx={18} fill="#ffd482" opacity={0.72} />
-      <circle cx={n(VIEW_W * 0.765)} cy={n(VIEW_H * 0.56)} r={28} fill="#ffe2a0" opacity={0.7} />
-      <Grandpa x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.5)} scale={0.86} />
-      {finish(paint)}
-    </g>
+  'machines-05-pulley-lift': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-05-pulley-lift"
+      stage="sunset-5"
+      far={
+        <>
+          <Canopy seed={seed + 24} y={54} />
+          <path d="M0,552 C178,492 364,520 548,472 C758,418 966,454 1200,386 L1200,800 L0,800 Z" fill="#2c4640" />
+          <Treehouse x={862} y={288} scale={0.78} paint={paint} lit />
+        </>
+      }
+      mid={
+        <>
+          <g data-cover-parity="identity" data-landform="pulley-oak">
+            <OakTree paint={paint} house={false} />
+          </g>
+          <path d="M0,696 C200,624 424,650 650,608 C868,570 1046,580 1200,548 L1200,800 L0,800 Z" fill="#203a32" />
+          <path d="M100,648 C330,594 504,610 676,574" stroke={paint('fill-light')} strokeWidth={76} fill="none" opacity={0.42} data-lighting="fill" />
+        </>
+      }
+      focus={
+        <>
+          <PulleyLift paint={paint} />
+          <ContactShadow paint={paint} cx={574} cy={650} rx={118} ry={30} />
+          <Basket x={592} y={550} scale={0.78} paint={paint} />
+          <Character
+            id={id}
+            kind="ana"
+            x={916}
+            y={758}
+            scale={0.9}
+            performance={performance('reach', { x: 826, y: 614 }, 'delighted', {
+              lineOfAction: -16,
+              shoulderTilt: -18,
+              pelvisTilt: 11,
+              weightFoot: 'right',
+              headTurn: -0.5,
+              leftHand: 'hold',
+              rightHand: 'hold',
+              leftHandTarget: { x: 832, y: 598 },
+              rightHandTarget: { x: 824, y: 672 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="kwame"
+            x={918}
+            y={444}
+            scale={0.68}
+            performance={performance('reach', { x: 598, y: 548 }, 'curious', {
+              lineOfAction: 14,
+              shoulderTilt: 13,
+              pelvisTilt: -8,
+              weightFoot: 'left',
+              headTurn: -0.72,
+              leftHand: 'open',
+              rightHand: 'open',
+              leftHandTarget: { x: 758, y: 530 },
+              rightHandTarget: { x: 778, y: 570 },
+            })}
+          />
+          <path d="M564,504 Q602,478 642,510" stroke="#ffd19a" strokeWidth={5} fill="none" opacity={0.62} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,666 Q104,620 216,692 L284,800 Z" fill="#152824" />
+          <path d="M1084,800 Q1126,714 1200,690 L1200,800 Z" fill="#142522" />
+        </>
+      }
+    />
+  ),
+
+  'machines-06-cozy-treehouse': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-06-cozy-treehouse"
+      stage="night-6"
+      far={
+        <>
+          <InteriorTreehouse paint={paint} />
+          <StarField seed={seed} count={22} x={796} y={232} width={232} height={202} color="#dbe8ff" minR={0.8} maxR={2.2} />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,674 Q302,610 604,650 T1200,630 L1200,800 L0,800 Z" fill="#4b3024" data-cover-parity="identity" />
+          <ellipse cx={612} cy={306} rx={260} ry={220} fill={paint('ramp-practical')} data-lighting="practical" />
+          <path d="M160,630 C352,586 548,602 716,568" stroke={paint('fill-light')} strokeWidth={74} fill="none" opacity={0.44} data-lighting="fill" />
+          <path d="M380,286 Q620,222 836,294" stroke="#f6c17a" strokeWidth={10} fill="none" opacity={0.52} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={558} cy={718} rx={286} ry={48} />
+          <Cushion x={438} y={690} fill="#ba737f" tilt={-8} paint={paint} />
+          <Cushion x={578} y={684} fill="#708fba" tilt={5} paint={paint} />
+          <path d="M330,734 Q566,618 806,728 L842,800 L300,800 Z" fill={paint('blanket')} filter={paint('soft-cloth')} />
+          <Basket x={914} y={686} scale={0.62} paint={paint} full={false} tilt={24} />
+          <Character
+            id={id}
+            kind="ana"
+            x={448}
+            y={700}
+            scale={0.76}
+            performance={performance('kneel', { x: 606, y: 600 }, 'delighted', {
+              lineOfAction: 7,
+              shoulderTilt: -9,
+              pelvisTilt: 8,
+              weightFoot: 'center',
+              headTurn: 0.5,
+              leftHand: 'open',
+              rightHand: 'open',
+              rightHandTarget: { x: 554, y: 584 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="kwame"
+            x={682}
+            y={700}
+            scale={0.76}
+            performance={performance('kneel', { x: 520, y: 602 }, 'delighted', {
+              lineOfAction: -7,
+              shoulderTilt: 9,
+              pelvisTilt: -8,
+              weightFoot: 'center',
+              headTurn: -0.5,
+              leftHand: 'open',
+              rightHand: 'open',
+              leftHandTarget: { x: 578, y: 586 },
+            })}
+          />
+          <path d="M494,558 Q560,526 630,558" stroke="#e9b472" strokeWidth={4} fill="none" opacity={0.46} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,714 Q86,680 174,728 L230,800 Z" fill="#30231e" />
+          <path d="M1200,800 L1200,694 Q1116,670 1042,724 L1004,800 Z" fill="#30231e" />
+        </>
+      }
+    />
+  ),
+
+  'machines-07-bedtime-sleep': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="machines-07-bedtime-sleep"
+      stage="night-7"
+      calm
+      far={
+        <>
+          <StarField seed={seed + 7} count={38} x={650} y={50} width={420} height={300} color="#d8e5ff" minR={0.7} maxR={2.2} />
+          <circle cx={912} cy={142} r={94} fill={paint('moon-glow')} />
+          <circle cx={912} cy={142} r={38} fill="#e8ead9" />
+          <g data-cover-parity="identity" data-landform="window-treehouse">
+            <path d="M630,80 L1080,80 L1080,424 L630,424 Z" fill="#0b1428" />
+            <path d="M658,104 L1052,104 L1052,398 L658,398 Z" fill="#1b2b4b" />
+            <Treehouse x={870} y={254} scale={0.3} paint={paint} night />
+            <path d="M640,326 C760,278 902,300 1064,250 L1064,402 L640,402 Z" fill="#101d31" />
+            <path d="M846,104 L846,398 M658,246 L1052,246" stroke="#4a4a6b" strokeWidth={14} />
+          </g>
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,0 L604,0 L604,800 L0,800 Z" fill="#22243e" />
+          <path d="M0,606 Q290,554 610,602 L610,800 L0,800 Z" fill="#33395e" />
+          <path d="M682,420 C824,382 956,400 1074,372" stroke={paint('fill-light')} strokeWidth={64} fill="none" opacity={0.34} data-lighting="fill" />
+          <path d="M654,154 Q806,118 954,104" stroke="#abc5dd" strokeWidth={6} fill="none" opacity={0.38} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={294} cy={704} rx={214} ry={42} />
+          <path d="M52,624 Q248,562 504,620 L536,786 L36,786 Z" fill="#555e8e" />
+          <ellipse cx={178} cy={614} rx={94} ry={44} fill="#e4e1e9" />
+          <path d="M38,706 Q228,584 518,680 L552,800 L32,800 Z" fill={paint('blanket')} filter={paint('soft-cloth')} />
+          <Character
+            id={id}
+            kind="kwame"
+            x={218}
+            y={650}
+            scale={0.86}
+            performance={performance('sleep', { x: 214, y: 540 }, 'sleeping', {
+              lineOfAction: 0,
+              shoulderTilt: 2,
+              pelvisTilt: -2,
+              weightFoot: 'center',
+              headTurn: -0.12,
+              leftHand: 'rest',
+              rightHand: 'rest',
+            })}
+          />
+          <ContactShadow paint={paint} cx={936} cy={744} rx={96} ry={28} />
+          <Character
+            id={id}
+            kind="grandpa"
+            x={924}
+            y={750}
+            scale={0.8}
+            performance={performance('stand', { x: 214, y: 614 }, 'calm', {
+              lineOfAction: -5,
+              shoulderTilt: -7,
+              pelvisTilt: 5,
+              weightFoot: 'right',
+              headTurn: -0.7,
+              leftHand: 'rest',
+              rightHand: 'open',
+              rightHandTarget: { x: 1010, y: 568 },
+            })}
+          />
+          <g transform="translate(1030 570)">
+            <ellipse cx={0} cy={0} rx={112} ry={92} fill={paint('ramp-practical')} data-lighting="practical" />
+            <path d="M-24,-54 L24,-54 L34,24 L-34,24 Z" fill="#d8a868" filter={paint('pulley-metal')} />
+            <path d="M-18,-42 L18,-42 L24,14 L-24,14 Z" fill="#f5c981" opacity={0.72} />
+          </g>
+          <path d="M884,548 Q930,516 978,538" stroke="#d2a362" strokeWidth={3} fill="none" opacity={0.38} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,748 Q86,714 168,752 L198,800 Z" fill="#1a1d34" />
+          <path d="M1200,800 L1200,714 Q1134,692 1072,738 L1038,800 Z" fill="#171a30" />
+        </>
+      }
+    />
   ),
 };
 

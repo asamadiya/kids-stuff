@@ -47,6 +47,20 @@ describe('Scene illustration contract', () => {
     expect(allPages).toHaveLength(63);
   });
 
+  it('uses the cinematic character performance system in every story world', () => {
+    for (const story of STORIES) {
+      const hasCinematicPerformance = story.pages.some((page) => {
+        const { svg } = renderScene(story, page);
+        cleanup();
+        return svg.querySelector('[data-pose]') !== null;
+      });
+      expect(
+        hasCinematicPerformance,
+        `${story.slug} must render at least one cinematic character performance`,
+      ).toBe(true);
+    }
+  });
+
   describe.each(allPages)('$story.slug — page $index', ({ story, page }) => {
     it('renders an <svg> with role="img"', () => {
       const { svg } = renderScene(story, page);

@@ -1,561 +1,701 @@
 import type { ReactNode } from 'react';
 import {
-  Blush,
-  Capsule,
-  ClosedEye,
-  Cloud,
-  Eye,
-  GrainFilter,
-  GrainWash,
-  GrassRow,
   Leaf,
   LinearGradient,
   Moon,
-  OpenMouth,
   RadialGradient,
-  Smile,
   StarField,
-  SunGlow,
   VIEW_H,
   VIEW_W,
   Vignette,
-  mulberry32,
   n,
   range,
   requireScenePage,
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  foreshortenGeometry,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
-const SKIN = '#d99565';
-const SKIN_LIGHT = '#efb180';
-const SKIN_SHADOW = '#bf7f56';
-const NANA_SKIN = '#c9825c';
-const SAM_HAIR = '#4b2c1c';
-const NANA_HAIR = '#d8d0c1';
-const SHIRT = '#7eb7bd';
-const SHIRT_DARK = '#5d9299';
-const NANA_DRESS = '#b86f88';
-const POT = '#b9633d';
-const POT_DARK = '#854126';
-const SOIL = '#302014';
-const SOIL_DARK = '#1c130d';
-const BEAN = '#7a4329';
-const HILUM = '#efd7ad';
-const SPROUT = '#b9db83';
-const LEAF_GREEN = '#4f8f49';
-const LEAF_DARK = '#2f6535';
-const STICK = '#7a5433';
-const WATER_BLUE = '#6fa9c8';
+const SAM: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#d99565', shadow: '#91573c', highlight: '#efb180' },
+  face: { shape: 'round', brow: '#40251a', mouth: '#743a3b' },
+  hair: { style: 'short', base: '#4b2c1c', highlight: '#78503a', volume: 0.56 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#5f9ea7',
+    shadow: '#376b78',
+    trim: '#e2b96b',
+    hemline: 0.48,
+  },
+  footwear: { style: 'barefoot', base: '#8b5639' },
+  secondaryShapes: [{ kind: 'belt', color: '#8b6038', accent: '#ebc47e' }],
+};
+
+const NANA: CharacterAppearance = {
+  ...defaultAppearance('elder'),
+  skin: { base: '#c9825c', shadow: '#875039', highlight: '#e5ad85' },
+  face: { shape: 'heart', brow: '#725f55', mouth: '#743d4b' },
+  hair: { style: 'bun', base: '#d8d0c1', highlight: '#f7f0e4', volume: 0.52 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#a85f7a',
+    shadow: '#6d3c5c',
+    trim: '#e5bd76',
+    hemline: 0.82,
+  },
+  footwear: { style: 'sandal', base: '#5d3b2a' },
+  secondaryShapes: [{ kind: 'necklace', color: '#d7aa61', accent: '#f2d696' }],
+};
+
+const WARM_TIMBER: MaterialInstance = {
+  id: 'bean-warm-timber',
+  preset: 'timber',
+  base: '#8a5a39',
+  shadow: '#4c3126',
+  highlight: '#c78b55',
+  textureScale: 1.15,
+  roughness: 0.68,
+};
+
+const SOFT_LEAF: MaterialInstance = {
+  id: 'bean-soft-leaf',
+  preset: 'cloth',
+  base: '#4f8f49',
+  shadow: '#244f31',
+  highlight: '#9dca75',
+  textureScale: 0.74,
+  roughness: 0.58,
+};
+
+const BED_CLOTH: MaterialInstance = {
+  id: 'bean-bed-cloth',
+  preset: 'cloth',
+  base: '#6874a2',
+  shadow: '#30395f',
+  highlight: '#a7b0d5',
+  textureScale: 0.94,
+  roughness: 0.7,
+};
+
+const KITCHEN_LIGHT: LightingRig = {
+  key: { azimuth: -34, elevation: 46, color: '#ffd79d', intensity: 0.82 },
+  fill: { color: '#7899ad', intensity: 0.2 },
+  rim: { azimuth: 146, elevation: 30, color: '#f3c58e', intensity: 0.34 },
+  practicals: [
+    { id: 'bean-kitchen-practical', x: 1020, y: 130, radius: 360, color: '#ffd17f', intensity: 0.48 },
+  ],
+};
+
+const WINDOW_LIGHT: LightingRig = {
+  key: { azimuth: -44, elevation: 52, color: '#ffe0a6', intensity: 0.72 },
+  fill: { color: '#7291aa', intensity: 0.22 },
+  rim: { azimuth: 138, elevation: 34, color: '#efd19b', intensity: 0.3 },
+  practicals: [
+    { id: 'bean-window-practical', x: 170, y: 150, radius: 330, color: '#ffe3a0', intensity: 0.42 },
+  ],
+};
+
+const MUTED_LIGHT: LightingRig = {
+  key: { azimuth: -28, elevation: 38, color: '#e5bd8d', intensity: 0.58 },
+  fill: { color: '#68819d', intensity: 0.26 },
+  rim: { azimuth: 152, elevation: 26, color: '#d6b589', intensity: 0.26 },
+  practicals: [
+    { id: 'bean-muted-practical', x: 1040, y: 190, radius: 300, color: '#d9b070', intensity: 0.3 },
+  ],
+};
+
+const DUSK_LIGHT: LightingRig = {
+  key: { azimuth: -18, elevation: 30, color: '#e9b06f', intensity: 0.62 },
+  fill: { color: '#58768d', intensity: 0.24 },
+  rim: { azimuth: 158, elevation: 24, color: '#f0ca8c', intensity: 0.3 },
+  practicals: [
+    { id: 'bean-dusk-practical', x: 1050, y: 220, radius: 330, color: '#e5a75f', intensity: 0.34 },
+  ],
+};
+
+const MOON_LIGHT: LightingRig = {
+  key: { azimuth: -52, elevation: 58, color: '#aec8e3', intensity: 0.56 },
+  fill: { color: '#425d7c', intensity: 0.18 },
+  rim: { azimuth: 142, elevation: 36, color: '#d5deef', intensity: 0.32 },
+  practicals: [
+    { id: 'bean-moon-practical', x: 900, y: 170, radius: 190, color: '#e9eddb', intensity: 0.48 },
+  ],
+};
+
+const SAM_WAIT: CharacterPerformance = {
+  pose: 'kneel',
+  lineOfAction: -8,
+  shoulderTilt: 10,
+  pelvisTilt: -5,
+  weightFoot: 'left',
+  gazeTarget: { x: 790, y: 520 },
+  headTurn: 0.72,
+  expression: 'uncertain',
+  leftHand: 'rest',
+  rightHand: 'rest',
+};
+
+const SAM_WORRIED: CharacterPerformance = {
+  pose: 'stand',
+  lineOfAction: -10,
+  shoulderTilt: 11,
+  pelvisTilt: -6,
+  weightFoot: 'left',
+  gazeTarget: { x: 320, y: 520 },
+  headTurn: -0.58,
+  expression: 'concerned',
+  leftHand: 'hold',
+  rightHand: 'rest',
+  leftHandTarget: { x: 355, y: 555 },
+};
+
+const NANA_COMFORT: CharacterPerformance = {
+  pose: 'kneel',
+  lineOfAction: 8,
+  shoulderTilt: -12,
+  pelvisTilt: 6,
+  weightFoot: 'right',
+  gazeTarget: { x: 420, y: 510 },
+  headTurn: 0.62,
+  expression: 'calm',
+  leftHand: 'hold',
+  rightHand: 'open',
+  leftHandTarget: { x: 390, y: 565 },
+  rightHandTarget: { x: 545, y: 500 },
+};
+
+const SAM_DISCOVER: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: 12,
+  shoulderTilt: -10,
+  pelvisTilt: 6,
+  weightFoot: 'right',
+  gazeTarget: { x: 510, y: 465 },
+  headTurn: -0.68,
+  expression: 'delighted',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 640, y: 430 },
+  rightHandTarget: { x: 790, y: 420 },
+};
+
+const SAM_MEASURE: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: -7,
+  shoulderTilt: 12,
+  pelvisTilt: -7,
+  weightFoot: 'left',
+  gazeTarget: { x: 560, y: 250 },
+  headTurn: -0.72,
+  expression: 'delighted',
+  leftHand: 'point',
+  rightHand: 'open',
+  leftHandTarget: { x: 590, y: 370 },
+  rightHandTarget: { x: 790, y: 460 },
+};
+
+const SAM_SLEEP: CharacterPerformance = {
+  pose: 'sleep',
+  lineOfAction: 0,
+  shoulderTilt: 0,
+  pelvisTilt: 0,
+  weightFoot: 'center',
+  gazeTarget: { x: 900, y: 170 },
+  headTurn: 0.18,
+  expression: 'sleeping',
+  leftHand: 'rest',
+  rightHand: 'rest',
+};
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
     <defs>
-      <LinearGradient
-        id={id('kitchenGold')}
-        stops={[
-          { offset: 0, color: '#ffe2a9' },
-          { offset: 0.52, color: '#e8b875' },
-          { offset: 1, color: '#9f6849' },
-        ]}
-      />
-      <LinearGradient
-        id={id('tableWood')}
-        stops={[
-          { offset: 0, color: '#c78b55' },
-          { offset: 1, color: '#7b4a2e' },
-        ]}
-      />
-      <RadialGradient
-        id={id('palmGlow')}
-        stops={[
-          { offset: 0, color: '#ffd1a0' },
-          { offset: 1, color: '#c07b55' },
-        ]}
-      />
-      <RadialGradient
-        id={id('bean')}
-        stops={[
-          { offset: 0, color: '#a9653b' },
-          { offset: 0.62, color: BEAN },
-          { offset: 1, color: '#472412' },
-        ]}
-      />
-      <LinearGradient
-        id={id('pot')}
-        stops={[
-          { offset: 0, color: '#d17a4d' },
-          { offset: 0.7, color: POT },
-          { offset: 1, color: POT_DARK },
-        ]}
-      />
-      <RadialGradient
-        id={id('soil')}
-        stops={[
-          { offset: 0, color: '#5b3b25' },
-          { offset: 0.72, color: SOIL },
-          { offset: 1, color: SOIL_DARK },
-        ]}
-      />
-      <LinearGradient
-        id={id('waterCan')}
-        stops={[
-          { offset: 0, color: '#a4d0df' },
-          { offset: 1, color: WATER_BLUE },
-        ]}
-      />
-      <LinearGradient
-        id={id('sunnyWall')}
-        stops={[
-          { offset: 0, color: '#fff2b9' },
-          { offset: 1, color: '#e4b86c' },
-        ]}
-      />
-      <LinearGradient
-        id={id('sunBeam')}
-        stops={[
-          { offset: 0, color: '#fff6be', opacity: 0.72 },
-          { offset: 1, color: '#fff6be', opacity: 0 },
-        ]}
-        x1={0}
-        y1={0}
-        x2={1}
-        y2={1}
-      />
-      <LinearGradient
-        id={id('underground')}
-        stops={[
-          { offset: 0, color: '#26334d' },
-          { offset: 1, color: '#121a2c' },
-        ]}
-      />
-      <LinearGradient
-        id={id('morning')}
-        stops={[
-          { offset: 0, color: '#d9e7c8' },
-          { offset: 0.65, color: '#f2d59a' },
-          { offset: 1, color: '#6b4a32' },
-        ]}
-      />
-      <RadialGradient
-        id={id('sproutGlow')}
-        stops={[
-          { offset: 0, color: '#dff4a6', opacity: 0.82 },
-          { offset: 1, color: '#dff4a6', opacity: 0 },
-        ]}
-      />
-      <LinearGradient
-        id={id('afternoon')}
-        stops={[
-          { offset: 0, color: '#f6dda0' },
-          { offset: 0.6, color: '#d3c989' },
-          { offset: 1, color: '#8aa46a' },
-        ]}
-      />
-      <LinearGradient
-        id={id('nightSky')}
-        stops={[
-          { offset: 0, color: '#17213e' },
-          { offset: 0.62, color: '#243053' },
-          { offset: 1, color: '#2e3658' },
-        ]}
-      />
-      <RadialGradient
-        id={id('moonGlow')}
-        stops={[
-          { offset: 0, color: '#f7f2d8', opacity: 0.86 },
-          { offset: 1, color: '#f7f2d8', opacity: 0 },
-        ]}
-      />
-      <LinearGradient
-        id={id('bed')}
-        stops={[
-          { offset: 0, color: '#7b82af' },
-          { offset: 1, color: '#3e456d' },
-        ]}
-      />
-      <RadialGradient
-        id={id('vignette')}
-        stops={[
-          { offset: 0.6, color: '#000000', opacity: 0 },
-          { offset: 1, color: '#1b1210', opacity: 0.36 },
-        ]}
-      />
-      <GrainFilter id={id('grain')} frequency={0.84} opacity={0.052} />
+      <LinearGradient id={id('beanKitchenSky')} stops={[
+        { offset: 0, color: '#6f6278' },
+        { offset: 0.58, color: '#c98769' },
+        { offset: 1, color: '#efc37f' },
+      ]} />
+      <LinearGradient id={id('beanWindowSky')} stops={[
+        { offset: 0, color: '#8094a0' },
+        { offset: 0.58, color: '#d0b184' },
+        { offset: 1, color: '#e7c27d' },
+      ]} />
+      <LinearGradient id={id('beanMutedSky')} stops={[
+        { offset: 0, color: '#667284' },
+        { offset: 0.62, color: '#9c8c7e' },
+        { offset: 1, color: '#c8a16f' },
+      ]} />
+      <LinearGradient id={id('beanDuskSky')} stops={[
+        { offset: 0, color: '#4b536d' },
+        { offset: 0.58, color: '#987067' },
+        { offset: 1, color: '#d39a61' },
+      ]} />
+      <LinearGradient id={id('beanNightSky')} stops={[
+        { offset: 0, color: '#080f24' },
+        { offset: 0.6, color: '#17284a' },
+        { offset: 1, color: '#2d3d61' },
+      ]} />
+      <LinearGradient id={id('beanTimber')} stops={[
+        { offset: 0, color: '#a46d43' },
+        { offset: 1, color: '#513528' },
+      ]} />
+      <LinearGradient id={id('beanPot')} stops={[
+        { offset: 0, color: '#d78155' },
+        { offset: 0.6, color: '#ae5538' },
+        { offset: 1, color: '#693423' },
+      ]} />
+      <LinearGradient id={id('beanBed')} stops={[
+        { offset: 0, color: '#7884b1' },
+        { offset: 1, color: '#343d67' },
+      ]} />
+      <RadialGradient id={id('beanMoonGlow')} stops={[
+        { offset: 0, color: '#f2f0da', opacity: 0.86 },
+        { offset: 1, color: '#f2f0da', opacity: 0 },
+      ]} />
+      <RadialGradient id={id('beanVignette')} stops={[
+        { offset: 0.58, color: '#000000', opacity: 0 },
+        { offset: 1, color: '#120d17', opacity: 0.42 },
+      ]} />
     </defs>
   );
 }
 
-const sky = (fill: string) => <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />;
-
-const finish = (paint: SceneWorldProps['paint']) => (
-  <>
-    <GrainWash filter={paint('grain')} />
-    <Vignette paint={paint('vignette')} />
-  </>
-);
-
-function Bean({ cx, cy, rx = 58, ry = 36, angle = -12, fill = BEAN }: { cx: number; cy: number; rx?: number; ry?: number; angle?: number; fill?: string }) {
+function CinematicPage({
+  sceneId,
+  stage,
+  id,
+  seed,
+  paint,
+  lighting,
+  materials,
+  calm = false,
+  children,
+}: {
+  sceneId: string;
+  stage: number;
+  id: SceneWorldProps['id'];
+  seed: number;
+  paint: SceneWorldProps['paint'];
+  lighting: LightingRig;
+  materials: readonly MaterialInstance[];
+  calm?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <g transform={`rotate(${n(angle)} ${n(cx)} ${n(cy)})`} data-motif="bean">
-      <ellipse cx={n(cx)} cy={n(cy)} rx={n(rx)} ry={n(ry)} fill={fill} />
-      <ellipse cx={n(cx - rx * 0.34)} cy={n(cy - ry * 0.02)} rx={n(rx * 0.1)} ry={n(ry * 0.42)} fill={HILUM} opacity={0.92} />
-      <path
-        d={`M${n(cx + rx * 0.1)},${n(cy - ry * 0.52)} Q${n(cx + rx * 0.52)},${n(cy - ry * 0.22)} ${n(cx + rx * 0.34)},${n(cy + ry * 0.12)}`}
-        stroke="#c68655"
-        strokeWidth={n(rx * 0.08)}
-        strokeLinecap="round"
-        fill="none"
-        opacity={0.45}
-      />
+    <g
+      data-scene-art
+      data-cinematic-scene={sceneId}
+      data-time-stage={stage}
+      data-calm-landing={calm ? 'true' : undefined}
+    >
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={lighting} materials={materials} />
+      </defs>
+      {children}
+      <Vignette paint={paint('beanVignette')} />
     </g>
   );
 }
 
-function Soil({ cx, cy, rx, ry, seed, count = 22 }: { cx: number; cy: number; rx: number; ry: number; seed: number; count?: number }) {
-  const rand = mulberry32(seed);
+function Bean({
+  cx,
+  cy,
+  scale = 1,
+}: {
+  cx: number;
+  cy: number;
+  scale?: number;
+}) {
   return (
-    <g className="scene-soil">
-      <ellipse cx={n(cx)} cy={n(cy)} rx={n(rx)} ry={n(ry)} fill="#000000" opacity={0.18} />
-      <ellipse cx={n(cx)} cy={n(cy - ry * 0.07)} rx={n(rx * 0.96)} ry={n(ry * 0.86)} fill="#3a2518" />
-      {range(count).map((i) => {
-        const px = n(cx + (rand() - 0.5) * rx * 1.55);
-        const py = n(cy - ry * 0.18 + (rand() - 0.5) * ry * 1.1);
-        const pr = n(2.4 + rand() * 7.2);
-        return <circle key={i} cx={px} cy={py} r={pr} fill={rand() > 0.5 ? '#5c3b26' : SOIL_DARK} opacity={n(0.62 + rand() * 0.34)} />;
+    <g transform={`translate(${n(cx)} ${n(cy)}) scale(${n(scale)}) rotate(-12)`} data-motif="bean">
+      <path d="M-62,0 C-58,-42 -18,-56 22,-42 C64,-28 74,12 48,42 C22,70 -30,58 -54,30 C-64,18 -66,8 -62,0 Z" fill="#7c432a" />
+      <path d="M-28,-32 C8,-48 42,-22 50,8" stroke="#b87348" strokeWidth={10} fill="none" opacity={0.58} strokeLinecap="round" />
+      <ellipse cx={-28} cy={4} rx={8} ry={24} fill="#efd7ad" transform="rotate(12 -28 4)" />
+      <path d="M38,-16 Q62,2 40,30" stroke="#e0a16e" strokeWidth={4} fill="none" opacity={0.72} data-lighting="key" />
+      <path d="M-52,18 Q-28,50 10,50" stroke="#607f95" strokeWidth={5} fill="none" opacity={0.38} data-lighting="fill" />
+      <path d="M-44,-26 Q-6,-56 26,-38" stroke="#f4c493" strokeWidth={3} fill="none" opacity={0.68} data-lighting="rim" />
+    </g>
+  );
+}
+
+function OpenPalm({
+  x,
+  y,
+  scale = 1,
+  rotate = 0,
+  fill = '#efb180',
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  rotate?: number;
+  fill?: string;
+}) {
+  return (
+    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(rotate)}) scale(${n(scale)})`}>
+      <path
+        d="M-118,24 C-112,-34 -70,-72 -18,-72 C30,-74 82,-46 112,-2 C132,28 116,70 74,84 C18,102 -62,90 -102,62 C-116,52 -122,38 -118,24 Z"
+        fill={fill}
+      />
+      <path d="M-88,-32 C-112,-82 -88,-118 -60,-94 L-42,-58 M-38,-58 C-48,-120 -12,-138 8,-82 L18,-54 M28,-54 C30,-116 66,-126 74,-68 L72,-42 M80,-34 C98,-86 130,-78 122,-28 L108,10" fill="none" stroke={fill} strokeWidth={28} strokeLinecap="round" />
+      <path d="M-80,28 Q-10,64 72,30" stroke="#9b6144" strokeWidth={4} fill="none" opacity={0.32} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Pot({
+  x,
+  y,
+  scale = 1,
+  paint,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  paint: SceneWorldProps['paint'];
+}) {
+  return (
+    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} data-motif="pot" data-material="terracotta">
+      <ellipse cx={0} cy={-58} rx={112} ry={32} fill="#e09063" />
+      <path d="M-104,-56 L-76,94 Q0,126 76,94 L104,-56 Z" fill={paint('beanPot')} />
+      <ellipse cx={0} cy={-54} rx={88} ry={22} fill="#302016" />
+      <path d="M-88,-22 Q-18,16 66,-4" stroke="#f2aa77" strokeWidth={10} fill="none" opacity={0.4} data-lighting="key" />
+      <path d="M62,-42 Q88,26 56,84" stroke="#6f8da3" strokeWidth={12} fill="none" opacity={0.3} data-lighting="fill" />
+      <path d="M-98,-50 Q-56,-72 -10,-70" stroke="#f3c18f" strokeWidth={5} fill="none" opacity={0.62} data-lighting="rim" />
+    </g>
+  );
+}
+
+function Soil({
+  cx,
+  cy,
+  rx,
+  ry,
+  seed,
+}: {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  seed: number;
+}) {
+  return (
+    <g data-material="soil">
+      <ellipse cx={n(cx)} cy={n(cy)} rx={n(rx)} ry={n(ry)} fill="#322117" />
+      {range(18).map((i) => {
+        const px = n(cx - rx * 0.75 + ((i * 83 + seed) % 150) / 100 * rx);
+        const py = n(cy - ry * 0.45 + ((i * 47 + seed) % 90) / 100 * ry);
+        return <circle key={i} cx={px} cy={py} r={n(3 + (i % 4))} fill={i % 2 ? '#674530' : '#1b120d'} opacity={0.72} />;
       })}
-    </g>
-  );
-}
-
-function Pot({ x, y, w, h, paint }: { x: number; y: number; w: number; h: number; paint: string }) {
-  return (
-    <g className="scene-pot" data-motif="pot">
-      <ellipse cx={n(x + w * 0.5)} cy={n(y + h * 0.12)} rx={n(w * 0.5)} ry={n(h * 0.15)} fill="#d88a5e" />
-      <path d={`M${n(x + w * 0.08)},${n(y + h * 0.14)} L${n(x + w * 0.24)},${n(y + h)} L${n(x + w * 0.76)},${n(y + h)} L${n(x + w * 0.92)},${n(y + h * 0.14)} Z`} fill={paint} />
-      <rect x={n(x + w * 0.07)} y={n(y + h * 0.02)} width={n(w * 0.86)} height={n(h * 0.22)} rx={n(h * 0.08)} fill="#d67b4d" />
-      <path d={`M${n(x + w * 0.23)},${n(y + h * 0.3)} C${n(x + w * 0.34)},${n(y + h * 0.72)} ${n(x + w * 0.55)},${n(y + h * 0.92)} ${n(x + w * 0.76)},${n(y + h * 0.96)}`} stroke="#f0a36e" strokeWidth={5} fill="none" opacity={0.35} />
-      <ellipse cx={n(x + w * 0.5)} cy={n(y + h * 0.15)} rx={n(w * 0.4)} ry={n(h * 0.09)} fill={SOIL} />
-    </g>
-  );
-}
-
-function ChildHand({ x, y, scale = 1, angle = 0 }: { x: number; y: number; scale?: number; angle?: number }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`}>
-      <ellipse cx={0} cy={0} rx={58} ry={34} fill={SKIN_LIGHT} />
-      {range(4).map((i) => (
-        <Capsule key={i} x1={n(-42 + i * 27)} y1={-20} x2={n(-50 + i * 26)} y2={-82} width={18} fill={SKIN_LIGHT} />
-      ))}
-      <Capsule x1={44} y1={-3} x2={86} y2={-42} width={20} fill={SKIN_LIGHT} />
-      <path d="M-42,8 q42,18 84,0" stroke={SKIN_SHADOW} strokeWidth={3} fill="none" opacity={0.35} strokeLinecap="round" />
-    </g>
-  );
-}
-
-function CuppedHand({ x, y, scale = 1, angle = 0, fill = SKIN_LIGHT }: { x: number; y: number; scale?: number; angle?: number; fill?: string }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`}>
-      <ellipse cx={0} cy={8} rx={132} ry={72} fill={fill} />
-      {range(4).map((i) => (
-        <Capsule key={i} x1={n(-80 + i * 42)} y1={-16} x2={n(-96 + i * 36)} y2={-118} width={30} fill={fill} />
-      ))}
-      <Capsule x1={92} y1={14} x2={154} y2={-58} width={36} fill={fill} />
-      <path d="M-92,24 C-42,52 45,54 96,18" stroke={SKIN_SHADOW} strokeWidth={5} fill="none" opacity={0.32} strokeLinecap="round" />
-      <path d="M-72,-6 q28,18 56,10 M-18,-8 q28,16 56,8" stroke={SKIN_SHADOW} strokeWidth={4} fill="none" opacity={0.24} strokeLinecap="round" />
-    </g>
-  );
-}
-
-function SamHead({ cx, cy, r = 36, tilt = 0, mood = 'smile' }: { cx: number; cy: number; r?: number; tilt?: number; mood?: 'smile' | 'open' | 'worried' | 'sleep' }) {
-  const asleep = mood === 'sleep';
-  return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`}>
-      <circle cx={n(cx - r * 1.03)} cy={n(cy + r * 0.03)} r={n(r * 0.18)} fill={SKIN} />
-      <circle cx={n(cx + r * 1.03)} cy={n(cy + r * 0.03)} r={n(r * 0.18)} fill={SKIN} />
-      <circle cx={n(cx)} cy={n(cy)} r={n(r)} fill={SKIN_LIGHT} />
-      <path
-        d={`M${n(cx - r * 0.95)},${n(cy - r * 0.22)} Q${n(cx - r * 0.35)},${n(cy - r * 1.34)} ${n(cx + r * 0.82)},${n(cy - r * 0.45)} Q${n(cx + r * 0.3)},${n(cy - r * 0.7)} ${n(cx - r * 0.06)},${n(cy - r * 0.66)} Q${n(cx - r * 0.48)},${n(cy - r * 0.66)} ${n(cx - r * 0.95)},${n(cy - r * 0.22)} Z`}
-        fill={SAM_HAIR}
-      />
-      {asleep ? (
-        <>
-          <ClosedEye cx={n(cx - r * 0.33)} cy={n(cy + r * 0.02)} w={n(r * 0.32)} />
-          <ClosedEye cx={n(cx + r * 0.33)} cy={n(cy + r * 0.02)} w={n(r * 0.32)} />
-        </>
-      ) : (
-        <>
-          <Eye cx={n(cx - r * 0.32)} cy={n(cy - r * 0.03)} r={n(r * 0.11)} />
-          <Eye cx={n(cx + r * 0.32)} cy={n(cy - r * 0.03)} r={n(r * 0.11)} />
-        </>
-      )}
-      <Blush cx={n(cx - r * 0.55)} cy={n(cy + r * 0.36)} r={n(r * 0.17)} />
-      <Blush cx={n(cx + r * 0.55)} cy={n(cy + r * 0.36)} r={n(r * 0.17)} />
-      {mood === 'open' ? (
-        <OpenMouth cx={n(cx)} cy={n(cy + r * 0.48)} rx={n(r * 0.2)} ry={n(r * 0.26)} />
-      ) : mood === 'worried' ? (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.5)} w={n(r * 0.5)} curve={n(-r * 0.13)} />
-      ) : (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.46)} w={n(r * 0.58)} curve={n(r * 0.24)} />
-      )}
-    </g>
-  );
-}
-
-function NanaHead({ cx, cy, r = 42, tilt = 0 }: { cx: number; cy: number; r?: number; tilt?: number }) {
-  return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`}>
-      <circle cx={n(cx)} cy={n(cy - r * 0.2)} r={n(r * 1.04)} fill={NANA_HAIR} />
-      <circle cx={n(cx)} cy={n(cy)} r={n(r * 0.86)} fill={NANA_SKIN} />
-      <path d={`M${n(cx - r * 0.8)},${n(cy - r * 0.18)} Q${n(cx)},${n(cy - r * 1.2)} ${n(cx + r * 0.8)},${n(cy - r * 0.18)}`} stroke="#efe6d6" strokeWidth={n(r * 0.26)} fill="none" strokeLinecap="round" />
-      <Eye cx={n(cx - r * 0.28)} cy={n(cy - r * 0.04)} r={n(r * 0.08)} />
-      <Eye cx={n(cx + r * 0.28)} cy={n(cy - r * 0.04)} r={n(r * 0.08)} />
-      <path d={`M${n(cx - r * 0.48)},${n(cy - r * 0.04)} h${n(r * 0.36)} M${n(cx + r * 0.12)},${n(cy - r * 0.04)} h${n(r * 0.36)}`} stroke="#7f665a" strokeWidth={3} strokeLinecap="round" />
-      <Smile cx={n(cx)} cy={n(cy + r * 0.36)} w={n(r * 0.46)} curve={n(r * 0.18)} />
-    </g>
-  );
-}
-
-function WateringCan({ x, y, scale = 1, angle = 0 }: { x: number; y: number; scale?: number; angle?: number }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`} fill={WATER_BLUE}>
-      <ellipse cx={0} cy={24} rx={72} ry={48} fill="#6fa9c8" />
-      <rect x={-68} y={-8} width={136} height={64} rx={24} fill="#7dbad0" />
-      <path d="M62,8 C122,-8 140,-4 178,18" stroke="#7dbad0" strokeWidth={22} fill="none" strokeLinecap="round" />
-      <path d="M-54,4 C-112,4 -112,58 -54,58" stroke="#5e9bb9" strokeWidth={18} fill="none" strokeLinecap="round" />
-      <ellipse cx={0} cy={-18} rx={42} ry={16} fill="#a4d0df" />
-      {range(5).map((i) => (
-        <circle key={i} cx={n(170 + i * 22)} cy={n(42 + i * 14)} r={n(5 - i * 0.35)} fill="#9bd3e5" opacity={0.82} />
-      ))}
-    </g>
-  );
-}
-
-function SproutLoop({ cx, baseY, scale = 1 }: { cx: number; baseY: number; scale?: number }) {
-  return (
-    <g transform={`translate(${n(cx)} ${n(baseY)}) scale(${n(scale)})`} data-motif="sprout">
-      <path d="M0,0 C-28,-44 -20,-94 18,-94 C54,-94 56,-42 18,-24" stroke={SPROUT} strokeWidth={18} strokeLinecap="round" fill="none" />
-      <path d="M18,-24 C36,-48 62,-62 88,-54" stroke="#d5eca7" strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.9} />
-      <Leaf x={-2} y={-4} length={52} width={32} angle={-28} fill="#9acb68" vein="#689b4e" />
-      <circle cx={-3} cy={0} r={11} fill="#d6ed9c" />
     </g>
   );
 }
 
 function Roots({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
   return (
-    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} stroke="#e6d3ad" strokeLinecap="round" fill="none" data-motif="root">
-      <path d="M0,0 C-6,48 -10,96 -4,154" strokeWidth={8} />
-      <path d="M-2,50 C-42,70 -72,94 -96,132" strokeWidth={5} />
-      <path d="M-1,78 C34,100 52,126 70,166" strokeWidth={5} />
-      <path d="M-4,108 C-30,126 -44,150 -56,184" strokeWidth={4} />
-      <path d="M6,36 C34,48 58,66 80,94" strokeWidth={4} />
-      <circle cx={0} cy={0} r={12} fill={HILUM} stroke="none" opacity={0.55} />
+    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} data-motif="root" fill="none" strokeLinecap="round">
+      <path d="M0,0 C-8,54 0,116 -8,190" stroke="#ead7ad" strokeWidth={9} />
+      <path d="M-4,46 C-54,72 -84,106 -106,150 M0,78 C48,104 72,136 84,180 M-6,118 C-46,146 -58,176 -66,212 M4,30 C38,46 64,70 88,104" stroke="#d8c59d" strokeWidth={5} />
+      <path d="M0,0 C-8,54 0,116 -8,190" stroke="#fff0c8" strokeWidth={3} opacity={0.7} data-lighting="rim" />
     </g>
   );
 }
 
-function VinePlant({ x, baseY, height = 330, silhouetted = false }: { x: number; baseY: number; height?: number; silhouetted?: boolean }) {
-  const stemColor = silhouetted ? '#16243b' : LEAF_GREEN;
-  const leafFill = silhouetted ? '#1d332d' : '#5aa153';
-  const leafAlt = silhouetted ? '#162a26' : LEAF_DARK;
-  const topY = n(baseY - height);
+function Sprout({ x, y, scale = 1, paint }: { x: number; y: number; scale?: number; paint: SceneWorldProps['paint'] }) {
   return (
-    <g className="scene-vine" data-motif="stem">
-      <line x1={n(x + 24)} y1={n(baseY + 18)} x2={n(x + 16)} y2={n(topY - 24)} stroke={silhouetted ? '#26304a' : STICK} strokeWidth={10} strokeLinecap="round" />
-      <path
-        d={`M${n(x)},${n(baseY)} C${n(x - 34)},${n(baseY - height * 0.25)} ${n(x + 56)},${n(baseY - height * 0.48)} ${n(x + 12)},${n(baseY - height * 0.7)} C${n(x - 26)},${n(baseY - height * 0.88)} ${n(x + 34)},${n(topY + 12)} ${n(x + 4)},${topY}`}
-        stroke={stemColor}
-        strokeWidth={14}
-        fill="none"
-        strokeLinecap="round"
+    <g transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`} data-motif="sprout" data-material="leaf" filter={paint('bean-soft-leaf')}>
+      <path d="M0,0 C-30,-42 -26,-96 14,-100 C52,-102 62,-54 22,-26" stroke="#9bcf70" strokeWidth={18} fill="none" strokeLinecap="round" />
+      <Leaf x={8} y={-28} length={70} width={42} angle={-36} fill="#75ac57" vein="#d9eba0" />
+      <path d="M-4,-4 C-20,-48 -14,-84 16,-92" stroke="#e2efad" strokeWidth={4} fill="none" opacity={0.76} data-lighting="key" />
+      <path d="M22,-24 Q54,-52 70,-46" stroke="#6e92a8" strokeWidth={5} fill="none" opacity={0.4} data-lighting="fill" />
+      <path d="M-10,-10 Q-34,-54 -14,-88" stroke="#eef1c4" strokeWidth={3} fill="none" opacity={0.68} data-lighting="rim" />
+    </g>
+  );
+}
+
+function Vine({
+  x,
+  baseY,
+  height,
+  paint,
+  night = false,
+}: {
+  x: number;
+  baseY: number;
+  height: number;
+  paint: SceneWorldProps['paint'];
+  night?: boolean;
+}) {
+  const stem = night ? '#203a3b' : '#4d8c48';
+  const leaf = night ? '#274940' : '#629d55';
+  const top = baseY - height;
+  return (
+    <g
+      className="scene-vine"
+      data-motif="stem"
+      data-material="leaf"
+      filter={paint('bean-soft-leaf')}
+    >
+      <path d={`M${x + 20},${baseY + 34} L${x + 18},${top - 34}`} stroke={night ? '#303d4a' : '#765238'} strokeWidth={12} strokeLinecap="round" />
+      <path d={`M${x},${baseY} C${x - 48},${baseY - height * 0.28} ${x + 54},${baseY - height * 0.52} ${x + 6},${baseY - height * 0.72} C${x - 24},${baseY - height * 0.88} ${x + 28},${top + 18} ${x + 6},${top}`} stroke={stem} strokeWidth={16} fill="none" strokeLinecap="round" />
+      <Leaf x={x - 10} y={baseY - height * 0.36} length={118} width={72} angle={-58} fill={leaf} vein={stem} />
+      <Leaf x={x + 32} y={baseY - height * 0.58} length={126} width={76} angle={54} fill={night ? '#1d3834' : '#3f7b42'} vein={stem} />
+      <Leaf x={x + 2} y={top + height * 0.14} length={88} width={52} angle={-42} fill={leaf} vein={stem} />
+      <path d={`M${x - 6},${baseY - height * 0.12} C${x - 42},${baseY - height * 0.4} ${x + 34},${baseY - height * 0.68} ${x + 4},${top + 8}`} stroke={night ? '#8faab1' : '#d7dd91'} strokeWidth={4} fill="none" opacity={0.56} data-lighting="key" />
+      <path d={`M${x + 22},${baseY - height * 0.22} C${x + 60},${baseY - height * 0.48} ${x + 2},${baseY - height * 0.76} ${x + 18},${top + 26}`} stroke="#688ba0" strokeWidth={6} fill="none" opacity={0.32} data-lighting="fill" />
+      <path d={`M${x - 16},${baseY - height * 0.28} C${x - 54},${baseY - height * 0.52} ${x + 26},${baseY - height * 0.78} ${x - 2},${top + 12}`} stroke={night ? '#d5deef' : '#f0d19a'} strokeWidth={3} fill="none" opacity={0.64} data-lighting="rim" />
+    </g>
+  );
+}
+
+function LitCharacter({
+  id,
+  kind,
+  x,
+  y,
+  scale,
+  performance,
+}: {
+  id: SceneWorldProps['id'];
+  kind: 'sam' | 'nana';
+  x: number;
+  y: number;
+  scale: number;
+  performance: CharacterPerformance;
+}) {
+  const appearance = kind === 'sam' ? SAM : NANA;
+  const geometry = resolvePoseGeometry(appearance, performance, { x, y, scale });
+  const rendered = foreshortenGeometry(geometry);
+  const hr = appearance.proportions.headRadius * scale;
+  return (
+    <g data-character-lighting="bean" data-character={kind}>
+      <CinematicCharacter
+        id={(part) => id(`${kind}-${part}`)}
+        x={x}
+        y={y}
+        scale={scale}
+        appearance={appearance}
+        performance={performance}
+        className={`scene-${kind}`}
       />
-      <Leaf x={n(x - 10)} y={n(baseY - height * 0.38)} length={104} width={66} angle={-62} fill={leafFill} vein={leafAlt} />
-      <Leaf x={n(x + 32)} y={n(baseY - height * 0.58)} length={112} width={70} angle={54} fill={leafAlt} vein={stemColor} />
-      <Leaf x={n(x + 2)} y={n(topY + height * 0.14)} length={76} width={46} angle={-44} fill={leafFill} vein={leafAlt} />
-      <path d={`M${n(x + 4)},${n(topY)} q44,-32 78,4 q-22,6 -36,24`} stroke={stemColor} strokeWidth={5} fill="none" strokeLinecap="round" />
+      <path d={`M${n(geometry.head.x - hr * 0.86)},${n(geometry.head.y - hr * 0.04)} Q${n(geometry.head.x - hr * 0.62)},${n(geometry.head.y - hr * 0.72)} ${n(geometry.head.x - hr * 0.08)},${n(geometry.head.y - hr * 0.9)} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y)} L${n(rendered.elbow.left.x)},${n(rendered.elbow.left.y)}`} stroke="#f3c18e" strokeWidth={n(4.4 * scale)} fill="none" strokeLinecap="round" opacity={0.72} data-lighting="key" />
+      <path d={`M${n(geometry.head.x + hr * 0.78)},${n(geometry.head.y + hr * 0.14)} Q${n(geometry.head.x + hr * 0.5)},${n(geometry.head.y + hr * 0.72)} ${n(geometry.head.x + hr * 0.04)},${n(geometry.head.y + hr * 0.86)} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y + 5)} L${n(geometry.hip.right.x)},${n(geometry.hip.right.y + 12)}`} stroke="#7799b0" strokeWidth={n(6 * scale)} fill="none" strokeLinecap="round" opacity={0.38} data-lighting="fill" />
+      <path d={`M${n(geometry.head.x + hr * 0.9)},${n(geometry.head.y - hr * 0.12)} Q${n(geometry.head.x + hr * 0.7)},${n(geometry.head.y - hr * 0.7)} ${n(geometry.head.x + hr * 0.18)},${n(geometry.head.y - hr * 0.9)} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y)} L${n(rendered.elbow.right.x)},${n(rendered.elbow.right.y)}`} stroke="#efd09a" strokeWidth={n(2.8 * scale)} fill="none" strokeLinecap="round" opacity={0.62} data-lighting="rim" />
     </g>
   );
 }
 
-function Sill({ y, fill = '#ead6a8' }: { y: number; fill?: string }) {
+function Window({ x, y, width, height, night = false }: { x: number; y: number; width: number; height: number; night?: boolean }) {
   return (
-    <g className="scene-sill">
-      <rect x={0} y={n(y)} width={VIEW_W} height={n(VIEW_H - y)} fill="#8a5f3d" />
-      <rect x={0} y={n(y - 18)} width={VIEW_W} height={46} rx={8} fill={fill} />
-      <rect x={0} y={n(y + 22)} width={VIEW_W} height={18} fill="#b98a5a" opacity={0.7} />
+    <g data-motif="window">
+      <rect x={x} y={y} width={width} height={height} rx={16} fill={night ? '#111b35' : '#ddbd83'} />
+      <rect x={x + 22} y={y + 22} width={width - 44} height={height - 44} fill={night ? '#172848' : '#c6d0b3'} />
+      <path d={`M${x + width / 2},${y + 20} V${y + height - 20} M${x + 20},${y + height / 2} H${x + width - 20}`} stroke={night ? '#405070' : '#9b764e'} strokeWidth={10} />
     </g>
   );
 }
 
-const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'bean-01-seed-in-palm': ({ paint }) => (
-    <g data-scene-art>
-      {sky(paint('kitchenGold'))}
-      <circle cx={n(VIEW_W * 0.78)} cy={n(VIEW_H * 0.16)} r={132} fill="#fff0bd" opacity={0.46} />
-      <Cloud x={VIEW_W * 0.24} y={VIEW_H * 0.18} scale={1.2} fill="#ffeac4" opacity={0.28} />
-      <rect x={0} y={n(VIEW_H * 0.62)} width={VIEW_W} height={n(VIEW_H * 0.38)} fill={paint('tableWood')} />
-      <CuppedHand x={n(VIEW_W * 0.29)} y={n(VIEW_H * 0.51)} scale={1.05} angle={-16} fill={NANA_SKIN} />
-      <CuppedHand x={n(VIEW_W * 0.72)} y={n(VIEW_H * 0.5)} scale={1.05} angle={192} fill={NANA_SKIN} />
-      <CuppedHand x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.55)} scale={1.16} angle={0} fill={SKIN_LIGHT} />
-      <ellipse cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.53)} rx={180} ry={112} fill={paint('palmGlow')} opacity={0.38} />
-      <Bean cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.5)} rx={72} ry={44} fill={paint('bean')} />
-      {range(9).map((i) => (
-        <circle key={i} cx={n(VIEW_W * (0.39 + i * 0.028))} cy={n(VIEW_H * (0.58 + (i % 3) * 0.018))} r={n(2.2 + (i % 2) * 1.1)} fill={SKIN_SHADOW} opacity={0.2} />
-      ))}
-      <path d={`M${n(VIEW_W * 0.36)},${n(VIEW_H * 0.68)} C${n(VIEW_W * 0.44)},${n(VIEW_H * 0.73)} ${n(VIEW_W * 0.58)},${n(VIEW_H * 0.73)} ${n(VIEW_W * 0.66)},${n(VIEW_H * 0.68)}`} stroke="#8a5638" strokeWidth={5} fill="none" opacity={0.2} strokeLinecap="round" />
-      {finish(paint)}
+function Bed({ paint }: { paint: SceneWorldProps['paint'] }) {
+  return (
+    <g data-material="cloth" filter={paint('bean-bed-cloth')}>
+      <rect x={34} y={560} width={520} height={188} rx={30} fill="#4a527d" />
+      <ellipse cx={174} cy={578} rx={110} ry={48} fill="#d8dced" />
+      <path d="M42,700 L42,630 Q210,570 548,646 L548,770 L42,770 Z" fill={paint('beanBed')} />
+      <path d="M58,646 Q230,602 522,662" stroke="#aab3d6" strokeWidth={8} fill="none" opacity={0.42} data-lighting="key" />
+      <path d="M46,710 Q250,658 536,714" stroke="#49627f" strokeWidth={14} fill="none" opacity={0.36} data-lighting="fill" />
+      <path d="M52,620 Q226,574 524,648" stroke="#d8ddec" strokeWidth={4} fill="none" opacity={0.58} data-lighting="rim" />
     </g>
+  );
+}
+
+const PAGES: Record<string, (props: SceneWorldProps) => ReactNode> = {
+  'bean-01-seed-in-palm': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-01-seed-in-palm" stage={0} id={id} seed={seed} paint={paint} lighting={KITCHEN_LIGHT} materials={[WARM_TIMBER]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanKitchenSky')} />
+      <DepthLayer depth="far">
+        <Window x={74} y={70} width={330} height={300} />
+        <path d="M420,360 C650,310 920,328 1200,250 L1200,500 L420,500 Z" fill="#815e54" opacity={0.5} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-material="timber" filter={paint('bean-warm-timber')}>
+          <path d="M0,488 C280,448 642,478 1200,420 L1200,800 L0,800 Z" fill={paint('beanTimber')} />
+          <path d="M40,612 C320,570 680,600 1130,542" stroke="#d09a63" strokeWidth={12} opacity={0.36} fill="none" />
+        </g>
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <OpenPalm x={600} y={500} scale={1.45} />
+        <Bean cx={600} cy={438} scale={1.15} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <OpenPalm x={240} y={650} scale={0.92} rotate={-28} fill="#c9825c" />
+        <OpenPalm x={980} y={652} scale={0.92} rotate={208} fill="#c9825c" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-02-planting-pot': ({ paint, seed }) => (
-    <g data-scene-art>
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={paint('tableWood')} />
-      {range(6).map((i) => (
-        <rect key={i} x={0} y={n(i * 132 + 28)} width={VIEW_W} height={6} fill="#6f4028" opacity={0.24} />
-      ))}
-      <circle cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.44)} r={286} fill="#8b4f31" opacity={0.18} />
-      <ellipse cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.45)} rx={330} ry={260} fill={paint('pot')} />
-      <ellipse cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.45)} rx={278} ry={216} fill="#cf7850" />
-      <Soil cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.45)} rx={240} ry={176} seed={seed} count={46} />
-      <ellipse cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.45)} rx={84} ry={42} fill="#21150f" opacity={0.55} />
-      <Bean cx={n(VIEW_W * 0.48)} cy={n(VIEW_H * 0.43)} rx={46} ry={29} angle={18} fill={paint('bean')} />
-      <ChildHand x={n(VIEW_W * 0.36)} y={n(VIEW_H * 0.26)} scale={0.82} angle={142} />
-      <ChildHand x={n(VIEW_W * 0.62)} y={n(VIEW_H * 0.69)} scale={0.82} angle={-38} />
-      <WateringCan x={n(VIEW_W * 0.9)} y={n(VIEW_H * 0.14)} scale={0.78} angle={-24} />
-      {range(8).map((i) => (
-        <circle key={i} cx={n(VIEW_W * (0.73 - i * 0.026))} cy={n(VIEW_H * (0.2 + i * 0.038))} r={n(5 + (i % 3))} fill="#9bd3e5" opacity={0.72} />
-      ))}
-      {finish(paint)}
-    </g>
+  'bean-02-planting-pot': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-02-planting-pot" stage={1} id={id} seed={seed} paint={paint} lighting={KITCHEN_LIGHT} materials={[WARM_TIMBER]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanTimber')} />
+      <DepthLayer depth="far">
+        <g data-material="timber" filter={paint('bean-warm-timber')}>
+          {range(5).map((i) => <path key={i} d={`M0,${100 + i * 150} C340,${74 + i * 150} 780,${126 + i * 150} 1200,${90 + i * 150}`} stroke="#5a3929" strokeWidth={9} fill="none" opacity={0.38} />)}
+        </g>
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <Pot x={600} y={510} scale={1.65} paint={paint} />
+        <Soil cx={600} cy={416} rx={140} ry={42} seed={seed} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Bean cx={570} cy={402} scale={0.68} />
+        <OpenPalm x={410} y={230} scale={0.72} rotate={138} />
+        <path d="M402,218 Q486,310 548,386" stroke="#ffd19b" strokeWidth={7} fill="none" opacity={0.68} data-lighting="key" />
+        <path d="M430,232 Q508,320 564,390" stroke="#7698ae" strokeWidth={10} fill="none" opacity={0.32} data-lighting="fill" />
+        <path d="M388,208 Q456,274 516,350" stroke="#f0c894" strokeWidth={3} fill="none" opacity={0.6} data-lighting="rim" />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <g transform="translate(1010 170) rotate(-18)" data-motif="watering-can">
+          <path d="M-92,20 Q-86,-54 0,-64 Q86,-54 92,20 L72,100 L-72,100 Z" fill="#6fa9c8" />
+          <path d="M80,-10 Q154,-26 196,8" stroke="#8fc4d7" strokeWidth={28} fill="none" strokeLinecap="round" />
+          <path d="M-70,-10 Q-134,-4 -126,64 Q-114,108 -64,84" stroke="#4e829f" strokeWidth={22} fill="none" />
+          <path d="M164,18 C136,78 106,116 82,148" stroke="#9bd3e5" strokeWidth={8} strokeDasharray="2 22" fill="none" data-lighting="rim" />
+        </g>
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-03-sunny-sill': ({ paint }) => (
-    <g data-scene-art>
-      {sky(paint('sunnyWall'))}
-      <SunGlow cx={n(VIEW_W * 0.16)} cy={n(VIEW_H * 0.16)} r={72} core="#fff5be" halo="#fff1a8" />
-      <path d={`M${n(VIEW_W * 0.1)},0 L${n(VIEW_W * 0.66)},${n(VIEW_H * 0.62)} L${n(VIEW_W * 0.48)},${n(VIEW_H * 0.68)} L0,${n(VIEW_H * 0.16)} Z`} fill={paint('sunBeam')} />
-      <path d={`M${n(VIEW_W * 0.28)},0 L${n(VIEW_W)},${n(VIEW_H * 0.54)} L${n(VIEW_W)},${n(VIEW_H * 0.72)} L${n(VIEW_W * 0.16)},${n(VIEW_H * 0.08)} Z`} fill={paint('sunBeam')} opacity={0.58} />
-      <rect x={n(VIEW_W * 0.06)} y={n(VIEW_H * 0.12)} width={n(VIEW_W * 0.32)} height={n(VIEW_H * 0.42)} rx={16} fill="#cfb17d" />
-      <rect x={n(VIEW_W * 0.085)} y={n(VIEW_H * 0.15)} width={n(VIEW_W * 0.27)} height={n(VIEW_H * 0.35)} fill="#fff4c8" opacity={0.55} />
-      <rect x={n(VIEW_W * 0.21)} y={n(VIEW_H * 0.13)} width={8} height={n(VIEW_H * 0.39)} fill="#b18a5b" />
-      <rect x={n(VIEW_W * 0.08)} y={n(VIEW_H * 0.32)} width={n(VIEW_W * 0.28)} height={8} fill="#b18a5b" />
-      <Sill y={VIEW_H * 0.62} />
-      <g transform={`translate(${n(VIEW_W * 0.31)} ${n(VIEW_H * 0.53)})`}>
-        <Capsule x1={-30} y1={70} x2={-82} y2={154} width={46} fill={SHIRT} />
-        <Capsule x1={30} y1={70} x2={82} y2={154} width={46} fill={SHIRT_DARK} />
-        <ellipse cx={-84} cy={158} rx={36} ry={20} fill={SKIN_LIGHT} />
-        <ellipse cx={84} cy={158} rx={36} ry={20} fill={SKIN_LIGHT} />
-        <Capsule x1={-130} y1={164} x2={130} y2={164} width={34} fill={SHIRT} />
-        <SamHead cx={0} cy={26} r={56} tilt={5} mood="smile" />
-      </g>
-      <Pot x={n(VIEW_W * 0.58)} y={n(VIEW_H * 0.42)} w={190} h={190} paint={paint('pot')} />
-      <Soil cx={n(VIEW_W * 0.58 + 95)} cy={n(VIEW_H * 0.42 + 32)} rx={72} ry={22} seed={3124} count={14} />
-      <ellipse cx={n(VIEW_W * 0.74)} cy={n(VIEW_H * 0.67)} rx={136} ry={26} fill="#5c3c26" opacity={0.24} />
-      {finish(paint)}
-    </g>
+  'bean-03-sunny-sill': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-03-sunny-sill" stage={2} id={id} seed={seed} paint={paint} lighting={WINDOW_LIGHT} materials={[WARM_TIMBER]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanWindowSky')} />
+      <DepthLayer depth="far">
+        <Window x={60} y={54} width={430} height={350} />
+        <path d="M72,324 C224,270 354,310 466,244" stroke="#7a8d72" strokeWidth={64} fill="none" opacity={0.42} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-material="timber" filter={paint('bean-warm-timber')}>
+          <path d="M0,594 C318,548 706,592 1200,526 L1200,800 L0,800 Z" fill="#6f4935" />
+          <path d="M0,574 C342,536 734,566 1200,508" stroke="#c8925d" strokeWidth={26} />
+        </g>
+        <Pot x={818} y={560} scale={1.12} paint={paint} />
+        <Soil cx={818} cy={496} rx={88} ry={24} seed={seed} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="sam" x={370} y={730} scale={0.96} performance={SAM_WAIT} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,724 Q122,676 248,724 L302,800 Z" fill="#45332f" />
+        <path d="M1200,800 L1200,690 Q1120,660 1046,710 L1010,800 Z" fill="#45332f" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-04-worried-wait': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('sunnyWall'))}
-      <rect x={0} y={n(VIEW_H * 0.52)} width={VIEW_W} height={n(VIEW_H * 0.48)} fill={paint('underground')} />
-      <path d={`M0,${n(VIEW_H * 0.52)} C${n(VIEW_W * 0.28)},${n(VIEW_H * 0.48)} ${n(VIEW_W * 0.72)},${n(VIEW_H * 0.58)} ${VIEW_W},${n(VIEW_H * 0.52)} L${VIEW_W},${VIEW_H} L0,${VIEW_H} Z`} fill="#213052" opacity={0.68} />
-      <Soil cx={n(VIEW_W * 0.62)} cy={n(VIEW_H * 0.58)} rx={208} ry={64} seed={seed} count={34} />
-      <Pot x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.3)} w={260} h={240} paint={paint('pot')} />
-      <Roots x={n(VIEW_W * 0.62)} y={n(VIEW_H * 0.54)} scale={1.06} />
-      <NanaHead cx={n(VIEW_W * 0.26)} cy={n(VIEW_H * 0.38)} r={56} tilt={8} />
-      <g transform={`translate(${n(VIEW_W * 0.24)} ${n(VIEW_H * 0.52)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={170} width={82} fill={NANA_DRESS} />
-        <Capsule x1={26} y1={34} x2={190} y2={64} width={26} fill={NANA_DRESS} />
-        <ellipse cx={196} cy={66} rx={24} ry={16} fill={NANA_SKIN} />
-        <Capsule x1={-18} y1={150} x2={-86} y2={232} width={28} fill={NANA_DRESS} />
-      </g>
-      <g transform={`translate(${n(VIEW_W * 0.43)} ${n(VIEW_H * 0.58)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={128} width={54} fill={SHIRT} />
-        <Capsule x1={-22} y1={22} x2={-120} y2={64} width={22} fill={SHIRT_DARK} />
-        <ellipse cx={-126} cy={66} rx={20} ry={13} fill={SKIN_LIGHT} />
-        <SamHead cx={0} cy={-48} r={42} tilt={-8} mood="worried" />
-      </g>
-      <ellipse cx={n(VIEW_W * 0.39)} cy={n(VIEW_H * 0.61)} rx={30} ry={18} fill={SKIN_LIGHT} />
-      <ellipse cx={n(VIEW_W * 0.41)} cy={n(VIEW_H * 0.61)} rx={30} ry={18} fill={NANA_SKIN} opacity={0.96} />
-      {range(18).map((i) => (
-        <circle key={i} cx={n(VIEW_W * (0.1 + i * 0.047))} cy={n(VIEW_H * (0.62 + (i % 5) * 0.07))} r={n(3 + (i % 4))} fill="#0e1728" opacity={0.5} />
-      ))}
-      {finish(paint)}
-    </g>
+  'bean-04-worried-wait': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-04-worried-wait" stage={3} id={id} seed={seed} paint={paint} lighting={MUTED_LIGHT} materials={[]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanMutedSky')} />
+      <DepthLayer depth="far">
+        <Window x={770} y={70} width={350} height={250} />
+        <path d="M0,500 C270,450 540,488 760,430 L760,800 L0,800 Z" fill="#6e5b54" opacity={0.72} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g transform="translate(820 410)">
+          <Pot x={0} y={0} scale={1.28} paint={paint} />
+          <path d="M-126,-54 L-96,158 Q0,208 96,158 L126,-54 Q0,-22 -126,-54 Z" fill="#162039" opacity={0.88} />
+          <Soil cx={0} cy={-54} rx={104} ry={30} seed={seed} />
+          <Roots x={0} y={-30} scale={0.9} />
+        </g>
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="nana" x={292} y={724} scale={0.82} performance={NANA_COMFORT} />
+        <LitCharacter id={id} kind="sam" x={478} y={724} scale={0.78} performance={SAM_WORRIED} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,700 C210,670 444,724 650,682 L728,800 Z" fill="#392b31" />
+        <path d="M720,800 Q900,734 1200,716 L1200,800 Z" fill="#111827" opacity={0.72} />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-05-first-sprout': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('morning'))}
-      <circle cx={n(VIEW_W * 0.55)} cy={n(VIEW_H * 0.46)} r={180} fill={paint('sproutGlow')} />
-      <g opacity={0.55}>
-        <SamHead cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.26)} r={132} tilt={0} mood="open" />
-        <ellipse cx={n(VIEW_W * 0.28)} cy={n(VIEW_H * 0.34)} rx={58} ry={42} fill={SKIN_LIGHT} />
-        <ellipse cx={n(VIEW_W * 0.72)} cy={n(VIEW_H * 0.34)} rx={58} ry={42} fill={SKIN_LIGHT} />
-        <Capsule x1={n(VIEW_W * 0.28)} y1={n(VIEW_H * 0.39)} x2={n(VIEW_W * 0.19)} y2={n(VIEW_H * 0.55)} width={38} fill={SHIRT} />
-        <Capsule x1={n(VIEW_W * 0.72)} y1={n(VIEW_H * 0.39)} x2={n(VIEW_W * 0.81)} y2={n(VIEW_H * 0.55)} width={38} fill={SHIRT} />
-      </g>
-      <path d={`M0,${n(VIEW_H * 0.58)} C${n(VIEW_W * 0.22)},${n(VIEW_H * 0.5)} ${n(VIEW_W * 0.76)},${n(VIEW_H * 0.48)} ${VIEW_W},${n(VIEW_H * 0.58)} L${VIEW_W},${VIEW_H} L0,${VIEW_H} Z`} fill={SOIL_DARK} />
-      <Soil cx={n(VIEW_W * 0.5)} cy={n(VIEW_H * 0.62)} rx={420} ry={144} seed={seed} count={58} />
-      <SproutLoop cx={n(VIEW_W * 0.51)} baseY={n(VIEW_H * 0.57)} scale={1.56} />
-      {range(12).map((i) => (
-        <path key={i} d={`M${n(VIEW_W * (0.22 + i * 0.05))},${n(VIEW_H * (0.7 + (i % 3) * 0.035))} q${n(18 + (i % 4) * 7)},${n(-8 - (i % 2) * 8)} ${n(44 + (i % 3) * 8)},2`} stroke="#6c452b" strokeWidth={n(3 + (i % 3))} fill="none" opacity={0.56} strokeLinecap="round" />
-      ))}
-      {finish(paint)}
-    </g>
+  'bean-05-first-sprout': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-05-first-sprout" stage={4} id={id} seed={seed} paint={paint} lighting={MUTED_LIGHT} materials={[SOFT_LEAF]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanMutedSky')} />
+      <DepthLayer depth="far">
+        <Window x={72} y={54} width={400} height={286} />
+        <path d="M0,480 C280,432 516,470 716,422 L716,700 L0,700 Z" fill="#665a54" opacity={0.62} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <LitCharacter id={id} kind="sam" x={880} y={744} scale={1.02} performance={SAM_DISCOVER} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Pot x={500} y={610} scale={1.45} paint={paint} />
+        <Soil cx={500} cy={526} rx={122} ry={34} seed={seed} />
+        <Sprout x={500} y={514} scale={1.3} paint={paint} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,664 C250,620 520,690 776,642 L852,800 Z" fill="#211712" />
+        <path d="M1000,800 Q1090,708 1200,730 L1200,800 Z" fill="#3b3032" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-06-climbing-stem': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('afternoon'))}
-      <SunGlow cx={n(VIEW_W * 0.82)} cy={n(VIEW_H * 0.16)} r={78} core="#fff0bd" halo="#ffe4a1" />
-      <Cloud x={VIEW_W * 0.24} y={VIEW_H * 0.14} scale={0.86} fill="#fff5d6" opacity={0.64} />
-      <Sill y={VIEW_H * 0.76} fill="#d4b47a" />
-      <GrassRow seed={seed} baseY={VIEW_H} blades={48} height={52} lean={4} fill="#5f9a4f" />
-      <Pot x={n(VIEW_W * 0.38)} y={n(VIEW_H * 0.56)} w={250} h={216} paint={paint('pot')} />
-      <VinePlant x={n(VIEW_W * 0.51)} baseY={n(VIEW_H * 0.58)} height={430} />
-      <g transform={`translate(${n(VIEW_W * 0.74)} ${n(VIEW_H * 0.55)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={148} width={56} fill={SHIRT} />
-        <Capsule x1={-18} y1={28} x2={-120} y2={-50} width={21} fill={SHIRT_DARK} />
-        <ellipse cx={-128} cy={-56} rx={22} ry={15} fill={SKIN_LIGHT} />
-        <Capsule x1={18} y1={32} x2={84} y2={-20} width={21} fill={SHIRT} />
-        <ellipse cx={92} cy={-26} rx={20} ry={14} fill={SKIN_LIGHT} />
-        <SamHead cx={0} cy={-58} r={44} tilt={-7} mood="smile" />
-        <Capsule x1={-12} y1={144} x2={-32} y2={222} width={20} fill={SHIRT_DARK} />
-        <Capsule x1={14} y1={144} x2={46} y2={220} width={20} fill={SHIRT_DARK} />
-      </g>
-      {range(5).map((i) => (
-        <ellipse key={i} cx={n(VIEW_W * 0.64)} cy={n(VIEW_H * (0.34 + i * 0.078))} rx={n(18 + i * 3)} ry={6} fill="#fff1bb" opacity={n(0.45 - i * 0.05)} />
-      ))}
-      {finish(paint)}
-    </g>
+  'bean-06-climbing-stem': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-06-climbing-stem" stage={5} id={id} seed={seed} paint={paint} lighting={DUSK_LIGHT} materials={[WARM_TIMBER, SOFT_LEAF]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanDuskSky')} />
+      <DepthLayer depth="far">
+        <Window x={62} y={54} width={430} height={322} />
+        <path d="M70,326 C220,278 344,310 458,252" stroke="#4f6b57" strokeWidth={72} fill="none" opacity={0.46} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-material="timber" filter={paint('bean-warm-timber')}>
+          <path d="M0,650 C342,590 716,632 1200,560 L1200,800 L0,800 Z" fill="#554238" />
+          <path d="M0,624 C366,580 756,608 1200,540" stroke="#a97850" strokeWidth={24} />
+        </g>
+        <Pot x={520} y={632} scale={1.28} paint={paint} />
+        <Soil cx={520} cy={558} rx={106} ry={30} seed={seed} />
+        <Vine x={520} baseY={560} height={430} paint={paint} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="sam" x={864} y={732} scale={0.9} performance={SAM_MEASURE} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,720 Q116,680 232,720 L286,800 Z" fill="#332b30" />
+        <path d="M1200,800 L1200,686 Q1124,660 1046,708 L1000,800 Z" fill="#332b30" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'bean-07-moonlit-plant': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('nightSky'))}
-      <StarField seed={seed} count={44} height={VIEW_H * 0.58} color="#dfe7ff" />
-      <rect x={n(VIEW_W * 0.46)} y={n(VIEW_H * 0.08)} width={n(VIEW_W * 0.42)} height={n(VIEW_H * 0.58)} rx={18} fill="#111a32" />
-      <rect x={n(VIEW_W * 0.49)} y={n(VIEW_H * 0.11)} width={n(VIEW_W * 0.36)} height={n(VIEW_H * 0.51)} fill="#202c50" />
-      <Moon cx={n(VIEW_W * 0.74)} cy={n(VIEW_H * 0.25)} r={76} glow={paint('moonGlow')} face="#f3eed5" />
-      <rect x={n(VIEW_W * 0.66)} y={n(VIEW_H * 0.1)} width={10} height={n(VIEW_H * 0.52)} fill="#3b456d" />
-      <rect x={n(VIEW_W * 0.49)} y={n(VIEW_H * 0.36)} width={n(VIEW_W * 0.36)} height={10} fill="#3b456d" />
-      <Sill y={VIEW_H * 0.66} fill="#566080" />
-      <Pot x={n(VIEW_W * 0.56)} y={n(VIEW_H * 0.49)} w={174} h={154} paint="#663622" />
-      <VinePlant x={n(VIEW_W * 0.635)} baseY={n(VIEW_H * 0.5)} height={250} silhouetted />
-      <ellipse cx={n(VIEW_W * 0.64)} cy={n(VIEW_H * 0.69)} rx={150} ry={24} fill="#12172b" opacity={0.44} />
-      <rect x={0} y={n(VIEW_H * 0.7)} width={VIEW_W} height={n(VIEW_H * 0.3)} fill="#252a4b" />
-      <rect x={n(VIEW_W * 0.04)} y={n(VIEW_H * 0.64)} width={n(VIEW_W * 0.42)} height={n(VIEW_H * 0.21)} rx={22} fill={paint('bed')} />
-      <path d={`M${n(VIEW_W * 0.05)},${n(VIEW_H * 0.85)} L${n(VIEW_W * 0.05)},${n(VIEW_H * 0.76)} Q${n(VIEW_W * 0.24)},${n(VIEW_H * 0.68)} ${n(VIEW_W * 0.47)},${n(VIEW_H * 0.76)} L${n(VIEW_W * 0.47)},${n(VIEW_H * 0.86)} Z`} fill="#6e78a8" />
-      <ellipse cx={n(VIEW_W * 0.14)} cy={n(VIEW_H * 0.69)} rx={72} ry={40} fill="#d9def0" />
-      <SamHead cx={n(VIEW_W * 0.16)} cy={n(VIEW_H * 0.65)} r={42} tilt={-14} mood="sleep" />
-      {range(5).map((i) => (
-        <circle key={i} cx={n(VIEW_W * (0.28 + i * 0.04))} cy={n(VIEW_H * (0.56 - i * 0.035))} r={n(7 + i * 3)} fill="#cfd7ff" opacity={n(0.48 - i * 0.04)} />
-      ))}
-      {finish(paint)}
-    </g>
+  'bean-07-moonlit-plant': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="bean-07-moonlit-plant" stage={6} id={id} seed={seed} paint={paint} lighting={MOON_LIGHT} materials={[SOFT_LEAF, BED_CLOTH]} calm>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('beanNightSky')} />
+      <DepthLayer depth="far">
+        <StarField seed={seed} count={44} x={520} y={20} width={650} height={420} color="#cddcf2" minR={0.7} maxR={2.2} />
+        <Window x={620} y={46} width={500} height={500} night />
+        <Moon cx={900} cy={166} r={74} glow={paint('beanMoonGlow')} face="#f2f0da" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <path d="M560,800 L560,540 L1200,540 L1200,800 Z" fill="#172036" />
+        <Pot x={864} y={612} scale={1.06} paint={paint} />
+        <Vine x={864} baseY={552} height={300} paint={paint} night />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Bed paint={paint} />
+        <LitCharacter id={id} kind="sam" x={260} y={676} scale={0.82} performance={SAM_SLEEP} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M32,800 L32,704 Q230,634 554,708 L554,800 Z" fill="#30395f" opacity={0.88} />
+        <path d="M560,800 Q820,730 1200,712 L1200,800 Z" fill="#10172a" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 };
 

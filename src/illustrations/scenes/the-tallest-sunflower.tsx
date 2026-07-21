@@ -1,19 +1,9 @@
 import type { ReactNode } from 'react';
 import {
-  Blush,
-  Capsule,
-  ClosedEye,
-  Cloud,
-  Eye,
-  GrainFilter,
-  GrainWash,
-  GrassRow,
   Leaf,
   LinearGradient,
   Moon,
-  OpenMouth,
   RadialGradient,
-  Smile,
   StarField,
   VIEW_H,
   VIEW_W,
@@ -24,66 +14,352 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  foreshortenGeometry,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
-/*
- * WORLD: The Tallest Sunflower — a sunlit measuring garden.
- * Motifs: a fence-high sunflower, a knotted blue ribbon, dewy grass, a glowing
- * house window, bees and a ladybug. The palette walks from dewy dawn to honeyed
- * noon to deep indigo night as Milo measures, wobbles, teams up, and sleeps.
- */
+const MILO: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#e3a775', shadow: '#935a3b', highlight: '#f4c08f' },
+  face: { shape: 'round', brow: '#4c2e20', mouth: '#7a3c3e' },
+  hair: { style: 'short', base: '#5b3a24', highlight: '#845a3d', volume: 0.56 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#659da6',
+    shadow: '#3e6c79',
+    trim: '#e2ba6a',
+    hemline: 0.5,
+  },
+  footwear: { style: 'barefoot', base: '#8f5739' },
+  secondaryShapes: [{ kind: 'belt', color: '#8a6238', accent: '#e8c47d' }],
+};
 
-const SKIN = '#e9ad7d';
-const SKIN_SHADOW = '#d8966a';
-const HAIR = '#5b3a24';
-const PJ = '#7fb0b8';
-const PJ_DARK = '#5f929b';
-const STEM = '#4f9145';
-const STEM_DARK = '#3c7434';
-const RIBBON = '#3f78c4';
+const ROSA: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#d99669', shadow: '#8c5237', highlight: '#edb685' },
+  face: { shape: 'heart', brow: '#352119', mouth: '#763b4a' },
+  hair: { style: 'long', base: '#3a2417', highlight: '#68432d', volume: 0.72 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#ad5f80',
+    shadow: '#703a5c',
+    trim: '#e3b866',
+    hemline: 0.74,
+  },
+  footwear: { style: 'sandal', base: '#5c3a27' },
+  secondaryShapes: [{ kind: 'sash', color: '#315f96', accent: '#78a8d4' }],
+};
 
-function Stem({
-  xBase,
-  baseY,
-  xTop,
-  topY,
-  wBase = 26,
-  wTop = 12,
-  sway = 0,
-  fill = STEM,
-}: {
-  xBase: number;
-  baseY: number;
-  xTop: number;
-  topY: number;
-  wBase?: number;
-  wTop?: number;
-  sway?: number;
-  fill?: string;
-}) {
-  const span = baseY - topY;
-  const cy1 = n(baseY - span * 0.4);
-  const cy2 = n(topY + span * 0.3);
-  const cx1 = n(xBase + sway * 0.3);
-  const cx2 = n(xTop + sway);
-  const d = `M${n(xBase - wBase / 2)},${n(baseY)} C${n(cx1 - wBase * 0.2)},${cy1} ${n(
-    cx2 - wTop * 0.2,
-  )},${cy2} ${n(xTop - wTop / 2)},${n(topY)} L${n(xTop + wTop / 2)},${n(
-    topY,
-  )} C${n(cx2 + wTop * 0.2)},${cy2} ${n(cx1 + wBase * 0.2)},${cy1} ${n(
-    xBase + wBase / 2,
-  )},${n(baseY)} Z`;
+const GARDEN_TIMBER: MaterialInstance = {
+  id: 'sunflower-garden-timber',
+  preset: 'timber',
+  base: '#9a704b',
+  shadow: '#503728',
+  highlight: '#caa171',
+  textureScale: 1.1,
+  roughness: 0.72,
+};
+
+const LEAF_MATERIAL: MaterialInstance = {
+  id: 'sunflower-leaf',
+  preset: 'cloth',
+  base: '#4f9145',
+  shadow: '#244f2a',
+  highlight: '#9dca72',
+  textureScale: 0.72,
+  roughness: 0.56,
+};
+
+const BED_MATERIAL: MaterialInstance = {
+  id: 'sunflower-bed-cloth',
+  preset: 'cloth',
+  base: '#6d6ea4',
+  shadow: '#33365f',
+  highlight: '#afb1dc',
+  textureScale: 0.9,
+  roughness: 0.7,
+};
+
+const DAWN_LIGHT: LightingRig = {
+  key: { azimuth: -38, elevation: 46, color: '#ffe0a9', intensity: 0.76 },
+  fill: { color: '#7896a5', intensity: 0.22 },
+  rim: { azimuth: 146, elevation: 30, color: '#f5cb93', intensity: 0.34 },
+  practicals: [
+    { id: 'sunflower-dawn-practical', x: 170, y: 160, radius: 300, color: '#ffe6aa', intensity: 0.44 },
+  ],
+};
+
+const MORNING_LIGHT: LightingRig = {
+  key: { azimuth: -32, elevation: 52, color: '#ffdda0', intensity: 0.72 },
+  fill: { color: '#6e91a5', intensity: 0.2 },
+  rim: { azimuth: 142, elevation: 34, color: '#edc487', intensity: 0.3 },
+  practicals: [
+    { id: 'sunflower-morning-practical', x: 1010, y: 150, radius: 330, color: '#ffdf8b', intensity: 0.4 },
+  ],
+};
+
+const BREEZE_LIGHT: LightingRig = {
+  key: { azimuth: -20, elevation: 38, color: '#efd092', intensity: 0.62 },
+  fill: { color: '#6c8fa8', intensity: 0.24 },
+  rim: { azimuth: 154, elevation: 28, color: '#f0c889', intensity: 0.28 },
+  practicals: [
+    { id: 'sunflower-breeze-practical', x: 1040, y: 200, radius: 330, color: '#e7c275', intensity: 0.34 },
+  ],
+};
+
+const HONEY_LIGHT: LightingRig = {
+  key: { azimuth: -18, elevation: 32, color: '#f0b86d', intensity: 0.66 },
+  fill: { color: '#5e7e96', intensity: 0.22 },
+  rim: { azimuth: 158, elevation: 24, color: '#f3cf8f', intensity: 0.3 },
+  practicals: [
+    { id: 'sunflower-honey-practical', x: 1030, y: 220, radius: 340, color: '#e8a959', intensity: 0.36 },
+  ],
+};
+
+const NIGHT_LIGHT: LightingRig = {
+  key: { azimuth: -54, elevation: 58, color: '#afc9e4', intensity: 0.54 },
+  fill: { color: '#405c7c', intensity: 0.18 },
+  rim: { azimuth: 140, elevation: 36, color: '#d7e0ef', intensity: 0.32 },
+  practicals: [
+    { id: 'sunflower-moon-practical', x: 930, y: 150, radius: 190, color: '#ecebd8', intensity: 0.5 },
+  ],
+};
+
+const MILO_GAZE: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: 12,
+  shoulderTilt: -10,
+  pelvisTilt: 7,
+  weightFoot: 'right',
+  gazeTarget: { x: 760, y: 120 },
+  headTurn: 0.72,
+  expression: 'curious',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 280, y: 390 },
+  rightHandTarget: { x: 460, y: 320 },
+};
+
+const MILO_STACK: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: -12,
+  shoulderTilt: 13,
+  pelvisTilt: -7,
+  weightFoot: 'left',
+  gazeTarget: { x: 670, y: 300 },
+  headTurn: 0.68,
+  expression: 'uncertain',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 635, y: 340 },
+  rightHandTarget: { x: 670, y: 450 },
+};
+
+const MILO_KNOT: CharacterPerformance = {
+  pose: 'kneel',
+  lineOfAction: 8,
+  shoulderTilt: -11,
+  pelvisTilt: 6,
+  weightFoot: 'right',
+  gazeTarget: { x: 520, y: 570 },
+  headTurn: 0.55,
+  expression: 'calm',
+  leftHand: 'hold',
+  rightHand: 'hold',
+  leftHandTarget: { x: 480, y: 584 },
+  rightHandTarget: { x: 550, y: 574 },
+};
+
+const ROSA_OFFER: CharacterPerformance = {
+  pose: 'kneel',
+  lineOfAction: -7,
+  shoulderTilt: 10,
+  pelvisTilt: -6,
+  weightFoot: 'left',
+  gazeTarget: { x: 500, y: 570 },
+  headTurn: -0.58,
+  expression: 'calm',
+  leftHand: 'open',
+  rightHand: 'hold',
+  rightHandTarget: { x: 610, y: 470 },
+};
+
+const MILO_STEADY: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: 18,
+  shoulderTilt: -14,
+  pelvisTilt: 8,
+  weightFoot: 'right',
+  gazeTarget: { x: 680, y: 350 },
+  headTurn: 0.7,
+  expression: 'concerned',
+  leftHand: 'hold',
+  rightHand: 'hold',
+  leftHandTarget: { x: 610, y: 430 },
+  rightHandTarget: { x: 660, y: 390 },
+};
+
+const MILO_COUNT: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: -8,
+  shoulderTilt: 12,
+  pelvisTilt: -7,
+  weightFoot: 'left',
+  gazeTarget: { x: 620, y: 250 },
+  headTurn: 0.62,
+  expression: 'calm',
+  leftHand: 'rest',
+  rightHand: 'point',
+  rightHandTarget: { x: 620, y: 310 },
+};
+
+const ROSA_HOLD: CharacterPerformance = {
+  pose: 'kneel',
+  lineOfAction: 8,
+  shoulderTilt: -12,
+  pelvisTilt: 6,
+  weightFoot: 'right',
+  gazeTarget: { x: 470, y: 430 },
+  headTurn: -0.48,
+  expression: 'calm',
+  leftHand: 'hold',
+  rightHand: 'open',
+  leftHandTarget: { x: 640, y: 650 },
+};
+
+const MILO_CHEER: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: 8,
+  shoulderTilt: -12,
+  pelvisTilt: 7,
+  weightFoot: 'right',
+  gazeTarget: { x: 600, y: 120 },
+  headTurn: 0.58,
+  expression: 'calling',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 180, y: 330 },
+  rightHandTarget: { x: 390, y: 310 },
+};
+
+const ROSA_CLAP: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: -5,
+  shoulderTilt: 11,
+  pelvisTilt: -6,
+  weightFoot: 'left',
+  gazeTarget: { x: 340, y: 430 },
+  headTurn: -0.55,
+  expression: 'delighted',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 830, y: 400 },
+  rightHandTarget: { x: 900, y: 400 },
+};
+
+const MILO_SLEEP: CharacterPerformance = {
+  pose: 'sleep',
+  lineOfAction: 0,
+  shoulderTilt: 0,
+  pelvisTilt: 0,
+  weightFoot: 'center',
+  gazeTarget: { x: 930, y: 150 },
+  headTurn: 0.12,
+  expression: 'sleeping',
+  leftHand: 'rest',
+  rightHand: 'rest',
+};
+
+function Defs({ id }: SceneWorldProps): ReactNode {
   return (
-    <g className="scene-sunflower-stem" data-motif="sunflower-stem">
-      <path d={d} fill={fill} />
-      <path
-        d={`M${n(xBase)},${n(baseY)} C${cx1},${cy1} ${cx2},${cy2} ${n(xTop)},${n(
-          topY,
-        )}`}
-        stroke={STEM_DARK}
-        strokeWidth={2}
-        fill="none"
-        opacity={0.4}
-      />
+    <defs>
+      <LinearGradient id={id('sunflowerDawnSky')} stops={[
+        { offset: 0, color: '#8393a0' },
+        { offset: 0.58, color: '#d2ad7f' },
+        { offset: 1, color: '#edca83' },
+      ]} />
+      <LinearGradient id={id('sunflowerMorningSky')} stops={[
+        { offset: 0, color: '#6f8792' },
+        { offset: 0.58, color: '#bda879' },
+        { offset: 1, color: '#e0bd70' },
+      ]} />
+      <LinearGradient id={id('sunflowerBreezeSky')} stops={[
+        { offset: 0, color: '#637784' },
+        { offset: 0.6, color: '#9d9278' },
+        { offset: 1, color: '#c9a66b' },
+      ]} />
+      <LinearGradient id={id('sunflowerHoneySky')} stops={[
+        { offset: 0, color: '#4f5f70' },
+        { offset: 0.58, color: '#927266' },
+        { offset: 1, color: '#d49a58' },
+      ]} />
+      <LinearGradient id={id('sunflowerNightSky')} stops={[
+        { offset: 0, color: '#070d20' },
+        { offset: 0.58, color: '#172544' },
+        { offset: 1, color: '#303c61' },
+      ]} />
+      <LinearGradient id={id('sunflowerBed')} stops={[
+        { offset: 0, color: '#7d7fb4' },
+        { offset: 1, color: '#393c69' },
+      ]} />
+      <RadialGradient id={id('sunflowerWindowGlow')} stops={[
+        { offset: 0, color: '#ffe6a5', opacity: 0.92 },
+        { offset: 1, color: '#e9a757', opacity: 0.08 },
+      ]} />
+      <RadialGradient id={id('sunflowerMoonGlow')} stops={[
+        { offset: 0, color: '#f2efda', opacity: 0.86 },
+        { offset: 1, color: '#f2efda', opacity: 0 },
+      ]} />
+      <RadialGradient id={id('sunflowerVignette')} stops={[
+        { offset: 0.58, color: '#000000', opacity: 0 },
+        { offset: 1, color: '#100d18', opacity: 0.44 },
+      ]} />
+    </defs>
+  );
+}
+
+function CinematicPage({
+  sceneId,
+  stage,
+  id,
+  seed,
+  paint,
+  lighting,
+  materials,
+  calm = false,
+  children,
+}: {
+  sceneId: string;
+  stage: number;
+  id: SceneWorldProps['id'];
+  seed: number;
+  paint: SceneWorldProps['paint'];
+  lighting: LightingRig;
+  materials: readonly MaterialInstance[];
+  calm?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <g
+      data-scene-art
+      data-cinematic-scene={sceneId}
+      data-time-stage={stage}
+      data-calm-landing={calm ? 'true' : undefined}
+    >
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={lighting} materials={materials} />
+      </defs>
+      {children}
+      <Vignette paint={paint('sunflowerVignette')} />
     </g>
   );
 }
@@ -92,578 +368,374 @@ function FlowerHead({
   cx,
   cy,
   r,
-  petal = '#f6c945',
-  petal2 = '#eeb038',
-  center = '#7a4f28',
+  night = false,
 }: {
   cx: number;
   cy: number;
   r: number;
-  petal?: string;
-  petal2?: string;
-  center?: string;
+  night?: boolean;
 }) {
+  const petalA = night ? '#29324e' : '#f5c84b';
+  const petalB = night ? '#202943' : '#e7a832';
   return (
     <g className="scene-sunflower-head" data-motif="sunflower-head">
-      {range(18).map((i) => {
-        const a = n((i / 18) * 360);
+      {range(18).map((i) => (
+        <ellipse
+          key={i}
+          cx={n(cx)}
+          cy={n(cy - r * 0.84)}
+          rx={n(r * 0.14)}
+          ry={n(r * 0.42)}
+          fill={i % 2 ? petalA : petalB}
+          transform={`rotate(${n((i / 18) * 360)} ${n(cx)} ${n(cy)})`}
+        />
+      ))}
+      <circle cx={n(cx)} cy={n(cy)} r={n(r * 0.58)} fill={night ? '#11182d' : '#684322'} />
+      {range(20).map((i) => {
+        const a = (i / 20) * Math.PI * 5;
+        const radius = r * 0.5 * (i / 20);
+        return <circle key={i} cx={n(cx + Math.cos(a) * radius)} cy={n(cy + Math.sin(a) * radius)} r={n(r * 0.026)} fill={night ? '#34405b' : '#9b6a32'} />;
+      })}
+      <path d={`M${n(cx - r * 0.72)},${n(cy - r * 0.26)} Q${n(cx)},${n(cy - r)} ${n(cx + r * 0.56)},${n(cy - r * 0.36)}`} stroke={night ? '#b9c9db' : '#ffe6a1'} strokeWidth={n(r * 0.06)} fill="none" opacity={0.68} data-lighting="key" />
+      <path d={`M${n(cx + r * 0.52)},${n(cy + r * 0.28)} Q${n(cx)},${n(cy + r * 0.84)} ${n(cx - r * 0.48)},${n(cy + r * 0.32)}`} stroke="#6e8da5" strokeWidth={n(r * 0.09)} fill="none" opacity={0.34} data-lighting="fill" />
+      <path d={`M${n(cx + r * 0.7)},${n(cy - r * 0.28)} Q${n(cx + r * 0.4)},${n(cy - r * 0.76)} ${n(cx)},${n(cy - r * 0.82)}`} stroke={night ? '#d5deed' : '#f2cf8d'} strokeWidth={n(r * 0.04)} fill="none" opacity={0.62} data-lighting="rim" />
+    </g>
+  );
+}
+
+function Sunflower({
+  baseX,
+  baseY,
+  topX,
+  topY,
+  headR,
+  paint,
+  sway = 0,
+  night = false,
+}: {
+  baseX: number;
+  baseY: number;
+  topX: number;
+  topY: number;
+  headR: number;
+  paint: SceneWorldProps['paint'];
+  sway?: number;
+  night?: boolean;
+}) {
+  const stem = night ? '#172c32' : '#4e8e45';
+  const leaf = night ? '#203d38' : '#5d9b50';
+  return (
+    <g>
+      <g data-motif="sunflower-stem" data-material="leaf" filter={paint('sunflower-leaf')}>
+        <path d={`M${baseX - 18},${baseY} C${baseX - 12 + sway * 0.2},${n(baseY * 0.68)} ${topX - 14 + sway},${n(topY + (baseY - topY) * 0.32)} ${topX - 8},${topY} L${topX + 8},${topY} C${topX + 14 + sway},${n(topY + (baseY - topY) * 0.32)} ${baseX + 12 + sway * 0.2},${n(baseY * 0.68)} ${baseX + 18},${baseY} Z`} fill={stem} />
+        <Leaf x={baseX - 8} y={baseY - (baseY - topY) * 0.3} length={150} width={88} angle={-58} fill={leaf} vein={night ? '#516c6a' : '#d3d08a'} />
+        <Leaf x={baseX + 20} y={baseY - (baseY - topY) * 0.55} length={142} width={84} angle={54} fill={night ? '#1a3533' : '#3d783d'} vein={stem} />
+        <Leaf x={topX - 6} y={topY + (baseY - topY) * 0.18} length={110} width={66} angle={-46} fill={leaf} vein={stem} />
+        <path d={`M${baseX - 6},${baseY - 30} C${baseX - 36},${baseY - 240} ${topX + sway - 24},${topY + 180} ${topX - 3},${topY + 14}`} stroke={night ? '#aabfd0' : '#e3d394'} strokeWidth={5} fill="none" opacity={0.58} data-lighting="key" />
+        <path d={`M${baseX + 16},${baseY - 40} C${baseX + 42},${baseY - 260} ${topX + sway + 22},${topY + 170} ${topX + 8},${topY + 18}`} stroke="#66879f" strokeWidth={7} fill="none" opacity={0.34} data-lighting="fill" />
+        <path d={`M${baseX - 18},${baseY - 80} C${baseX - 42},${baseY - 300} ${topX + sway - 18},${topY + 120} ${topX - 8},${topY + 8}`} stroke={night ? '#d1dbe9' : '#f0c987'} strokeWidth={3} fill="none" opacity={0.64} data-lighting="rim" />
+      </g>
+      <FlowerHead cx={topX} cy={topY} r={headR} night={night} />
+    </g>
+  );
+}
+
+function Ribbon({
+  x1,
+  y1,
+  x2,
+  y2,
+  count,
+  bend = 0,
+}: {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  count: number;
+  bend?: number;
+}) {
+  const point = (t: number) => ({
+    x: x1 + (x2 - x1) * t,
+    y: y1 + (y2 - y1) * t - Math.sin(t * Math.PI) * bend,
+  });
+  return (
+    <g data-material="ribbon">
+      <path d={`M${x1},${y1} Q${n((x1 + x2) / 2)},${n((y1 + y2) / 2 - bend * 2)} ${x2},${y2}`} stroke="#3973bd" strokeWidth={12} fill="none" strokeLinecap="round" data-motif="ribbon" />
+      {range(count).map((i) => {
+        const p = point(count === 1 ? 0 : i / (count - 1));
         return (
-          <g key={i} transform={`rotate(${a} ${n(cx)} ${n(cy)})`}>
-            <ellipse
-              cx={n(cx)}
-              cy={n(cy - r * 0.98)}
-              rx={n(r * 0.15)}
-              ry={n(r * 0.5)}
-              fill={i % 2 === 0 ? petal : petal2}
-            />
+          <g key={i} data-motif="knot">
+            <circle cx={n(p.x)} cy={n(p.y)} r={9} fill="#28599b" />
+            <path d={`M${n(p.x - 12)},${n(p.y - 8)} L${n(p.x + 12)},${n(p.y + 8)} M${n(p.x - 12)},${n(p.y + 8)} L${n(p.x + 12)},${n(p.y - 8)}`} stroke="#6da0d3" strokeWidth={4} strokeLinecap="round" />
           </g>
         );
       })}
-      <circle cx={n(cx)} cy={n(cy)} r={n(r * 0.62)} fill={center} />
-      <circle cx={n(cx)} cy={n(cy)} r={n(r * 0.62)} fill="#000000" opacity={0.12} />
-      {range(24).map((i) => {
-        const a = (i / 24) * Math.PI * 2 * 3;
-        const rr = n(r * 0.6 * (i / 24));
-        return (
-          <circle
-            key={i}
-            cx={n(cx + Math.cos(a) * rr)}
-            cy={n(cy + Math.sin(a) * rr)}
-            r={2.2}
-            fill="#5a3a20"
-            opacity={0.7}
-          />
-        );
-      })}
     </g>
   );
 }
 
-function Fence({ y, fill = '#c39a6b', post = '#a97f52' }: { y: number; fill?: string; post?: string }) {
+function Fence({ y, paint, night = false }: { y: number; paint: SceneWorldProps['paint']; night?: boolean }) {
   return (
-    <g className="scene-fence">
-      <rect x={0} y={n(y)} width={VIEW_W} height={14} fill={fill} />
-      <rect x={0} y={n(y + 44)} width={VIEW_W} height={14} fill={fill} />
-      {range(13).map((i) => (
-        <rect
-          key={i}
-          x={n(i * 100 + 20)}
-          y={n(y - 24)}
-          width={22}
-          height={96}
-          rx={4}
-          fill={post}
-        />
-      ))}
+    <g data-material="timber" filter={paint('sunflower-garden-timber')}>
+      <path d={`M0,${y} C320,${y - 26} 760,${y + 22} 1200,${y - 18}`} stroke={night ? '#26324a' : '#a77a50'} strokeWidth={22} fill="none" />
+      <path d={`M0,${y + 74} C340,${y + 44} 770,${y + 96} 1200,${y + 54}`} stroke={night ? '#202a40' : '#8c6242'} strokeWidth={18} fill="none" />
+      {range(12).map((i) => <path key={i} d={`M${30 + i * 106},${y - 34} L${44 + i * 106},${y + 118}`} stroke={night ? '#1c2538' : '#8f6646'} strokeWidth={24} strokeLinecap="round" />)}
     </g>
   );
 }
 
-function GlowWindow({ x, y, w, h, paint }: { x: number; y: number; w: number; h: number; paint: string }) {
+function LitCharacter({
+  id,
+  kind,
+  x,
+  y,
+  scale,
+  performance,
+}: {
+  id: SceneWorldProps['id'];
+  kind: 'milo' | 'rosa';
+  x: number;
+  y: number;
+  scale: number;
+  performance: CharacterPerformance;
+}) {
+  const appearance = kind === 'milo' ? MILO : ROSA;
+  const geometry = resolvePoseGeometry(appearance, performance, { x, y, scale });
+  const rendered = foreshortenGeometry(geometry);
+  const hr = appearance.proportions.headRadius * scale;
   return (
-    <g className="scene-window">
-      <rect x={n(x - 8)} y={n(y - 8)} width={n(w + 16)} height={n(h + 16)} rx={8} fill="#8a6b4a" />
-      <rect x={n(x)} y={n(y)} width={n(w)} height={n(h)} fill={paint} />
-      <rect x={n(x + w / 2 - 2)} y={n(y)} width={4} height={n(h)} fill="#8a6b4a" />
-      <rect x={n(x)} y={n(y + h / 2 - 2)} width={n(w)} height={4} fill="#8a6b4a" />
+    <g data-character-lighting="sunflower" data-character={kind}>
+      <CinematicCharacter
+        id={(part) => id(`${kind}-${part}`)}
+        x={x}
+        y={y}
+        scale={scale}
+        appearance={appearance}
+        performance={performance}
+        className={`scene-${kind}`}
+      />
+      <path d={`M${n(geometry.head.x - hr * 0.86)},${n(geometry.head.y - hr * 0.04)} Q${n(geometry.head.x - hr * 0.62)},${n(geometry.head.y - hr * 0.72)} ${n(geometry.head.x - hr * 0.08)},${n(geometry.head.y - hr * 0.9)} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y)} L${n(rendered.elbow.left.x)},${n(rendered.elbow.left.y)}`} stroke="#f4c48d" strokeWidth={n(4.5 * scale)} fill="none" strokeLinecap="round" opacity={0.72} data-lighting="key" />
+      <path d={`M${n(geometry.head.x + hr * 0.78)},${n(geometry.head.y + hr * 0.14)} Q${n(geometry.head.x + hr * 0.5)},${n(geometry.head.y + hr * 0.72)} ${n(geometry.head.x + hr * 0.04)},${n(geometry.head.y + hr * 0.86)} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y + 5)} L${n(geometry.hip.right.x)},${n(geometry.hip.right.y + 12)}`} stroke="#7598af" strokeWidth={n(6 * scale)} fill="none" strokeLinecap="round" opacity={0.38} data-lighting="fill" />
+      <path d={`M${n(geometry.head.x + hr * 0.9)},${n(geometry.head.y - hr * 0.12)} Q${n(geometry.head.x + hr * 0.7)},${n(geometry.head.y - hr * 0.7)} ${n(geometry.head.x + hr * 0.18)},${n(geometry.head.y - hr * 0.9)} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y)} L${n(rendered.elbow.right.x)},${n(rendered.elbow.right.y)}`} stroke="#efd09a" strokeWidth={n(2.8 * scale)} fill="none" strokeLinecap="round" opacity={0.62} data-lighting="rim" />
+    </g>
+  );
+}
+
+function Window({ x, y, width, height, paint, night = false }: { x: number; y: number; width: number; height: number; paint: SceneWorldProps['paint']; night?: boolean }) {
+  return (
+    <g data-motif="window">
+      <rect x={x} y={y} width={width} height={height} rx={14} fill={night ? '#111a32' : '#8d6948'} />
+      <rect x={x + 20} y={y + 20} width={width - 40} height={height - 40} fill={night ? '#18294b' : paint('sunflowerWindowGlow')} />
+      <path d={`M${x + width / 2},${y + 18} V${y + height - 18} M${x + 18},${y + height / 2} H${x + width - 18}`} stroke={night ? '#3f4c70' : '#795a40'} strokeWidth={10} />
     </g>
   );
 }
 
 function Bee({ x, y }: { x: number; y: number }) {
   return (
-    <g className="scene-bee" transform={`translate(${n(x)} ${n(y)})`}>
-      <ellipse cx={0} cy={0} rx={9} ry={6} fill="#f2c14e" />
-      <rect x={-4} y={-6} width={3} height={12} fill="#3a2a1a" rx={1} />
-      <rect x={2} y={-6} width={3} height={12} fill="#3a2a1a" rx={1} />
-      <ellipse cx={-8} cy={-6} rx={7} ry={4} fill="#ffffff" opacity={0.7} />
-      <ellipse cx={8} cy={-6} rx={7} ry={4} fill="#ffffff" opacity={0.7} />
+    <g transform={`translate(${x} ${y})`}>
+      <ellipse cx={0} cy={0} rx={10} ry={7} fill="#e9b840" />
+      <path d="M-4,-6 V6 M3,-6 V6" stroke="#2e271d" strokeWidth={3} />
+      <ellipse cx={-9} cy={-7} rx={7} ry={4} fill="#dbe7e8" opacity={0.7} />
+      <ellipse cx={9} cy={-7} rx={7} ry={4} fill="#dbe7e8" opacity={0.7} />
     </g>
   );
 }
 
 function Ladybug({ x, y }: { x: number; y: number }) {
   return (
-    <g className="scene-ladybug" transform={`translate(${n(x)} ${n(y)})`}>
-      <ellipse cx={0} cy={0} rx={8} ry={7} fill="#d64b3f" />
-      <rect x={-0.8} y={-7} width={1.6} height={14} fill="#2b2233" />
-      <circle cx={-3} cy={-1} r={1.4} fill="#2b2233" />
-      <circle cx={3} cy={2} r={1.4} fill="#2b2233" />
-      <circle cx={0} cy={-9} r={3} fill="#2b2233" />
+    <g transform={`translate(${x} ${y})`}>
+      <ellipse cx={0} cy={0} rx={9} ry={8} fill="#c94639" />
+      <path d="M0,-8 V8" stroke="#251e27" strokeWidth={2} />
+      <circle cx={-3} cy={-1} r={1.5} fill="#251e27" />
+      <circle cx={3} cy={2} r={1.5} fill="#251e27" />
     </g>
   );
 }
 
-/** Milo's head, tilted by `tilt` degrees, awake or asleep. */
-function MiloHead({
-  cx,
-  cy,
-  r = 34,
-  tilt = 0,
-  asleep = false,
-  mouth = 'smile',
-}: {
-  cx: number;
-  cy: number;
-  r?: number;
-  tilt?: number;
-  asleep?: boolean;
-  mouth?: 'smile' | 'open' | 'soft';
-}) {
+function Bed({ paint }: { paint: SceneWorldProps['paint'] }) {
   return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`}>
-      <circle cx={n(cx)} cy={n(cy)} r={r} fill={SKIN} />
-      <path
-        d={`M${n(cx - r)},${n(cy - r * 0.3)} Q${n(cx)},${n(cy - r * 1.5)} ${n(
-          cx + r,
-        )},${n(cy - r * 0.3)} Q${n(cx + r * 0.6)},${n(cy - r * 0.9)} ${n(cx)},${n(
-          cy - r * 0.85,
-        )} Q${n(cx - r * 0.6)},${n(cy - r * 0.9)} ${n(cx - r)},${n(cy - r * 0.3)} Z`}
-        fill={HAIR}
-      />
-      {asleep ? (
-        <>
-          <ClosedEye cx={n(cx - r * 0.35)} cy={n(cy)} w={13} />
-          <ClosedEye cx={n(cx + r * 0.35)} cy={n(cy)} w={13} />
-        </>
-      ) : (
-        <>
-          <Eye cx={n(cx - r * 0.32)} cy={n(cy - r * 0.02)} r={4.6} />
-          <Eye cx={n(cx + r * 0.32)} cy={n(cy - r * 0.02)} r={4.6} />
-        </>
-      )}
-      <Blush cx={n(cx - r * 0.55)} cy={n(cy + r * 0.38)} r={6} />
-      <Blush cx={n(cx + r * 0.55)} cy={n(cy + r * 0.38)} r={6} />
-      {mouth === 'open' ? (
-        <OpenMouth cx={n(cx)} cy={n(cy + r * 0.5)} rx={7} ry={9} />
-      ) : mouth === 'soft' ? (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.42)} w={16} curve={6} />
-      ) : (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.42)} w={22} curve={11} />
-      )}
+    <g data-material="cloth" filter={paint('sunflower-bed-cloth')}>
+      <rect x={34} y={558} width={536} height={194} rx={30} fill="#4a4d78" />
+      <ellipse cx={176} cy={576} rx={112} ry={48} fill="#dedff0" />
+      <path d="M42,704 L42,630 Q232,572 564,648 L564,774 L42,774 Z" fill={paint('sunflowerBed')} />
+      <path d="M54,646 Q250,596 540,664" stroke="#b1b4db" strokeWidth={8} fill="none" opacity={0.44} data-lighting="key" />
+      <path d="M48,714 Q266,656 552,718" stroke="#48627f" strokeWidth={14} fill="none" opacity={0.34} data-lighting="fill" />
+      <path d="M50,622 Q244,572 538,650" stroke="#d9dceb" strokeWidth={4} fill="none" opacity={0.62} data-lighting="rim" />
     </g>
   );
 }
 
-/** A small child hand: palm plus four fingers and a thumb, for readable poses. */
-function Hand({
-  x,
-  y,
-  angle = 0,
-  scale = 1,
-  skin = SKIN,
-}: {
-  x: number;
-  y: number;
-  angle?: number;
-  scale?: number;
-  skin?: string;
-}) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`}>
-      <ellipse cx={0} cy={0} rx={20} ry={15} fill={skin} />
-      <Capsule x1={12} y1={-9} x2={32} y2={-15} width={8} fill={skin} />
-      <Capsule x1={15} y1={-2} x2={37} y2={-4} width={8} fill={skin} />
-      <Capsule x1={14} y1={6} x2={35} y2={9} width={8} fill={skin} />
-      <Capsule x1={10} y1={12} x2={27} y2={20} width={7} fill={skin} />
-      <Capsule x1={-2} y1={-12} x2={6} y2={-26} width={8} fill={skin} />
-    </g>
-  );
-}
-
-function Defs({ id }: SceneWorldProps): ReactNode {
-  return (
-    <defs>
-      <LinearGradient
-        id={id('dawnSky')}
-        stops={[
-          { offset: 0, color: '#fbe4c2' },
-          { offset: 0.5, color: '#f7ddb5' },
-          { offset: 1, color: '#dfe6c0' },
-        ]}
-      />
-      <LinearGradient
-        id={id('warmSky')}
-        stops={[
-          { offset: 0, color: '#cfe6c8' },
-          { offset: 1, color: '#f4e3a8' },
-        ]}
-      />
-      <LinearGradient
-        id={id('honeySky')}
-        stops={[
-          { offset: 0, color: '#f7d98a' },
-          { offset: 1, color: '#f6e7b4' },
-        ]}
-      />
-      <LinearGradient
-        id={id('nightSky')}
-        stops={[
-          { offset: 0, color: '#1b2140' },
-          { offset: 0.6, color: '#2a2f57' },
-          { offset: 1, color: '#3d3b63' },
-        ]}
-      />
-      <RadialGradient
-        id={id('windowGlow')}
-        stops={[
-          { offset: 0, color: '#ffe6a3' },
-          { offset: 1, color: '#f4b95e' },
-        ]}
-      />
-      <RadialGradient
-        id={id('moonGlow')}
-        stops={[
-          { offset: 0, color: '#f8f3d6', opacity: 0.85 },
-          { offset: 1, color: '#f8f3d6', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('vignette')}
-        stops={[
-          { offset: 0.62, color: '#000000', opacity: 0 },
-          { offset: 1, color: '#241a10', opacity: 0.34 },
-        ]}
-      />
-      <GrainFilter id={id('grain')} opacity={0.045} />
-    </defs>
-  );
-}
-
-const sky = (fill: string) => (
-  <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />
-);
-
-const finish = (paint: SceneWorldProps['paint']) => (
-  <>
-    <GrainWash filter={paint('grain')} />
-    <Vignette paint={paint('vignette')} />
-  </>
-);
-
-const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'sunflower-01-dawn-window': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('dawnSky'))}
-      <circle cx={n(VIEW_W * 0.2)} cy={n(VIEW_H * 0.22)} r={70} fill="#fff2cf" opacity={0.7} />
-      <Cloud x={VIEW_W * 0.68} y={VIEW_H * 0.16} scale={1.1} fill="#fff7ea" opacity={0.8} />
-      <Cloud x={VIEW_W * 0.4} y={VIEW_H * 0.28} scale={0.8} fill="#fff7ea" opacity={0.6} />
-      {/* house wall + glowing window, behind */}
-      <rect x={0} y={n(VIEW_H * 0.32)} width={n(VIEW_W * 0.34)} height={n(VIEW_H * 0.5)} fill="#e7c79a" />
-      <GlowWindow x={VIEW_W * 0.08} y={VIEW_H * 0.4} w={130} h={150} paint={paint('windowGlow')} />
-      <Fence y={VIEW_H * 0.62} />
-      {/* towering sunflower */}
-      <Stem xBase={VIEW_W * 0.66} baseY={VIEW_H * 0.9} xTop={VIEW_W * 0.63} topY={VIEW_H * 0.12} wBase={30} sway={-14} />
-      <Leaf x={VIEW_W * 0.66} y={VIEW_H * 0.62} length={130} width={80} angle={-58} fill={STEM} />
-      <Leaf x={VIEW_W * 0.63} y={VIEW_H * 0.4} length={120} width={72} angle={54} fill={STEM_DARK} />
-      <FlowerHead cx={VIEW_W * 0.63} cy={VIEW_H * 0.13} r={92} />
-      <Ladybug x={VIEW_W * 0.665} y={VIEW_H * 0.72} />
-      <Bee x={VIEW_W * 0.5} y={VIEW_H * 0.2} />
-      <Bee x={VIEW_W * 0.74} y={VIEW_H * 0.26} />
-      <GrassRow seed={seed} baseY={VIEW_H * 0.92} blades={46} height={44} lean={6} fill="#6aa653" />
-      <GrassRow seed={seed + 5} baseY={VIEW_H} blades={40} height={58} lean={4} fill="#548a44" />
-      {/* Milo, small, looking up */}
-      <g transform={`translate(${n(VIEW_W * 0.26)} ${n(VIEW_H * 0.7)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={90} width={46} fill={PJ} />
-        <rect x={-23} y={40} width={46} height={10} fill={PJ_DARK} opacity={0.5} />
-        <Capsule x1={-14} y1={20} x2={-30} y2={-24} width={16} fill={PJ} />
-        <Capsule x1={14} y1={20} x2={34} y2={-26} width={16} fill={PJ} />
-        <Capsule x1={-10} y1={88} x2={-14} y2={140} width={17} fill={PJ_DARK} />
-        <Capsule x1={10} y1={88} x2={14} y2={140} width={17} fill={PJ_DARK} />
-        <ellipse cx={-14} cy={146} rx={12} ry={7} fill={SKIN} />
-        <ellipse cx={14} cy={146} rx={12} ry={7} fill={SKIN} />
-        <MiloHead cx={0} cy={-40} r={34} tilt={-8} mouth="open" />
-      </g>
-      {finish(paint)}
-    </g>
+const PAGES: Record<string, (props: SceneWorldProps) => ReactNode> = {
+  'sunflower-01-dawn-window': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-01-dawn-window" stage={0} id={id} seed={seed} paint={paint} lighting={DAWN_LIGHT} materials={[GARDEN_TIMBER, LEAF_MATERIAL]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerDawnSky')} />
+      <DepthLayer depth="far">
+        <path d="M0,520 L0,250 L390,250 L390,800 L0,800 Z" fill="#96745d" />
+        <Window x={72} y={292} width={240} height={190} paint={paint} />
+        <path d="M390,468 C570,420 744,448 920,394 C1050,354 1126,372 1200,346 L1200,610 L390,610 Z" fill="#66785e" opacity={0.56} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <Fence y={560} paint={paint} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Sunflower baseX={780} baseY={760} topX={742} topY={134} headR={82} paint={paint} sway={-18} />
+        <Ladybug x={786} y={604} />
+        <Bee x={616} y={188} />
+        <Bee x={874} y={240} />
+        <LitCharacter id={id} kind="milo" x={290} y={730} scale={0.86} performance={MILO_GAZE} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,704 Q130,666 268,712 L326,800 Z" fill="#394032" />
+        <path d="M1200,800 L1200,676 Q1116,646 1030,706 L990,800 Z" fill="#394032" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-02-hand-stack': ({ paint }) => (
-    <g data-scene-art>
-      {sky(paint('warmSky'))}
-      <circle cx={n(VIEW_W * 0.8)} cy={n(VIEW_H * 0.2)} r={90} fill="#fff2c8" opacity={0.55} />
-      {/* a big diagonal stem, close-up */}
-      <g transform={`rotate(-16 ${n(VIEW_W * 0.5)} ${n(VIEW_H * 0.5)})`} data-motif="sunflower-stem">
-        <rect x={n(VIEW_W * 0.42)} y={-40} width={110} height={VIEW_H + 120} fill={STEM} rx={30} />
-        <rect x={n(VIEW_W * 0.42)} y={-40} width={26} height={VIEW_H + 120} fill="#ffffff" opacity={0.12} />
-        <rect x={n(VIEW_W * 0.42 + 84)} y={-40} width={24} height={VIEW_H + 120} fill={STEM_DARK} opacity={0.5} />
-      </g>
-      <Leaf x={VIEW_W * 0.36} y={VIEW_H * 0.34} length={200} width={120} angle={-64} fill={STEM_DARK} />
-      <Leaf x={VIEW_W * 0.7} y={VIEW_H * 0.7} length={210} width={128} angle={128} fill={STEM} />
-      {/* Milo at bottom, hands stacked flat on stem */}
-      <g transform={`translate(${n(VIEW_W * 0.34)} ${n(VIEW_H * 0.78)})`}>
-        <Capsule x1={0} y1={70} x2={0} y2={200} width={70} fill={PJ} />
-        <MiloHead cx={0} cy={20} r={44} tilt={10} mouth="soft" />
-        <Capsule x1={30} y1={70} x2={150} y2={-80} width={26} fill={PJ} />
-        <Capsule x1={40} y1={110} x2={168} y2={-8} width={26} fill={PJ_DARK} />
-        {/* two flat hands pressed on the stem */}
-        <g fill={SKIN}>
-          <rect x={140} y={-104} width={62} height={30} rx={14} transform="rotate(-30 171 -89)" />
-          <rect x={160} y={-30} width={62} height={30} rx={14} transform="rotate(-30 191 -15)" />
+  'sunflower-02-hand-stack': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-02-hand-stack" stage={1} id={id} seed={seed} paint={paint} lighting={MORNING_LIGHT} materials={[LEAF_MATERIAL]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerMorningSky')} />
+      <DepthLayer depth="far">
+        <path d="M0,520 C250,464 470,510 680,446 C870,388 1032,416 1200,364 L1200,800 L0,800 Z" fill="#6c7b5f" opacity={0.56} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g transform="rotate(-12 660 420)">
+          <path d="M610,850 C626,620 640,344 652,-80 L744,-80 C724,320 706,600 696,850 Z" fill="#4e8e45" data-motif="sunflower-stem" />
+          <path d="M630,800 C650,570 664,310 678,-40" stroke="#d6cf86" strokeWidth={8} fill="none" opacity={0.52} data-lighting="key" />
+          <path d="M700,790 C694,560 704,306 718,-30" stroke="#6b8ca1" strokeWidth={12} fill="none" opacity={0.34} data-lighting="fill" />
+          <path d="M612,740 C634,520 646,278 660,-20" stroke="#f0c98b" strokeWidth={4} fill="none" opacity={0.62} data-lighting="rim" />
         </g>
-        <path d="M150,-98 l40,-22 M156,-88 l40,-22 M162,-78 l40,-22" stroke={SKIN_SHADOW} strokeWidth={3} opacity={0.5} />
-      </g>
-      <Bee x={VIEW_W * 0.82} y={VIEW_H * 0.38} />
-      {finish(paint)}
-    </g>
+        <Leaf x={610} y={320} length={230} width={132} angle={-64} fill="#3d783d" vein="#d4cf88" />
+        <Leaf x={742} y={600} length={240} width={140} angle={128} fill="#5d9b50" vein="#3f743b" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="milo" x={500} y={742} scale={1.06} performance={MILO_STACK} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,724 Q120,680 246,724 L300,800 Z" fill="#384034" />
+        <path d="M1200,800 L1200,696 Q1114,662 1028,716 L986,800 Z" fill="#384034" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-03-knot-ribbon': ({ paint }) => (
-    <g data-scene-art>
-      {/* top-down warm plank floor */}
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#b98a56" />
-      {range(7).map((i) => (
-        <rect key={i} x={0} y={n(i * (VIEW_H / 7))} width={VIEW_W} height={10} fill="#93693e" opacity={0.7} />
-      ))}
-      {range(7).map((i) => (
-        <rect key={i} x={0} y={n(i * (VIEW_H / 7) + 6)} width={VIEW_W} height={2} fill="#7a5531" opacity={0.5} />
-      ))}
-      <ellipse cx={n(VIEW_W * 0.42)} cy={n(VIEW_H * 0.66)} rx={n(VIEW_W * 0.52)} ry={n(VIEW_H * 0.44)} fill="#e6ba7c" opacity={0.35} />
-      {/* open doorway behind, warm light spilling out */}
-      <rect x={n(VIEW_W * 0.28)} y={-20} width={n(VIEW_W * 0.44)} height={n(VIEW_H * 0.3)} fill="#4a3320" />
-      <rect x={n(VIEW_W * 0.31)} y={-20} width={n(VIEW_W * 0.38)} height={n(VIEW_H * 0.25)} fill={paint('windowGlow')} opacity={0.9} />
-      <path
-        d={`M${n(VIEW_W * 0.31)},${n(VIEW_H * 0.25)} L${n(VIEW_W * 0.24)},${n(VIEW_H * 0.5)} L${n(
-          VIEW_W * 0.76,
-        )},${n(VIEW_H * 0.5)} L${n(VIEW_W * 0.69)},${n(VIEW_H * 0.25)} Z`}
-        fill={paint('windowGlow')}
-        opacity={0.22}
-      />
-      {/* Rosa leaning in from the doorway, reaching a ribbon end down */}
-      <g transform={`translate(${n(VIEW_W * 0.5)} ${n(VIEW_H * 0.04)})`}>
-        <ellipse cx={0} cy={116} rx={104} ry={70} fill="#c66d8e" />
-        <ellipse cx={0} cy={116} rx={104} ry={70} fill="#000000" opacity={0.06} />
-        <circle cx={0} cy={70} r={48} fill={SKIN} />
-        <path d={`M-48,58 Q0,-6 48,58 Q26,20 0,26 Q-26,20 -48,58 Z`} fill="#3a2417" />
-        <path d="M0,20 q40,-14 30,-56" stroke="#3a2417" strokeWidth={18} fill="none" strokeLinecap="round" />
-        <Eye cx={-16} cy={72} r={4.5} />
-        <Eye cx={16} cy={72} r={4.5} />
-        <Smile cx={0} cy={88} w={22} curve={9} />
-        <Capsule x1={-70} y1={150} x2={-150} y2={280} width={26} fill="#c66d8e" />
-        <Hand x={-158} y={292} angle={116} scale={1.05} />
-      </g>
-      {/* an open craft box with ribbon spools */}
-      <g transform={`translate(${n(VIEW_W * 0.14)} ${n(VIEW_H * 0.42)})`}>
-        <rect x={-56} y={-38} width={112} height={78} rx={10} fill="#8a5a34" />
-        <rect x={-46} y={-30} width={92} height={60} rx={8} fill="#6f4526" />
-        <circle cx={-22} cy={-2} r={20} fill="#d8c25a" />
-        <circle cx={-22} cy={-2} r={7} fill="#8a5a34" />
-        <circle cx={20} cy={6} r={16} fill="#c96f74" />
-        <circle cx={20} cy={6} r={5} fill="#8a5a34" />
-        <path d="M40,-20 q40,14 70,2" stroke={RIBBON} strokeWidth={9} fill="none" strokeLinecap="round" opacity={0.9} />
-      </g>
-      {/* the blue ribbon laid across, with a neat row of tied knots */}
-      <path
-        d={`M${n(VIEW_W * 0.12)},${n(VIEW_H * 0.66)} C${n(VIEW_W * 0.32)},${n(VIEW_H * 0.58)} ${n(
-          VIEW_W * 0.52,
-        )},${n(VIEW_H * 0.74)} ${n(VIEW_W * 0.9)},${n(VIEW_H * 0.64)}`}
-        stroke={RIBBON}
-        strokeWidth={18}
-        fill="none"
-        strokeLinecap="round"
-        data-motif="ribbon"
-      />
-      {range(7).map((i) => {
-        const t = i / 6;
-        const x = n(VIEW_W * (0.12 + t * 0.78));
-        const y = n(VIEW_H * (0.66 - Math.sin(t * Math.PI) * 0.08));
-        return (
-          <g key={i} data-motif="knot">
-            <circle cx={x} cy={y} r={13} fill="#2f5da3" />
-            <Capsule x1={n(x - 12)} y1={n(y - 10)} x2={n(x + 12)} y2={n(y - 16)} width={5} fill="#2f5da3" />
-            <Capsule x1={n(x - 12)} y1={n(y + 10)} x2={n(x + 12)} y2={n(y + 16)} width={5} fill="#2f5da3" />
-          </g>
-        );
-      })}
-      {/* Milo's two small hands tying a knot in the foreground */}
-      <Capsule x1={n(VIEW_W * 0.32)} y1={n(VIEW_H * 1.02)} x2={n(VIEW_W * 0.4)} y2={n(VIEW_H * 0.78)} width={30} fill={PJ} />
-      <Capsule x1={n(VIEW_W * 0.5)} y1={n(VIEW_H * 1.02)} x2={n(VIEW_W * 0.46)} y2={n(VIEW_H * 0.78)} width={30} fill={PJ} />
-      <Hand x={n(VIEW_W * 0.41)} y={n(VIEW_H * 0.76)} angle={-64} scale={1.1} />
-      <Hand x={n(VIEW_W * 0.47)} y={n(VIEW_H * 0.76)} angle={-116} scale={1.1} />
-      {finish(paint)}
-    </g>
+  'sunflower-03-knot-ribbon': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-03-knot-ribbon" stage={2} id={id} seed={seed} paint={paint} lighting={MORNING_LIGHT} materials={[GARDEN_TIMBER]}>
+      <rect width={VIEW_W} height={VIEW_H} fill="#8a5b3a" />
+      <DepthLayer depth="far">
+        <Window x={410} y={18} width={380} height={260} paint={paint} />
+        <path d="M390,260 L280,500 L920,500 L810,260 Z" fill={paint('sunflowerWindowGlow')} opacity={0.28} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-material="timber" filter={paint('sunflower-garden-timber')}>
+          {range(6).map((i) => <path key={i} d={`M0,${100 + i * 130} C340,${76 + i * 130} 780,${124 + i * 130} 1200,${88 + i * 130}`} stroke="#5a3929" strokeWidth={10} fill="none" opacity={0.4} />)}
+        </g>
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Ribbon x1={160} y1={570} x2={1040} y2={552} count={7} bend={74} />
+        <LitCharacter id={id} kind="milo" x={500} y={730} scale={0.82} performance={MILO_KNOT} />
+        <LitCharacter id={id} kind="rosa" x={790} y={690} scale={0.88} performance={ROSA_OFFER} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <g transform="translate(120 700)" data-motif="craft-box">
+          <path d="M-100,-48 L86,-66 L112,70 L-82,88 Z" fill="#5c3c2b" />
+          <circle cx={-34} cy={-8} r={28} fill="#c4a94c" />
+          <circle cx={38} cy={8} r={24} fill="#ae5e72" />
+        </g>
+        <path d="M980,800 Q1080,690 1200,724 L1200,800 Z" fill="#43322c" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-04-windy-wobble': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('warmSky'))}
-      <Cloud x={VIEW_W * 0.3} y={VIEW_H * 0.18} scale={1} fill="#fff7ea" opacity={0.8} />
-      <Cloud x={VIEW_W * 0.72} y={VIEW_H * 0.12} scale={0.7} fill="#fff7ea" opacity={0.6} />
-      {/* strongly bending stem */}
-      <Stem xBase={VIEW_W * 0.5} baseY={VIEW_H * 0.95} xTop={VIEW_W * 0.78} topY={VIEW_H * 0.14} wBase={30} sway={120} />
-      <Leaf x={VIEW_W * 0.56} y={VIEW_H * 0.6} length={130} width={78} angle={40} fill={STEM_DARK} />
-      <FlowerHead cx={VIEW_W * 0.78} cy={VIEW_H * 0.14} r={78} />
-      {/* fluttering ribbon flapping like a flag */}
-      <path
-        d={`M${n(VIEW_W * 0.5)},${n(VIEW_H * 0.5)} q60,-40 120,-6 q60,34 130,-2`}
-        stroke={RIBBON}
-        strokeWidth={12}
-        fill="none"
-        strokeLinecap="round"
-        className="scene-ribbon"
-        data-motif="ribbon"
-      />
-      {range(4).map((i) => (
-        <circle key={i} cx={n(VIEW_W * 0.5 + i * 66 + 30)} cy={n(VIEW_H * (0.48 + (i % 2) * 0.04))} r={9} fill="#2f5da3" data-motif="knot" />
-      ))}
-      {/* petals lifting into the air */}
-      {range(6).map((i) => {
-        const rand = ((seed + i * 97) % 100) / 100;
-        return (
-          <ellipse
-            key={i}
-            cx={n(VIEW_W * (0.6 + rand * 0.28))}
-            cy={n(VIEW_H * (0.2 + rand * 0.3))}
-            rx={16}
-            ry={7}
-            fill="#f6c945"
-            transform={`rotate(${n(rand * 120 - 40)} ${n(VIEW_W * (0.6 + rand * 0.28))} ${n(
-              VIEW_H * (0.2 + rand * 0.3),
-            )})`}
-            opacity={0.9}
-          />
-        );
-      })}
-      <GrassRow seed={seed} baseY={VIEW_H} blades={44} height={58} lean={30} fill="#5f9a4f" />
-      {/* Milo steadying with both hands, hair blown */}
-      <g transform={`translate(${n(VIEW_W * 0.32)} ${n(VIEW_H * 0.66)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={96} width={48} fill={PJ} />
-        <Capsule x1={16} y1={16} x2={120} y2={-4} width={16} fill={PJ} />
-        <Capsule x1={16} y1={30} x2={122} y2={20} width={16} fill={PJ_DARK} />
-        <ellipse cx={126} cy={-6} rx={16} ry={11} fill={SKIN} />
-        <ellipse cx={128} cy={20} rx={16} ry={11} fill={SKIN} />
-        <Capsule x1={-8} y1={94} x2={-14} y2={150} width={17} fill={PJ_DARK} />
-        <Capsule x1={12} y1={94} x2={20} y2={150} width={17} fill={PJ_DARK} />
-        <MiloHead cx={0} cy={-38} r={32} tilt={12} mouth="open" />
-        {/* windblown hair streaks */}
-        <path d="M20,-58 q30,-6 46,4 M22,-46 q30,-4 44,6" stroke={HAIR} strokeWidth={5} fill="none" strokeLinecap="round" />
-      </g>
-      {finish(paint)}
-    </g>
+  'sunflower-04-windy-wobble': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-04-windy-wobble" stage={3} id={id} seed={seed} paint={paint} lighting={BREEZE_LIGHT} materials={[LEAF_MATERIAL]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerBreezeSky')} />
+      <DepthLayer depth="far">
+        <path d="M0,430 C190,386 330,420 490,370 C660,316 804,356 978,310 C1068,286 1138,292 1200,272" stroke="#aeb5a1" strokeWidth={62} fill="none" opacity={0.3} />
+        <path d="M80,230 C310,190 540,220 760,172 M420,300 C668,252 882,276 1110,224" stroke="#d6d8c6" strokeWidth={10} fill="none" opacity={0.42} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <Sunflower baseX={650} baseY={780} topX={900} topY={142} headR={72} paint={paint} sway={110} />
+        <Ribbon x1={630} y1={610} x2={1050} y2={376} count={4} bend={92} />
+        {range(6).map((i) => <ellipse key={i} cx={n(790 + i * 54)} cy={n(250 + (i % 3) * 44)} rx={16} ry={7} fill="#efbd42" transform={`rotate(${i * 23 - 30} ${790 + i * 54} ${250 + (i % 3) * 44})`} />)}
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="milo" x={472} y={736} scale={1.0} performance={MILO_STEADY} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,704 Q130,654 280,710 L342,800 Z" fill="#344039" />
+        <path d="M1200,800 L1200,676 Q1128,650 1044,706 L1002,800 Z" fill="#344039" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-05-teamwork-count': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('honeySky'))}
-      <circle cx={n(VIEW_W * 0.16)} cy={n(VIEW_H * 0.2)} r={80} fill="#fff0bf" opacity={0.6} />
-      <Fence y={VIEW_H * 0.58} />
-      {/* vertical stem with ribbon of knots */}
-      <Stem xBase={VIEW_W * 0.52} baseY={VIEW_H * 0.95} xTop={VIEW_W * 0.5} topY={VIEW_H * 0.1} wBase={30} sway={-6} />
-      <Leaf x={VIEW_W * 0.52} y={VIEW_H * 0.62} length={128} width={76} angle={-56} fill={STEM} />
-      <Leaf x={VIEW_W * 0.5} y={VIEW_H * 0.36} length={120} width={72} angle={52} fill={STEM_DARK} />
-      <FlowerHead cx={VIEW_W * 0.5} cy={VIEW_H * 0.11} r={80} />
-      <line x1={n(VIEW_W * 0.55)} y1={n(VIEW_H * 0.92)} x2={n(VIEW_W * 0.53)} y2={n(VIEW_H * 0.16)} stroke={RIBBON} strokeWidth={9} strokeLinecap="round" data-motif="ribbon" />
-      {range(11).map((i) => {
-        const t = i / 10;
-        return <circle key={i} cx={n(VIEW_W * (0.55 - t * 0.02))} cy={n(VIEW_H * (0.92 - t * 0.76))} r={8} fill="#2f5da3" data-motif="knot" />;
-      })}
-      {/* Rosa kneeling low, holding the base */}
-      <g transform={`translate(${n(VIEW_W * 0.66)} ${n(VIEW_H * 0.72)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={120} width={58} fill="#c66d8e" />
-        <Capsule x1={-20} y1={30} x2={-120} y2={110} width={20} fill="#c66d8e" />
-        <ellipse cx={-124} cy={112} rx={16} ry={11} fill={SKIN} />
-        <circle cx={0} cy={-46} r={38} fill={SKIN} />
-        <path d={`M-38,-56 Q0,-104 38,-56 Q20,-92 0,-88 Q-20,-92 -38,-56 Z`} fill="#3a2417" />
-        <path d="M34,-52 q26,20 16,72" stroke="#3a2417" strokeWidth={16} fill="none" strokeLinecap="round" />
-        <Eye cx={-12} cy={-48} r={4} />
-        <Eye cx={12} cy={-48} r={4} />
-        <Smile cx={0} cy={-34} w={18} curve={8} />
-      </g>
-      {/* Milo above, touching a knot */}
-      <g transform={`translate(${n(VIEW_W * 0.36)} ${n(VIEW_H * 0.5)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={90} width={44} fill={PJ} />
-        <Capsule x1={16} y1={14} x2={130} y2={20} width={15} fill={PJ} />
-        <ellipse cx={136} cy={20} rx={14} ry={10} fill={SKIN} />
-        <MiloHead cx={0} cy={-34} r={30} tilt={6} mouth="soft" />
-      </g>
-      <GrassRow seed={seed} baseY={VIEW_H} blades={42} height={46} lean={5} fill="#6aa653" />
-      {finish(paint)}
-    </g>
+  'sunflower-05-teamwork-count': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-05-teamwork-count" stage={4} id={id} seed={seed} paint={paint} lighting={HONEY_LIGHT} materials={[GARDEN_TIMBER, LEAF_MATERIAL]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerHoneySky')} />
+      <DepthLayer depth="far">
+        <Fence y={548} paint={paint} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <Sunflower baseX={620} baseY={770} topX={600} topY={130} headR={76} paint={paint} sway={-8} />
+        <Ribbon x1={660} y1={742} x2={642} y2={188} count={11} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="milo" x={392} y={726} scale={0.86} performance={MILO_COUNT} />
+        <LitCharacter id={id} kind="rosa" x={812} y={734} scale={0.92} performance={ROSA_HOLD} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,712 Q104,676 226,714 L278,800 Z" fill="#3a3932" />
+        <path d="M1200,800 L1200,694 Q1118,664 1036,712 L992,800 Z" fill="#3a3932" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-06-fourteen-hands': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('honeySky'))}
-      <circle cx={n(VIEW_W * 0.82)} cy={n(VIEW_H * 0.18)} r={96} fill="#fff0bd" opacity={0.7} />
-      <Cloud x={VIEW_W * 0.25} y={VIEW_H * 0.14} scale={0.9} fill="#fff7ea" opacity={0.7} />
-      <Fence y={VIEW_H * 0.66} />
-      {/* whole sunflower, full height, ribbon of knots its full length */}
-      <Stem xBase={VIEW_W * 0.5} baseY={VIEW_H * 0.98} xTop={VIEW_W * 0.5} topY={VIEW_H * 0.12} wBase={34} sway={-4} />
-      <Leaf x={VIEW_W * 0.5} y={VIEW_H * 0.7} length={150} width={90} angle={-58} fill={STEM} />
-      <Leaf x={VIEW_W * 0.5} y={VIEW_H * 0.46} length={140} width={84} angle={56} fill={STEM_DARK} />
-      <Leaf x={VIEW_W * 0.5} y={VIEW_H * 0.3} length={110} width={66} angle={-50} fill={STEM} />
-      <FlowerHead cx={VIEW_W * 0.5} cy={VIEW_H * 0.13} r={104} />
-      <line x1={n(VIEW_W * 0.55)} y1={n(VIEW_H * 0.96)} x2={n(VIEW_W * 0.55)} y2={n(VIEW_H * 0.18)} stroke={RIBBON} strokeWidth={9} strokeLinecap="round" data-motif="ribbon" />
-      {range(14).map((i) => {
-        const t = i / 13;
-        return <circle key={i} cx={n(VIEW_W * 0.55)} cy={n(VIEW_H * (0.95 - t * 0.76))} r={7.5} fill="#2f5da3" data-motif="knot" />;
-      })}
-      <GrassRow seed={seed} baseY={VIEW_H} blades={44} height={50} lean={5} fill="#6aa653" />
-      {/* Milo cheering, arms up */}
-      <g transform={`translate(${n(VIEW_W * 0.2)} ${n(VIEW_H * 0.66)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={96} width={46} fill={PJ} />
-        <Capsule x1={-14} y1={12} x2={-44} y2={-58} width={16} fill={PJ} />
-        <Capsule x1={14} y1={12} x2={44} y2={-58} width={16} fill={PJ} />
-        <ellipse cx={-48} cy={-62} rx={12} ry={12} fill={SKIN} />
-        <ellipse cx={48} cy={-62} rx={12} ry={12} fill={SKIN} />
-        <Capsule x1={-8} y1={94} x2={-14} y2={150} width={17} fill={PJ_DARK} />
-        <Capsule x1={12} y1={94} x2={18} y2={150} width={17} fill={PJ_DARK} />
-        <MiloHead cx={0} cy={-40} r={32} tilt={-4} mouth="open" />
-      </g>
-      {/* Rosa clapping */}
-      <g transform={`translate(${n(VIEW_W * 0.78)} ${n(VIEW_H * 0.62)})`}>
-        <Capsule x1={0} y1={0} x2={0} y2={120} width={58} fill="#c66d8e" />
-        <Capsule x1={-16} y1={16} x2={-64} y2={-30} width={18} fill="#c66d8e" />
-        <Capsule x1={16} y1={16} x2={64} y2={-30} width={18} fill="#c66d8e" />
-        <ellipse cx={-66} cy={-34} rx={13} ry={10} fill={SKIN} />
-        <ellipse cx={66} cy={-34} rx={13} ry={10} fill={SKIN} />
-        <circle cx={0} cy={-46} r={38} fill={SKIN} />
-        <path d={`M-38,-56 Q0,-104 38,-56 Q20,-92 0,-88 Q-20,-92 -38,-56 Z`} fill="#3a2417" />
-        <path d="M-34,-52 q-26,20 -16,72" stroke="#3a2417" strokeWidth={16} fill="none" strokeLinecap="round" />
-        <Eye cx={-12} cy={-48} r={4} />
-        <Eye cx={12} cy={-48} r={4} />
-        <Smile cx={0} cy={-34} w={20} curve={10} />
-      </g>
-      {finish(paint)}
-    </g>
+  'sunflower-06-fourteen-hands': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-06-fourteen-hands" stage={5} id={id} seed={seed} paint={paint} lighting={HONEY_LIGHT} materials={[GARDEN_TIMBER, LEAF_MATERIAL]}>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerHoneySky')} />
+      <DepthLayer depth="far">
+        <Fence y={580} paint={paint} />
+        <path d="M0,470 C210,426 408,458 590,408 C770,358 938,392 1200,330 L1200,580 L0,580 Z" fill="#59634d" opacity={0.42} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <Sunflower baseX={600} baseY={782} topX={600} topY={124} headR={92} paint={paint} sway={-4} />
+        <Ribbon x1={654} y1={750} x2={654} y2={192} count={14} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter id={id} kind="milo" x={248} y={728} scale={0.9} performance={MILO_CHEER} />
+        <LitCharacter id={id} kind="rosa" x={948} y={728} scale={0.94} performance={ROSA_CLAP} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,716 Q118,674 248,718 L304,800 Z" fill="#383630" />
+        <path d="M1200,800 L1200,690 Q1120,660 1034,714 L990,800 Z" fill="#383630" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 
-  'sunflower-07-moonlit-sleep': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('nightSky'))}
-      <StarField seed={seed} count={46} height={VIEW_H * 0.7} color="#e9eefb" />
-      {/* window to the moonlit garden */}
-      <rect x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.1)} width={n(VIEW_W * 0.42)} height={n(VIEW_H * 0.6)} rx={12} fill="#20264a" />
-      <rect x={n(VIEW_W * 0.545)} y={n(VIEW_H * 0.12)} width={n(VIEW_W * 0.37)} height={n(VIEW_H * 0.55)} fill="#2b325c" />
-      <Moon cx={VIEW_W * 0.83} cy={VIEW_H * 0.24} r={46} glow={paint('moonGlow')} />
-      {/* sunflower silhouette against the moon */}
-      <Stem xBase={VIEW_W * 0.62} baseY={VIEW_H * 0.67} xTop={VIEW_W * 0.64} topY={VIEW_H * 0.18} wBase={16} sway={8} fill="#141a33" />
-      <FlowerHead cx={VIEW_W * 0.64} cy={VIEW_H * 0.19} r={44} petal="#232a4d" petal2="#1c2242" center="#10152b" />
-      <rect x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.08)} width={12} height={n(VIEW_H * 0.64)} fill="#3a3f66" />
-      <rect x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.38)} width={n(VIEW_W * 0.42)} height={10} fill="#3a3f66" />
-      {/* Milo tucked in bed, foreground */}
-      <rect x={0} y={n(VIEW_H * 0.72)} width={VIEW_W} height={n(VIEW_H * 0.28)} fill="#3b3a63" />
-      <rect x={n(VIEW_W * 0.02)} y={n(VIEW_H * 0.66)} width={n(VIEW_W * 0.5)} height={n(VIEW_H * 0.2)} rx={20} fill="#6b6aa0" />
-      <path
-        d={`M${n(VIEW_W * 0.02)},${n(VIEW_H * 0.86)} L${n(VIEW_W * 0.02)},${n(
-          VIEW_H * 0.78,
-        )} Q${n(VIEW_W * 0.26)},${n(VIEW_H * 0.7)} ${n(VIEW_W * 0.52)},${n(
-          VIEW_H * 0.78,
-        )} L${n(VIEW_W * 0.52)},${n(VIEW_H * 0.86)} Z`}
-        fill="#8a86c4"
-      />
-      <ellipse cx={n(VIEW_W * 0.12)} cy={n(VIEW_H * 0.72)} rx={54} ry={30} fill="#eef0ff" />
-      <g transform={`translate(${n(VIEW_W * 0.14)} ${n(VIEW_H * 0.68)})`}>
-        <MiloHead cx={0} cy={0} r={34} tilt={-14} asleep mouth="soft" />
-      </g>
-      {/* drifting dream motes — a soft, non-letter sleep cue */}
-      <g data-motif="sleep-cue" fill="#cfd3ff" transform={`translate(${n(VIEW_W * 0.24)} ${n(VIEW_H * 0.6)})`}>
-        {range(5).map((i) => (
-          <circle key={i} cx={n(i * 15)} cy={n(-i * 22)} r={n(9 - i * 1.3)} opacity={n(0.72 - i * 0.11)} />
-        ))}
-      </g>
-      {finish(paint)}
-    </g>
+  'sunflower-07-moonlit-sleep': ({ id, paint, seed }) => (
+    <CinematicPage sceneId="sunflower-07-moonlit-sleep" stage={6} id={id} seed={seed} paint={paint} lighting={NIGHT_LIGHT} materials={[LEAF_MATERIAL, BED_MATERIAL]} calm>
+      <rect width={VIEW_W} height={VIEW_H} fill={paint('sunflowerNightSky')} />
+      <DepthLayer depth="far">
+        <StarField seed={seed} count={48} x={520} y={20} width={660} height={430} color="#d4e0f0" minR={0.7} maxR={2.1} />
+        <Window x={600} y={48} width={530} height={500} paint={paint} night />
+        <Moon cx={930} cy={154} r={70} glow={paint('sunflowerMoonGlow')} face="#f2efda" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <path d="M560,800 L560,540 L1200,540 L1200,800 Z" fill="#151d33" />
+        <Sunflower baseX={780} baseY={548} topX={812} topY={166} headR={56} paint={paint} sway={12} night />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <Bed paint={paint} />
+        <LitCharacter id={id} kind="milo" x={260} y={676} scale={0.82} performance={MILO_SLEEP} />
+        <g data-motif="sleep-cue" fill="#cbd6ee" opacity={0.62}>
+          {range(5).map((i) => <circle key={i} cx={n(370 + i * 34)} cy={n(500 - i * 34)} r={n(10 - i * 1.4)} />)}
+        </g>
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M32,800 L32,704 Q238,632 568,710 L568,800 Z" fill="#343767" opacity={0.88} />
+        <path d="M560,800 Q830,730 1200,712 L1200,800 Z" fill="#0f1628" />
+      </DepthLayer>
+    </CinematicPage>
   ),
 };
 

@@ -3,7 +3,6 @@ import {
   Blush,
   Capsule,
   ClosedEye,
-  Cloud,
   Eye,
   GrainFilter,
   GrainWash,
@@ -13,7 +12,6 @@ import {
   RadialGradient,
   Smile,
   StarField,
-  SunGlow,
   VIEW_H,
   VIEW_W,
   Vignette,
@@ -23,6 +21,18 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  foreshortenGeometry,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
 /*
  * WORLD: The Sneaky Golden Crown — displacement in a Syracuse workshop at dusk.
@@ -34,7 +44,6 @@ import {
 
 type Paint = SceneWorldProps['paint'];
 
-const SEA = '#245b7a';
 const DEEP_SEA = '#173f59';
 const STONE_WALL = '#caa06a';
 const STONE_DARK = '#9c744a';
@@ -55,6 +64,100 @@ const SMITH_APRON = '#5c4633';
 const WATER_BLUE = '#3d86ad';
 const FLOOR = '#8a6a44';
 const FLOOR_EDGE = '#6a4c2c';
+
+const WORKSHOP_LIGHTING: LightingRig = {
+  key: {
+    azimuth: -32,
+    elevation: 44,
+    color: '#ffd9a6',
+    intensity: 0.84,
+  },
+  fill: {
+    color: '#6f8eae',
+    intensity: 0.22,
+  },
+  rim: {
+    azimuth: 148,
+    elevation: 30,
+    color: '#f5c98e',
+    intensity: 0.42,
+  },
+  practicals: [
+    {
+      id: 'workshop-practical',
+      x: -40,
+      y: 168,
+      radius: 310,
+      color: '#ffc978',
+      intensity: 0.58,
+    },
+  ],
+};
+
+const WORKSHOP_MATERIALS: readonly MaterialInstance[] = [
+  {
+    id: 'worn-timber',
+    preset: 'timber',
+    base: '#805333',
+    shadow: '#422b20',
+    highlight: '#bd8b59',
+    textureScale: 1.3,
+    roughness: 0.62,
+  },
+  {
+    id: 'woven-cloth',
+    preset: 'cloth',
+    base: '#9f3e43',
+    shadow: '#54242d',
+    highlight: '#dd8580',
+    textureScale: 1.05,
+    roughness: 0.68,
+  },
+  {
+    id: 'calm-water',
+    preset: 'water',
+    base: '#285d76',
+    shadow: '#173a51',
+    highlight: '#a9d3dd',
+    textureScale: 0.58,
+    roughness: 0.2,
+  },
+];
+
+const WORKSHOP_DELIA_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#c98a5c', shadow: '#8e5637', highlight: '#edba8e' },
+  face: { shape: 'heart', brow: '#2f1d17', mouth: '#7e3d3f' },
+  hair: { style: 'long', base: '#2c1a12', highlight: '#5b3822', volume: 0.68 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#326f7d',
+    shadow: '#204754',
+    trim: '#e6b866',
+    hemline: 0.68,
+  },
+  footwear: { style: 'sandal', base: '#624127' },
+  secondaryShapes: [{ kind: 'belt', color: '#b37b3d', accent: '#f5d18a' }],
+};
+
+const WORKSHOP_KING_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('adult'),
+  skin: { base: '#b9784f', shadow: '#754429', highlight: '#dda679' },
+  face: { shape: 'square', brow: '#5b4535', mouth: '#743d3e' },
+  hair: { style: 'wispy', base: '#e7ddca', highlight: '#fff8e9', volume: 0.38 },
+  wardrobe: {
+    garment: 'robe',
+    base: '#78445e',
+    shadow: '#49283f',
+    trim: '#d9b15c',
+    hemline: 0.9,
+  },
+  footwear: { style: 'boot', base: '#3b271b' },
+  secondaryShapes: [
+    { kind: 'circlet', color: '#d9b15c', accent: '#f8df9c' },
+    { kind: 'sash', color: '#b98b42', accent: '#f3d48c' },
+  ],
+};
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
@@ -206,6 +309,84 @@ function Harbor({ topY, height, fill }: { topY: number; height: number; fill: st
   );
 }
 
+function WorkshopSkyline({ baseY }: { baseY: number }) {
+  return (
+    <g className="scene-skyline" data-motif="asymmetrical-skyline">
+      <path
+        d={`M0,${baseY} L0,${n(baseY - 74)} L92,${n(baseY - 112)} L176,${n(
+          baseY - 78,
+        )} L238,${n(baseY - 154)} L322,${n(baseY - 126)} L390,${n(
+          baseY - 196,
+        )} L458,${n(baseY - 142)} L542,${n(baseY - 174)} L628,${n(
+          baseY - 106,
+        )} L710,${n(baseY - 138)} L804,${n(baseY - 92)} L900,${n(
+          baseY - 124,
+        )} L1006,${n(baseY - 76)} L1110,${n(baseY - 104)} L1200,${n(
+          baseY - 66,
+        )} L1200,${baseY} Z`}
+        fill="#75536a"
+        opacity={0.66}
+      />
+      <path
+        d={`M0,${baseY} L0,${n(baseY - 38)} L132,${n(baseY - 72)} L258,${n(
+          baseY - 44,
+        )} L344,${n(baseY - 102)} L466,${n(baseY - 58)} L584,${n(
+          baseY - 92,
+        )} L720,${n(baseY - 50)} L846,${n(baseY - 84)} L962,${n(
+          baseY - 42,
+        )} L1084,${n(baseY - 68)} L1200,${n(baseY - 36)} L1200,${baseY} Z`}
+        fill="#463d59"
+        opacity={0.86}
+      />
+      <path
+        d={`M184,${n(baseY - 80)} L238,${n(baseY - 146)} L292,${n(
+          baseY - 80,
+        )} M504,${n(baseY - 100)} L548,${n(baseY - 156)} L602,${n(
+          baseY - 100,
+        )} M868,${n(baseY - 78)} L910,${n(baseY - 126)} L960,${n(
+          baseY - 78,
+        )}`}
+        stroke="#9a6259"
+        strokeWidth={18}
+        strokeLinejoin="round"
+        fill="none"
+        opacity={0.62}
+      />
+    </g>
+  );
+}
+
+function WorkshopHarbor({ paint }: { paint: Paint }) {
+  return (
+    <g className="scene-harbor" data-material="water" filter={paint('calm-water')}>
+      <rect x={0} y={438} width={VIEW_W} height={122} fill="#214f68" />
+      <path
+        d="M0,472 C210,446 386,486 594,458 C792,432 982,476 1200,446 L1200,560 L0,560 Z"
+        fill="#163d55"
+        opacity={0.72}
+      />
+      <path
+        d="M390,446 C612,426 812,456 1050,430 L1200,430 L1200,494 C940,474 698,494 430,472 Z"
+        fill={paint('fill-light')}
+        opacity={0.32}
+        data-lighting="fill"
+      />
+      <path
+        d="M0,450 C212,428 420,462 614,438 C820,414 1008,454 1200,430"
+        stroke="#e5b77c"
+        strokeWidth={8}
+        fill="none"
+        opacity={0.34}
+      />
+      <g className="scene-ripple" stroke="#b8d5db" fill="none" strokeLinecap="round">
+        <path d="M78,492 q66,-12 132,0" strokeWidth={4} opacity={0.48} />
+        <path d="M424,514 q84,-10 168,0" strokeWidth={3} opacity={0.38} />
+        <path d="M820,478 q72,-9 144,0" strokeWidth={3.5} opacity={0.42} />
+      </g>
+    </g>
+  );
+}
+
 function Columns({ baseY, height }: { baseY: number; height: number }) {
   return (
     <g className="scene-columns">
@@ -256,6 +437,80 @@ function Crown({ x, y, scale = 1, tilt = 0, paint }: { x: number; y: number; sca
         <path d="M-40,16 l10,-22" stroke="#fff7dc" strokeWidth={4} strokeLinecap="round" opacity={0.85} />
         <circle cx={-16} cy={8} r={3} fill="#fffae6" opacity={0.9} />
         <circle cx={22} cy={2} r={2.5} fill="#fffae6" opacity={0.8} />
+      </g>
+    </g>
+  );
+}
+
+function WorkshopCrown({
+  x,
+  y,
+  scale = 1,
+  paint,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  paint: Paint;
+}) {
+  return (
+    <g
+      transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}
+      className="scene-crown scene-crown--workshop"
+      data-motif="crown"
+      data-cx={n(x)}
+      data-cy={n(y)}
+      data-key-direction="upper-left"
+    >
+      <ellipse
+        cx={18}
+        cy={54}
+        rx={82}
+        ry={19}
+        fill={paint('contact-ao')}
+        transform="rotate(7 18 54)"
+        data-lighting="contact-shadow"
+      />
+      <g data-material="cloth" filter={paint('woven-cloth')}>
+        <path
+          d="M-104,30 Q-88,-8 0,-14 Q88,-8 104,30 L90,67 Q0,82 -90,67 Z"
+          fill="#9f3e43"
+        />
+        <path d="M-94,38 Q-24,20 82,42 L72,64 Q-10,72 -86,60 Z" fill="#54242d" opacity={0.74} />
+        <path d="M-80,20 Q-14,0 78,24" stroke="#dd8580" strokeWidth={8} fill="none" opacity={0.72} />
+        <path d="M-52,22 Q-38,48 -48,65 M20,8 Q34,40 28,70" stroke="#742e38" strokeWidth={6} fill="none" opacity={0.62} />
+      </g>
+      <g data-material="gold">
+        <path
+          d="M-66,20 L-68,-26 L-36,-3 L-10,-54 L15,-8 L48,-42 L70,-2 L66,28 Z"
+          fill="#cf9228"
+          stroke="#70421f"
+          strokeWidth={4}
+          strokeLinejoin="round"
+        />
+        <path
+          d="M-61,7 L-43,15 L-22,3 L-2,18 L20,4 L42,12 L59,4 L62,22 L-61,22 Z"
+          fill="#69401f"
+          opacity={0.92}
+          data-material-pass="reflected-dark"
+        />
+        <path
+          d="M-50,-13 Q-30,-22 -12,-47"
+          stroke="#fff0b7"
+          strokeWidth={3.6}
+          strokeLinecap="round"
+          fill="none"
+          opacity={0.84}
+          data-material-pass="directional-highlight"
+        />
+        <path
+          d="M-66,20 Q0,8 66,28 L62,42 Q0,52 -62,42 Z"
+          fill="#8b5424"
+          stroke="#5a341d"
+          strokeWidth={3}
+        />
+        <path d="M-55,23 Q2,15 58,30" stroke={paint('rim-light')} strokeWidth={5} fill="none" opacity={0.72} />
+        <path d="M-48,34 Q4,27 50,37" stroke="#e6b75d" strokeWidth={4} fill="none" opacity={0.64} />
       </g>
     </g>
   );
@@ -535,26 +790,299 @@ function SleepMotes({ x, y }: { x: number; y: number }) {
   );
 }
 
+/**
+ * A single grooved pulley wheel — the reusable unit a compound (block-and-
+ * tackle) rig is built from. Matches the `data-motif="pulley-wheel"` /
+ * `data-grooved` convention already used by the ramp-to-the-treehouse world.
+ */
+function PulleyWheel({ x, y, r = 18 }: { x: number; y: number; r?: number }) {
+  return (
+    <g
+      transform={`translate(${n(x)} ${n(y)})`}
+      className="scene-pulley-wheel"
+      data-motif="pulley-wheel"
+      data-grooved="true"
+    >
+      <circle cx={0} cy={0} r={r} fill="#4c3c2e" />
+      <circle cx={0} cy={0} r={n(r * 0.76)} fill="#caa15c" />
+      <circle cx={0} cy={0} r={n(r * 0.52)} fill="#8a6238" />
+      <circle cx={0} cy={0} r={n(r * 0.2)} fill="#332619" />
+    </g>
+  );
+}
+
+/**
+ * The authored timber crane: an upright mast with a diagonal brace, a jib arm
+ * reaching out over the bench, and a compound (block-and-tackle) pulley —
+ * a fixed wheel at the mast head, a fixed wheel at the jib tip, and a
+ * traveling wheel/hook block, all threaded by one continuous rope path. Every
+ * timber surface carries the shared `worn-timber` material response.
+ */
+function TimberCrane({ x, y, scale = 1, paint }: { x: number; y: number; scale?: number; paint: Paint }) {
+  const mastTopY = -274;
+  const jibTipX = 330;
+  const jibTipY = -126;
+  const blockX = 252;
+  const blockY = -42;
+  return (
+    <g
+      transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}
+      className="scene-crane"
+      data-motif="timber-crane"
+      data-framing="diagonal"
+      data-key-direction="upper-left"
+    >
+      <g data-material="timber" filter={paint('worn-timber')}>
+        <path d={`M-38,18 L-24,${mastTopY} L16,${mastTopY} L28,18 Z`} fill="#765035" />
+        <path d={`M-12,${mastTopY + 16} L${jibTipX},${jibTipY} L${n(jibTipX - 10)},${n(jibTipY + 28)} L-12,${n(mastTopY + 42)} Z`} fill="#865b38" />
+        <path d={`M-12,${n(mastTopY + 48)} L244,${n(jibTipY + 44)} L232,${n(jibTipY + 58)} L-8,${n(mastTopY + 72)} Z`} fill="#5f3e2a" />
+        <path d="M-30,-92 L-126,12 L-104,32 L-20,-38 Z" fill="#543624" />
+        <path d={`M-15,${n(mastTopY + 20)} L${n(jibTipX - 4)},${n(jibTipY + 3)}`} stroke="#bd8b59" strokeWidth={7} fill="none" opacity={0.7} />
+        <path d="M-16,-228 L14,-214 M-20,-158 L20,-144 M-26,-76 L24,-62" stroke="#3f291d" strokeWidth={5} opacity={0.66} />
+      </g>
+      <path d="M-26,18 L-4,-274 L34,18 Z" fill="#261b18" opacity={0.24} transform="translate(24 18)" data-cast-direction="down-right" />
+      <PulleyWheel x={6} y={n(mastTopY + 27)} r={18} />
+      <PulleyWheel x={n(jibTipX - 18)} y={n(jibTipY + 22)} r={16} />
+      <path
+        d={`M6,${n(mastTopY + 27)} L${n(jibTipX - 18)},${n(jibTipY + 22)} L${n(
+          jibTipX - 18,
+        )},${blockY} L${blockX},${n(blockY + 22)}`}
+        stroke="#caa15c"
+        strokeWidth={5}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        data-motif="rope"
+      />
+      <g transform={`translate(${blockX} ${n(blockY + 22)})`}>
+        <PulleyWheel x={0} y={0} r={13} />
+        <path d="M0,13 L0,34" stroke="#caa15c" strokeWidth={5} strokeLinecap="round" data-motif="rope" />
+        <path d="M-14,34 L14,34 L10,52 L-10,52 Z" fill="#6a4c2c" filter={paint('worn-timber')} />
+      </g>
+    </g>
+  );
+}
+
+/** Delia's workshop performance: leaning in, pointing at the crown, curious. */
+const WORKSHOP_DELIA_PERFORMANCE: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: -18,
+  shoulderTilt: 13,
+  pelvisTilt: -7,
+  weightFoot: 'left',
+  gazeTarget: { x: 356, y: 478 },
+  headTurn: -0.72,
+  expression: 'curious',
+  leftHand: 'point',
+  rightHand: 'rest',
+  leftHandTarget: { x: 404, y: 470 },
+};
+
+/** King Hiero's workshop performance: stable, attentive, and open to Delia's discovery. */
+const WORKSHOP_KING_PERFORMANCE: CharacterPerformance = {
+  pose: 'stand',
+  lineOfAction: -8,
+  shoulderTilt: -10,
+  pelvisTilt: 6,
+  weightFoot: 'right',
+  gazeTarget: { x: 390, y: 486 },
+  headTurn: -0.64,
+  expression: 'concerned',
+  leftHand: 'open',
+  rightHand: 'rest',
+  leftHandTarget: { x: 748, y: 508 },
+};
+
+const WORKSHOP_DELIA_PLACEMENT = { x: 650, y: 720, scale: 0.82 } as const;
+const WORKSHOP_KING_PLACEMENT = { x: 930, y: 716, scale: 0.8 } as const;
+
+function WorkshopLitCharacter({
+  id,
+  kind,
+}: {
+  id: SceneWorldProps['id'];
+  kind: 'delia' | 'king';
+}) {
+  const appearance = kind === 'delia' ? WORKSHOP_DELIA_APPEARANCE : WORKSHOP_KING_APPEARANCE;
+  const performance = kind === 'delia' ? WORKSHOP_DELIA_PERFORMANCE : WORKSHOP_KING_PERFORMANCE;
+  const placement = kind === 'delia' ? WORKSHOP_DELIA_PLACEMENT : WORKSHOP_KING_PLACEMENT;
+  const geometry = resolvePoseGeometry(appearance, performance, placement);
+  const rendered = foreshortenGeometry(geometry);
+  const headRadius = appearance.proportions.headRadius * placement.scale;
+  const hemline = appearance.wardrobe.hemline;
+  const hemRight = {
+    x: geometry.hip.right.x + (rendered.ankle.right.x - geometry.hip.right.x) * hemline,
+    y: geometry.hip.right.y + (rendered.ankle.right.y - geometry.hip.right.y) * hemline,
+  };
+
+  return (
+    <g data-character-lighting="workshop" data-character={kind}>
+      <CinematicCharacter
+        id={(part) => id(`${kind}-${part}`)}
+        x={placement.x}
+        y={placement.y}
+        scale={placement.scale}
+        appearance={appearance}
+        performance={performance}
+        className={`scene-${kind}`}
+      />
+      <path
+        d={`M${n(geometry.head.x - headRadius * 0.9)},${n(
+          geometry.head.y - headRadius * 0.02,
+        )} Q${n(geometry.head.x - headRadius * 0.68)},${n(
+          geometry.head.y - headRadius * 0.7,
+        )} ${n(geometry.head.x - headRadius * 0.1)},${n(
+          geometry.head.y - headRadius * 0.9,
+        )} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y)} L${n(
+          rendered.elbow.left.x,
+        )},${n(rendered.elbow.left.y)}`}
+        stroke="#ffd4a1"
+        strokeWidth={n(kind === 'delia' ? 4.8 : 5.2)}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.7}
+        data-lighting="key"
+      />
+      <path
+        d={`M${n(geometry.head.x + headRadius * 0.8)},${n(
+          geometry.head.y + headRadius * 0.16,
+        )} Q${n(geometry.head.x + headRadius * 0.54)},${n(
+          geometry.head.y + headRadius * 0.7,
+        )} ${n(geometry.head.x + headRadius * 0.06)},${n(
+          geometry.head.y + headRadius * 0.86,
+        )} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y + 6)} Q${n(
+          geometry.hip.right.x + 10,
+        )},${n(geometry.hip.right.y)} ${n(hemRight.x)},${n(hemRight.y)}`}
+        stroke="#7899b5"
+        strokeWidth={n(kind === 'delia' ? 6 : 7)}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.38}
+        data-lighting="fill"
+      />
+      <path
+        d={`M${n(geometry.head.x + headRadius * 0.92)},${n(
+          geometry.head.y - headRadius * 0.08,
+        )} Q${n(geometry.head.x + headRadius * 0.72)},${n(
+          geometry.head.y - headRadius * 0.66,
+        )} ${n(geometry.head.x + headRadius * 0.2)},${n(
+          geometry.head.y - headRadius * 0.9,
+        )} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y)} L${n(
+          rendered.elbow.right.x,
+        )},${n(rendered.elbow.right.y)}`}
+        stroke="#e7ae75"
+        strokeWidth={2.8}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.58}
+        data-lighting="rim"
+      />
+    </g>
+  );
+}
+
 const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'crown-01-workshop-dusk': ({ paint, seed }) => (
-    <g data-scene-art>
+  'crown-01-workshop-dusk': ({ id, paint, seed }) => (
+    <g data-scene-art data-cinematic-scene="crown-01-workshop-dusk">
+      <defs>
+        <CinematicDefs
+          id={id}
+          seed={seed}
+          lighting={WORKSHOP_LIGHTING}
+          materials={WORKSHOP_MATERIALS}
+        />
+      </defs>
+
+      {/* The sky is an opaque base; only selected distant geometry is softened. */}
       {sky(paint('duskSky'))}
-      <SunGlow cx={n(VIEW_W * 0.82)} cy={n(VIEW_H * 0.24)} r={64} core="#ffe6ab" halo="#f3ad63" />
-      <Cloud x={n(VIEW_W * 0.24)} y={n(VIEW_H * 0.16)} scale={0.8} fill="#ffdcb0" opacity={0.4} />
-      <Skyline baseY={n(VIEW_H * 0.6)} seed={seed} />
-      <Harbor topY={n(VIEW_H * 0.6)} height={n(VIEW_H * 0.12)} fill={SEA} />
-      <rect x={0} y={n(VIEW_H * 0.72)} width={VIEW_W} height={n(VIEW_H * 0.28)} fill="#7c5636" />
-      <rect x={0} y={n(VIEW_H * 0.72)} width={VIEW_W} height={12} fill="#5f3f26" />
-      <rect x={n(VIEW_W * 0.08)} y={n(VIEW_H * 0.66)} width={n(VIEW_W * 0.5)} height={n(VIEW_H * 0.1)} rx={10} fill="#8a5f39" />
-      <rect x={n(VIEW_W * 0.1)} y={n(VIEW_H * 0.64)} width={n(VIEW_W * 0.46)} height={10} fill="#a9793f" />
-      <ellipse cx={n(VIEW_W * 0.28)} cy={n(VIEW_H * 0.62)} rx={92} ry={22} fill="#b3413f" />
-      <Crown x={n(VIEW_W * 0.28)} y={n(VIEW_H * 0.56)} scale={1.25} paint={paint} />
-      {range(3).map((i) => (
-        <rect key={i} x={n(VIEW_W * 0.44 + i * 26)} y={n(VIEW_H * 0.6)} width={10} height={44} rx={4} fill="#6d4f2c" />
-      ))}
-      <Delia x={n(VIEW_W * 0.66)} y={n(VIEW_H * 0.5)} scale={1.05} pose="stand" />
-      <King x={n(VIEW_W * 0.86)} y={n(VIEW_H * 0.4)} scale={1.02} pose="proud" />
-      {finish(paint)}
+      <rect
+        x={0}
+        y={0}
+        width={VIEW_W}
+        height={VIEW_H}
+        fill={paint('workshop-practical')}
+        data-lighting="practical"
+      />
+
+      <DepthLayer
+        depth="far"
+        treatment={{ opacity: 0.76 }}
+      >
+        <WorkshopSkyline baseY={438} />
+        <WorkshopHarbor paint={paint} />
+      </DepthLayer>
+
+      {/* Mid: workshop threshold and diagonal crane frame the focal triangle. */}
+      <DepthLayer depth="mid">
+        <path
+          d="M0,548 C246,522 476,550 690,534 C906,516 1072,538 1200,526 L1200,800 L0,800 Z"
+          fill="#5c4938"
+        />
+        <path d="M0,548 C248,532 442,558 686,540" stroke="#b98454" strokeWidth={14} fill="none" opacity={0.48} />
+        <g data-material="timber" filter={paint('worn-timber')}>
+          <path d="M0,0 L72,0 L58,566 L0,586 Z" fill="#5f3e2a" />
+          <path d="M0,18 L46,18 L34,550 L0,566 Z" fill="#9a6840" opacity={0.54} />
+          <path d="M0,42 L1200,18 L1200,66 L0,92 Z" fill="#6c472e" />
+          <path d="M10,54 L1200,30" stroke="#b98252" strokeWidth={8} opacity={0.56} />
+        </g>
+        <TimberCrane x={88} y={594} scale={1.04} paint={paint} />
+        <path
+          d="M85,610 C252,634 406,620 548,644"
+          stroke="#241a18"
+          strokeWidth={24}
+          fill="none"
+          opacity={0.26}
+          data-cast-direction="down-right"
+        />
+      </DepthLayer>
+
+      {/* Focus: crown, pointing child and attentive king form one triangular beat. */}
+      <DepthLayer depth="focus">
+        <g data-material="timber" data-motif="workbench">
+          <path d="M142,528 Q332,506 526,532 L514,596 Q326,616 136,590 Z" fill="#855634" />
+          <path d="M148,530 Q330,514 518,536" stroke="#c08b59" strokeWidth={12} fill="none" />
+          <path d="M168,586 L142,732 L196,732 L222,592 Z M448,592 L478,732 L530,732 L500,584 Z" fill="#4d3124" />
+          <path d="M220,552 C286,538 390,548 466,536" stroke="#4a2e22" strokeWidth={6} opacity={0.62} />
+          <path
+            d="M176,548 C264,526 416,538 498,542"
+            stroke="#b78659"
+            strokeWidth={3}
+            opacity={0.44}
+            filter={paint('worn-timber')}
+          />
+        </g>
+        <path d="M194,610 C312,632 422,618 536,640" stroke="#241a18" strokeWidth={28} fill="none" opacity={0.3} data-cast-direction="down-right" />
+        <WorkshopCrown x={356} y={476} scale={1.1} paint={paint} />
+        <path
+          d="M474,684 C572,708 666,702 746,724"
+          stroke="#21191b"
+          strokeWidth={30}
+          fill="none"
+          opacity={0.25}
+          data-cast-direction="down-right"
+        />
+        <WorkshopLitCharacter id={id} kind="delia" />
+        <path
+          d="M786,690 C874,714 960,708 1046,728"
+          stroke="#21191b"
+          strokeWidth={34}
+          fill="none"
+          opacity={0.24}
+          data-cast-direction="down-right"
+        />
+        <WorkshopLitCharacter id={id} kind="king" />
+      </DepthLayer>
+
+      {/* Near: one quiet cropped timber edge frames without competing. */}
+      <DepthLayer depth="near">
+        <g data-material="timber" data-motif="workshop-foreground">
+          <path d="M0,706 L112,686 L154,800 L0,800 Z" fill="#43312d" />
+          <path d="M0,728 L98,710 L126,800 L0,800 Z" fill="#65483a" opacity={0.72} />
+          <path d="M18,724 L102,708" stroke="#92684a" strokeWidth={6} opacity={0.38} />
+        </g>
+      </DepthLayer>
+
+      <Vignette paint={paint('vignette')} />
     </g>
   ),
 

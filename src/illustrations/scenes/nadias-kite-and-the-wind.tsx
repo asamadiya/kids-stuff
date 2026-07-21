@@ -1,69 +1,642 @@
 import type { ReactNode } from 'react';
 import {
-  Blush,
-  Capsule,
-  ClosedEye,
-  Cloud,
-  Eye,
-  GrainFilter,
-  GrainWash,
-  GrassRow,
-  Hill,
-  Leaf,
   LinearGradient,
-  Moon,
-  OpenMouth,
   RadialGradient,
-  Smile,
   StarField,
-  SunGlow,
-  Tree,
   VIEW_H,
   VIEW_W,
   Vignette,
+  mulberry32,
   n,
   range,
   requireScenePage,
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
-/*
- * WORLD: Nadia's Kite and the Wind — a breezy grassy hilltop and a big sky.
- * Motifs: red poppy kite, long rag-bow tail, one-direction wind clues,
- * streaming flag, leaning grass, drifting clouds, and a cozy blue bedroom.
- */
+const NADIA_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#9b684c', shadow: '#6e463b', highlight: '#c88c68' },
+  face: { shape: 'heart', brow: '#2d1c1a', mouth: '#713944' },
+  hair: { style: 'long', base: '#2f1d1a', highlight: '#5d362b', volume: 0.72 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#e9a94f',
+    shadow: '#a8643c',
+    trim: '#f6d78d',
+    hemline: 0.58,
+  },
+  footwear: { style: 'boot', base: '#2d3f51' },
+  secondaryShapes: [{ kind: 'sash', color: '#2f6975', accent: '#9dc4c6' }],
+};
 
-const KITE = '#d93e36';
-const KITE_DARK = '#a9282e';
-const KITE_LIGHT = '#ef6754';
-const SPAR = '#7a4a36';
-const STRING = '#f1eee5';
-const SKIN = '#9b6a4a';
-const SKIN_LIGHT = '#b9825b';
-const HAIR = '#2f1d1a';
-const NADIA_DRESS = '#f3b554';
-const NADIA_DRESS_DARK = '#d88b3d';
-const NADIA_LEGGINGS = '#326d78';
-const GRANDPA_SWEATER = '#4f8f83';
-const GRANDPA_PANTS = '#7b684d';
-const GRANDPA_HAIR = '#e1ddd2';
+const GRANDPA_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('elder'),
+  skin: { base: '#a87658', shadow: '#725044', highlight: '#d1a17e' },
+  face: { shape: 'square', brow: '#e1ddd2', mouth: '#75414a' },
+  hair: { style: 'wispy', base: '#ded9cf', highlight: '#f3efe6', volume: 0.4 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#4d8379',
+    shadow: '#315b59',
+    trim: '#a8c6a6',
+    hemline: 0.5,
+  },
+  footwear: { style: 'boot', base: '#4b392d' },
+  secondaryShapes: [{ kind: 'belt', color: '#776044', accent: '#ccb477' }],
+};
 
-const sky = (fill: string) => <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />;
+const performance = (
+  overrides: Partial<CharacterPerformance>,
+): CharacterPerformance => ({
+  pose: 'stand',
+  lineOfAction: 0,
+  shoulderTilt: -5,
+  pelvisTilt: 5,
+  weightFoot: 'center',
+  gazeTarget: { x: 650, y: 350 },
+  headTurn: 0,
+  expression: 'delighted',
+  leftHand: 'open',
+  rightHand: 'open',
+  ...overrides,
+});
 
-function WindStreaks({ y, count = 4, color = '#ffffff', opacity = 0.4 }: { y: number; count?: number; color?: string; opacity?: number }) {
+const NADIA_HUG = performance({
+  pose: 'reach',
+  lineOfAction: -6,
+  shoulderTilt: -12,
+  pelvisTilt: 7,
+  weightFoot: 'left',
+  gazeTarget: { x: 642, y: 430 },
+  headTurn: 0.52,
+  leftHand: 'hold',
+  rightHand: 'hold',
+  leftHandTarget: { x: 566, y: 512 },
+  rightHandTarget: { x: 642, y: 500 },
+});
+
+const NADIA_RUN = performance({
+  pose: 'reach',
+  lineOfAction: 28,
+  shoulderTilt: 15,
+  pelvisTilt: -11,
+  weightFoot: 'right',
+  gazeTarget: { x: 314, y: 608 },
+  headTurn: -0.58,
+  expression: 'uncertain',
+  leftHand: 'hold',
+  rightHand: 'open',
+  leftHandTarget: { x: 540, y: 498 },
+  rightHandTarget: { x: 830, y: 426 },
+});
+
+const NADIA_POINT = performance({
+  pose: 'point',
+  lineOfAction: -10,
+  shoulderTilt: -16,
+  pelvisTilt: 8,
+  weightFoot: 'left',
+  gazeTarget: { x: 1000, y: 314 },
+  headTurn: 0.72,
+  expression: 'curious',
+  leftHand: 'rest',
+  rightHand: 'point',
+  rightHandTarget: { x: 890, y: 320 },
+});
+
+const NADIA_STRING = performance({
+  pose: 'reach',
+  lineOfAction: 12,
+  shoulderTilt: 11,
+  pelvisTilt: -9,
+  weightFoot: 'right',
+  gazeTarget: { x: 820, y: 214 },
+  headTurn: 0.7,
+  expression: 'delighted',
+  leftHand: 'hold',
+  rightHand: 'hold',
+  leftHandTarget: { x: 370, y: 480 },
+  rightHandTarget: { x: 440, y: 468 },
+});
+
+const NADIA_LOOK_UP = performance({
+  pose: 'stand',
+  lineOfAction: 8,
+  shoulderTilt: 8,
+  pelvisTilt: -6,
+  weightFoot: 'right',
+  gazeTarget: { x: 714, y: 112 },
+  headTurn: 0.64,
+  expression: 'delighted',
+  leftHand: 'hold',
+  rightHand: 'hold',
+  leftHandTarget: { x: 470, y: 590 },
+  rightHandTarget: { x: 514, y: 576 },
+});
+
+const NADIA_CATCH = performance({
+  pose: 'reach',
+  lineOfAction: -9,
+  shoulderTilt: -14,
+  pelvisTilt: 8,
+  weightFoot: 'left',
+  gazeTarget: { x: 520, y: 470 },
+  headTurn: -0.35,
+  expression: 'calm',
+  leftHand: 'cup',
+  rightHand: 'cup',
+  leftHandTarget: { x: 470, y: 438 },
+  rightHandTarget: { x: 586, y: 432 },
+});
+
+const NADIA_SLEEP = performance({
+  pose: 'sleep',
+  lineOfAction: -7,
+  shoulderTilt: 2,
+  pelvisTilt: -3,
+  weightFoot: 'center',
+  gazeTarget: { x: 420, y: 650 },
+  headTurn: -0.28,
+  expression: 'sleeping',
+  leftHand: 'rest',
+  rightHand: 'rest',
+});
+
+const GRANDPA_STAND = performance({
+  pose: 'stand',
+  lineOfAction: 2,
+  shoulderTilt: -4,
+  pelvisTilt: 6,
+  weightFoot: 'left',
+  gazeTarget: { x: 610, y: 480 },
+  headTurn: -0.48,
+  expression: 'calm',
+  leftHand: 'rest',
+  rightHand: 'open',
+});
+
+const GRANDPA_WATCH = performance({
+  pose: 'stand',
+  lineOfAction: -2,
+  shoulderTilt: 5,
+  pelvisTilt: -5,
+  weightFoot: 'right',
+  gazeTarget: { x: 638, y: 530 },
+  headTurn: -0.72,
+  expression: 'calm',
+  leftHand: 'rest',
+  rightHand: 'rest',
+});
+
+const GRANDPA_RELEASE = performance({
+  pose: 'reach',
+  lineOfAction: -8,
+  shoulderTilt: -15,
+  pelvisTilt: 8,
+  weightFoot: 'left',
+  gazeTarget: { x: 824, y: 204 },
+  headTurn: 0.65,
+  expression: 'delighted',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 670, y: 330 },
+  rightHandTarget: { x: 824, y: 292 },
+});
+
+const GRANDPA_LOOK_UP = performance({
+  pose: 'stand',
+  lineOfAction: 4,
+  shoulderTilt: -3,
+  pelvisTilt: 6,
+  weightFoot: 'left',
+  gazeTarget: { x: 708, y: 110 },
+  headTurn: 0.62,
+  expression: 'delighted',
+  leftHand: 'rest',
+  rightHand: 'open',
+});
+
+const GRANDPA_PROUD = performance({
+  pose: 'reach',
+  lineOfAction: -4,
+  shoulderTilt: -10,
+  pelvisTilt: 7,
+  weightFoot: 'left',
+  gazeTarget: { x: 526, y: 490 },
+  headTurn: -0.58,
+  expression: 'delighted',
+  leftHand: 'rest',
+  rightHand: 'open',
+  rightHandTarget: { x: 632, y: 520 },
+});
+
+const OUTDOOR_MATERIALS: readonly MaterialInstance[] = [
+  {
+    id: 'wind-kite-cloth',
+    preset: 'cloth',
+    base: '#d83d38',
+    shadow: '#8e2730',
+    highlight: '#f27b62',
+    textureScale: 0.28,
+    roughness: 0.48,
+  },
+  {
+    id: 'wind-kite-spar',
+    preset: 'timber',
+    base: '#7a4b36',
+    shadow: '#3f2c2d',
+    highlight: '#b87b50',
+    textureScale: 0.44,
+    roughness: 0.66,
+  },
+];
+
+const BEDROOM_MATERIALS: readonly MaterialInstance[] = [
+  ...OUTDOOR_MATERIALS,
+  {
+    id: 'wind-room-cloth',
+    preset: 'cloth',
+    base: '#6874aa',
+    shadow: '#343e70',
+    highlight: '#a3acd6',
+    textureScale: 0.26,
+    roughness: 0.62,
+  },
+];
+
+const LIGHTING: Record<string, LightingRig> = {
+  'wind-01-hilltop-kite': {
+    key: { azimuth: -22, elevation: 30, color: '#ffd49a', intensity: 0.78 },
+    fill: { color: '#7da5be', intensity: 0.22 },
+    rim: { azimuth: 156, elevation: 24, color: '#ffe0ad', intensity: 0.3 },
+    practicals: [
+      { id: 'wind-sun-1', x: 84, y: 270, radius: 320, color: '#ffb65f', intensity: 0.52 },
+    ],
+  },
+  'wind-02-flop-run': {
+    key: { azimuth: -10, elevation: 28, color: '#f8c58e', intensity: 0.73 },
+    fill: { color: '#789cb8', intensity: 0.23 },
+    rim: { azimuth: 168, elevation: 22, color: '#f1cf9f', intensity: 0.26 },
+    practicals: [
+      { id: 'wind-sun-2', x: 1020, y: 192, radius: 280, color: '#eda25f', intensity: 0.44 },
+    ],
+  },
+  'wind-03-reading-clues': {
+    key: { azimuth: -2, elevation: 25, color: '#efbc84', intensity: 0.7 },
+    fill: { color: '#7295af', intensity: 0.24 },
+    rim: { azimuth: 174, elevation: 20, color: '#e7c69c', intensity: 0.27 },
+    practicals: [
+      { id: 'wind-sun-3', x: 140, y: 180, radius: 270, color: '#e69c5c', intensity: 0.4 },
+    ],
+  },
+  'wind-04-first-lift': {
+    key: { azimuth: -14, elevation: 22, color: '#f4ba7b', intensity: 0.8 },
+    fill: { color: '#6f91ad', intensity: 0.22 },
+    rim: { azimuth: 158, elevation: 24, color: '#ffd09a', intensity: 0.32 },
+    practicals: [
+      { id: 'wind-sun-4', x: 1060, y: 154, radius: 300, color: '#e88950', intensity: 0.46 },
+    ],
+  },
+  'wind-05-dancing-high': {
+    key: { azimuth: -24, elevation: 17, color: '#eeb276', intensity: 0.72 },
+    fill: { color: '#6c86aa', intensity: 0.24 },
+    rim: { azimuth: 148, elevation: 22, color: '#e9c99d', intensity: 0.28 },
+    practicals: [
+      { id: 'wind-sun-5', x: 34, y: 490, radius: 340, color: '#e7764b', intensity: 0.48 },
+    ],
+  },
+  'wind-06-winding-in': {
+    key: { azimuth: -34, elevation: 12, color: '#ffb268', intensity: 0.78 },
+    fill: { color: '#7284aa', intensity: 0.23 },
+    rim: { azimuth: 142, elevation: 20, color: '#ffd09e', intensity: 0.32 },
+    practicals: [
+      { id: 'wind-sun-6', x: 94, y: 520, radius: 350, color: '#ef7547', intensity: 0.58 },
+    ],
+  },
+  'wind-07-resting-kite': {
+    key: { azimuth: 20, elevation: 18, color: '#ffd18a', intensity: 0.58 },
+    fill: { color: '#536d98', intensity: 0.21 },
+    rim: { azimuth: 162, elevation: 18, color: '#8da8d2', intensity: 0.23 },
+    practicals: [
+      { id: 'wind-lamp-7', x: 1040, y: 520, radius: 310, color: '#f2a34e', intensity: 0.54 },
+    ],
+  },
+};
+
+function Defs({ id }: SceneWorldProps): ReactNode {
+  const skies = [
+    ['windSky1', '#657f9c', '#e5ad72'],
+    ['windSky2', '#596f8f', '#cd8d68'],
+    ['windSky3', '#4b6383', '#b87869'],
+    ['windSky4', '#3d5478', '#9f686d'],
+    ['windSky5', '#2e3e64', '#73566e'],
+    ['windSky6', '#243354', '#ce6e54'],
+    ['windSky7', '#0d1730', '#29375e'],
+  ] as const;
   return (
-    <g className="scene-wind-streaks" data-motif="wind" data-wind-dir="right" stroke={color} strokeLinecap="round" fill="none" opacity={opacity}>
-      {range(count).map((i) => {
-        const yy = n(y + i * 58);
-        const start = n(72 + i * 84);
+    <defs>
+      {skies.map(([name, top, bottom]) => (
+        <LinearGradient
+          key={name}
+          id={id(name)}
+          stops={[
+            { offset: 0, color: top },
+            { offset: 0.62, color: bottom },
+            { offset: 1, color: '#e7a36b' },
+          ]}
+        />
+      ))}
+      <LinearGradient
+        id={id('windHillWarm')}
+        x1={0}
+        y1={0}
+        x2={1}
+        y2={1}
+        stops={[
+          { offset: 0, color: '#6f8356' },
+          { offset: 0.5, color: '#425d4a' },
+          { offset: 1, color: '#263b3f' },
+        ]}
+      />
+      <LinearGradient
+        id={id('windHillCool')}
+        stops={[
+          { offset: 0, color: '#3a5150' },
+          { offset: 1, color: '#182b38' },
+        ]}
+      />
+      <LinearGradient
+        id={id('windRoomWall')}
+        x1={0}
+        y1={0}
+        x2={1}
+        y2={1}
+        stops={[
+          { offset: 0, color: '#151f3c' },
+          { offset: 0.62, color: '#27345d' },
+          { offset: 1, color: '#3a406a' },
+        ]}
+      />
+      <LinearGradient
+        id={id('windQuilt')}
+        x1={0}
+        y1={0}
+        x2={1}
+        y2={1}
+        stops={[
+          { offset: 0, color: '#8993c5' },
+          { offset: 0.58, color: '#5e6ca4' },
+          { offset: 1, color: '#374173' },
+        ]}
+      />
+      <RadialGradient
+        id={id('windVignette')}
+        stops={[
+          { offset: 0.55, color: '#0b1020', opacity: 0 },
+          { offset: 1, color: '#0b1020', opacity: 0.42 },
+        ]}
+      />
+    </defs>
+  );
+}
+
+function SceneFrame({
+  id,
+  paint,
+  seed,
+  sceneId,
+  timeIndex,
+  materials,
+  calm = false,
+  children,
+}: SceneWorldProps & {
+  readonly sceneId: string;
+  readonly timeIndex: number;
+  readonly materials: readonly MaterialInstance[];
+  readonly calm?: boolean;
+  readonly children: ReactNode;
+}) {
+  return (
+    <g
+      data-scene-art
+      data-cinematic-scene={sceneId}
+      data-time-index={timeIndex}
+      data-calm-landing={calm ? 'true' : undefined}
+    >
+      <defs>
+        <CinematicDefs
+          id={id}
+          seed={seed}
+          lighting={LIGHTING[sceneId]}
+          materials={materials}
+        />
+      </defs>
+      {children}
+      <Vignette paint={paint('windVignette')} />
+    </g>
+  );
+}
+
+function Sky({
+  fill,
+  paint,
+  fillOpacity = 0.18,
+}: {
+  readonly fill: string;
+  readonly paint: SceneWorldProps['paint'];
+  readonly fillOpacity?: number;
+}) {
+  return (
+    <>
+      <rect width={VIEW_W} height={VIEW_H} fill={fill} />
+      <rect
+        width={VIEW_W}
+        height={VIEW_H}
+        fill={paint('fill-light')}
+        opacity={fillOpacity}
+        data-lighting="fill"
+      />
+    </>
+  );
+}
+
+function Practical({
+  paint,
+  id,
+  x,
+  y,
+  radius,
+  source,
+  core,
+}: {
+  readonly paint: SceneWorldProps['paint'];
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  readonly source: string;
+  readonly core: string;
+}) {
+  return (
+    <g data-lighting="practical" data-practical-source={source}>
+      <circle cx={x} cy={y} r={radius * 2.2} fill={paint(id)} />
+      <circle cx={x} cy={y} r={radius} fill={core} />
+      <circle cx={x - radius * 0.24} cy={y - radius * 0.25} r={radius * 0.28} fill="#fff3c7" opacity={0.62} />
+    </g>
+  );
+}
+
+function LitCharacter({
+  id,
+  x,
+  y,
+  scale,
+  appearance,
+  performance: pose,
+  className,
+  motif,
+  lightKey,
+  lightFill,
+  lightRim,
+}: {
+  readonly id: SceneWorldProps['id'];
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly appearance: CharacterAppearance;
+  readonly performance: CharacterPerformance;
+  readonly className: string;
+  readonly motif?: string;
+  readonly lightKey: string;
+  readonly lightFill: string;
+  readonly lightRim: string;
+}) {
+  const geometry = resolvePoseGeometry(appearance, pose, { x, y, scale });
+  const headRadius = appearance.proportions.headRadius * scale;
+  const feetX = (geometry.foot.left.x + geometry.foot.right.x) / 2;
+  const feetY = Math.max(geometry.foot.left.y, geometry.foot.right.y);
+  return (
+    <g
+      className={className}
+      data-character-lighting={className}
+      data-motif={motif}
+      data-cx={n(x)}
+      data-cy={n(y)}
+    >
+      <ellipse
+        cx={n(feetX)}
+        cy={n(feetY + 7)}
+        rx={n(appearance.proportions.hipWidth * scale * 1.45)}
+        ry={n(10 * scale)}
+        fill="#0b1020"
+        opacity={0.42}
+        data-lighting="contact-shadow"
+      />
+      <CinematicCharacter
+        id={(part) => id(`${className}-${part}`)}
+        x={x}
+        y={y}
+        scale={scale}
+        appearance={appearance}
+        performance={pose}
+        className={className}
+      />
+      <path
+        d={`M${n(geometry.head.x - headRadius * 0.82)},${n(
+          geometry.head.y - headRadius * 0.18,
+        )} Q${n(geometry.head.x - headRadius * 0.34)},${n(
+          geometry.head.y - headRadius * 0.94,
+        )} ${n(geometry.head.x + headRadius * 0.22)},${n(
+          geometry.head.y - headRadius * 0.82,
+        )} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y)} L${n(
+          geometry.elbow.left.x,
+        )},${n(geometry.elbow.left.y)}`}
+        fill="none"
+        stroke={lightKey}
+        strokeWidth={n(4.2 * scale)}
+        strokeLinecap="round"
+        opacity={0.68}
+        data-lighting="key"
+      />
+      <path
+        d={`M${n(geometry.shoulder.right.x)},${n(
+          geometry.shoulder.right.y + 8,
+        )} Q${n(geometry.hip.right.x + 10)},${n(
+          geometry.hip.right.y + 14,
+        )} ${n(geometry.ankle.right.x + 7)},${n(geometry.ankle.right.y)}`}
+        fill="none"
+        stroke={lightFill}
+        strokeWidth={n(6 * scale)}
+        strokeLinecap="round"
+        opacity={0.3}
+        data-lighting="fill"
+      />
+      <path
+        d={`M${n(geometry.head.x + headRadius * 0.88)},${n(
+          geometry.head.y - headRadius * 0.08,
+        )} Q${n(geometry.head.x + headRadius * 0.68)},${n(
+          geometry.head.y - headRadius * 0.7,
+        )} ${n(geometry.head.x + headRadius * 0.18)},${n(
+          geometry.head.y - headRadius * 0.88,
+        )}`}
+        fill="none"
+        stroke={lightRim}
+        strokeWidth={n(2.7 * scale)}
+        strokeLinecap="round"
+        opacity={0.58}
+        data-lighting="rim"
+      />
+    </g>
+  );
+}
+
+function WindStream({
+  y,
+  strength = 'steady',
+  opacity = 0.3,
+  color = '#e8f1ee',
+}: {
+  readonly y: number;
+  readonly strength?: 'steady' | 'gust' | 'gentle';
+  readonly opacity?: number;
+  readonly color?: string;
+}) {
+  const reach = strength === 'gust' ? 470 : strength === 'gentle' ? 250 : 360;
+  return (
+    <g
+      className="scene-wind-streaks"
+      data-motif="wind"
+      data-wind-dir="right"
+      data-wind-strength={strength}
+      fill="none"
+      stroke={color}
+      strokeLinecap="round"
+      opacity={opacity}
+    >
+      {range(3).map((index) => {
+        const start = 70 + index * 104;
+        const yy = y + index * 62;
         return (
           <path
-            key={i}
-            d={`M${start},${yy} C${n(start + 92)},${n(yy - 28)} ${n(start + 210)},${n(yy + 26)} ${n(
-              start + 360,
-            )},${n(yy - 8)}`}
-            strokeWidth={n(3.5 - i * 0.35)}
+            key={index}
+            d={`M${start},${yy} C${n(start + reach * 0.25)},${n(
+              yy - 38,
+            )} ${n(start + reach * 0.62)},${n(yy + 28)} ${n(
+              start + reach,
+            )},${n(yy - 12)}`}
+            strokeWidth={n(4.2 - index * 0.7)}
           />
         );
       })}
@@ -71,505 +644,572 @@ function WindStreaks({ y, count = 4, color = '#ffffff', opacity = 0.4 }: { y: nu
   );
 }
 
-function RagBow({ x, y, scale = 1, angle = 0 }: { x: number; y: number; scale?: number; angle?: number }) {
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${n(scale)})`}>
-      <circle cx={0} cy={0} r={4} fill={KITE_DARK} />
-      <path d="M-3,0 C-18,-12 -30,-10 -34,0 C-28,8 -16,10 -3,0 Z" fill="#f7d6a4" />
-      <path d="M3,0 C18,-12 30,-10 34,0 C28,8 16,10 3,0 Z" fill="#f0bfc5" />
-    </g>
-  );
-}
-
-function Kite({
-  cx,
-  cy,
-  size,
-  rotate = 0,
-  crumpled = false,
-  tail = true,
+function WindGrass({
+  seed,
+  baseY,
+  count,
+  color,
+  height,
+  lean,
 }: {
-  cx: number;
-  cy: number;
-  size: number;
-  rotate?: number;
-  crumpled?: boolean;
-  tail?: boolean;
+  readonly seed: number;
+  readonly baseY: number;
+  readonly count: number;
+  readonly color: string;
+  readonly height: number;
+  readonly lean: number;
 }) {
-  const top = n(-size);
-  const right = n(size * (crumpled ? 0.68 : 0.58));
-  const bottom = n(size * (crumpled ? 0.86 : 0.98));
-  const left = n(-size * (crumpled ? 0.5 : 0.58));
-  const fold = crumpled ? ` Q${n(size * 0.24)},${n(size * 0.12)} 0,${bottom}` : ` L0,${bottom}`;
+  const rand = mulberry32(seed);
   return (
-    <g className="scene-kite-tug">
-      <g className="scene-kite" data-motif="kite" data-cx={n(cx)} data-cy={n(cy)} transform={`translate(${n(cx)} ${n(cy)}) rotate(${n(rotate)})`}>
-        <path d={`M0,${top} L${right},0${fold} L${left},0 Z`} fill={KITE} />
-        <path d={`M0,${top} L${right},0 L0,${bottom} Z`} fill={KITE_LIGHT} opacity={0.32} />
-        <path d={`M0,${top} L0,${bottom} M${left},0 L${right},0`} stroke={SPAR} strokeWidth={n(size * 0.055)} strokeLinecap="round" />
-        <path d={`M0,${bottom} C${n(size * 0.3)},${n(size * 1.45)} ${n(-size * 0.4)},${n(size * 1.88)} ${n(size * 0.2)},${n(size * 2.4)}`} stroke={KITE_DARK} strokeWidth={n(size * 0.035)} fill="none" strokeLinecap="round" />
-        {tail ? (
-          <>
-            {range(5).map((i) => (
-              <RagBow
-                key={i}
-                x={n((i % 2 === 0 ? 1 : -1) * size * (0.1 + i * 0.03))}
-                y={n(size * (1.22 + i * 0.28))}
-                scale={n(size / 82)}
-                angle={n(i % 2 === 0 ? 18 : -20)}
-              />
-            ))}
-          </>
-        ) : null}
-      </g>
-    </g>
-  );
-}
-
-function Flag({ x, y, scale = 1, wind = 1 }: { x: number; y: number; scale?: number; wind?: number }) {
-  return (
-    <g className="scene-flag" data-motif="wind" data-wind-dir="right" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-      <rect x={-5} y={0} width={10} height={170} rx={4} fill="#6b614e" />
-      <path
-        d={`M4,14 C${n(55 * wind)},${n(-10)} ${n(102 * wind)},${n(36)} ${n(154 * wind)},${n(10)} L${n(
-          154 * wind,
-        )},62 C${n(108 * wind)},86 ${n(55 * wind)},42 4,70 Z`}
-        fill={KITE}
-      />
-      <path d={`M4,18 C${n(50 * wind)},8 ${n(102 * wind)},46 ${n(154 * wind)},20`} stroke="#ffaea1" strokeWidth={6} fill="none" opacity={0.55} />
-    </g>
-  );
-}
-
-function NadiaHead({ cx, cy, r = 30, tilt = 0, asleep = false, mouth = 'smile' }: { cx: number; cy: number; r?: number; tilt?: number; asleep?: boolean; mouth?: 'smile' | 'open' | 'soft' }) {
-  return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`}>
-      <circle cx={n(cx)} cy={n(cy)} r={r} fill={SKIN} />
-      <path
-        d={`M${n(cx - r * 1.05)},${n(cy - r * 0.15)} C${n(cx - r * 0.95)},${n(cy - r * 1.15)} ${n(
-          cx + r * 0.5,
-        )},${n(cy - r * 1.35)} ${n(cx + r * 1.05)},${n(cy - r * 0.2)} C${n(cx + r * 0.5)},${n(
-          cy - r * 0.62,
-        )} ${n(cx - r * 0.25)},${n(cy - r * 0.5)} ${n(cx - r * 1.05)},${n(cy - r * 0.15)} Z`}
-        fill={HAIR}
-      />
-      <path d={`M${n(cx + r * 0.65)},${n(cy - r * 0.35)} q${n(r * 0.72)},${n(-r * 0.22)} ${n(r * 1.0)},${n(r * 0.12)}`} stroke={HAIR} strokeWidth={n(r * 0.22)} fill="none" strokeLinecap="round" />
-      {asleep ? (
-        <>
-          <ClosedEye cx={n(cx - r * 0.32)} cy={n(cy)} w={n(r * 0.38)} />
-          <ClosedEye cx={n(cx + r * 0.32)} cy={n(cy)} w={n(r * 0.38)} />
-        </>
-      ) : (
-        <>
-          <Eye cx={n(cx - r * 0.32)} cy={n(cy - r * 0.03)} r={n(r * 0.13)} />
-          <Eye cx={n(cx + r * 0.32)} cy={n(cy - r * 0.03)} r={n(r * 0.13)} />
-        </>
-      )}
-      <Blush cx={n(cx - r * 0.55)} cy={n(cy + r * 0.34)} r={n(r * 0.16)} />
-      <Blush cx={n(cx + r * 0.55)} cy={n(cy + r * 0.34)} r={n(r * 0.16)} />
-      {mouth === 'open' ? (
-        <OpenMouth cx={n(cx)} cy={n(cy + r * 0.46)} rx={n(r * 0.18)} ry={n(r * 0.24)} />
-      ) : mouth === 'soft' ? (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.42)} w={n(r * 0.42)} curve={n(r * 0.15)} />
-      ) : (
-        <Smile cx={n(cx)} cy={n(cy + r * 0.42)} w={n(r * 0.58)} curve={n(r * 0.25)} />
-      )}
-    </g>
-  );
-}
-
-type NadiaPose = 'hug' | 'run' | 'point' | 'string' | 'lookUp' | 'catch' | 'sleep';
-
-function Nadia({ x, y, scale = 1, pose = 'hug' }: { x: number; y: number; scale?: number; pose?: NadiaPose }) {
-  if (pose === 'sleep') {
-    return (
-      <g className="scene-nadia" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-        <ellipse cx={0} cy={0} rx={46} ry={27} fill="#eef0ff" />
-        <NadiaHead cx={8} cy={-14} r={30} tilt={-12} asleep mouth="soft" />
-      </g>
-    );
-  }
-
-  const mouth = pose === 'run' || pose === 'string' ? 'open' : 'smile';
-  const tilt = pose === 'lookUp' ? -18 : pose === 'run' ? 10 : pose === 'point' ? -8 : 0;
-  return (
-    <g className="scene-nadia" data-motif="flyer" data-cx={n(x)} data-cy={n(y)} transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-      <path d="M-28,34 L30,34 L48,118 Q0,144 -48,118 Z" fill={NADIA_DRESS} />
-      <path d="M-26,38 L28,38 L40,96 Q2,112 -38,96 Z" fill={NADIA_DRESS_DARK} opacity={0.26} />
-      <Capsule x1={-18} y1={118} x2={-34} y2={176} width={18} fill={NADIA_LEGGINGS} />
-      <Capsule x1={20} y1={118} x2={32} y2={176} width={18} fill={NADIA_LEGGINGS} />
-      <ellipse cx={-40} cy={180} rx={18} ry={8} fill={HAIR} />
-      <ellipse cx={38} cy={180} rx={18} ry={8} fill={HAIR} />
-      {pose === 'run' ? (
-        <>
-          <Capsule x1={-28} y1={50} x2={-94} y2={24} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={30} y1={52} x2={92} y2={78} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={-18} y1={118} x2={-86} y2={144} width={18} fill={NADIA_LEGGINGS} />
-          <Capsule x1={20} y1={118} x2={74} y2={164} width={18} fill={NADIA_LEGGINGS} />
-        </>
-      ) : pose === 'point' ? (
-        <>
-          <Capsule x1={-24} y1={54} x2={-72} y2={98} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={30} y1={52} x2={124} y2={14} width={16} fill={SKIN_LIGHT} />
-          <circle cx={132} cy={10} r={10} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'string' ? (
-        <>
-          <Capsule x1={-20} y1={54} x2={-78} y2={58} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={28} y1={54} x2={82} y2={42} width={16} fill={SKIN_LIGHT} />
-          <circle cx={-84} cy={58} r={11} fill={SKIN_LIGHT} />
-          <circle cx={88} cy={42} r={11} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'catch' ? (
-        <>
-          <Capsule x1={-26} y1={54} x2={-78} y2={-4} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={30} y1={54} x2={76} y2={-8} width={17} fill={SKIN_LIGHT} />
-          <circle cx={-82} cy={-8} r={12} fill={SKIN_LIGHT} />
-          <circle cx={80} cy={-12} r={12} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'lookUp' ? (
-        <>
-          <Capsule x1={-24} y1={54} x2={-64} y2={76} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={30} y1={54} x2={70} y2={76} width={16} fill={SKIN_LIGHT} />
-        </>
-      ) : (
-        <>
-          <Capsule x1={-28} y1={54} x2={-76} y2={18} width={16} fill={SKIN_LIGHT} />
-          <Capsule x1={28} y1={54} x2={74} y2={18} width={16} fill={SKIN_LIGHT} />
-        </>
-      )}
-      <NadiaHead cx={0} cy={-16} r={31} tilt={tilt} mouth={mouth} />
-      <path d="M24,-34 q40,-16 68,12 M24,-22 q36,-8 58,18" stroke={HAIR} strokeWidth={5} fill="none" strokeLinecap="round" opacity={0.9} />
-    </g>
-  );
-}
-
-function GrandpaHead({ cx, cy, r = 34, tilt = 0, lookingUp = false }: { cx: number; cy: number; r?: number; tilt?: number; lookingUp?: boolean }) {
-  return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`}>
-      <circle cx={n(cx)} cy={n(cy)} r={r} fill={SKIN_LIGHT} />
-      <path d={`M${n(cx - r)},${n(cy - r * 0.15)} Q${n(cx)},${n(cy - r * 1.35)} ${n(cx + r)},${n(cy - r * 0.15)}`} stroke={GRANDPA_HAIR} strokeWidth={n(r * 0.36)} fill="none" strokeLinecap="round" />
-      <path d={`M${n(cx - r * 0.58)},${n(cy + r * 0.34)} Q${n(cx)},${n(cy + r * 0.92)} ${n(cx + r * 0.58)},${n(cy + r * 0.34)} Q${n(cx)},${n(cy + r * 0.68)} ${n(cx - r * 0.58)},${n(cy + r * 0.34)} Z`} fill={GRANDPA_HAIR} opacity={0.92} />
-      <Eye cx={n(cx - r * 0.28)} cy={n(cy - (lookingUp ? r * 0.12 : 0))} r={n(r * 0.11)} />
-      <Eye cx={n(cx + r * 0.28)} cy={n(cy - (lookingUp ? r * 0.12 : 0))} r={n(r * 0.11)} />
-      <Smile cx={n(cx)} cy={n(cy + r * 0.42)} w={n(r * 0.52)} curve={n(r * 0.2)} />
-    </g>
-  );
-}
-
-type GrandpaPose = 'stand' | 'watch' | 'release' | 'lookUp' | 'proud';
-
-function Grandpa({ x, y, scale = 1, pose = 'stand' }: { x: number; y: number; scale?: number; pose?: GrandpaPose }) {
-  return (
-    <g className="scene-grandpa" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-      <Capsule x1={0} y1={36} x2={0} y2={134} width={56} fill={GRANDPA_SWEATER} />
-      <Capsule x1={-16} y1={128} x2={-30} y2={194} width={20} fill={GRANDPA_PANTS} />
-      <Capsule x1={18} y1={128} x2={30} y2={194} width={20} fill={GRANDPA_PANTS} />
-      <ellipse cx={-34} cy={200} rx={18} ry={8} fill="#4b3a2c" />
-      <ellipse cx={34} cy={200} rx={18} ry={8} fill="#4b3a2c" />
-      {pose === 'release' ? (
-        <>
-          <Capsule x1={-24} y1={58} x2={-88} y2={10} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={26} y1={58} x2={88} y2={8} width={17} fill={SKIN_LIGHT} />
-          <ellipse cx={-94} cy={6} rx={15} ry={10} fill={SKIN_LIGHT} />
-          <ellipse cx={94} cy={4} rx={15} ry={10} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'proud' ? (
-        <>
-          <Capsule x1={-24} y1={58} x2={-78} y2={88} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={26} y1={58} x2={112} y2={28} width={18} fill={SKIN_LIGHT} />
-          <ellipse cx={118} cy={26} rx={15} ry={11} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'watch' ? (
-        <>
-          <Capsule x1={-24} y1={58} x2={-64} y2={104} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={26} y1={58} x2={66} y2={98} width={17} fill={SKIN_LIGHT} />
-        </>
-      ) : pose === 'lookUp' ? (
-        <>
-          <Capsule x1={-24} y1={58} x2={-76} y2={72} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={26} y1={58} x2={78} y2={72} width={17} fill={SKIN_LIGHT} />
-        </>
-      ) : (
-        <>
-          <Capsule x1={-24} y1={58} x2={-74} y2={34} width={17} fill={SKIN_LIGHT} />
-          <Capsule x1={26} y1={58} x2={78} y2={34} width={17} fill={SKIN_LIGHT} />
-        </>
-      )}
-      <GrandpaHead cx={0} cy={-14} r={34} tilt={pose === 'lookUp' ? -16 : 0} lookingUp={pose === 'lookUp'} />
-    </g>
-  );
-}
-
-function WindLeaves({ seed, y = 260, count = 7 }: { seed: number; y?: number; count?: number }) {
-  return (
-    <g className="scene-wind-leaves" data-motif="wind" data-wind-dir="right">
-      {range(count).map((i) => {
-        const x = n(80 + i * 145 + ((seed + i * 23) % 40));
-        const yy = n(y + ((seed + i * 37) % 90));
-        return <Leaf key={i} x={x} y={yy} length={n(34 + i * 2)} width={n(18 + i)} angle={n(88 + i * 8)} fill={i % 2 === 0 ? '#6ca455' : '#86b95e'} />;
+    <g data-motif="wind" data-wind-dir="right" fill="none" stroke={color} strokeLinecap="round">
+      {range(count).map((index) => {
+        const x = n(rand() * VIEW_W);
+        const h = n(height * (0.5 + rand() * 0.78));
+        const sway = n(lean * (0.68 + rand() * 0.66));
+        return (
+          <path
+            key={index}
+            d={`M${x},${baseY} Q${n(x + sway * 0.42)},${n(
+              baseY - h * 0.56,
+            )} ${n(x + sway)},${n(baseY - h)}`}
+            strokeWidth={n(2 + rand() * 3)}
+            opacity={n(0.42 + rand() * 0.48)}
+          />
+        );
       })}
     </g>
   );
 }
 
-function Defs({ id }: SceneWorldProps): ReactNode {
+function CloudMass({
+  x,
+  y,
+  scale = 1,
+  fill = '#dce3df',
+  opacity = 0.55,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale?: number;
+  readonly fill?: string;
+  readonly opacity?: number;
+}) {
   return (
-    <defs>
-      <LinearGradient
-        id={id('daySky')}
-        stops={[
-          { offset: 0, color: '#7ec7ed' },
-          { offset: 0.58, color: '#bfe6f6' },
-          { offset: 1, color: '#eaf8e9' },
-        ]}
-      />
-      <LinearGradient
-        id={id('actionSky')}
-        stops={[
-          { offset: 0, color: '#68bfe8' },
-          { offset: 1, color: '#d9f3d5' },
-        ]}
-      />
-      <LinearGradient
-        id={id('clueSky')}
-        stops={[
-          { offset: 0, color: '#86d1eb' },
-          { offset: 0.7, color: '#e3f4c7' },
-          { offset: 1, color: '#f6e5a4' },
-        ]}
-      />
-      <LinearGradient
-        id={id('liftSky')}
-        stops={[
-          { offset: 0, color: '#4baee5' },
-          { offset: 0.56, color: '#9bdcf5' },
-          { offset: 1, color: '#e9fbff' },
-        ]}
-      />
-      <LinearGradient
-        id={id('highSky')}
-        stops={[
-          { offset: 0, color: '#5fb7e9' },
-          { offset: 0.72, color: '#cceefa' },
-          { offset: 1, color: '#f6fbff' },
-        ]}
-      />
-      <LinearGradient
-        id={id('sunsetSky')}
-        stops={[
-          { offset: 0, color: '#5c79b7' },
-          { offset: 0.46, color: '#f3a76f' },
-          { offset: 1, color: '#f7d28a' },
-        ]}
-      />
-      <LinearGradient
-        id={id('nightRoom')}
-        stops={[
-          { offset: 0, color: '#172246' },
-          { offset: 0.65, color: '#24315c' },
-          { offset: 1, color: '#30345f' },
-        ]}
-      />
-      <LinearGradient
-        id={id('grass')}
-        stops={[
-          { offset: 0, color: '#87bf5b' },
-          { offset: 1, color: '#4f8f43' },
-        ]}
-      />
-      <LinearGradient
-        id={id('darkGrass')}
-        stops={[
-          { offset: 0, color: '#5b9344' },
-          { offset: 1, color: '#2f6536' },
-        ]}
-      />
-      <RadialGradient
-        id={id('sunGlow')}
-        stops={[
-          { offset: 0, color: '#fff1ba', opacity: 0.95 },
-          { offset: 0.5, color: '#ffc36f', opacity: 0.42 },
-          { offset: 1, color: '#ff9f6d', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('lampGlow')}
-        stops={[
-          { offset: 0, color: '#ffe6a4', opacity: 0.95 },
-          { offset: 0.54, color: '#f8b85d', opacity: 0.5 },
-          { offset: 1, color: '#f8b85d', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('moonGlow')}
-        stops={[
-          { offset: 0, color: '#f4f0d6', opacity: 0.75 },
-          { offset: 1, color: '#f4f0d6', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('vignette')}
-        stops={[
-          { offset: 0.62, color: '#000000', opacity: 0 },
-          { offset: 1, color: '#142236', opacity: 0.34 },
-        ]}
-      />
-      <GrainFilter id={id('grain')} opacity={0.045} />
-    </defs>
+    <path
+      d="M-132,34 C-116,-18 -68,-42 -22,-22 C8,-72 88,-68 104,-12 C158,-20 186,18 164,54 C104,70 -72,72 -132,34 Z"
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      fill={fill}
+      opacity={opacity}
+    />
   );
 }
 
-const finish = (paint: SceneWorldProps['paint']) => (
-  <>
-    <GrainWash filter={paint('grain')} />
-    <Vignette paint={paint('vignette')} />
-  </>
-);
-
-const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'wind-01-hilltop-kite': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('daySky'))}
-      <WindStreaks y={120} count={4} opacity={0.32} />
-      <Cloud x={n(VIEW_W * 0.18)} y={n(VIEW_H * 0.14)} scale={1.05} fill="#ffffff" opacity={0.78} />
-      <Cloud x={n(VIEW_W * 0.62)} y={n(VIEW_H * 0.2)} scale={1.34} fill="#ffffff" opacity={0.82} />
-      <Cloud x={n(VIEW_W * 0.86)} y={n(VIEW_H * 0.34)} scale={0.72} fill="#f5fbff" opacity={0.62} />
-      <Hill baseY={n(VIEW_H * 0.88)} crest={250} peakX={n(VIEW_W * 0.42)} spread={n(VIEW_W * 0.9)} fill={paint('grass')} />
-      <Hill baseY={n(VIEW_H * 0.95)} crest={144} peakX={n(VIEW_W * 0.84)} spread={n(VIEW_W * 0.78)} fill="#5aa44a" />
-      <Tree x={n(VIEW_W * 0.12)} baseY={n(VIEW_H * 0.76)} height={150} spread={82} canopy="#477f47" />
-      <Tree x={n(VIEW_W * 0.93)} baseY={n(VIEW_H * 0.78)} height={132} spread={72} canopy="#57964c" />
-      <Kite cx={n(VIEW_W * 0.47)} cy={n(VIEW_H * 0.55)} size={86} rotate={-8} />
-      <Grandpa x={n(VIEW_W * 0.62)} y={n(VIEW_H * 0.58)} scale={0.63} pose="stand" />
-      <Nadia x={n(VIEW_W * 0.42)} y={n(VIEW_H * 0.62)} scale={0.62} pose="hug" />
-      <GrassRow seed={seed} baseY={n(VIEW_H * 0.89)} blades={52} height={54} lean={28} fill="#6fb34f" />
-      <GrassRow seed={seed + 11} baseY={VIEW_H} blades={58} height={72} lean={34} fill="#3f7d3a" />
-      {finish(paint)}
-    </g>
-  ),
-
-  'wind-02-flop-run': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('actionSky'))}
-      <WindStreaks y={108} count={5} opacity={0.28} />
-      <Cloud x={n(VIEW_W * 0.28)} y={n(VIEW_H * 0.18)} scale={0.84} fill="#ffffff" opacity={0.72} />
-      <Cloud x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.16)} scale={1.18} fill="#f9fdff" opacity={0.78} />
-      <Hill baseY={n(VIEW_H * 0.8)} crest={110} peakX={n(VIEW_W * 0.62)} spread={n(VIEW_W * 0.84)} fill={paint('grass')} />
-      <Hill baseY={n(VIEW_H * 0.96)} crest={82} peakX={n(VIEW_W * 0.32)} spread={n(VIEW_W * 0.9)} fill="#4d9340" />
-      <path d={`M${n(VIEW_W * 0.18)},${n(VIEW_H * 0.7)} C${n(VIEW_W * 0.38)},${n(VIEW_H * 0.78)} ${n(VIEW_W * 0.55)},${n(VIEW_H * 0.66)} ${n(VIEW_W * 0.74)},${n(VIEW_H * 0.75)}`} stroke="#d9f2b0" strokeWidth={18} fill="none" opacity={0.35} />
-      <Kite cx={n(VIEW_W * 0.28)} cy={n(VIEW_H * 0.64)} size={92} rotate={-72} crumpled />
-      <path d={`M${n(VIEW_W * 0.33)},${n(VIEW_H * 0.66)} C${n(VIEW_W * 0.43)},${n(VIEW_H * 0.58)} ${n(VIEW_W * 0.55)},${n(VIEW_H * 0.7)} ${n(VIEW_W * 0.66)},${n(VIEW_H * 0.61)}`} stroke={STRING} strokeWidth={3} fill="none" strokeDasharray="9 9" opacity={0.9} />
-      <Nadia x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.56)} scale={0.82} pose="run" />
-      <Grandpa x={n(VIEW_W * 0.9)} y={n(VIEW_H * 0.54)} scale={0.62} pose="watch" />
-      <GrassRow seed={seed + 2} baseY={n(VIEW_H * 0.82)} blades={44} height={42} lean={24} fill="#78b956" />
-      <GrassRow seed={seed + 13} baseY={VIEW_H} blades={60} height={78} lean={30} fill="#407b3a" />
-      {finish(paint)}
-    </g>
-  ),
-
-  'wind-03-reading-clues': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('clueSky'))}
-      <SunGlow cx={n(VIEW_W * 0.14)} cy={n(VIEW_H * 0.16)} r={58} core="#fff0b8" halo={paint('sunGlow')} />
-      <g transform={`rotate(-5 ${n(VIEW_W * 0.5)} ${n(VIEW_H * 0.52)})`}>
-        <Cloud x={n(VIEW_W * 0.22)} y={n(VIEW_H * 0.2)} scale={0.94} fill="#ffffff" opacity={0.76} />
-        <Cloud x={n(VIEW_W * 0.7)} y={n(VIEW_H * 0.28)} scale={1.16} fill="#ffffff" opacity={0.66} />
-        <Flag x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.38)} scale={0.8} wind={1.08} />
-        <Tree x={n(VIEW_W * 0.12)} baseY={n(VIEW_H * 0.66)} height={170} spread={84} canopy="#5b9144" />
-        <Tree x={n(VIEW_W * 0.26)} baseY={n(VIEW_H * 0.68)} height={138} spread={70} canopy="#6fa64e" />
-        <WindLeaves seed={seed} y={n(VIEW_H * 0.25)} count={8} />
-        <Hill baseY={n(VIEW_H * 0.82)} crest={96} peakX={n(VIEW_W * 0.5)} spread={n(VIEW_W * 0.86)} fill={paint('grass')} />
-        <Nadia x={n(VIEW_W * 0.45)} y={n(VIEW_H * 0.54)} scale={0.78} pose="point" />
-        <Grandpa x={n(VIEW_W * 0.26)} y={n(VIEW_H * 0.54)} scale={0.66} pose="watch" />
-        <GrassRow seed={seed + 17} baseY={n(VIEW_H * 0.83)} blades={55} height={58} lean={36} fill="#6eaf52" />
-        <GrassRow seed={seed + 23} baseY={VIEW_H} blades={58} height={82} lean={42} fill="#3f7a38" />
+function Kite({
+  paint,
+  cx,
+  cy,
+  size,
+  rotate = 0,
+  state = 'flying',
+}: {
+  readonly paint: SceneWorldProps['paint'];
+  readonly cx: number;
+  readonly cy: number;
+  readonly size: number;
+  readonly rotate?: number;
+  readonly state?: 'held' | 'flopped' | 'flying' | 'descending' | 'resting';
+}) {
+  const flopped = state === 'flopped';
+  const right = size * (flopped ? 0.42 : 0.58);
+  const left = size * (flopped ? 0.64 : 0.58);
+  const bottom = size * (flopped ? 0.66 : 0.96);
+  return (
+    <g className="scene-kite-tug">
+      <g
+        className="scene-kite"
+        data-motif="kite"
+        data-kite-state={state}
+        data-cx={n(cx)}
+        data-cy={n(cy)}
+        transform={`translate(${n(cx)} ${n(cy)}) rotate(${n(rotate)})`}
+      >
+        <path
+          d={`M0,${n(-size)} L${n(right)},0 L0,${n(bottom)} L${n(-left)},0 Z`}
+          fill="#d83d38"
+          filter={paint('wind-kite-cloth')}
+        />
+        <path d={`M0,${n(-size)} L${n(right)},0 L0,${n(bottom)} Z`} fill="#ef715b" opacity={0.38} />
+        <path d={`M0,${n(-size)} L0,${n(bottom)} M${n(-left)},0 L${n(right)},0`} fill="none" stroke="#744633" strokeWidth={n(size * 0.055)} strokeLinecap="round" filter={paint('wind-kite-spar')} />
+        <path d={`M0,${n(bottom)} C${n(size * 0.42)},${n(size * 1.35)} ${n(
+          -size * 0.44,
+        )},${n(size * 1.75)} ${n(size * 0.28)},${n(size * 2.32)}`} fill="none" stroke="#962a31" strokeWidth={n(size * 0.035)} strokeLinecap="round" />
+        {range(4).map((index) => {
+          const yy = size * (1.2 + index * 0.31);
+          const xx = (index % 2 === 0 ? 1 : -1) * size * (0.08 + index * 0.025);
+          return (
+            <g key={index} transform={`translate(${n(xx)} ${n(yy)}) rotate(${index % 2 === 0 ? 15 : -18})`}>
+              <path d="M-2,0 C-16,-10 -28,-8 -32,0 C-26,8 -14,9 -2,0 Z" fill="#edc398" />
+              <path d="M2,0 C16,-10 28,-8 32,0 C26,8 14,9 2,0 Z" fill="#d99caf" />
+            </g>
+          );
+        })}
       </g>
-      {finish(paint)}
     </g>
-  ),
+  );
+}
 
-  'wind-04-first-lift': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('liftSky'))}
-      <WindStreaks y={88} count={5} opacity={0.34} />
-      <Cloud x={n(VIEW_W * 0.18)} y={n(VIEW_H * 0.24)} scale={0.86} fill="#ffffff" opacity={0.64} />
-      <Cloud x={n(VIEW_W * 0.78)} y={n(VIEW_H * 0.18)} scale={1.12} fill="#ffffff" opacity={0.78} />
-      <Hill baseY={n(VIEW_H * 0.88)} crest={118} peakX={n(VIEW_W * 0.4)} spread={n(VIEW_W * 0.88)} fill={paint('grass')} />
-      <Tree x={n(VIEW_W * 0.09)} baseY={n(VIEW_H * 0.82)} height={124} spread={70} canopy="#4f8b48" />
-      <Tree x={n(VIEW_W * 0.92)} baseY={n(VIEW_H * 0.84)} height={116} spread={66} canopy="#5d9b4f" />
-      <path d={`M${n(VIEW_W * 0.26)},${n(VIEW_H * 0.58)} C${n(VIEW_W * 0.44)},${n(VIEW_H * 0.5)} ${n(VIEW_W * 0.56)},${n(VIEW_H * 0.38)} ${n(VIEW_W * 0.67)},${n(VIEW_H * 0.27)}`} stroke={STRING} strokeWidth={4} fill="none" />
-      <Kite cx={n(VIEW_W * 0.68)} cy={n(VIEW_H * 0.26)} size={78} rotate={-18} />
-      <Grandpa x={n(VIEW_W * 0.55)} y={n(VIEW_H * 0.58)} scale={0.74} pose="release" />
-      <Nadia x={n(VIEW_W * 0.22)} y={n(VIEW_H * 0.6)} scale={0.74} pose="string" />
-      <GrassRow seed={seed + 31} baseY={n(VIEW_H * 0.88)} blades={50} height={54} lean={32} fill="#6eb14e" />
-      <GrassRow seed={seed + 37} baseY={VIEW_H} blades={58} height={78} lean={38} fill="#3e7a38" />
-      {finish(paint)}
-    </g>
-  ),
+function KiteString({
+  d,
+  state,
+}: {
+  readonly d: string;
+  readonly state: 'slack' | 'taut' | 'winding';
+}) {
+  return (
+    <path
+      d={d}
+      fill="none"
+      stroke="#e9e4d8"
+      strokeWidth={state === 'taut' ? 4 : 3}
+      strokeLinecap="round"
+      strokeDasharray={state === 'slack' ? '9 8' : undefined}
+      opacity={0.88}
+      data-motif="kite-string"
+      data-string-state={state}
+    />
+  );
+}
 
-  'wind-05-dancing-high': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('highSky'))}
-      <WindStreaks y={86} count={6} opacity={0.25} />
-      <Cloud x={n(VIEW_W * 0.16)} y={n(VIEW_H * 0.2)} scale={1.26} fill="#ffffff" opacity={0.68} />
-      <Cloud x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.14)} scale={0.82} fill="#ffffff" opacity={0.58} />
-      <Cloud x={n(VIEW_W * 0.86)} y={n(VIEW_H * 0.3)} scale={1.05} fill="#ffffff" opacity={0.72} />
-      <Kite cx={n(VIEW_W * 0.58)} cy={n(VIEW_H * 0.16)} size={42} rotate={12} />
-      <path d={`M${n(VIEW_W * 0.56)},${n(VIEW_H * 0.22)} C${n(VIEW_W * 0.46)},${n(VIEW_H * 0.34)} ${n(VIEW_W * 0.5)},${n(VIEW_H * 0.52)} ${n(VIEW_W * 0.42)},${n(VIEW_H * 0.73)}`} stroke={STRING} strokeWidth={2.5} fill="none" opacity={0.8} />
-      <Tree x={n(VIEW_W * 0.1)} baseY={n(VIEW_H * 0.82)} height={160} spread={80} canopy="#45834a" />
-      <Tree x={n(VIEW_W * 0.26)} baseY={n(VIEW_H * 0.84)} height={142} spread={76} canopy="#53914f" />
-      <Tree x={n(VIEW_W * 0.88)} baseY={n(VIEW_H * 0.83)} height={152} spread={82} canopy="#4b8948" />
-      <Hill baseY={n(VIEW_H * 0.9)} crest={84} peakX={n(VIEW_W * 0.5)} spread={n(VIEW_W * 0.9)} fill={paint('grass')} />
-      <Nadia x={n(VIEW_W * 0.42)} y={n(VIEW_H * 0.72)} scale={0.42} pose="lookUp" />
-      <Grandpa x={n(VIEW_W * 0.53)} y={n(VIEW_H * 0.7)} scale={0.4} pose="lookUp" />
-      <GrassRow seed={seed + 41} baseY={n(VIEW_H * 0.91)} blades={45} height={40} lean={22} fill="#6aad50" />
-      <GrassRow seed={seed + 43} baseY={VIEW_H} blades={55} height={62} lean={28} fill="#3e7d39" />
-      {finish(paint)}
+function Flag({
+  x,
+  y,
+  scale = 1,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale?: number;
+}) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} data-motif="wind" data-wind-dir="right">
+      <path d="M0,190 L0,0" stroke="#5b5048" strokeWidth={12} strokeLinecap="round" />
+      <path d="M6,12 C72,-12 132,38 194,8 L194,78 C132,104 74,48 6,80 Z" fill="#c83a3d" />
+      <path d="M10,24 C78,12 130,58 188,26" fill="none" stroke="#f19b83" strokeWidth={8} opacity={0.45} />
     </g>
-  ),
+  );
+}
 
-  'wind-06-winding-in': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('sunsetSky'))}
-      <SunGlow cx={n(VIEW_W * 0.18)} cy={n(VIEW_H * 0.58)} r={72} core="#ffe29b" halo={paint('sunGlow')} />
-      <Cloud x={n(VIEW_W * 0.65)} y={n(VIEW_H * 0.16)} scale={1.08} fill="#ffe8c6" opacity={0.58} />
-      <Cloud x={n(VIEW_W * 0.32)} y={n(VIEW_H * 0.25)} scale={0.72} fill="#fff0d7" opacity={0.52} />
-      <Hill baseY={n(VIEW_H * 0.86)} crest={96} peakX={n(VIEW_W * 0.5)} spread={n(VIEW_W * 0.9)} fill="#5b8c47" />
-      <path d={`M${n(VIEW_W * 0.36)},${n(VIEW_H * 0.48)} C${n(VIEW_W * 0.45)},${n(VIEW_H * 0.43)} ${n(VIEW_W * 0.5)},${n(VIEW_H * 0.38)} ${n(VIEW_W * 0.58)},${n(VIEW_H * 0.38)}`} stroke={STRING} strokeWidth={3} fill="none" opacity={0.78} />
-      <Kite cx={n(VIEW_W * 0.42)} cy={n(VIEW_H * 0.52)} size={92} rotate={8} />
-      <Nadia x={n(VIEW_W * 0.48)} y={n(VIEW_H * 0.58)} scale={0.92} pose="catch" />
-      <Grandpa x={n(VIEW_W * 0.64)} y={n(VIEW_H * 0.56)} scale={0.78} pose="proud" />
-      <path d={`M${n(VIEW_W * 0.16)},${n(VIEW_H * 0.72)} C${n(VIEW_W * 0.34)},${n(VIEW_H * 0.68)} ${n(VIEW_W * 0.74)},${n(VIEW_H * 0.69)} ${n(VIEW_W * 0.92)},${n(VIEW_H * 0.73)}`} stroke="#f9d6a5" strokeWidth={14} fill="none" opacity={0.28} />
-      <GrassRow seed={seed + 51} baseY={n(VIEW_H * 0.88)} blades={48} height={46} lean={18} fill="#789b49" />
-      <GrassRow seed={seed + 57} baseY={VIEW_H} blades={58} height={70} lean={22} fill="#3f6937" />
-      {finish(paint)}
+function LeafFlight({ seed, y, count = 8 }: { readonly seed: number; readonly y: number; readonly count?: number }) {
+  const rand = mulberry32(seed);
+  return (
+    <g data-motif="wind" data-wind-dir="right">
+      {range(count).map((index) => {
+        const x = 120 + index * 124 + rand() * 44;
+        const yy = y + rand() * 120;
+        const angle = -28 + rand() * 72;
+        return (
+          <path
+            key={index}
+            d="M-18,0 C-8,-18 14,-18 24,0 C10,10 -4,12 -18,0 Z"
+            transform={`translate(${n(x)} ${n(yy)}) rotate(${n(angle)})`}
+            fill={index % 2 === 0 ? '#87905b' : '#617b54'}
+            opacity={0.8}
+          />
+        );
+      })}
     </g>
-  ),
+  );
+}
 
-  'wind-07-resting-kite': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('nightRoom'))}
-      <StarField seed={seed} count={34} x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.06)} width={n(VIEW_W * 0.38)} height={n(VIEW_H * 0.32)} color="#dfe8ff" minR={1} maxR={2.6} />
-      <rect x={n(VIEW_W * 0.5)} y={n(VIEW_H * 0.08)} width={n(VIEW_W * 0.38)} height={n(VIEW_H * 0.42)} rx={14} fill="#111936" />
-      <rect x={n(VIEW_W * 0.53)} y={n(VIEW_H * 0.11)} width={n(VIEW_W * 0.32)} height={n(VIEW_H * 0.35)} fill="#1d2b55" />
-      <Moon cx={n(VIEW_W * 0.78)} cy={n(VIEW_H * 0.2)} r={38} glow={paint('moonGlow')} />
-      <rect x={n(VIEW_W * 0.685)} y={n(VIEW_H * 0.09)} width={10} height={n(VIEW_H * 0.4)} fill="#38436d" />
-      <rect x={n(VIEW_W * 0.52)} y={n(VIEW_H * 0.28)} width={n(VIEW_W * 0.34)} height={10} fill="#38436d" />
-      <path d={`M${n(VIEW_W * 0.5)},${n(VIEW_H * 0.1)} C${n(VIEW_W * 0.47)},${n(VIEW_H * 0.24)} ${n(VIEW_W * 0.49)},${n(VIEW_H * 0.37)} ${n(VIEW_W * 0.46)},${n(VIEW_H * 0.5)} L${n(VIEW_W * 0.52)},${n(VIEW_H * 0.5)} C${n(VIEW_W * 0.54)},${n(VIEW_H * 0.34)} ${n(VIEW_W * 0.54)},${n(VIEW_H * 0.22)} ${n(VIEW_W * 0.52)},${n(VIEW_H * 0.1)} Z`} fill="#6571aa" opacity={0.72} />
-      <path d={`M${n(VIEW_W * 0.86)},${n(VIEW_H * 0.1)} C${n(VIEW_W * 0.91)},${n(VIEW_H * 0.24)} ${n(VIEW_W * 0.88)},${n(VIEW_H * 0.37)} ${n(VIEW_W * 0.92)},${n(VIEW_H * 0.5)} L${n(VIEW_W * 0.85)},${n(VIEW_H * 0.5)} C${n(VIEW_W * 0.82)},${n(VIEW_H * 0.34)} ${n(VIEW_W * 0.83)},${n(VIEW_H * 0.22)} ${n(VIEW_W * 0.84)},${n(VIEW_H * 0.1)} Z`} fill="#59659d" opacity={0.72} />
-      <rect x={0} y={n(VIEW_H * 0.74)} width={VIEW_W} height={n(VIEW_H * 0.26)} fill="#20264a" />
-      <rect x={n(VIEW_W * 0.08)} y={n(VIEW_H * 0.62)} width={n(VIEW_W * 0.48)} height={n(VIEW_H * 0.2)} rx={24} fill="#59639a" />
-      <path d={`M${n(VIEW_W * 0.08)},${n(VIEW_H * 0.78)} L${n(VIEW_W * 0.08)},${n(VIEW_H * 0.7)} Q${n(VIEW_W * 0.3)},${n(VIEW_H * 0.62)} ${n(VIEW_W * 0.56)},${n(VIEW_H * 0.71)} L${n(VIEW_W * 0.56)},${n(VIEW_H * 0.82)} Z`} fill="#7f86c4" />
-      <path d={`M${n(VIEW_W * 0.11)},${n(VIEW_H * 0.74)} q${n(VIEW_W * 0.08)},${n(-VIEW_H * 0.05)} ${n(VIEW_W * 0.17)},0 t${n(VIEW_W * 0.17)},0`} stroke="#a5a9d8" strokeWidth={5} fill="none" opacity={0.55} />
-      <Nadia x={n(VIEW_W * 0.19)} y={n(VIEW_H * 0.65)} scale={0.92} pose="sleep" />
-      <Kite cx={n(VIEW_W * 0.31)} cy={n(VIEW_H * 0.38)} size={78} rotate={-18} />
-      <path d={`M${n(VIEW_W * 0.28)},${n(VIEW_H * 0.6)} L${n(VIEW_W * 0.36)},${n(VIEW_H * 0.22)}`} stroke={SPAR} strokeWidth={5} opacity={0.58} />
-      <rect x={n(VIEW_W * 0.9)} y={n(VIEW_H * 0.58)} width={44} height={72} rx={14} fill="#6c4f63" />
-      <circle cx={n(VIEW_W * 0.922)} cy={n(VIEW_H * 0.57)} r={30} fill={paint('lampGlow')} />
-      <circle cx={n(VIEW_W * 0.922)} cy={n(VIEW_H * 0.57)} r={16} fill="#ffdc8a" />
-      {finish(paint)}
-    </g>
-  ),
+function PageOne(props: SceneWorldProps) {
+  const sceneId = 'wind-01-hilltop-kite';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={1} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky1')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.86 }}>
+        <Practical paint={props.paint} id="wind-sun-1" x={84} y={270} radius={44} source="low-sun" core="#ffd58f" />
+        <CloudMass x={300} y={160} scale={0.82} />
+        <CloudMass x={852} y={216} scale={1.08} fill="#d5ddd9" opacity={0.48} />
+        <WindStream y={108} strength="steady" />
+        <path d="M0,510 C230,400 430,438 648,360 C872,280 1046,340 1200,304 L1200,594 L0,594 Z" fill="#586b68" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M-80,800 C88,546 338,430 604,500 C822,558 978,490 1280,392 L1280,800 Z" fill={props.paint('windHillWarm')} />
+          <path d="M0,738 C224,640 430,666 646,626 C864,586 1044,604 1200,560 L1200,800 L0,800 Z" fill="#314944" />
+        </g>
+        <Kite paint={props.paint} cx={650} cy={444} size={78} rotate={-9} state="held" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={430}
+          y={704}
+          scale={0.82}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_HUG}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#ffd49a"
+          lightFill="#7da2bb"
+          lightRim="#ffe0ad"
+        />
+        <LitCharacter
+          id={props.id}
+          x={788}
+          y={704}
+          scale={0.68}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_STAND}
+          className="scene-grandpa"
+          lightKey="#ffd49a"
+          lightFill="#7da2bb"
+          lightRim="#ffe0ad"
+        />
+        <path d="M350,642 C544,578 718,584 904,512" fill="none" stroke="#d7c08a" strokeWidth={11} opacity={0.32} strokeLinecap="round" />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed} baseY={800} count={68} color="#1f3735" height={82} lean={32} />
+        <path d="M0,800 L0,704 C112,670 210,710 294,800 Z" fill="#173033" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageTwo(props: SceneWorldProps) {
+  const sceneId = 'wind-02-flop-run';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={2} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky2')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.84 }}>
+        <Practical paint={props.paint} id="wind-sun-2" x={1020} y={192} radius={38} source="sun" core="#f3ca8f" />
+        <CloudMass x={270} y={178} scale={0.78} />
+        <WindStream y={126} strength="gust" opacity={0.25} />
+        <path d="M0,500 C216,434 402,464 596,416 C812,362 1012,402 1200,352 L1200,570 L0,570 Z" fill="#4d6260" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M0,548 C236,512 438,552 666,516 C884,480 1048,510 1200,474 L1200,800 L0,800 Z" fill="#4f694e" />
+          <path d="M0,704 C256,636 460,680 704,628 C918,582 1060,602 1200,576 L1200,800 L0,800 Z" fill="#344b40" />
+        </g>
+        <Kite paint={props.paint} cx={286} cy={650} size={94} rotate={-70} state="flopped" />
+        <KiteString d="M322,646 C438,584 548,660 650,574" state="slack" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={696}
+          y={706}
+          scale={0.88}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_RUN}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#f7c28d"
+          lightFill="#789ab5"
+          lightRim="#efcc9e"
+        />
+        <LitCharacter
+          id={props.id}
+          x={1020}
+          y={704}
+          scale={0.62}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_WATCH}
+          className="scene-grandpa"
+          lightKey="#f7c28d"
+          lightFill="#789ab5"
+          lightRim="#efcc9e"
+        />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed + 7} baseY={800} count={72} color="#223d36" height={78} lean={38} />
+        <path d="M1200,800 L1200,704 C1108,676 1028,712 950,800 Z" fill="#1a3032" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageThree(props: SceneWorldProps) {
+  const sceneId = 'wind-03-reading-clues';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={3} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky3')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.8, saturation: 0.8 }}>
+        <Practical paint={props.paint} id="wind-sun-3" x={140} y={180} radius={36} source="sun" core="#efc58c" />
+        <CloudMass x={348} y={164} scale={0.76} opacity={0.48} />
+        <CloudMass x={840} y={226} scale={0.96} opacity={0.42} />
+        <LeafFlight seed={props.seed} y={174} />
+        <path d="M0,492 C220,430 410,458 608,412 C820,362 1024,400 1200,354 L1200,562 L0,562 Z" fill="#435a59" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M0,548 C236,510 452,554 676,514 C898,476 1050,504 1200,474 L1200,800 L0,800 Z" fill="#49604b" />
+          <path d="M0,710 C240,642 462,680 706,630 C922,586 1062,602 1200,578 L1200,800 L0,800 Z" fill="#30463d" />
+        </g>
+        <Flag x={936} y={330} scale={0.9} />
+        <WindGrass seed={props.seed + 11} baseY={634} count={42} color="#50674c" height={72} lean={46} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={550}
+          y={706}
+          scale={0.88}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_POINT}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#efba83"
+          lightFill="#7293ae"
+          lightRim="#e6c49b"
+        />
+        <LitCharacter
+          id={props.id}
+          x={314}
+          y={706}
+          scale={0.68}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_WATCH}
+          className="scene-grandpa"
+          lightKey="#efba83"
+          lightFill="#7293ae"
+          lightRim="#e6c49b"
+        />
+        <path d="M642,484 C760,424 868,416 988,390" fill="none" stroke="#d9b37e" strokeWidth={8} opacity={0.38} strokeLinecap="round" />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed + 17} baseY={800} count={76} color="#1f3733" height={86} lean={48} />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageFour(props: SceneWorldProps) {
+  const sceneId = 'wind-04-first-lift';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={4} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky4')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.84 }}>
+        <Practical paint={props.paint} id="wind-sun-4" x={1060} y={154} radius={38} source="sun" core="#efbf83" />
+        <CloudMass x={290} y={172} scale={0.72} opacity={0.46} />
+        <WindStream y={102} strength="gust" opacity={0.3} />
+        <path d="M0,512 C228,438 408,466 612,412 C830,356 1028,400 1200,350 L1200,576 L0,576 Z" fill="#3e5357" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M0,562 C230,520 442,558 666,520 C886,482 1050,510 1200,476 L1200,800 L0,800 Z" fill="#415947" />
+          <path d="M0,716 C250,650 456,680 700,634 C918,592 1064,606 1200,580 L1200,800 L0,800 Z" fill="#2d433d" />
+        </g>
+        <Kite paint={props.paint} cx={830} cy={214} size={84} rotate={-18} state="flying" />
+        <KiteString d="M432,514 C548,454 672,350 830,214" state="taut" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={390}
+          y={706}
+          scale={0.86}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_STRING}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#f3b879"
+          lightFill="#6f90ac"
+          lightRim="#ffcf98"
+        />
+        <LitCharacter
+          id={props.id}
+          x={686}
+          y={704}
+          scale={0.72}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_RELEASE}
+          className="scene-grandpa"
+          lightKey="#f3b879"
+          lightFill="#6f90ac"
+          lightRim="#ffcf98"
+        />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed + 23} baseY={800} count={70} color="#1d3633" height={82} lean={42} />
+        <path d="M0,800 L0,714 C102,680 194,714 270,800 Z" fill="#172e32" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageFive(props: SceneWorldProps) {
+  const sceneId = 'wind-05-dancing-high';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={5} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky5')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.84, saturation: 0.78 }}>
+        <Practical paint={props.paint} id="wind-sun-5" x={34} y={490} radius={44} source="setting-sun" core="#e9aa72" />
+        <CloudMass x={272} y={176} scale={0.96} fill="#cbd2d2" opacity={0.36} />
+        <CloudMass x={928} y={264} scale={0.76} fill="#c4ccd0" opacity={0.3} />
+        <WindStream y={104} strength="steady" opacity={0.22} color="#d3dce1" />
+        <path d="M0,566 C222,488 412,512 614,462 C834,408 1026,438 1200,394 L1200,620 L0,620 Z" fill="#344858" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M0,642 C244,594 450,628 678,596 C900,566 1056,584 1200,556 L1200,800 L0,800 Z" fill={props.paint('windHillCool')} />
+        </g>
+        <Kite paint={props.paint} cx={720} cy={128} size={54} rotate={12} state="flying" />
+        <KiteString d="M486,648 C520,496 608,300 720,128" state="taut" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={460}
+          y={734}
+          scale={0.56}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_LOOK_UP}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#eeb075"
+          lightFill="#6d86a8"
+          lightRim="#e8c89b"
+        />
+        <LitCharacter
+          id={props.id}
+          x={612}
+          y={734}
+          scale={0.46}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_LOOK_UP}
+          className="scene-grandpa"
+          lightKey="#eeb075"
+          lightFill="#6d86a8"
+          lightRim="#e8c89b"
+        />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed + 31} baseY={800} count={62} color="#182f34" height={68} lean={30} />
+        <path d="M1200,800 L1200,690 C1108,668 1020,706 946,800 Z" fill="#142a32" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageSix(props: SceneWorldProps) {
+  const sceneId = 'wind-06-winding-in';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={6} materials={OUTDOOR_MATERIALS}>
+      <Sky fill={props.paint('windSky6')} paint={props.paint} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.88 }}>
+        <Practical paint={props.paint} id="wind-sun-6" x={94} y={520} radius={50} source="setting-sun" core="#ffbf71" />
+        <CloudMass x={850} y={180} scale={0.94} fill="#d7b9a4" opacity={0.36} />
+        <path d="M0,522 C226,450 420,482 612,432 C830,376 1024,416 1200,370 L1200,586 L0,586 Z" fill="#4b4c5a" />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <path d="M0,574 C238,532 450,570 678,532 C896,496 1054,516 1200,486 L1200,800 L0,800 Z" fill="#3d5144" />
+          <path d="M0,724 C242,658 460,692 704,644 C918,602 1062,614 1200,586 L1200,800 L0,800 Z" fill="#293d3a" />
+        </g>
+        <Kite paint={props.paint} cx={480} cy={456} size={92} rotate={8} state="descending" />
+        <KiteString d="M538,496 C604,470 648,466 706,518" state="winding" />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <LitCharacter
+          id={props.id}
+          x={568}
+          y={714}
+          scale={0.94}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_CATCH}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#ffb167"
+          lightFill="#7283a9"
+          lightRim="#ffd09d"
+        />
+        <LitCharacter
+          id={props.id}
+          x={786}
+          y={714}
+          scale={0.74}
+          appearance={GRANDPA_APPEARANCE}
+          performance={GRANDPA_PROUD}
+          className="scene-grandpa"
+          lightKey="#ffb167"
+          lightFill="#7283a9"
+          lightRim="#ffd09d"
+        />
+        <path d="M680,524 Q706,500 736,518" fill="none" stroke="#d8a989" strokeWidth={11} strokeLinecap="round" opacity={0.64} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <WindGrass seed={props.seed + 37} baseY={800} count={62} color="#1c3332" height={66} lean={20} />
+        <path d="M0,800 L0,708 C110,674 204,712 288,800 Z" fill="#172c31" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+function PageSeven(props: SceneWorldProps) {
+  const sceneId = 'wind-07-resting-kite';
+  return (
+    <SceneFrame {...props} sceneId={sceneId} timeIndex={7} materials={BEDROOM_MATERIALS} calm>
+      <Sky fill={props.paint('windRoomWall')} paint={props.paint} fillOpacity={0.13} />
+      <DepthLayer depth="far" treatment={{ opacity: 0.76, saturation: 0.74 }}>
+        <rect x={714} y={66} width={326} height={294} rx={18} fill="#101a32" stroke="#53658e" strokeWidth={12} />
+        <StarField seed={props.seed} count={24} x={738} y={90} width={276} height={242} color="#d1daef" minR={1} maxR={2.5} />
+        <path d="M876,74 L876,352 M722,210 L1032,210" stroke="#53658e" strokeWidth={9} />
+      </DepthLayer>
+      <DepthLayer depth="mid">
+        <g data-cover-parity="geometry">
+          <rect width={VIEW_W} height={VIEW_H} fill={props.paint('windRoomWall')} opacity={0.36} />
+          <path d="M0,614 L1200,614 L1200,800 L0,800 Z" fill="#111a32" />
+          <path d="M92,602 C272,540 530,548 704,620 L704,790 L82,790 Z" fill="#4c5688" />
+        </g>
+        <g data-motif="wind" data-wind-dir="right" data-wind-strength="gentle">
+          <path d="M706,86 C660,196 680,280 642,366 L716,366 C752,272 748,180 738,86 Z" fill="#6471a8" opacity={0.76} />
+          <path d="M1038,86 C1084,192 1060,278 1098,366 L1028,366 C994,278 1000,184 1008,86 Z" fill="#59679e" opacity={0.76} />
+          <path d="M670,178 C716,160 754,170 790,194" fill="none" stroke="#8291bf" strokeWidth={7} opacity={0.34} />
+        </g>
+        <Practical paint={props.paint} id="wind-lamp-7" x={1040} y={520} radius={28} source="lamp" core="#ffd282" />
+        <Kite paint={props.paint} cx={874} cy={484} size={82} rotate={-16} state="resting" />
+        <path d="M836,560 L910,350" stroke="#664333" strokeWidth={7} opacity={0.66} />
+      </DepthLayer>
+      <DepthLayer depth="focus">
+        <path
+          d="M84,652 C238,574 504,576 704,654 L704,792 L84,792 Z"
+          fill={props.paint('windQuilt')}
+          filter={props.paint('wind-room-cloth')}
+          data-motif="quilt"
+        />
+        <ellipse cx={332} cy={684} rx={122} ry={48} fill="#dce1f2" opacity={0.9} />
+        <LitCharacter
+          id={props.id}
+          x={378}
+          y={726}
+          scale={1.02}
+          appearance={NADIA_APPEARANCE}
+          performance={NADIA_SLEEP}
+          className="scene-nadia"
+          motif="flyer"
+          lightKey="#ffd18a"
+          lightFill="#586f99"
+          lightRim="#8da8d2"
+        />
+        <path d="M242,704 C360,658 494,672 580,728 L580,788 L232,788 Z" fill={props.paint('windQuilt')} opacity={0.95} />
+      </DepthLayer>
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,692 C94,656 170,684 232,800 Z M1200,800 L1200,680 C1110,654 1032,690 970,800 Z" fill="#0d162b" />
+        <path d="M984,800 C1018,714 1070,684 1132,708 L1160,800 Z" fill="#18223e" />
+      </DepthLayer>
+    </SceneFrame>
+  );
+}
+
+const PAGES: Record<string, (props: SceneWorldProps) => ReactNode> = {
+  'wind-01-hilltop-kite': PageOne,
+  'wind-02-flop-run': PageTwo,
+  'wind-03-reading-clues': PageThree,
+  'wind-04-first-lift': PageFour,
+  'wind-05-dancing-high': PageFive,
+  'wind-06-winding-in': PageSix,
+  'wind-07-resting-kite': PageSeven,
 };
 
 export const windWorld: SceneWorld = (props) => (

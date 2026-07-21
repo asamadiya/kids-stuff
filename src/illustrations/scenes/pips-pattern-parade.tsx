@@ -1,17 +1,7 @@
 import type { ReactNode } from 'react';
 import {
-  Blush,
-  Capsule,
-  ClosedEye,
-  Eye,
-  GrainFilter,
-  GrainWash,
   LinearGradient,
-  Moon,
-  OpenMouth,
   RadialGradient,
-  Smile,
-  Star,
   StarField,
   VIEW_H,
   VIEW_W,
@@ -22,510 +12,1105 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+  type MaterialInstance,
+} from '../cinematic';
 
-/*
- * WORLD: Pip's Pattern Parade — a golden-hour porch and one quiet moonlit room.
- * Motifs: glass button jar, red/blue and big/small button patterns, flowerpot,
- * Grandpa's rocker, porch lamp with a moth, firefly, quilt, and windowsill.
- */
+type Paint = SceneWorldProps['paint'];
 
-const SKIN_PIP = '#d99667';
-const SKIN_ADA = '#8f5a43';
-const SKIN_GRANDPA = '#c98f68';
-const HAIR_PIP = '#6b3d24';
-const HAIR_ADA = '#2e1d18';
-const HAIR_GRANDPA = '#e5ded2';
-const SHIRT_PIP = '#6fa7c9';
-const SHIRT_ADA = '#d77a70';
-const SHIRT_GRANDPA = '#7e8d8c';
-const PANTS = '#5b6474';
-const WOOD = '#a96f3f';
-const WOOD_DARK = '#6e4529';
-const WOOD_LIGHT = '#d2945a';
-const RED_BUTTON = '#cf3f37';
-const BLUE_BUTTON = '#2f70b9';
-const GOLD_BUTTON = '#dfa43d';
-const GREEN_BUTTON = '#4c9a6c';
-const THREAD = '#f7dfbc';
-const SHADOW = '#3b2b25';
+const RED = '#bd433c';
+const BLUE = '#356faa';
+const GOLD = '#d8a23f';
+const GREEN = '#4f8d68';
+const VIOLET = '#765b9a';
+
+const PIP: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#d99667', shadow: '#955f42', highlight: '#f1bb8e' },
+  face: { shape: 'round', brow: '#5c3521', mouth: '#7e3f46' },
+  hair: { style: 'short', base: '#6b3d24', highlight: '#a9683c', volume: 0.62 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#5f91b5',
+    shadow: '#3b6285',
+    trim: '#d9ba6f',
+    hemline: 0.46,
+  },
+  footwear: { style: 'boot', base: '#42342e' },
+  secondaryShapes: [{ kind: 'belt', color: '#745238', accent: '#e2bc73' }],
+};
+
+const ADA: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#8f5a43', shadow: '#5d382d', highlight: '#bd8062' },
+  face: { shape: 'heart', brow: '#2e1d18', mouth: '#6d3840' },
+  hair: { style: 'bun', base: '#2e1d18', highlight: '#5c392e', volume: 0.66 },
+  wardrobe: {
+    garment: 'dress',
+    base: '#c86761',
+    shadow: '#85413f',
+    trim: '#e5b56c',
+    hemline: 0.64,
+  },
+  footwear: { style: 'boot', base: '#3a2d29' },
+  secondaryShapes: [{ kind: 'sash', color: '#8b4b4d', accent: '#efbd76' }],
+};
+
+const GRANDPA: CharacterAppearance = {
+  ...defaultAppearance('elder'),
+  skin: { base: '#c98f68', shadow: '#895c44', highlight: '#e4b391' },
+  face: { shape: 'oval', brow: '#e5ded2', mouth: '#744147' },
+  hair: { style: 'wispy', base: '#e5ded2', highlight: '#fff9ea', volume: 0.34 },
+  wardrobe: {
+    garment: 'robe',
+    base: '#697d7f',
+    shadow: '#455759',
+    trim: '#b9c8bf',
+    hemline: 0.88,
+  },
+  footwear: { style: 'slipper', base: '#3d3937' },
+  secondaryShapes: [],
+};
+
+const MATERIALS: readonly MaterialInstance[] = [
+  {
+    id: 'porch-timber',
+    preset: 'timber',
+    base: '#9b6038',
+    shadow: '#4f3126',
+    highlight: '#d69a60',
+    textureScale: 1.08,
+    roughness: 0.64,
+  },
+  {
+    id: 'button-sheen',
+    preset: 'metal',
+    base: '#8b745a',
+    shadow: '#302d31',
+    highlight: '#fff0be',
+    textureScale: 0.34,
+    roughness: 0.28,
+  },
+  {
+    id: 'soft-cloth',
+    preset: 'cloth',
+    base: '#777aa9',
+    shadow: '#42466f',
+    highlight: '#c2c8e7',
+    textureScale: 0.86,
+    roughness: 0.76,
+  },
+];
+
+const LIGHTING: Record<string, LightingRig> = {
+  'golden-1': {
+    key: { azimuth: -30, elevation: 42, color: '#ffd39a', intensity: 0.78 },
+    fill: { color: '#7893a4', intensity: 0.18 },
+    rim: { azimuth: 146, elevation: 28, color: '#f2b66e', intensity: 0.24 },
+    practicals: [{ id: 'pattern-practical', x: 1040, y: 118, radius: 260, color: '#ffc46f', intensity: 0.48 }],
+  },
+  'golden-2': {
+    key: { azimuth: -34, elevation: 39, color: '#ffcd8d', intensity: 0.74 },
+    fill: { color: '#718da2', intensity: 0.2 },
+    rim: { azimuth: 150, elevation: 27, color: '#efae68', intensity: 0.25 },
+    practicals: [{ id: 'pattern-practical', x: 1020, y: 132, radius: 250, color: '#ffbd69', intensity: 0.46 }],
+  },
+  'dusk-3': {
+    key: { azimuth: -38, elevation: 36, color: '#f8bd7e', intensity: 0.68 },
+    fill: { color: '#69859e', intensity: 0.22 },
+    rim: { azimuth: 152, elevation: 26, color: '#eaa563', intensity: 0.26 },
+    practicals: [{ id: 'pattern-practical', x: 1000, y: 150, radius: 244, color: '#f4aa5f', intensity: 0.42 }],
+  },
+  'dusk-4': {
+    key: { azimuth: -42, elevation: 34, color: '#eeb073', intensity: 0.62 },
+    fill: { color: '#617e9b', intensity: 0.25 },
+    rim: { azimuth: 154, elevation: 25, color: '#e49f61', intensity: 0.27 },
+    practicals: [{ id: 'pattern-practical', x: 990, y: 158, radius: 238, color: '#eaa35f', intensity: 0.4 }],
+  },
+  'gloaming-5': {
+    key: { azimuth: -46, elevation: 32, color: '#e6a56d', intensity: 0.58 },
+    fill: { color: '#5b7695', intensity: 0.26 },
+    rim: { azimuth: 156, elevation: 24, color: '#e3a465', intensity: 0.28 },
+    practicals: [{ id: 'pattern-practical', x: 980, y: 170, radius: 232, color: '#e8a45f', intensity: 0.44 }],
+  },
+  'night-6': {
+    key: { azimuth: -50, elevation: 34, color: '#d99d66', intensity: 0.5 },
+    fill: { color: '#526f8f', intensity: 0.24 },
+    rim: { azimuth: 140, elevation: 28, color: '#e5b16b', intensity: 0.22 },
+    practicals: [{ id: 'pattern-practical', x: 176, y: 160, radius: 250, color: '#ffc870', intensity: 0.56 }],
+  },
+  'night-7': {
+    key: { azimuth: -58, elevation: 44, color: '#a9c4dd', intensity: 0.36 },
+    fill: { color: '#4b6280', intensity: 0.16 },
+    rim: { azimuth: 132, elevation: 28, color: '#d4a664', intensity: 0.14 },
+    practicals: [{ id: 'pattern-practical', x: 1020, y: 558, radius: 190, color: '#e8aa66', intensity: 0.28 }],
+  },
+};
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
     <defs>
-      <LinearGradient
-        id={id('porchGold')}
-        stops={[
-          { offset: 0, color: '#f6bf72' },
-          { offset: 0.48, color: '#d98b4e' },
-          { offset: 1, color: '#8d5a38' },
-        ]}
-      />
-      <LinearGradient
-        id={id('duskPorch')}
-        stops={[
-          { offset: 0, color: '#d9935c' },
-          { offset: 0.55, color: '#986344' },
-          { offset: 1, color: '#526174' },
-        ]}
-      />
-      <LinearGradient
-        id={id('sunsetSky')}
-        stops={[
-          { offset: 0, color: '#f5b967' },
-          { offset: 0.58, color: '#d77a55' },
-          { offset: 1, color: '#474267' },
-        ]}
-      />
-      <LinearGradient
-        id={id('nightRoom')}
-        stops={[
-          { offset: 0, color: '#101b38' },
-          { offset: 0.62, color: '#1f2d55' },
-          { offset: 1, color: '#32416d' },
-        ]}
-      />
-      <LinearGradient
-        id={id('glassJar')}
-        stops={[
-          { offset: 0, color: '#ffffff', opacity: 0.62 },
-          { offset: 0.5, color: '#c7ecff', opacity: 0.26 },
-          { offset: 1, color: '#7ab5cf', opacity: 0.42 },
-        ]}
-        x1={0}
-        y1={0}
-        x2={1}
-        y2={1}
-      />
-      <RadialGradient
-        id={id('lampGlow')}
-        stops={[
-          { offset: 0, color: '#fff0a8', opacity: 0.9 },
-          { offset: 0.55, color: '#f7bd64', opacity: 0.36 },
-          { offset: 1, color: '#f7bd64', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('fireflyGlow')}
-        stops={[
-          { offset: 0, color: '#f8ff9a', opacity: 0.95 },
-          { offset: 1, color: '#f8ff9a', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('moonGlow')}
-        stops={[
-          { offset: 0, color: '#edf2ff', opacity: 0.82 },
-          { offset: 1, color: '#edf2ff', opacity: 0 },
-        ]}
-      />
-      <RadialGradient
-        id={id('vignette')}
-        stops={[
-          { offset: 0.56, color: '#000000', opacity: 0 },
-          { offset: 1, color: '#160f18', opacity: 0.38 },
-        ]}
-      />
-      <GrainFilter id={id('grain')} opacity={0.045} />
+      <LinearGradient id={id('sky-golden-1')} stops={[
+        { offset: 0, color: '#678092' },
+        { offset: 0.5, color: '#dda06d' },
+        { offset: 1, color: '#f4cf8b' },
+      ]} />
+      <LinearGradient id={id('sky-golden-2')} stops={[
+        { offset: 0, color: '#5f7388' },
+        { offset: 0.52, color: '#ca8a65' },
+        { offset: 1, color: '#efbd79' },
+      ]} />
+      <LinearGradient id={id('sky-dusk-3')} stops={[
+        { offset: 0, color: '#4d6079' },
+        { offset: 0.54, color: '#ad705e' },
+        { offset: 1, color: '#dc9c61' },
+      ]} />
+      <LinearGradient id={id('sky-dusk-4')} stops={[
+        { offset: 0, color: '#3d506d' },
+        { offset: 0.58, color: '#895b5b' },
+        { offset: 1, color: '#c57f58' },
+      ]} />
+      <LinearGradient id={id('sky-gloaming-5')} stops={[
+        { offset: 0, color: '#2d415f' },
+        { offset: 0.58, color: '#6f4c5b' },
+        { offset: 1, color: '#a96850' },
+      ]} />
+      <LinearGradient id={id('sky-night-6')} stops={[
+        { offset: 0, color: '#1b2b48' },
+        { offset: 0.6, color: '#35415c' },
+        { offset: 1, color: '#61505a' },
+      ]} />
+      <LinearGradient id={id('sky-night-7')} stops={[
+        { offset: 0, color: '#0d1831' },
+        { offset: 0.62, color: '#1d2b4b' },
+        { offset: 1, color: '#343d63' },
+      ]} />
+      <LinearGradient id={id('porch-face')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#b87543' },
+        { offset: 0.55, color: '#875034' },
+        { offset: 1, color: '#4f3329' },
+      ]} />
+      <LinearGradient id={id('door-face')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#80503a' },
+        { offset: 1, color: '#462f2b' },
+      ]} />
+      <LinearGradient id={id('glass')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#ffffff', opacity: 0.62 },
+        { offset: 0.46, color: '#bfe5f3', opacity: 0.22 },
+        { offset: 1, color: '#6e9fae', opacity: 0.42 },
+      ]} />
+      <LinearGradient id={id('quilt')} x1={0} y1={0} x2={1} y2={1} stops={[
+        { offset: 0, color: '#8e95c4' },
+        { offset: 0.55, color: '#626a9b' },
+        { offset: 1, color: '#414a79' },
+      ]} />
+      <RadialGradient id={id('vignette')} stops={[
+        { offset: 0.56, color: '#000000', opacity: 0 },
+        { offset: 1, color: '#130f1a', opacity: 0.4 },
+      ]} />
+      <RadialGradient id={id('moon-glow')} stops={[
+        { offset: 0, color: '#eaf1ff', opacity: 0.76 },
+        { offset: 1, color: '#eaf1ff', opacity: 0 },
+      ]} />
     </defs>
   );
 }
 
-const finish = (paint: SceneWorldProps['paint']) => (
-  <>
-    <GrainWash filter={paint('grain')} />
-    <Vignette paint={paint('vignette')} />
-  </>
-);
+function performance(
+  pose: CharacterPerformance['pose'],
+  gazeTarget: CharacterPerformance['gazeTarget'],
+  expression: CharacterPerformance['expression'],
+  options: Partial<CharacterPerformance> = {},
+): CharacterPerformance {
+  return {
+    pose,
+    lineOfAction: options.lineOfAction ?? 0,
+    shoulderTilt: options.shoulderTilt ?? -8,
+    pelvisTilt: options.pelvisTilt ?? 6,
+    weightFoot: options.weightFoot ?? 'center',
+    gazeTarget,
+    headTurn: options.headTurn ?? 0,
+    expression,
+    leftHand: options.leftHand ?? 'rest',
+    rightHand: options.rightHand ?? 'rest',
+    leftHandTarget: options.leftHandTarget,
+    rightHandTarget: options.rightHandTarget,
+  };
+}
 
-const sky = (fill: string) => <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />;
-
-function PorchBoards({ fill = WOOD, shadow = WOOD_DARK, glow = WOOD_LIGHT }: { fill?: string; shadow?: string; glow?: string }) {
+function Character({
+  id,
+  kind,
+  x,
+  y,
+  scale,
+  scenePerformance,
+}: {
+  readonly id: SceneWorldProps['id'];
+  readonly kind: 'pip' | 'ada' | 'grandpa';
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly scenePerformance: CharacterPerformance;
+}) {
+  const appearance = kind === 'pip' ? PIP : kind === 'ada' ? ADA : GRANDPA;
   return (
-    <g className="scene-porch-boards">
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={fill} />
-      {range(9).map((i) => (
-        <g key={i}>
-          <rect x={0} y={n(i * 96 + 40)} width={VIEW_W} height={7} fill={shadow} opacity={0.56} />
-          <rect x={0} y={n(i * 96 + 48)} width={VIEW_W} height={2} fill="#f1b16d" opacity={0.38} />
-        </g>
-      ))}
-      {range(20).map((i) => (
-        <path
-          key={i}
-          d={`M${n(i * 72 - 20)},${n(80 + (i % 5) * 34)} q${n(24 + (i % 3) * 7)},${n(-9 + (i % 2) * 18)} ${n(78 + (i % 4) * 8)},0`}
-          stroke={glow}
-          strokeWidth={2}
-          fill="none"
-          opacity={0.26}
-          strokeLinecap="round"
-        />
-      ))}
+    <CinematicCharacter
+      id={(part) => id(`${kind}-${part}`)}
+      x={x}
+      y={y}
+      scale={scale}
+      appearance={appearance}
+      performance={scenePerformance}
+      className={`scene-${kind}`}
+    />
+  );
+}
+
+function ContactShadow({
+  paint,
+  cx,
+  cy,
+  rx,
+  ry,
+}: {
+  readonly paint: Paint;
+  readonly cx: number;
+  readonly cy: number;
+  readonly rx: number;
+  readonly ry: number;
+}) {
+  return (
+    <ellipse
+      cx={cx}
+      cy={cy}
+      rx={rx}
+      ry={ry}
+      fill={paint('contact-ao')}
+      data-lighting="contact-shadow"
+    />
+  );
+}
+
+function PorchArchitecture({
+  paint,
+  night = false,
+  doorOpen = false,
+}: {
+  readonly paint: Paint;
+  readonly night?: boolean;
+  readonly doorOpen?: boolean;
+}) {
+  return (
+    <g data-landform="pattern-porch" data-cover-parity="identity">
+      <path d="M0,0 L1200,0 L1200,348 L0,454 Z" fill={night ? '#263247' : '#79503b'} />
+      <g data-material="timber" filter={paint('porch-timber')}>
+        <path d="M0,436 L1200,326 L1200,800 L0,800 Z" fill={paint('porch-face')} />
+        {range(8).map((i) => {
+          const y1 = 458 + i * 48;
+          return (
+            <path
+              key={i}
+              d={`M0,${y1} L1200,${n(344 + i * 58)}`}
+              stroke={night ? '#253041' : '#633c2c'}
+              strokeWidth={8}
+              opacity={0.62}
+            />
+          );
+        })}
+      </g>
+      <path d="M748,70 L1084,54 L1082,350 L760,382 Z" fill={paint('door-face')} />
+      <path d="M786,104 L1028,94 L1026,330 L792,352 Z" fill={doorOpen ? '#182338' : night ? '#324058' : '#9b6443'} />
+      <path d="M914,98 L914,340 M790,222 L1028,212" stroke="#55372d" strokeWidth={10} opacity={0.72} />
+      <path d="M82,240 L666,190" stroke="#4c342c" strokeWidth={24} />
+      <path d="M112,234 L112,482 M330,216 L330,454 M548,198 L548,430" stroke="#4c342c" strokeWidth={20} />
+      <path d="M96,222 L656,176" stroke={night ? '#52667d' : '#c98553'} strokeWidth={7} opacity={0.48} data-lighting="key" />
     </g>
   );
 }
 
-function Button({ x, y, r, fill, angle = 0 }: { x: number; y: number; r: number; fill: string; angle?: number }) {
-  const hole = n(r * 0.14);
-  const offset = n(r * 0.32);
+function RockingChair({
+  x,
+  y,
+  scale,
+  paint,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly paint: Paint;
+}) {
   return (
-    <g className="scene-button" data-motif="button" data-x={n(x)} data-y={n(y)} data-r={n(r)} data-fill={fill} transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)})`}>
-      <circle cx={0} cy={n(r * 0.14)} r={n(r * 1.05)} fill={SHADOW} opacity={0.2} />
-      <circle cx={0} cy={0} r={n(r)} fill={fill} />
-      <circle cx={0} cy={0} r={n(r * 0.68)} fill="none" stroke="#ffffff" strokeWidth={n(r * 0.1)} opacity={0.34} />
-      <circle cx={n(-offset)} cy={n(-offset)} r={hole} fill={THREAD} opacity={0.88} />
-      <circle cx={offset} cy={n(-offset)} r={hole} fill={THREAD} opacity={0.88} />
-      <circle cx={n(-offset)} cy={offset} r={hole} fill={THREAD} opacity={0.88} />
-      <circle cx={offset} cy={offset} r={hole} fill={THREAD} opacity={0.88} />
+    <g className="scene-rocking-chair" transform={`translate(${x} ${y}) scale(${scale})`}>
+      <ContactShadow paint={paint} cx={0} cy={134} rx={98} ry={22} />
+      <g data-material="timber" filter={paint('porch-timber')}>
+        <path d="M-74,126 Q0,166 86,124" stroke="#4f3127" strokeWidth={14} fill="none" strokeLinecap="round" />
+        <path d="M-52,-62 L34,-46 L24,80 L-58,66 Z" fill="#74472f" />
+        <path d="M-40,-44 L22,-34 L14,62 L-46,52 Z" fill="#9a6540" />
+        <path d="M-56,24 L-92,96 M34,22 L76,102 M-58,72 L54,88" stroke="#503127" strokeWidth={15} strokeLinecap="round" />
+      </g>
     </g>
   );
 }
 
-function ButtonLine({ points, colors, sizes }: { points: readonly [number, number][]; colors: readonly string[]; sizes: readonly number[] }) {
+function FlowerPot({ x, y, scale = 1, paint }: { readonly x: number; readonly y: number; readonly scale?: number; readonly paint: Paint }) {
   return (
-    <g className="scene-button-line">
-      {points.map(([x, y], i) => (
-        <Button key={`${x}-${y}-${i}`} x={x} y={y} r={sizes[i % sizes.length]} fill={colors[i % colors.length]} angle={n(i * 17)} />
-      ))}
+    <g transform={`translate(${x} ${y}) scale(${scale})`} data-motif="flowerpot">
+      <ContactShadow paint={paint} cx={0} cy={78} rx={62} ry={14} />
+      <path d="M-54,-18 L54,-18 L38,76 L-36,76 Z" fill="#a9533b" />
+      <path d="M-62,-34 L62,-34 L56,-10 L-56,-10 Z" fill="#d17750" />
+      <path d="M-24,-34 C-42,-90 -2,-102 4,-38 M18,-34 C12,-92 62,-84 48,-34" stroke="#456f4d" strokeWidth={9} fill="none" strokeLinecap="round" />
+      <path d="M-40,-82 Q-10,-104 10,-74 Q-14,-52 -40,-82 Z M34,-82 Q64,-96 72,-64 Q44,-46 34,-82 Z" fill="#5d8d58" />
+      <path d="M-46,-28 Q0,-14 48,-28" stroke="#efa378" strokeWidth={5} opacity={0.44} fill="none" data-lighting="rim" />
     </g>
   );
 }
 
-function SpillButtons({ x, y }: { x: number; y: number }) {
-  const colors = [RED_BUTTON, BLUE_BUTTON, GOLD_BUTTON, GREEN_BUTTON, '#9b65b7'];
+function PorchLamp({ x, y, scale = 1, paint }: { readonly x: number; readonly y: number; readonly scale?: number; readonly paint: Paint }) {
   return (
-    <g className="scene-button-spill" transform={`translate(${n(x)} ${n(y)})`}>
-      {range(30).map((i) => {
-        const angle = n(i * 137.5);
-        const radius = n(20 + (i % 6) * 28 + Math.floor(i / 6) * 8);
-        const px = n(Math.cos((angle * Math.PI) / 180) * radius * 1.35);
-        const py = n(Math.sin((angle * Math.PI) / 180) * radius * 0.72);
-        return <Button key={i} x={px} y={py} r={n(9 + (i % 4) * 3)} fill={colors[i % colors.length]} angle={angle} />;
+    <g transform={`translate(${x} ${y}) scale(${scale})`} className="scene-porch-lamp">
+      <ellipse cx={0} cy={0} rx={148} ry={128} fill={paint('pattern-practical')} data-lighting="practical" />
+      <path d="M-32,-72 L32,-72 L42,18 L-42,18 Z" fill="#5a4537" />
+      <path d="M-24,-54 L24,-54 L30,8 L-30,8 Z" fill="#f2c36f" opacity={0.86} />
+      <path d="M-42,-78 L42,-78 L22,-100 L-22,-100 Z" fill="#3f352e" />
+    </g>
+  );
+}
+
+function Button({
+  x,
+  y,
+  r,
+  fill,
+  paint,
+  angle = 0,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly r: number;
+  readonly fill: string;
+  readonly paint: Paint;
+  readonly angle?: number;
+}) {
+  const hole = n(r * 0.13);
+  const offset = n(r * 0.3);
+  return (
+    <g
+      className="scene-button"
+      data-motif="button"
+      data-x={n(x)}
+      data-y={n(y)}
+      data-r={n(r)}
+      data-fill={fill}
+      transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)})`}
+    >
+      <ellipse cx={0} cy={n(r * 0.34)} rx={n(r * 1.02)} ry={n(r * 0.4)} fill="#211b1d" opacity={0.24} />
+      <g filter={paint('button-sheen')} data-material="button">
+        <circle cx={0} cy={0} r={n(r)} fill={fill} />
+        <circle cx={0} cy={0} r={n(r * 0.72)} fill="none" stroke="#fff2cf" strokeWidth={n(Math.max(1.5, r * 0.08))} opacity={0.28} />
+      </g>
+      <path d={`M${n(-r * 0.64)},${n(-r * 0.28)} Q0,${n(-r * 0.72)} ${n(r * 0.62)},${n(-r * 0.22)}`} stroke="#fff1c8" strokeWidth={n(Math.max(1.4, r * 0.1))} fill="none" opacity={0.52} data-material-pass="directional-highlight" />
+      <circle cx={-offset} cy={-offset} r={hole} fill="#f6dfb8" />
+      <circle cx={offset} cy={-offset} r={hole} fill="#f6dfb8" />
+      <circle cx={-offset} cy={offset} r={hole} fill="#f6dfb8" />
+      <circle cx={offset} cy={offset} r={hole} fill="#f6dfb8" />
+    </g>
+  );
+}
+
+function ButtonJar({
+  x,
+  y,
+  scale,
+  paint,
+  seed,
+  tipped = false,
+  full = false,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly scale: number;
+  readonly paint: Paint;
+  readonly seed: number;
+  readonly tipped?: boolean;
+  readonly full?: boolean;
+}) {
+  const count = full ? 18 : 9;
+  return (
+    <g
+      className="scene-button-jar"
+      data-motif="button-jar"
+      transform={`translate(${x} ${y}) rotate(${tipped ? -64 : 0}) scale(${scale})`}
+    >
+      <ContactShadow paint={paint} cx={0} cy={94} rx={68} ry={18} />
+      {range(count).map((i) => {
+        const px = -32 + (i % 6) * 13 + ((seed + i * 17) % 5);
+        const py = 58 - Math.floor(i / 6) * 20 + (i % 2) * 4;
+        const colors = [RED, BLUE, GOLD, GREEN, VIOLET];
+        return <Button key={i} x={px} y={py} r={n(7 + (i % 3) * 1.4)} fill={colors[i % colors.length]} paint={paint} angle={i * 19} />;
+      })}
+      <path d="M-50,-76 C-64,-38 -66,42 -48,92 C-22,112 22,112 48,92 C66,42 64,-38 50,-76 Z" fill={paint('glass')} stroke="#eaf8f8" strokeWidth={5} />
+      <path d="M-30,-58 C-42,-8 -36,58 -20,86" stroke="#ffffff" strokeWidth={7} opacity={0.46} fill="none" strokeLinecap="round" />
+      <path d="M-42,-82 L42,-82 L38,-108 L-38,-108 Z" fill="#9a7658" />
+      <path d="M-34,-108 L34,-108 L28,-120 L-28,-120 Z" fill="#c89b70" />
+      <path d="M-38,-70 Q0,-88 38,-70" stroke="#f3d69b" strokeWidth={4} fill="none" opacity={0.54} data-lighting="rim" />
+    </g>
+  );
+}
+
+function Spill({
+  paint,
+  seed,
+  cx,
+  cy,
+}: {
+  readonly paint: Paint;
+  readonly seed: number;
+  readonly cx: number;
+  readonly cy: number;
+}) {
+  const colors = [RED, BLUE, GOLD, GREEN, VIOLET];
+  return (
+    <g className="scene-button-spill">
+      {range(26).map((i) => {
+        const angle = i * 137.5;
+        const radius = 24 + (i % 6) * 30 + Math.floor(i / 6) * 7;
+        const x = cx + Math.cos((angle * Math.PI) / 180) * radius * 1.45;
+        const y = cy + Math.sin((angle * Math.PI) / 180) * radius * 0.55 + ((seed + i * 13) % 8);
+        return <Button key={i} x={n(x)} y={n(y)} r={n(9 + (i % 4) * 2.2)} fill={colors[i % colors.length]} paint={paint} angle={angle} />;
       })}
     </g>
   );
 }
 
-function ButtonJar({ x, y, scale = 1, tipped = false, full = false, paint }: { x: number; y: number; scale?: number; tipped?: boolean; full?: boolean; paint: string }) {
-  const rotation = tipped ? -68 : 0;
+function Firefly({ x, y, paint }: { readonly x: number; readonly y: number; readonly paint: Paint }) {
   return (
-    <g className="scene-button-jar" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)}) rotate(${n(rotation)})`}>
-      <ellipse cx={0} cy={72} rx={58} ry={13} fill={SHADOW} opacity={0.22} />
-      <path d="M-44,-70 C-56,-38 -60,38 -44,86 C-20,102 20,102 44,86 C60,38 56,-38 44,-70 Z" fill={paint} stroke="#ecfbff" strokeWidth={5} />
-      <rect x={-36} y={-96} width={72} height={30} rx={10} fill="#b98b61" />
-      <rect x={-28} y={-104} width={56} height={11} rx={5} fill="#d2a87a" />
-      <path d="M-24,-52 C-34,-10 -30,48 -18,76" stroke="#ffffff" strokeWidth={7} opacity={0.46} fill="none" strokeLinecap="round" />
-      {(full ? range(18) : range(8)).map((i) => {
-        const px = n(-28 + (i % 6) * 12);
-        const py = n(36 - Math.floor(i / 6) * 18 + (i % 2) * 4);
-        const color = [RED_BUTTON, BLUE_BUTTON, GOLD_BUTTON, GREEN_BUTTON][i % 4];
-        return <Button key={i} x={px} y={py} r={n(6 + (i % 3) * 1.5)} fill={color} angle={n(i * 19)} />;
-      })}
-    </g>
-  );
-}
-
-function Hand({ x, y, angle = 0, skin = SKIN_PIP, sleeve = SHIRT_PIP, flip = false }: { x: number; y: number; angle?: number; skin?: string; sleeve?: string; flip?: boolean }) {
-  const sx = flip ? -1 : 1;
-  return (
-    <g transform={`translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(${sx} 1)`} className="scene-hand">
-      <Capsule x1={-78} y1={8} x2={-16} y2={0} width={24} fill={sleeve} />
-      <ellipse cx={0} cy={0} rx={23} ry={16} fill={skin} />
-      {range(4).map((i) => (
-        <Capsule key={i} x1={n(-10 + i * 7)} y1={n(-12)} x2={n(-6 + i * 7)} y2={n(-25)} width={5} fill={skin} />
-      ))}
-    </g>
-  );
-}
-
-function ChildHead({ cx, cy, r = 30, skin, hair, mood = 'smile', tilt = 0, asleep = false }: { cx: number; cy: number; r?: number; skin: string; hair: string; mood?: 'smile' | 'open' | 'soft'; tilt?: number; asleep?: boolean }) {
-  return (
-    <g transform={`rotate(${n(tilt)} ${n(cx)} ${n(cy)})`} className="scene-child-head">
-      <circle cx={n(cx)} cy={n(cy)} r={r} fill={skin} />
-      <path
-        d={`M${n(cx - r)},${n(cy - r * 0.2)} Q${n(cx - r * 0.4)},${n(cy - r * 1.24)} ${n(cx + r * 0.32)},${n(cy - r * 0.95)} Q${n(cx + r * 0.88)},${n(cy - r * 0.7)} ${n(cx + r)},${n(cy - r * 0.05)} Q${n(cx + r * 0.2)},${n(cy - r * 0.42)} ${n(cx - r)},${n(cy - r * 0.2)} Z`}
-        fill={hair}
-      />
-      {asleep ? (
-        <>
-          <ClosedEye cx={n(cx - r * 0.32)} cy={n(cy + r * 0.05)} w={n(r * 0.42)} />
-          <ClosedEye cx={n(cx + r * 0.32)} cy={n(cy + r * 0.05)} w={n(r * 0.42)} />
-        </>
-      ) : (
-        <>
-          <Eye cx={n(cx - r * 0.3)} cy={n(cy)} r={n(r * 0.13)} />
-          <Eye cx={n(cx + r * 0.3)} cy={n(cy)} r={n(r * 0.13)} />
-        </>
-      )}
-      <Blush cx={n(cx - r * 0.5)} cy={n(cy + r * 0.35)} r={n(r * 0.17)} />
-      <Blush cx={n(cx + r * 0.5)} cy={n(cy + r * 0.35)} r={n(r * 0.17)} />
-      {mood === 'open' ? <OpenMouth cx={n(cx)} cy={n(cy + r * 0.42)} rx={n(r * 0.18)} ry={n(r * 0.25)} /> : <Smile cx={n(cx)} cy={n(cy + r * 0.38)} w={n(r * 0.55)} curve={mood === 'soft' ? n(r * 0.16) : n(r * 0.32)} />}
-    </g>
-  );
-}
-
-function KneelingChild({ x, y, skin, hair, shirt, flip = false, reaching = false }: { x: number; y: number; skin: string; hair: string; shirt: string; flip?: boolean; reaching?: boolean }) {
-  const sx = flip ? -1 : 1;
-  return (
-    <g className="scene-kneeling-child" transform={`translate(${n(x)} ${n(y)}) scale(${sx} 1)`}>
-      <ellipse cx={0} cy={72} rx={58} ry={32} fill={SHADOW} opacity={0.18} />
-      <Capsule x1={0} y1={0} x2={0} y2={72} width={52} fill={shirt} />
-      <Capsule x1={-15} y1={60} x2={-70} y2={86} width={24} fill={PANTS} />
-      <Capsule x1={16} y1={62} x2={62} y2={96} width={24} fill={PANTS} />
-      <Capsule x1={-16} y1={20} x2={reaching ? -94 : -56} y2={reaching ? 84 : 56} width={17} fill={shirt} />
-      <Capsule x1={18} y1={20} x2={reaching ? 86 : 54} y2={reaching ? 78 : 50} width={17} fill={shirt} />
-      <ellipse cx={reaching ? -100 : -61} cy={reaching ? 88 : 60} rx={15} ry={10} fill={skin} />
-      <ellipse cx={reaching ? 92 : 59} cy={reaching ? 82 : 54} rx={15} ry={10} fill={skin} />
-      <ChildHead cx={0} cy={-42} r={34} skin={skin} hair={hair} tilt={flip ? 9 : -9} mood="soft" />
-    </g>
-  );
-}
-
-function BowingChild({ x, y, skin, hair, shirt, flip = false }: { x: number; y: number; skin: string; hair: string; shirt: string; flip?: boolean }) {
-  const sx = flip ? -1 : 1;
-  return (
-    <g className="scene-bowing-child" transform={`translate(${n(x)} ${n(y)}) scale(${sx} 1) rotate(-8)`}>
-      <Capsule x1={0} y1={0} x2={36} y2={76} width={48} fill={shirt} />
-      <Capsule x1={2} y1={28} x2={-56} y2={65} width={15} fill={shirt} />
-      <Capsule x1={22} y1={34} x2={85} y2={54} width={15} fill={shirt} />
-      <ellipse cx={-62} cy={68} rx={12} ry={9} fill={skin} />
-      <ellipse cx={91} cy={56} rx={12} ry={9} fill={skin} />
-      <Capsule x1={24} y1={74} x2={4} y2={126} width={17} fill={PANTS} />
-      <Capsule x1={42} y1={74} x2={68} y2={120} width={17} fill={PANTS} />
-      <ChildHead cx={52} cy={-18} r={27} skin={skin} hair={hair} mood="smile" tilt={16} />
-    </g>
-  );
-}
-
-function RockingChair({ x, y, scale = 1, grandpa = true, paper = false }: { x: number; y: number; scale?: number; grandpa?: boolean; paper?: boolean }) {
-  return (
-    <g className="scene-rocking-chair" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-      <path d="M-78,132 Q0,172 88,132" stroke="#5d3b27" strokeWidth={13} fill="none" strokeLinecap="round" />
-      <rect x={-54} y={-48} width={88} height={134} rx={14} fill="#7c5133" />
-      <rect x={-42} y={-34} width={64} height={104} rx={9} fill="#9a6840" />
-      <Capsule x1={-58} y1={32} x2={-92} y2={102} width={13} fill="#5d3b27" />
-      <Capsule x1={38} y1={30} x2={72} y2={104} width={13} fill="#5d3b27" />
-      <Capsule x1={-62} y1={92} x2={54} y2={96} width={20} fill="#6a432c" />
-      {grandpa ? (
-        <g>
-          <Capsule x1={-4} y1={4} x2={0} y2={80} width={48} fill={SHIRT_GRANDPA} />
-          <circle cx={-4} cy={-42} r={31} fill={SKIN_GRANDPA} />
-          <path d="M-35,-50 Q-4,-82 27,-50 Q16,-70 -4,-68 Q-22,-70 -35,-50 Z" fill={HAIR_GRANDPA} />
-          <ClosedEye cx={-15} cy={-42} w={12} />
-          <ClosedEye cx={6} cy={-42} w={12} />
-          <Smile cx={-4} cy={-28} w={20} curve={8} />
-          {paper ? (
-            <g transform="translate(6 10) rotate(-4)">
-              <rect x={-54} y={-24} width={104} height={70} rx={4} fill="#f3e7cf" />
-              {range(5).map((i) => (
-                <rect key={i} x={n(-42 + (i % 2) * 44)} y={n(-12 + Math.floor(i / 2) * 18)} width={34} height={5} rx={2} fill="#b6a98f" opacity={0.68} />
-              ))}
-            </g>
-          ) : null}
-        </g>
-      ) : null}
-    </g>
-  );
-}
-
-function FlowerPot({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g className="scene-flowerpot" transform={`translate(${n(x)} ${n(y)}) scale(${n(scale)})`}>
-      <ellipse cx={0} cy={68} rx={58} ry={13} fill={SHADOW} opacity={0.24} />
-      <path d="M-50,-20 H50 L34,76 H-34 Z" fill="#b95e3e" />
-      <rect x={-58} y={-36} width={116} height={28} rx={8} fill="#d0784d" />
-      <path d="M-30,-38 C-40,-76 -8,-78 -4,-40" stroke="#3f7747" strokeWidth={8} fill="none" strokeLinecap="round" />
-      <path d="M12,-38 C8,-88 54,-74 42,-40" stroke="#4b8a50" strokeWidth={8} fill="none" strokeLinecap="round" />
-      <ellipse cx={-22} cy={-68} rx={22} ry={12} fill="#588f53" transform="rotate(-22 -22 -68)" />
-      <ellipse cx={42} cy={-66} rx={24} ry={13} fill="#68a35f" transform="rotate(24 42 -66)" />
-    </g>
-  );
-}
-
-function PorchLamp({ x, y, paint }: { x: number; y: number; paint: string }) {
-  return (
-    <g className="scene-porch-lamp" transform={`translate(${n(x)} ${n(y)})`}>
-      <circle cx={0} cy={0} r={114} fill={paint} />
-      <rect x={-28} y={-68} width={56} height={74} rx={18} fill="#62432f" />
-      <path d="M-20,-48 H20 L30,8 H-30 Z" fill="#ffd581" opacity={0.86} />
-      <ellipse cx={70} cy={-18} rx={14} ry={7} fill="#d8b77e" transform="rotate(28 70 -18)" />
-      <path d="M58,-22 q12,-14 28,-4" stroke="#7a5837" strokeWidth={2} fill="none" />
-    </g>
-  );
-}
-
-function Firefly({ x, y, paint }: { x: number; y: number; paint: string }) {
-  return (
-    <g className="scene-firefly" transform={`translate(${n(x)} ${n(y)})`}>
+    <g className="scene-firefly" transform={`translate(${x} ${y})`}>
       <g className="scene-firefly-drift">
-        <circle cx={0} cy={0} r={34} fill={paint} />
-        <ellipse cx={0} cy={0} rx={8} ry={5} fill="#2d2b25" />
-        <circle cx={7} cy={0} r={6} fill="#f8ff8a" />
-        <ellipse cx={-5} cy={-7} rx={8} ry={4} fill="#e6f5ff" opacity={0.55} transform="rotate(-28 -5 -7)" />
-        <ellipse cx={-5} cy={7} rx={8} ry={4} fill="#e6f5ff" opacity={0.55} transform="rotate(28 -5 7)" />
+        <circle cx={0} cy={0} r={36} fill={paint('pattern-practical')} />
+        <ellipse cx={0} cy={0} rx={8} ry={5} fill="#252724" />
+        <circle cx={7} cy={0} r={6} fill="#f1f58b" />
+        <path d="M-4,-4 Q-22,-18 -28,-2 Q-16,6 -4,2 Z M-4,4 Q-22,18 -28,2 Q-16,-6 -4,-2 Z" fill="#dce9ef" opacity={0.5} />
       </g>
     </g>
   );
 }
 
-const redBluePoints = range(12).map((i): [number, number] => [n(160 + i * 78), n(520 - i * 24)]);
-const curvePoints = range(18).map((i): [number, number] => {
-  const t = i / 17;
-  return [n(118 + t * 920), n(548 - Math.sin(t * Math.PI * 1.42) * 142 + Math.sin(t * Math.PI * 3) * 35)];
-});
-const paradePoints = range(34).map((i): [number, number] => {
-  const t = i / 33;
-  return [n(110 + t * 970), n(660 - Math.sin(t * Math.PI * 2.3) * 172 - t * 210)];
-});
-
-const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
-  'pattern-01-porch-buttons': ({ paint }) => (
-    <g data-scene-art>
-      <PorchBoards fill={paint('porchGold')} />
-      <rect x={0} y={0} width={VIEW_W} height={n(VIEW_H * 0.3)} fill="#f5b66c" opacity={0.18} />
-      <PorchLamp x={1030} y={112} paint={paint('lampGlow')} />
-      <RockingChair x={930} y={274} scale={0.72} />
-      <ButtonJar x={560} y={306} scale={0.88} tipped paint={paint('glassJar')} />
-      <SpillButtons x={548} y={424} />
-      <KneelingChild x={332} y={496} skin={SKIN_PIP} hair={HAIR_PIP} shirt={SHIRT_PIP} reaching />
-      <KneelingChild x={768} y={514} skin={SKIN_ADA} hair={HAIR_ADA} shirt={SHIRT_ADA} flip reaching />
-      <Hand x={470} y={430} angle={-22} skin={SKIN_PIP} sleeve={SHIRT_PIP} />
-      <Hand x={654} y={450} angle={205} skin={SKIN_ADA} sleeve={SHIRT_ADA} />
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-02-red-blue-line': ({ paint }) => (
-    <g data-scene-art>
-      <PorchBoards fill={paint('porchGold')} />
-      <rect x={0} y={0} width={VIEW_W} height={250} fill="#ffe2a6" opacity={0.18} />
-      <path d={`M0,${n(286)} L${VIEW_W},${n(168)} L${VIEW_W},${n(258)} L0,${n(390)} Z`} fill="#78482c" opacity={0.22} />
-      {redBluePoints.map(([x, y], i) => (
-        <Button key={i} x={x} y={y} r={n(28 - i * 1.15)} fill={i % 2 === 0 ? RED_BUTTON : BLUE_BUTTON} angle={n(i * 12)} />
-      ))}
-      <Hand x={1022} y={248} angle={170} skin={SKIN_ADA} sleeve={SHIRT_ADA} flip />
-      <Hand x={930} y={292} angle={150} skin={SKIN_PIP} sleeve={SHIRT_PIP} flip />
-      <Button x={1074} y={220} r={14} fill={BLUE_BUTTON} angle={18} />
-      <ellipse cx={330} cy={640} rx={260} ry={54} fill={SHADOW} opacity={0.12} />
-      <path d={`M${n(0)},${n(594)} C${n(260)},${n(534)} ${n(520)},${n(614)} ${n(760)},${n(552)}`} stroke="#f3b56b" strokeWidth={5} fill="none" opacity={0.34} />
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-03-big-small-curve': ({ paint }) => (
-    <g data-scene-art>
-      <PorchBoards fill="#b97845" glow="#efaa66" />
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#e49457" opacity={0.22} />
-      <FlowerPot x={940} y={356} scale={1.06} />
-      <RockingChair x={340} y={340} scale={0.54} grandpa={false} />
-      <Capsule x1={280} y1={282} x2={248} y2={520} width={26} fill="#5d3b27" />
-      <ButtonLine points={curvePoints} colors={[GOLD_BUTTON, RED_BUTTON, BLUE_BUTTON]} sizes={[25, 12, 12]} />
-      <KneelingChild x={248} y={620} skin={SKIN_PIP} hair={HAIR_PIP} shirt={SHIRT_PIP} reaching />
-      <KneelingChild x={852} y={628} skin={SKIN_ADA} hair={HAIR_ADA} shirt={SHIRT_ADA} flip reaching />
-      <Hand x={555} y={510} angle={-8} skin={SKIN_PIP} sleeve={SHIRT_PIP} />
-      <Hand x={704} y={476} angle={196} skin={SKIN_ADA} sleeve={SHIRT_ADA} />
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-04-breeze-bump': ({ paint, seed }) => (
-    <g data-scene-art>
-      <PorchBoards fill={paint('duskPorch')} shadow="#334258" glow="#d48b55" />
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#293a55" opacity={0.2} />
-      <path d={`M${n(0)},${n(224)} C${n(280)},${n(300)} ${n(500)},${n(228)} ${n(760)},${n(302)} S${n(1040)},${n(360)} ${VIEW_W},${n(302)}`} stroke="#7389a6" strokeWidth={38} fill="none" opacity={0.13} strokeLinecap="round" />
-      <Button x={250} y={452} r={24} fill={GOLD_BUTTON} angle={4} />
-      <Button x={348} y={452} r={12} fill={BLUE_BUTTON} angle={21} />
-      <Button x={430} y={452} r={12} fill={RED_BUTTON} angle={38} />
-      <Button x={534} y={452} r={26} fill={GOLD_BUTTON} angle={55} />
-      <Button x={628} y={452} r={26} fill={GOLD_BUTTON} angle={72} />
-      <Button x={726} y={452} r={12} fill={BLUE_BUTTON} angle={89} />
-      <Button x={806} y={452} r={12} fill={RED_BUTTON} angle={106} />
-      <Button x={914} y={512} r={12} fill={BLUE_BUTTON} angle={118} />
-      <path d={`M${n(910)},${n(500)} q${n(42)},${n(-24)} ${n(88)},${n(-2)}`} stroke="#d4dbe8" strokeWidth={3} fill="none" opacity={0.45} strokeLinecap="round" />
-      <StarField seed={seed} count={14} y={20} height={180} color="#d7e2ee" minR={1} maxR={2.5} />
-      <g transform={`translate(${n(214)} ${n(260)}) rotate(10)`}>
-        <ChildHead cx={0} cy={0} r={46} skin={SKIN_PIP} hair={HAIR_PIP} mood="open" tilt={-5} />
-        <Capsule x1={-10} y1={48} x2={-48} y2={150} width={36} fill={SHIRT_PIP} />
-      </g>
-      <g transform={`translate(${n(978)} ${n(274)}) rotate(-12)`}>
-        <ChildHead cx={0} cy={0} r={46} skin={SKIN_ADA} hair={HAIR_ADA} mood="soft" tilt={7} />
-        <Capsule x1={8} y1={48} x2={54} y2={148} width={36} fill={SHIRT_ADA} />
-      </g>
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-05-fix-together': ({ paint }) => (
-    <g data-scene-art>
-      <PorchBoards fill={paint('porchGold')} shadow="#7b4d2e" />
-      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#f0b46a" opacity={0.18} />
-      <path d={`M${n(80)},${n(504)} C${n(270)},${n(450)} ${n(428)},${n(492)} ${n(548)},${n(454)} S${n(780)},${n(416)} ${n(1090)},${n(486)}`} stroke="#4b332b" strokeWidth={16} fill="none" opacity={0.1} strokeLinecap="round" />
-      <Button x={176} y={506} r={24} fill={GOLD_BUTTON} angle={7} />
-      <Button x={276} y={486} r={12} fill={BLUE_BUTTON} angle={24} />
-      <Button x={360} y={472} r={12} fill={RED_BUTTON} angle={41} />
-      <Button x={466} y={462} r={25} fill={GOLD_BUTTON} angle={58} />
-      <Button x={594} y={444} r={12} fill={BLUE_BUTTON} angle={75} />
-      <Button x={678} y={438} r={12} fill={RED_BUTTON} angle={92} />
-      <Button x={780} y={444} r={25} fill={GOLD_BUTTON} angle={109} />
-      <Button x={878} y={462} r={12} fill={BLUE_BUTTON} angle={126} />
-      <Button x={966} y={486} r={12} fill={RED_BUTTON} angle={143} />
-      <Hand x={522} y={374} angle={34} skin={SKIN_PIP} sleeve={SHIRT_PIP} />
-      <Hand x={678} y={342} angle={152} skin={SKIN_ADA} sleeve={SHIRT_ADA} flip />
-      <Button x={604} y={430} r={12} fill={BLUE_BUTTON} angle={28} />
-      <ellipse cx={604} cy={454} rx={70} ry={18} fill="#fff1ba" opacity={0.18} />
-      <ChildHead cx={190} cy={232} r={43} skin={SKIN_PIP} hair={HAIR_PIP} mood="soft" tilt={14} />
-      <ChildHead cx={1016} cy={228} r={43} skin={SKIN_ADA} hair={HAIR_ADA} mood="smile" tilt={-14} />
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-06-finished-parade': ({ paint }) => (
-    <g data-scene-art>
-      {sky(paint('sunsetSky'))}
-      <rect x={0} y={n(VIEW_H * 0.26)} width={VIEW_W} height={n(VIEW_H * 0.74)} fill={paint('porchGold')} />
-      {range(7).map((i) => (
-        <rect key={i} x={0} y={n(250 + i * 78)} width={VIEW_W} height={6} fill={WOOD_DARK} opacity={0.45} />
-      ))}
-      <rect x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.1)} width={260} height={250} rx={10} fill="#6a3f2d" />
-      <rect x={n(VIEW_W * 0.705)} y={n(VIEW_H * 0.14)} width={176} height={198} rx={8} fill="#a16643" />
-      <PorchLamp x={160} y={168} paint={paint('lampGlow')} />
-      <RockingChair x={910} y={426} scale={0.72} paper />
-      <ButtonLine points={paradePoints} colors={[RED_BUTTON, BLUE_BUTTON, GOLD_BUTTON, GREEN_BUTTON, '#8d63b8']} sizes={[13, 13, 25, 12, 12]} />
-      <BowingChild x={336} y={588} skin={SKIN_PIP} hair={HAIR_PIP} shirt={SHIRT_PIP} />
-      <BowingChild x={560} y={600} skin={SKIN_ADA} hair={HAIR_ADA} shirt={SHIRT_ADA} flip />
-      <Firefly x={676} y={176} paint={paint('fireflyGlow')} />
-      <Star cx={710} cy={214} r={12} fill="#f8ff9a" />
-      {finish(paint)}
-    </g>
-  ),
-
-  'pattern-07-jar-moonlight': ({ paint, seed }) => (
-    <g data-scene-art>
-      {sky(paint('nightRoom'))}
-      <StarField seed={seed} count={34} x={610} y={40} width={420} height={280} color="#dce8ff" minR={1} maxR={2.6} />
-      <rect x={n(610)} y={n(72)} width={420} height={300} rx={18} fill="#0c1833" />
-      <rect x={n(642)} y={n(98)} width={356} height={236} rx={10} fill="#18284e" />
-      <Moon cx={880} cy={150} r={42} glow={paint('moonGlow')} face="#f1f3df" />
-      <rect x={n(812)} y={n(90)} width={16} height={258} fill="#3c4a74" />
-      <rect x={n(642)} y={n(214)} width={356} height={14} fill="#3c4a74" />
-      <rect x={n(570)} y={n(360)} width={512} height={48} rx={12} fill="#526085" />
-      <ButtonJar x={786} y={302} scale={0.74} full paint={paint('glassJar')} />
-      <path d={`M${n(650)},${n(332)} L${n(938)},${n(240)} L${n(960)},${n(286)} L${n(664)},${n(382)} Z`} fill="#eaf0ff" opacity={0.14} />
-      <rect x={0} y={n(620)} width={VIEW_W} height={180} fill="#1a2546" />
-      <rect x={n(74)} y={n(526)} width={430} height={150} rx={26} fill="#475586" />
-      <ellipse cx={180} cy={534} rx={74} ry={36} fill="#e8e6f2" />
-      <ChildHead cx={204} cy={500} r={38} skin={SKIN_PIP} hair={HAIR_PIP} mood="soft" tilt={-12} asleep />
-      <path
-        d={`M${n(66)},${n(664)} C${n(178)},${n(574)} ${n(362)},${n(570)} ${n(548)},${n(654)} L${n(548)},${n(800)} L${n(66)},${n(800)} Z`}
-        fill="#6f77b0"
+function SceneFrame({
+  id,
+  paint,
+  seed,
+  sceneId,
+  stage,
+  far,
+  mid,
+  focus,
+  near,
+  calm = false,
+}: {
+  readonly id: SceneWorldProps['id'];
+  readonly paint: Paint;
+  readonly seed: number;
+  readonly sceneId: string;
+  readonly stage: keyof typeof LIGHTING;
+  readonly far: ReactNode;
+  readonly mid: ReactNode;
+  readonly focus: ReactNode;
+  readonly near: ReactNode;
+  readonly calm?: boolean;
+}) {
+  const practical = LIGHTING[stage].practicals[0];
+  return (
+    <g
+      data-scene-art
+      data-cinematic-scene={sceneId}
+      data-time-stage={stage}
+      data-calm-landing={calm ? 'true' : undefined}
+    >
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={LIGHTING[stage]} materials={MATERIALS} />
+      </defs>
+      <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill={paint(`sky-${stage}`)} />
+      <ellipse
+        cx={practical.x}
+        cy={practical.y}
+        rx={practical.radius}
+        ry={n(practical.radius * 0.78)}
+        fill={paint('pattern-practical')}
+        data-lighting="practical"
       />
-      {range(6).map((i) => (
-        <path key={i} d={`M${n(98 + i * 78)},${n(646)} l${n(82)},${n(94)}`} stroke={i % 2 === 0 ? '#93a0d0' : '#525d98'} strokeWidth={8} opacity={0.58} />
-      ))}
-      {range(5).map((i) => (
-        <circle key={i} cx={n(150 + i * 82)} cy={n(690 + (i % 2) * 34)} r={18} fill={i % 2 === 0 ? RED_BUTTON : BLUE_BUTTON} opacity={0.5} />
-      ))}
-      {finish(paint)}
+      <DepthLayer depth="far" id={id} treatment={{ opacity: calm ? 0.62 : 0.78, blur: calm ? 2.3 : 1.35, saturation: calm ? 0.68 : 0.84 }}>
+        {far}
+      </DepthLayer>
+      <DepthLayer depth="mid">{mid}</DepthLayer>
+      <DepthLayer depth="focus">{focus}</DepthLayer>
+      <DepthLayer depth="near">{near}</DepthLayer>
+      <Vignette paint={paint('vignette')} />
     </g>
+  );
+}
+
+const PAGES: Record<string, (props: SceneWorldProps) => ReactNode> = {
+  'pattern-01-porch-buttons': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="pattern-01-porch-buttons"
+      stage="golden-1"
+      far={
+        <>
+          <PorchArchitecture paint={paint} />
+          <PorchLamp x={1080} y={132} scale={0.72} paint={paint} />
+          <RockingChair x={940} y={368} scale={0.68} paint={paint} />
+          <Character
+            id={id}
+            kind="grandpa"
+            x={930}
+            y={450}
+            scale={0.54}
+            scenePerformance={performance('stand', { x: 572, y: 540 }, 'calm', {
+              shoulderTilt: -6,
+              pelvisTilt: 4,
+              headTurn: -0.62,
+              rightHand: 'rest',
+            })}
+          />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,438 L1200,328 L1200,800 L0,800 Z" fill="#835039" opacity={0.24} data-cover-parity="identity" />
+          <path d="M162,588 C362,528 570,542 760,490" stroke={paint('fill-light')} strokeWidth={76} fill="none" opacity={0.44} data-lighting="fill" />
+          <path d="M720,346 Q896,292 1060,262" stroke="#f5bd77" strokeWidth={9} fill="none" opacity={0.48} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={584} cy={642} rx={264} ry={52} />
+          <ButtonJar x={602} y={438} scale={0.88} paint={paint} seed={seed} tipped />
+          <Spill paint={paint} seed={seed} cx={586} cy={568} />
+          <Character
+            id={id}
+            kind="pip"
+            x={296}
+            y={736}
+            scale={0.86}
+            scenePerformance={performance('kneel', { x: 540, y: 560 }, 'curious', {
+              lineOfAction: 12,
+              shoulderTilt: 11,
+              pelvisTilt: -8,
+              headTurn: 0.64,
+              leftHand: 'open',
+              rightHand: 'open',
+              rightHandTarget: { x: 472, y: 590 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="ada"
+            x={888}
+            y={738}
+            scale={0.84}
+            scenePerformance={performance('kneel', { x: 642, y: 566 }, 'delighted', {
+              lineOfAction: -12,
+              shoulderTilt: -11,
+              pelvisTilt: 8,
+              headTurn: -0.64,
+              leftHand: 'open',
+              rightHand: 'open',
+              leftHandTarget: { x: 708, y: 592 },
+            })}
+          />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,700 Q96,660 190,718 L246,800 Z" fill="#362a2a" />
+          <path d="M1200,800 L1200,688 Q1128,656 1050,718 L1014,800 Z" fill="#32282a" />
+        </>
+      }
+    />
+  ),
+
+  'pattern-02-red-blue-line': ({ id, paint, seed }) => {
+    const line = range(10).map((i) => ({
+      x: 154 + i * 96,
+      y: 626 - i * 28,
+      r: 24 - i * 0.85,
+      fill: i % 2 === 0 ? RED : BLUE,
+    }));
+    return (
+      <SceneFrame
+        id={id}
+        paint={paint}
+        seed={seed}
+        sceneId="pattern-02-red-blue-line"
+        stage="golden-2"
+        far={
+          <>
+            <PorchArchitecture paint={paint} />
+            <PorchLamp x={1050} y={140} scale={0.68} paint={paint} />
+          </>
+        }
+        mid={
+          <>
+            <path d="M0,440 L1200,330 L1200,800 L0,800 Z" fill="#754632" opacity={0.2} data-cover-parity="identity" />
+            <path d="M136,610 L1070,338" stroke={paint('fill-light')} strokeWidth={86} fill="none" opacity={0.4} data-lighting="fill" />
+            <path d="M204,574 L1002,342" stroke="#f6c17c" strokeWidth={7} fill="none" opacity={0.44} data-lighting="key" />
+          </>
+        }
+        focus={
+          <>
+            <ContactShadow paint={paint} cx={604} cy={574} rx={430} ry={42} />
+            {line.map((button, i) => (
+              <Button key={i} {...button} paint={paint} angle={i * 13} />
+            ))}
+            <Character
+              id={id}
+              kind="pip"
+              x={206}
+              y={738}
+              scale={0.76}
+              scenePerformance={performance('point', { x: 482, y: 532 }, 'delighted', {
+                lineOfAction: 9,
+                shoulderTilt: -12,
+                pelvisTilt: 8,
+                headTurn: 0.7,
+                rightHand: 'point',
+                rightHandTarget: { x: 386, y: 568 },
+              })}
+            />
+            <Character
+              id={id}
+              kind="ada"
+              x={1004}
+              y={500}
+              scale={0.66}
+              scenePerformance={performance('kneel', { x: 858, y: 408 }, 'curious', {
+                lineOfAction: -10,
+                shoulderTilt: -10,
+                pelvisTilt: 7,
+                headTurn: -0.68,
+                leftHand: 'open',
+                leftHandTarget: { x: 930, y: 426 },
+              })}
+            />
+            <path d="M128,648 Q576,530 1010,356" stroke="#f6cf8f" strokeWidth={4} fill="none" opacity={0.46} data-lighting="rim" />
+          </>
+        }
+        near={
+          <>
+            <path d="M0,800 L0,724 Q98,680 198,732 L244,800 Z" fill="#33282a" />
+            <path d="M1200,800 L1200,650 Q1128,624 1058,684 L1010,800 Z" fill="#30262a" />
+          </>
+        }
+      />
+    );
+  },
+
+  'pattern-03-big-small-curve': ({ id, paint, seed }) => {
+    const points = range(15).map((i) => {
+      const t = i / 14;
+      return {
+        x: 142 + t * 914,
+        y: 640 - Math.sin(t * Math.PI * 1.35) * 176 + Math.sin(t * Math.PI * 3) * 24,
+        r: i % 3 === 0 ? 27 : 13,
+        fill: [GOLD, RED, BLUE][i % 3],
+      };
+    });
+    return (
+      <SceneFrame
+        id={id}
+        paint={paint}
+        seed={seed}
+        sceneId="pattern-03-big-small-curve"
+        stage="dusk-3"
+        far={
+          <>
+            <PorchArchitecture paint={paint} />
+            <RockingChair x={332} y={360} scale={0.62} paint={paint} />
+            <FlowerPot x={964} y={380} scale={0.94} paint={paint} />
+          </>
+        }
+        mid={
+          <>
+            <path d="M0,442 L1200,330 L1200,800 L0,800 Z" fill="#6b4031" opacity={0.22} data-cover-parity="identity" />
+            <path d="M148,620 C374,548 566,580 788,504" stroke={paint('fill-light')} strokeWidth={78} fill="none" opacity={0.42} data-lighting="fill" />
+            <path d="M670,390 Q858,334 1042,302" stroke="#efb16f" strokeWidth={8} fill="none" opacity={0.48} data-lighting="key" />
+          </>
+        }
+        focus={
+          <>
+            <ContactShadow paint={paint} cx={590} cy={616} rx={426} ry={46} />
+            {points.map((button, i) => (
+              <Button key={i} {...button} paint={paint} angle={i * 17} />
+            ))}
+            <Character
+              id={id}
+              kind="pip"
+              x={258}
+              y={744}
+              scale={0.78}
+              scenePerformance={performance('kneel', { x: 486, y: 490 }, 'delighted', {
+                lineOfAction: 10,
+                shoulderTilt: 10,
+                pelvisTilt: -8,
+                headTurn: 0.62,
+                rightHand: 'open',
+                rightHandTarget: { x: 420, y: 540 },
+              })}
+            />
+            <Character
+              id={id}
+              kind="ada"
+              x={914}
+              y={730}
+              scale={0.76}
+              scenePerformance={performance('kneel', { x: 720, y: 470 }, 'curious', {
+                lineOfAction: -10,
+                shoulderTilt: -10,
+                pelvisTilt: 8,
+                headTurn: -0.62,
+                leftHand: 'open',
+                leftHandTarget: { x: 766, y: 500 },
+              })}
+            />
+            <path d="M232,622 C474,500 720,510 1000,568" stroke="#efc581" strokeWidth={4} fill="none" opacity={0.4} data-lighting="rim" />
+          </>
+        }
+        near={
+          <>
+            <path d="M0,800 L0,708 Q88,668 176,722 L230,800 Z" fill="#30272a" />
+            <path d="M1200,800 L1200,696 Q1124,662 1046,724 L1008,800 Z" fill="#2e2528" />
+          </>
+        }
+      />
+    );
+  },
+
+  'pattern-04-breeze-bump': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="pattern-04-breeze-bump"
+      stage="dusk-4"
+      far={
+        <>
+          <PorchArchitecture paint={paint} night />
+          <PorchLamp x={1020} y={148} scale={0.7} paint={paint} />
+          <path d="M84,280 C300,232 492,264 704,216" stroke="#7189a0" strokeWidth={34} fill="none" opacity={0.18} strokeLinecap="round" />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,442 L1200,330 L1200,800 L0,800 Z" fill="#4a3b3a" opacity={0.22} data-cover-parity="identity" />
+          <path d="M160,614 C360,552 568,568 752,514" stroke={paint('fill-light')} strokeWidth={82} fill="none" opacity={0.46} data-lighting="fill" />
+          <path d="M702,372 Q862,326 1028,294" stroke="#dea066" strokeWidth={7} fill="none" opacity={0.4} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={600} cy={602} rx={390} ry={44} />
+          <Button x={250} y={556} r={27} fill={GOLD} paint={paint} />
+          <Button x={348} y={538} r={13} fill={BLUE} paint={paint} angle={18} />
+          <Button x={432} y={522} r={13} fill={RED} paint={paint} angle={36} />
+          <Button x={538} y={508} r={28} fill={GOLD} paint={paint} angle={54} />
+          <Button x={650} y={494} r={28} fill={GOLD} paint={paint} angle={72} />
+          <Button x={748} y={482} r={13} fill={BLUE} paint={paint} angle={90} />
+          <Button x={838} y={474} r={13} fill={RED} paint={paint} angle={108} />
+          <Button x={958} y={538} r={13} fill={BLUE} paint={paint} angle={126} />
+          <path d="M930,526 Q984,494 1042,518" stroke="#cbd8e7" strokeWidth={5} fill="none" opacity={0.5} />
+          <Character
+            id={id}
+            kind="pip"
+            x={202}
+            y={730}
+            scale={0.84}
+            scenePerformance={performance('kneel', { x: 600, y: 508 }, 'concerned', {
+              lineOfAction: 13,
+              shoulderTilt: 12,
+              pelvisTilt: -8,
+              headTurn: 0.72,
+              rightHand: 'point',
+              rightHandTarget: { x: 448, y: 536 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="ada"
+            x={1004}
+            y={690}
+            scale={0.82}
+            scenePerformance={performance('kneel', { x: 652, y: 494 }, 'uncertain', {
+              lineOfAction: -13,
+              shoulderTilt: -12,
+              pelvisTilt: 8,
+              headTurn: -0.72,
+              leftHand: 'point',
+              leftHandTarget: { x: 820, y: 482 },
+            })}
+          />
+          <path d="M520,472 Q594,448 668,466" stroke="#e4ac6d" strokeWidth={4} fill="none" opacity={0.42} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,696 Q96,656 188,716 L244,800 Z" fill="#29232a" />
+          <path d="M1200,800 L1200,676 Q1124,650 1052,710 L1012,800 Z" fill="#292229" />
+        </>
+      }
+    />
+  ),
+
+  'pattern-05-fix-together': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="pattern-05-fix-together"
+      stage="gloaming-5"
+      far={
+        <>
+          <PorchArchitecture paint={paint} night />
+          <RockingChair x={970} y={352} scale={0.58} paint={paint} />
+          <PorchLamp x={1030} y={152} scale={0.7} paint={paint} />
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,442 L1200,330 L1200,800 L0,800 Z" fill="#45353a" opacity={0.24} data-cover-parity="identity" />
+          <path d="M150,622 C352,558 556,574 750,520" stroke={paint('fill-light')} strokeWidth={82} fill="none" opacity={0.46} data-lighting="fill" />
+          <path d="M730,370 Q878,328 1030,300" stroke="#d89a62" strokeWidth={7} fill="none" opacity={0.4} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={602} cy={606} rx={410} ry={48} />
+          {[
+            [176, 574, 27, GOLD],
+            [278, 552, 13, BLUE],
+            [366, 534, 13, RED],
+            [474, 516, 27, GOLD],
+            [584, 502, 13, BLUE],
+            [680, 494, 13, RED],
+            [790, 500, 27, GOLD],
+            [894, 518, 13, BLUE],
+            [982, 542, 13, RED],
+          ].map(([x, y, r, fill], i) => (
+            <Button key={i} x={Number(x)} y={Number(y)} r={Number(r)} fill={String(fill)} paint={paint} angle={i * 17} />
+          ))}
+          <Character
+            id={id}
+            kind="pip"
+            x={288}
+            y={738}
+            scale={0.8}
+            scenePerformance={performance('kneel', { x: 596, y: 500 }, 'calm', {
+              lineOfAction: 10,
+              shoulderTilt: 10,
+              pelvisTilt: -8,
+              headTurn: 0.66,
+              rightHand: 'open',
+              rightHandTarget: { x: 530, y: 470 },
+            })}
+          />
+          <Character
+            id={id}
+            kind="ada"
+            x={900}
+            y={726}
+            scale={0.8}
+            scenePerformance={performance('kneel', { x: 596, y: 500 }, 'delighted', {
+              lineOfAction: -10,
+              shoulderTilt: -10,
+              pelvisTilt: 8,
+              headTurn: -0.66,
+              leftHand: 'hold',
+              leftHandTarget: { x: 650, y: 466 },
+            })}
+          />
+          <Button x={620} y={472} r={13} fill={BLUE} paint={paint} angle={28} />
+          <ellipse cx={620} cy={500} rx={82} ry={22} fill="#f8d992" opacity={0.14} />
+          <path d="M540,464 Q620,436 700,458" stroke="#e4ad6b" strokeWidth={4} fill="none" opacity={0.42} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,710 Q90,674 176,724 L222,800 Z" fill="#282229" />
+          <path d="M1200,800 L1200,688 Q1124,660 1050,716 L1014,800 Z" fill="#262128" />
+        </>
+      }
+    />
+  ),
+
+  'pattern-06-finished-parade': ({ id, paint, seed }) => {
+    const parade = range(22).map((i) => {
+      const t = i / 21;
+      return {
+        x: 116 + t * 966,
+        y: 700 - Math.sin(t * Math.PI * 2.1) * 142 - t * 260,
+        r: i % 5 === 2 ? 24 : 13,
+        fill: [RED, BLUE, GOLD, GREEN, VIOLET][i % 5],
+      };
+    });
+    return (
+      <SceneFrame
+        id={id}
+        paint={paint}
+        seed={seed}
+        sceneId="pattern-06-finished-parade"
+        stage="night-6"
+        far={
+          <>
+            <PorchArchitecture paint={paint} night doorOpen />
+            <PorchLamp x={164} y={166} scale={0.78} paint={paint} />
+            <RockingChair x={940} y={392} scale={0.66} paint={paint} />
+            <Character
+              id={id}
+              kind="grandpa"
+              x={930}
+              y={474}
+              scale={0.54}
+              scenePerformance={performance('stand', { x: 580, y: 560 }, 'delighted', {
+                shoulderTilt: -5,
+                pelvisTilt: 4,
+                headTurn: -0.66,
+                leftHand: 'open',
+              })}
+            />
+          </>
+        }
+        mid={
+          <>
+            <path d="M0,440 L1200,330 L1200,800 L0,800 Z" fill="#34303b" opacity={0.22} data-cover-parity="identity" />
+            <path d="M104,632 C326,560 538,580 756,518" stroke={paint('fill-light')} strokeWidth={84} fill="none" opacity={0.42} data-lighting="fill" />
+            <path d="M176,316 Q328,278 478,260" stroke="#efb86f" strokeWidth={8} fill="none" opacity={0.46} data-lighting="key" />
+          </>
+        }
+        focus={
+          <>
+            <ContactShadow paint={paint} cx={602} cy={610} rx={468} ry={52} />
+            {parade.map((button, i) => (
+              <Button key={i} {...button} paint={paint} angle={i * 17} />
+            ))}
+            <Character
+              id={id}
+              kind="pip"
+              x={336}
+              y={738}
+              scale={0.78}
+              scenePerformance={performance('kneel', { x: 604, y: 512 }, 'delighted', {
+                lineOfAction: 18,
+                shoulderTilt: 14,
+                pelvisTilt: -10,
+                headTurn: 0.58,
+                leftHand: 'open',
+                rightHand: 'open',
+              })}
+            />
+            <Character
+              id={id}
+              kind="ada"
+              x={592}
+              y={742}
+              scale={0.76}
+              scenePerformance={performance('kneel', { x: 742, y: 470 }, 'delighted', {
+                lineOfAction: -18,
+                shoulderTilt: -14,
+                pelvisTilt: 10,
+                headTurn: -0.5,
+                leftHand: 'open',
+                rightHand: 'open',
+              })}
+            />
+            <Firefly x={704} y={206} paint={paint} />
+            <path d="M214,668 C470,544 744,514 1018,432" stroke="#e5b06b" strokeWidth={4} fill="none" opacity={0.4} data-lighting="rim" />
+          </>
+        }
+        near={
+          <>
+            <path d="M0,800 L0,694 Q96,654 188,716 L246,800 Z" fill="#242129" />
+            <path d="M1200,800 L1200,674 Q1124,650 1050,708 L1010,800 Z" fill="#222027" />
+          </>
+        }
+      />
+    );
+  },
+
+  'pattern-07-jar-moonlight': ({ id, paint, seed }) => (
+    <SceneFrame
+      id={id}
+      paint={paint}
+      seed={seed}
+      sceneId="pattern-07-jar-moonlight"
+      stage="night-7"
+      calm
+      far={
+        <>
+          <StarField seed={seed} count={34} x={620} y={40} width={420} height={286} color="#dce8ff" minR={0.7} maxR={2.2} />
+          <circle cx={900} cy={142} r={92} fill={paint('moon-glow')} />
+          <circle cx={900} cy={142} r={38} fill="#e8eadb" />
+          <g data-landform="pattern-bedroom-window" data-cover-parity="identity">
+            <path d="M602,68 L1084,68 L1084,410 L602,410 Z" fill="#0b1428" />
+            <path d="M630,94 L1056,94 L1056,384 L630,384 Z" fill="#1a2a4b" />
+            <path d="M838,94 L838,384 M630,236 L1056,236" stroke="#4a4b70" strokeWidth={14} />
+            <path d="M580,390 L1096,390 L1096,438 L580,438 Z" fill="#555b80" />
+          </g>
+        </>
+      }
+      mid={
+        <>
+          <path d="M0,0 L568,0 L568,800 L0,800 Z" fill="#22243f" />
+          <path d="M0,616 Q278,562 584,610 L584,800 L0,800 Z" fill="#343a61" />
+          <path d="M662,402 C804,360 934,378 1056,346" stroke={paint('fill-light')} strokeWidth={66} fill="none" opacity={0.34} data-lighting="fill" />
+          <path d="M642,140 Q808,104 964,96" stroke="#abc5dd" strokeWidth={6} fill="none" opacity={0.38} data-lighting="key" />
+        </>
+      }
+      focus={
+        <>
+          <ContactShadow paint={paint} cx={292} cy={716} rx={220} ry={44} />
+          <path d="M48,632 Q252,570 514,626 L548,792 L34,792 Z" fill="#535d8c" />
+          <ellipse cx={178} cy={620} rx={92} ry={44} fill="#e4e2e9" />
+          <path d="M34,712 Q232,594 526,684 L560,800 L28,800 Z" fill={paint('quilt')} filter={paint('soft-cloth')} />
+          {range(6).map((i) => (
+            <path key={i} d={`M${76 + i * 82},690 L${150 + i * 82},774`} stroke={i % 2 === 0 ? '#aab0d5' : '#555f94'} strokeWidth={8} opacity={0.48} />
+          ))}
+          <Character
+            id={id}
+            kind="pip"
+            x={216}
+            y={658}
+            scale={0.86}
+            scenePerformance={performance('sleep', { x: 216, y: 548 }, 'sleeping', {
+              shoulderTilt: 2,
+              pelvisTilt: -2,
+              headTurn: -0.1,
+              leftHand: 'rest',
+              rightHand: 'rest',
+            })}
+          />
+          <ContactShadow paint={paint} cx={820} cy={406} rx={86} ry={20} />
+          <ButtonJar x={820} y={310} scale={0.72} paint={paint} seed={seed} full />
+          <path d="M642,358 L970,242 L990,286 L660,406 Z" fill="#eaf0ff" opacity={0.12} />
+          <path d="M760,254 Q822,218 884,244" stroke="#cbd9ed" strokeWidth={4} fill="none" opacity={0.36} data-lighting="rim" />
+        </>
+      }
+      near={
+        <>
+          <path d="M0,800 L0,750 Q88,716 170,752 L202,800 Z" fill="#191c33" />
+          <path d="M1200,800 L1200,710 Q1130,690 1068,738 L1038,800 Z" fill="#171a30" />
+        </>
+      }
+    />
   ),
 };
 

@@ -25,6 +25,17 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  foreshortenGeometry,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+} from '../cinematic';
 
 const SKIN_MIRA = '#c78c67';
 const SKIN_BEN = '#8f5b3f';
@@ -44,6 +55,185 @@ const GRASS_MID = '#213a4a';
 const MOON_FACE = '#ece9d8';
 const STAR_WARM = '#ffe7a0';
 const STAR_COOL = '#dce8ff';
+
+const POLARIS_LIGHTING: LightingRig = {
+  key: { azimuth: -48, elevation: 48, color: '#8eb5d6', intensity: 0.54 },
+  fill: { color: '#547795', intensity: 0.16 },
+  rim: { azimuth: 142, elevation: 32, color: '#e3b96f', intensity: 0.28 },
+  practicals: [
+    {
+      id: 'polaris-practical',
+      x: 808,
+      y: 130,
+      radius: 124,
+      color: '#f3d58b',
+      intensity: 0.42,
+    },
+  ],
+};
+
+const POLARIS_MIRA_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#c78c67', shadow: '#87573e', highlight: '#e8b48d' },
+  face: { shape: 'round', brow: '#241726', mouth: '#753e49' },
+  hair: { style: 'long', base: '#201525', highlight: '#4a304d', volume: 0.58 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#4e6394',
+    shadow: '#33456d',
+    trim: '#d2a45d',
+    hemline: 0.52,
+  },
+  footwear: { style: 'boot', base: '#29243b' },
+  secondaryShapes: [{ kind: 'sash', color: '#b7894f', accent: '#f0d08d' }],
+};
+
+const POLARIS_BEN_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('adult'),
+  skin: { base: '#8f5b3f', shadow: '#5d382a', highlight: '#bc8060' },
+  face: { shape: 'oval', brow: '#251713', mouth: '#64383b' },
+  hair: { style: 'short', base: '#2b1a14', highlight: '#573529', volume: 0.42 },
+  wardrobe: {
+    garment: 'cloak',
+    base: '#293f61',
+    shadow: '#172a45',
+    trim: '#c49a58',
+    hemline: 0.84,
+  },
+  footwear: { style: 'boot', base: '#211b2c' },
+  secondaryShapes: [{ kind: 'cape', color: '#223552', accent: '#b68b52' }],
+};
+
+const POLARIS_MIRA_PERFORMANCE: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: 13,
+  shoulderTilt: -12,
+  pelvisTilt: 7,
+  weightFoot: 'left',
+  gazeTarget: { x: 808, y: 130 },
+  headTurn: 0.76,
+  expression: 'curious',
+  leftHand: 'rest',
+  rightHand: 'point',
+  rightHandTarget: { x: 716, y: 226 },
+};
+
+const POLARIS_BEN_PERFORMANCE: CharacterPerformance = {
+  pose: 'point',
+  lineOfAction: 9,
+  shoulderTilt: -10,
+  pelvisTilt: 8,
+  weightFoot: 'right',
+  gazeTarget: { x: 808, y: 130 },
+  headTurn: 0.7,
+  expression: 'calm',
+  leftHand: 'rest',
+  rightHand: 'point',
+  rightHandTarget: { x: 748, y: 190 },
+};
+
+const POLARIS_BEN_PLACEMENT = { x: 268, y: 730, scale: 0.78 } as const;
+const POLARIS_MIRA_PLACEMENT = { x: 462, y: 730, scale: 0.72 } as const;
+
+function PolarisLitCharacter({
+  id,
+  kind,
+}: {
+  id: SceneWorldProps['id'];
+  kind: 'ben' | 'mira';
+}) {
+  const appearance = kind === 'ben' ? POLARIS_BEN_APPEARANCE : POLARIS_MIRA_APPEARANCE;
+  const performance = kind === 'ben' ? POLARIS_BEN_PERFORMANCE : POLARIS_MIRA_PERFORMANCE;
+  const placement = kind === 'ben' ? POLARIS_BEN_PLACEMENT : POLARIS_MIRA_PLACEMENT;
+  const geometry = resolvePoseGeometry(appearance, performance, placement);
+  const rendered = foreshortenGeometry(geometry);
+  const headRadius = appearance.proportions.headRadius * placement.scale;
+  const hemline = appearance.wardrobe.hemline;
+  const hemLeft = {
+    x: geometry.hip.left.x + (rendered.ankle.left.x - geometry.hip.left.x) * hemline,
+    y: geometry.hip.left.y + (rendered.ankle.left.y - geometry.hip.left.y) * hemline,
+  };
+  const hemRight = {
+    x: geometry.hip.right.x + (rendered.ankle.right.x - geometry.hip.right.x) * hemline,
+    y: geometry.hip.right.y + (rendered.ankle.right.y - geometry.hip.right.y) * hemline,
+  };
+
+  return (
+    <g data-character-lighting="polaris" data-character={kind}>
+      <ellipse
+        cx={n((rendered.foot.left.x + rendered.foot.right.x) / 2)}
+        cy={n(Math.max(rendered.foot.left.y, rendered.foot.right.y) + 2)}
+        rx={n(kind === 'ben' ? 62 : 52)}
+        ry={n(kind === 'ben' ? 16 : 13)}
+        fill="#244966"
+        opacity={0.2}
+      />
+      <CinematicCharacter
+        id={(part) => id(`${kind}-${part}`)}
+        x={placement.x}
+        y={placement.y}
+        scale={placement.scale}
+        appearance={appearance}
+        performance={performance}
+        className={`scene-${kind}`}
+      />
+      <path
+        d={`M${n(geometry.head.x - headRadius * 0.88)},${n(
+          geometry.head.y - headRadius * 0.08,
+        )} Q${n(geometry.head.x - headRadius * 0.64)},${n(
+          geometry.head.y + headRadius * 0.62,
+        )} ${n(geometry.head.x - headRadius * 0.1)},${n(
+          geometry.head.y + headRadius * 0.82,
+        )} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y + 5)} Q${n(
+          geometry.hip.left.x - 10,
+        )},${n(geometry.hip.left.y)} ${n(hemLeft.x)},${n(hemLeft.y)}`}
+        stroke="#6f9fc3"
+        strokeWidth={n(kind === 'ben' ? 7 : 6)}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.42}
+        data-lighting="fill"
+      />
+      <path
+        d={`M${n(geometry.head.x + headRadius * 0.88)},${n(
+          geometry.head.y + headRadius * 0.05,
+        )} Q${n(geometry.head.x + headRadius * 0.76)},${n(
+          geometry.head.y - headRadius * 0.62,
+        )} ${n(geometry.head.x + headRadius * 0.18)},${n(
+          geometry.head.y - headRadius * 0.88,
+        )} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y)} L${n(
+          rendered.elbow.right.x,
+        )},${n(rendered.elbow.right.y)} L${n(rendered.wrist.right.x)},${n(
+          rendered.wrist.right.y,
+        )}`}
+        stroke="#e5b86f"
+        strokeWidth={n(kind === 'ben' ? 3.4 : 3)}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.66}
+        data-lighting="rim"
+      />
+      <path
+        d={`M${n(hemLeft.x)},${n(hemLeft.y)} Q${n(
+          (hemLeft.x + hemRight.x) / 2,
+        )},${n(Math.max(hemLeft.y, hemRight.y) + 5)} ${n(hemRight.x)},${n(
+          hemRight.y,
+        )} M${n(rendered.foot.left.x - 7)},${n(rendered.foot.left.y + 2)} L${n(
+          rendered.foot.left.x + 9,
+        )},${n(rendered.foot.left.y + 1)} M${n(rendered.foot.right.x - 7)},${n(
+          rendered.foot.right.y + 2,
+        )} L${n(rendered.foot.right.x + 9)},${n(rendered.foot.right.y + 1)}`}
+        stroke="#769bb7"
+        strokeWidth={2.6}
+        fill="none"
+        strokeLinecap="round"
+        opacity={0.64}
+        data-lighting="ground-edge"
+      />
+    </g>
+  );
+}
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
@@ -550,28 +740,73 @@ const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
     </g>
   ),
 
-  'navigation-05-find-polaris': ({ paint, seed }) => (
-    <g data-scene-art>
+  'navigation-05-find-polaris': ({ id, paint, seed }) => (
+    <g data-scene-art data-cinematic-scene="navigation-05-find-polaris">
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={POLARIS_LIGHTING} materials={[]} />
+      </defs>
+
       {sky(paint('polarisSky'))}
-      <StarField seed={seed} count={72} height={n(VIEW_H * 0.74)} color="#d9e7ff" minR={0.7} maxR={2.1} />
-      <NorthStar cx={n(VIEW_W * 0.66)} cy={n(VIEW_H * 0.18)} r={42} paint={paint('northGlow')} />
-      <g data-motif="pointer-star" data-cx={n(VIEW_W * 0.36)} data-cy={n(VIEW_H * 0.52)}>
-        <Star cx={n(VIEW_W * 0.36)} cy={n(VIEW_H * 0.52)} r={24} fill="#f2f5ff" waist={0.22} />
-      </g>
-      <g data-motif="pointer-star" data-cx={n(VIEW_W * 0.49)} data-cy={n(VIEW_H * 0.39)}>
-        <Star cx={n(VIEW_W * 0.49)} cy={n(VIEW_H * 0.39)} r={26} fill="#f4f7ff" waist={0.22} />
-      </g>
-      <path d={`M${n(VIEW_W * 0.36)},${n(VIEW_H * 0.52)} L${n(VIEW_W * 0.49)},${n(VIEW_H * 0.39)} L${n(VIEW_W * 0.66)},${n(VIEW_H * 0.18)}`} stroke="#f7edc9" strokeWidth={5} fill="none" strokeLinecap="round" strokeDasharray="2 18" opacity={0.86} data-motif="pointer-line" />
-      <g transform={`translate(${n(VIEW_W * 0.17)} ${n(VIEW_H * 0.78)}) rotate(-25)`}>
-        <Capsule x1={0} y1={24} x2={155} y2={-225} width={22} fill={COAT_BEN} />
-        <ellipse cx={164} cy={-238} rx={22} ry={13} fill={SKIN_BEN} />
-        <Capsule x1={34} y1={20} x2={220} y2={-180} width={10} fill={COAT_MIRA} />
-        <ellipse cx={226} cy={-188} rx={14} ry={8} fill={SKIN_MIRA} />
-      </g>
-      <Mira x={n(VIEW_W * 0.2)} y={n(VIEW_H * 0.68)} scale={0.72} pose="reach" />
-      <Ben x={n(VIEW_W * 0.08)} y={n(VIEW_H * 0.62)} scale={0.8} pose="point" />
-      <path d={`M0,${VIEW_H} L0,${n(VIEW_H * 0.82)} C${n(VIEW_W * 0.35)},${n(VIEW_H * 0.72)} ${n(VIEW_W * 0.75)},${n(VIEW_H * 0.84)} ${VIEW_W},${n(VIEW_H * 0.76)} L${VIEW_W},${VIEW_H} Z`} fill="#091827" />
-      {finish(paint)}
+
+      <DepthLayer depth="far" treatment={{ opacity: 0.68 }}>
+        <StarField seed={seed} count={46} x={34} y={28} width={1132} height={470} color="#b9cbe4" minR={0.6} maxR={1.65} />
+        <path
+          d="M0,566 C166,512 302,550 460,514 C624,476 758,530 922,486 C1044,454 1128,468 1200,448 L1200,650 L0,650 Z"
+          fill="#0a1629"
+        />
+        <path
+          d="M0,604 C186,558 348,590 536,552 C724,516 924,568 1200,506"
+          stroke="#172b42"
+          strokeWidth={34}
+          fill="none"
+          opacity={0.78}
+        />
+      </DepthLayer>
+
+      <DepthLayer depth="mid">
+        <path
+          d="M0,800 L0,620 C144,578 302,642 462,604 C642,560 830,628 1200,548 L1200,800 Z"
+          fill="#07111f"
+        />
+        <path
+          d="M68,690 C250,630 442,662 612,628"
+          stroke={paint('fill-light')}
+          strokeWidth={44}
+          fill="none"
+          opacity={0.34}
+          data-lighting="fill"
+        />
+      </DepthLayer>
+
+      <DepthLayer depth="focus">
+        <NorthStar cx={808} cy={130} r={28} paint={paint('polaris-practical')} />
+        <g data-motif="pointer-star" data-cx={520} data-cy={350}>
+          <Star cx={520} cy={350} r={21} fill="#dce8ff" waist={0.2} />
+        </g>
+        <g data-motif="pointer-star" data-cx={650} data-cy={258}>
+          <Star cx={650} cy={258} r={24} fill="#edf2ff" waist={0.2} />
+        </g>
+        <path
+          d="M520,350 L650,258 L808,130"
+          stroke="#d9e3ef"
+          strokeWidth={4}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray="2 16"
+          opacity={0.72}
+          data-motif="pointer-line"
+        />
+        <PolarisLitCharacter id={id} kind="ben" />
+        <PolarisLitCharacter id={id} kind="mira" />
+      </DepthLayer>
+
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,708 Q96,664 196,704 L250,800 Z" fill="#050b15" />
+        <path d="M1200,800 L1200,650 Q1118,622 1042,680 L984,800 Z" fill="#050b15" />
+        <path d="M18,706 q62,-52 128,-8 M1062,676 q58,-58 118,-18" stroke="#14283b" strokeWidth={18} fill="none" strokeLinecap="round" />
+      </DepthLayer>
+
+      <Vignette paint={paint('vignette')} />
     </g>
   ),
 

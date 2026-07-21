@@ -26,6 +26,16 @@ import {
   type SceneWorld,
   type SceneWorldProps,
 } from '../shared';
+import {
+  CinematicCharacter,
+  CinematicDefs,
+  DepthLayer,
+  defaultAppearance,
+  resolvePoseGeometry,
+  type CharacterAppearance,
+  type CharacterPerformance,
+  type LightingRig,
+} from '../cinematic';
 
 /*
  * WORLD: The Echo in the Canyon — red-rock dusk, safe rim, voice arcs, river
@@ -48,6 +58,165 @@ const RAIL = '#d5a06e';
 const RAIL_SHADOW = '#9f684b';
 const ECHO = '#ffe6ba';
 const ECHO_COOL = '#cfe4ff';
+
+const BRAVE_CALL_LIGHTING: LightingRig = {
+  key: { azimuth: -26, elevation: 38, color: '#ffd3a0', intensity: 0.78 },
+  fill: { color: '#7898b5', intensity: 0.2 },
+  rim: { azimuth: 152, elevation: 26, color: '#ffd7aa', intensity: 0.34 },
+  practicals: [
+    {
+      id: 'brave-sunset',
+      x: -70,
+      y: 250,
+      radius: 390,
+      color: '#ffb363',
+      intensity: 0.5,
+    },
+  ],
+};
+
+const BRAVE_THEO_APPEARANCE: CharacterAppearance = {
+  ...defaultAppearance('child'),
+  skin: { base: '#d99062', shadow: '#995a3d', highlight: '#f0b27f' },
+  face: { shape: 'round', brow: '#372316', mouth: '#743b42' },
+  hair: { style: 'short', base: '#372316', highlight: '#6a4229', volume: 0.52 },
+  wardrobe: {
+    garment: 'tunic',
+    base: '#557da4',
+    shadow: '#324f73',
+    trim: '#e5b864',
+    hemline: 0.44,
+  },
+  footwear: { style: 'boot', base: '#4b3428' },
+  secondaryShapes: [{ kind: 'belt', color: '#8c6039', accent: '#efc879' }],
+};
+
+const BRAVE_THEO_PERFORMANCE: CharacterPerformance = {
+  pose: 'reach',
+  lineOfAction: 13,
+  shoulderTilt: -11,
+  pelvisTilt: 7,
+  weightFoot: 'right',
+  gazeTarget: { x: 900, y: 300 },
+  headTurn: 0.72,
+  expression: 'calling',
+  leftHand: 'open',
+  rightHand: 'open',
+  leftHandTarget: { x: 190, y: 338 },
+  rightHandTarget: { x: 590, y: 310 },
+};
+
+const BRAVE_THEO_PLACEMENT = { x: 352, y: 724, scale: 1.02 } as const;
+
+function BraveCallFocus({
+  id,
+}: {
+  id: SceneWorldProps['id'];
+}) {
+  const geometry = resolvePoseGeometry(
+    BRAVE_THEO_APPEARANCE,
+    BRAVE_THEO_PERFORMANCE,
+    BRAVE_THEO_PLACEMENT,
+  );
+  const headRadius = BRAVE_THEO_APPEARANCE.proportions.headRadius * BRAVE_THEO_PLACEMENT.scale;
+  const mouth = {
+    x: n(geometry.head.x + headRadius * 0.72 * 0.18),
+    y: n(geometry.head.y + headRadius * 0.54),
+  };
+
+  return (
+    <>
+      <g
+        className="scene-sound"
+        data-motif="echo-arc"
+        data-echo-direction="call"
+        data-sound-origin="theo-mouth"
+        data-origin-x={mouth.x}
+        data-origin-y={mouth.y}
+        fill="none"
+        strokeLinecap="round"
+      >
+        <path
+          d={`M${mouth.x},${mouth.y} C${n(mouth.x + 122)},${n(mouth.y - 78)} 630,326 812,338`}
+          stroke="#ffe2b6"
+          strokeWidth={7}
+          opacity={0.78}
+        />
+        <path
+          d={`M${mouth.x},${n(mouth.y + 8)} C${n(mouth.x + 132)},${n(mouth.y - 48)} 642,354 786,366`}
+          stroke="#f4bd86"
+          strokeWidth={4.8}
+          opacity={0.56}
+        />
+        <path
+          d={`M${mouth.x},${n(mouth.y + 15)} C${n(mouth.x + 124)},${n(mouth.y - 20)} 620,382 744,390`}
+          stroke="#cfe4ff"
+          strokeWidth={3}
+          opacity={0.38}
+        />
+      </g>
+
+      <g data-character-lighting="brave-call">
+        <CinematicCharacter
+          id={(part) => id(`theo-${part}`)}
+          x={BRAVE_THEO_PLACEMENT.x}
+          y={BRAVE_THEO_PLACEMENT.y}
+          scale={BRAVE_THEO_PLACEMENT.scale}
+          appearance={BRAVE_THEO_APPEARANCE}
+          performance={BRAVE_THEO_PERFORMANCE}
+          className="scene-theo"
+        />
+        <path
+          d={`M${n(geometry.head.x - headRadius * 0.82)},${n(
+            geometry.head.y - headRadius * 0.24,
+          )} Q${n(geometry.head.x - headRadius * 0.36)},${n(
+            geometry.head.y - headRadius * 0.92,
+          )} ${n(geometry.head.x + headRadius * 0.12)},${n(
+            geometry.head.y - headRadius * 0.82,
+          )} M${n(geometry.shoulder.left.x)},${n(geometry.shoulder.left.y)} L${n(
+            geometry.elbow.left.x,
+          )},${n(geometry.elbow.left.y)}`}
+          stroke="#ffd39e"
+          strokeWidth={5}
+          fill="none"
+          strokeLinecap="round"
+          opacity={0.78}
+          data-lighting="key"
+        />
+        <path
+          d={`M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y + 10)} Q${n(
+            geometry.hip.right.x + 14,
+          )},${n(geometry.hip.right.y + 16)} ${n(geometry.ankle.right.x + 8)},${n(
+            geometry.ankle.right.y,
+          )}`}
+          stroke="#7fa9ca"
+          strokeWidth={7}
+          fill="none"
+          strokeLinecap="round"
+          opacity={0.46}
+          data-lighting="fill"
+        />
+        <path
+          d={`M${n(geometry.head.x + headRadius * 0.9)},${n(
+            geometry.head.y - headRadius * 0.1,
+          )} Q${n(geometry.head.x + headRadius * 0.72)},${n(
+            geometry.head.y - headRadius * 0.72,
+          )} ${n(geometry.head.x + headRadius * 0.2)},${n(
+            geometry.head.y - headRadius * 0.9,
+          )} M${n(geometry.shoulder.right.x)},${n(geometry.shoulder.right.y)} L${n(
+            geometry.elbow.right.x,
+          )},${n(geometry.elbow.right.y)}`}
+          stroke="#ffe2bb"
+          strokeWidth={3.2}
+          fill="none"
+          strokeLinecap="round"
+          opacity={0.66}
+          data-lighting="rim"
+        />
+      </g>
+    </>
+  );
+}
 
 function Defs({ id }: SceneWorldProps): ReactNode {
   return (
@@ -624,20 +793,120 @@ const PAGES: Record<string, (p: SceneWorldProps) => ReactNode> = {
     </g>
   ),
 
-  'echo-04-brave-call': ({ paint, seed }) => (
-    <g data-scene-art>
+  'echo-04-brave-call': ({ id, paint, seed }) => (
+    <g data-scene-art data-cinematic-scene="echo-04-brave-call">
+      <defs>
+        <CinematicDefs id={id} seed={seed} lighting={BRAVE_CALL_LIGHTING} materials={[]} />
+      </defs>
+
       {sky(paint('skyHero'))}
-      <CanyonDepth paint={paint} seed={seed} />
-      <CanyonWall y={n(VIEW_H * 0.46)} depth={430} fill={paint('canyonNear')} mirror opacity={0.92} />
-      <SoundArcs cx={n(VIEW_W * 0.45)} cy={n(VIEW_H * 0.4)} from={2} to={6} step={58} startAngle={-36} endAngle={38} stroke={ECHO} opacity={0.72} width={7} />
-      <SoundArcs cx={n(VIEW_W * 0.97)} cy={n(VIEW_H * 0.38)} from={1} to={5} step={42} startAngle={146} endAngle={222} stroke="#ffd59d" opacity={0.46} width={5} />
-      <Rim topY={n(VIEW_H * 0.65)} />
-      <SafetyRailing y={n(VIEW_H * 0.61)} x={n(VIEW_W * 0.02)} width={n(VIEW_W * 0.38)} />
-      <Person x={n(VIEW_W * 0.42)} y={n(VIEW_H * 0.58)} scale={1.42} kind="theo" pose="open" mouth="open" />
-      <Person x={n(VIEW_W * 0.2)} y={n(VIEW_H * 0.61)} scale={0.86} kind="juno" pose="wave" mouth="open" />
-      <Person x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.57)} scale={0.96} kind="mom" pose="stand" mouth="smile" />
-      <Hawk x={n(VIEW_W * 0.68)} y={n(VIEW_H * 0.19)} scale={0.78} dark="#372940" />
-      {finish(paint)}
+      <ellipse
+        cx={24}
+        cy={244}
+        rx={286}
+        ry={232}
+        fill={paint('brave-sunset')}
+        opacity={0.62}
+        data-lighting="practical"
+      />
+
+      <DepthLayer depth="far" treatment={{ opacity: 0.86 }}>
+        <path
+          d="M0,548 L0,296 C142,258 264,326 392,270 C522,214 638,302 776,244 C914,186 1034,282 1200,226 L1200,548 Z"
+          fill="#765166"
+        />
+        <path
+          d="M0,548 L0,378 C174,338 300,402 468,346 C646,286 778,392 938,330 C1054,284 1126,324 1200,300 L1200,548 Z"
+          fill="#4b3d56"
+          opacity={0.94}
+        />
+        <path
+          d="M44,424 C264,372 438,424 608,370 C786,314 946,382 1164,322"
+          stroke="#d99472"
+          strokeWidth={14}
+          fill="none"
+          opacity={0.3}
+          data-landform-lighting="key"
+        />
+        <path
+          d="M530,548 C660,520 786,532 914,496 C1028,466 1100,472 1200,446"
+          stroke="#7797b2"
+          strokeWidth={12}
+          fill="none"
+          opacity={0.34}
+          data-lighting="fill"
+          data-landform-lighting="fill"
+        />
+        <path
+          d="M736,360 C868,310 1010,300 1178,260"
+          stroke="#f4c396"
+          strokeWidth={5}
+          fill="none"
+          opacity={0.38}
+          strokeLinecap="round"
+          data-landform-lighting="rim"
+        />
+        <g
+          className="scene-sound scene-sound--far"
+          data-motif="echo-arc"
+          data-echo-direction="distance"
+          fill="none"
+          strokeLinecap="round"
+        >
+          <path d="M760,344 C916,338 1048,366 1160,408" stroke="#f6c797" strokeWidth={3} opacity={0.3} />
+          <path d="M748,374 C890,378 1004,408 1102,444" stroke="#abc7df" strokeWidth={2} opacity={0.22} />
+        </g>
+      </DepthLayer>
+
+      <DepthLayer depth="mid">
+        <Rim topY={650} />
+        <g data-landform="echo-canyon-anchor" data-cover-parity="geometry">
+          <path
+            d="M770,562 C836,474 908,414 990,372 C1060,336 1128,320 1200,302 L1200,622 C1042,600 910,580 770,562 Z"
+            fill="#663d4c"
+          />
+          <path
+            d="M824,536 C914,454 1032,402 1178,354"
+            stroke="#a95d50"
+            strokeWidth={18}
+            fill="none"
+            opacity={0.52}
+          />
+          <path
+            d="M878,550 C984,476 1080,446 1200,416"
+            stroke="#3d2b43"
+            strokeWidth={14}
+            fill="none"
+            opacity={0.76}
+          />
+        </g>
+        <path
+          d="M0,642 C188,592 382,620 558,582 C742,540 916,590 1200,520 L1200,800 L0,800 Z"
+          fill="#4e343f"
+        />
+        <SafetyRailing y={584} x={12} width={252} scale={0.88} />
+      </DepthLayer>
+
+      <DepthLayer depth="focus">
+        <g
+          className="scene-sound"
+          data-motif="echo-arc"
+          data-echo-direction="return"
+          fill="none"
+          strokeLinecap="round"
+        >
+          <path d="M1088,430 C920,418 782,430 650,458" stroke="#cfe4ff" strokeWidth={4} opacity={0.38} />
+          <path d="M1032,458 C884,448 754,462 636,486" stroke="#ffd2a5" strokeWidth={2.5} opacity={0.3} />
+        </g>
+        <BraveCallFocus id={id} />
+      </DepthLayer>
+
+      <DepthLayer depth="near">
+        <path d="M0,800 L0,724 Q82,682 170,710 L224,800 Z" fill="#342838" />
+        <path d="M1200,800 L1200,714 Q1146,686 1090,716 L1048,800 Z" fill="#342838" />
+      </DepthLayer>
+
+      <Vignette paint={paint('vignette')} />
     </g>
   ),
 
