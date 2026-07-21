@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { render, screen, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -107,6 +107,18 @@ describe('Library', () => {
         ),
         `missing cinematic cover for ${story.slug}`,
       ).toBe(true);
+    }
+  });
+
+  it('does not leave filter-stripped grain overlays that paint covers black', () => {
+    for (const story of STORIES) {
+      const cover = readFileSync(
+        resolve(process.cwd(), 'public', 'covers', `${story.slug}.svg`),
+        'utf8',
+      );
+      expect(cover).not.toMatch(
+        /<rect\b[^>]*class="scene-grain"[^>]*><\/rect>/,
+      );
     }
   });
 
