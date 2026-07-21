@@ -181,11 +181,24 @@ test.describe('Library', () => {
     const cards = page.locator('.story-card');
     await expect(cards).toHaveCount(STORIES.length);
 
-    // Every cover renders a well-formed, non-empty inline SVG world.
-    const scenes = page.locator('.story-card .scene');
-    await expect(scenes).toHaveCount(STORIES.length);
+    // Every cover loads the committed cinematic SVG through the Pages base path.
+    const covers = page.locator('.story-card .story-card__cover-image');
+    await expect(covers).toHaveCount(STORIES.length);
     for (let i = 0; i < STORIES.length; i += 1) {
-      await expectWellFormedScene(scenes.nth(i));
+      const cover = covers.nth(i);
+      await expect(cover).toBeVisible();
+      await expect(cover).toHaveAttribute(
+        'src',
+        `/kids-stuff/covers/${STORIES[i].slug}.svg`,
+      );
+      const loaded = await cover.evaluate(
+        (node) =>
+          node instanceof HTMLImageElement &&
+          node.complete &&
+          node.naturalWidth > 0 &&
+          node.naturalHeight > 0,
+      );
+      expect(loaded, `${STORIES[i].slug} cinematic cover loaded`).toBe(true);
     }
 
     await expectNoHorizontalOverflow(page);
@@ -213,19 +226,19 @@ test.describe('Library', () => {
   }) => {
     await page.goto('./');
     const cover = page.locator('.story-card--featured .story-card__cover');
-    const scene = cover.locator('.scene');
-    await expect(scene).toBeVisible();
+    const image = cover.locator('.story-card__cover-image');
+    await expect(image).toBeVisible();
 
     const coverBox = await cover.boundingBox();
-    const sceneBox = await scene.boundingBox();
+    const imageBox = await image.boundingBox();
     expect(coverBox, 'featured cover has a layout box').not.toBeNull();
-    expect(sceneBox, 'featured scene has a layout box').not.toBeNull();
-    if (!coverBox || !sceneBox) return;
+    expect(imageBox, 'featured cover image has a layout box').not.toBeNull();
+    if (!coverBox || !imageBox) return;
 
     // The illustration must fill the cover panel — a shorter scene leaves an
     // awkward dark rectangle beneath it (worst on the tablet portrait column).
     expect(
-      sceneBox.height,
+      imageBox.height,
       'featured illustration fills the cover panel height',
     ).toBeGreaterThanOrEqual(coverBox.height - 2);
   });
