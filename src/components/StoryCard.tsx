@@ -1,4 +1,4 @@
-import { Scene } from '../illustrations/Scene';
+import { CoverImage } from './CoverImage';
 import type { Story, StoryDomain } from '../types';
 
 /** Warm, child-facing labels for each learning domain shown on a cover. */
@@ -25,7 +25,7 @@ export interface StoryCardProps {
    * reflects the flag it is given via a `data-completed` attribute and copy.
    */
   readonly completed?: boolean;
-  /** Reserved motion hook, threaded to the cover <Scene>. No animation here. */
+  /** Reserved motion hook, threaded to the static cover. No animation here. */
   readonly motionEnabled?: boolean;
 }
 
@@ -46,7 +46,12 @@ export function StoryCard({
       data-motion={motionEnabled ? 'on' : 'off'}
     >
       <div className="story-card__cover">
-        <Scene story={story} page={story.pages[0]} motionEnabled={motionEnabled} />
+        <CoverImage
+          className="story-card__cover-image"
+          src={`/covers/${story.slug}.svg`}
+          alt={story.pages[0].alt}
+          motionEnabled={motionEnabled}
+        />
         {featured ? (
           <p className="story-card__eyebrow">Tonight&rsquo;s pick</p>
         ) : null}

@@ -105,7 +105,12 @@
   background: var(--c-night-700);
 }
 
-.story-card__cover .scene {
+.story-card__cover-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
   border-radius: 0;
 }
 
@@ -228,7 +233,7 @@
   border-color: rgba(240, 198, 122, 0.38);
 }
 
-.story-card[data-completed='true'] .story-card__cover .scene {
+.story-card[data-completed='true'] .story-card__cover-image {
   opacity: 0.92;
 }
 
@@ -245,8 +250,10 @@
   .story-card--featured .story-card__cover {
     flex: 1 1 58%;
   }
-  .story-card--featured .story-card__cover .scene {
+  .story-card--featured .story-card__cover-image {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .story-card--featured .story-card__body {
     flex: 1 1 42%;

@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { render, screen, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -81,6 +83,31 @@ describe('Library', () => {
     expect(
       within(card).getByRole('img', { name: pick.pages[0].alt }),
     ).toBeInTheDocument();
+  });
+
+  it('loads each prerendered cinematic cover from the configured Pages base path', () => {
+    renderLibrary();
+    for (const story of STORIES) {
+      const cover = within(cardFor(story.title)).getByRole('img', {
+        name: story.pages[0].alt,
+      });
+      expect(cover.tagName).toBe('IMG');
+      expect(cover).toHaveAttribute(
+        'src',
+        `/kids-stuff/covers/${story.slug}.svg`,
+      );
+    }
+  });
+
+  it('ships a prerendered cinematic cover asset for every published story', () => {
+    for (const story of STORIES) {
+      expect(
+        existsSync(
+          resolve(process.cwd(), 'public', 'covers', `${story.slug}.svg`),
+        ),
+        `missing cinematic cover for ${story.slug}`,
+      ).toBe(true);
+    }
   });
 
   it('opens a story from its labelled read control, not from the card body', async () => {
