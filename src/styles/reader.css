@@ -51,7 +51,7 @@
   max-width: 880px;
 }
 
-.reader__figure .scene {
+.reader__figure .story-image {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lift);
 }
@@ -421,3 +421,11 @@
     transform: perspective(1600px) rotateY(0) translate3d(0, 0, 0);
   }
 }
+
+/* Generated raster illustration in the reader. */
+.reader__figure .story-image { display: block; width: 100%; height: auto; }
+/* Calm optional ken-burns when motion is enabled (respects reduced-motion). */
+@media (prefers-reduced-motion: no-preference) {
+  .story-image[data-motion='on'] { animation: story-image-drift 24s ease-in-out infinite alternate; will-change: transform; }
+}
+@keyframes story-image-drift { from { transform: scale(1.0); } to { transform: scale(1.045); } }

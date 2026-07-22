@@ -1,4 +1,4 @@
-import { Scene } from '../illustrations/Scene';
+import { StoryImage } from './StoryImage';
 import type { Story, StoryDomain } from '../types';
 
 /** Warm, child-facing labels for each learning domain shown on a cover. */
@@ -46,7 +46,7 @@ export function StoryCard({
       data-motion={motionEnabled ? 'on' : 'off'}
     >
       <div className="story-card__cover">
-        <Scene story={story} page={story.pages[0]} motionEnabled={motionEnabled} />
+        <StoryImage story={story} page="cover" alt={story.pages[0].alt} motionEnabled={motionEnabled} />
         {featured ? (
           <p className="story-card__eyebrow">Tonight&rsquo;s pick</p>
         ) : null}

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { Scene } from '../illustrations/Scene';
+import { StoryImage } from './StoryImage';
 import { ReaderControls } from './ReaderControls';
 import { StoryComplete } from './StoryComplete';
 import type { Story } from '../types';
@@ -213,9 +213,10 @@ export function Reader({
             aria-labelledby="reader-story-title"
           >
             <figure className="reader__figure">
-              <Scene
+              <StoryImage
                 story={story}
-                page={story.pages[current]}
+                page={current}
+                alt={story.pages[current].alt}
                 motionEnabled={motionEnabled}
               />
             </figure>
