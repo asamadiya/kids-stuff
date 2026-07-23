@@ -1,47 +1,71 @@
-# AI story proxy (optional)
+# AI story proxy (optional, Azure Functions)
 
-The site is static (GitHub Pages), so "Sign in with GitHub → have Copilot/GPT
-write the story" needs one tiny always-on piece: this Cloudflare Worker. It
+The site is static (GitHub Pages), so "Sign in with GitHub → have a model write
+the story" needs one tiny always-on piece: this **Azure Function app**. It
 completes GitHub sign-in, keeps the token in an **httpOnly cookie** (the browser
-never reads it), and forwards the story request to a model. Until it's deployed
-and the app is built with `VITE_AI_PROXY_URL`, the app quietly uses its built-in
-offline story weaver — nothing breaks.
+never reads it), and forwards the request to a model. Until it's deployed and the
+app is built with `VITE_AI_PROXY_URL`, the site quietly uses its built-in offline
+story weaver — nothing breaks.
 
-## What you set up (≈5 minutes)
+The web client is proxy-agnostic: it just calls `VITE_AI_PROXY_URL/{login,me,story,logout}`.
 
-1. **Create a GitHub OAuth App** — https://github.com/settings/developers → *New OAuth App*
-   - Homepage URL: `https://asamadiya.github.io/kids-stuff/`
-   - Authorization callback URL: `https://<your-worker-subdomain>.workers.dev/callback`
-   - Save. Copy the **Client ID**, and generate a **Client secret**.
+## Endpoints
 
-2. **Configure the worker** (in this `proxy/` folder):
-   - Put the Client ID into `wrangler.toml` (`GITHUB_CLIENT_ID`).
-   - `npx wrangler secret put GITHUB_CLIENT_SECRET` → paste the secret.
-   - (Optional) adjust `MODEL` / `MODELS_URL`. Default is GitHub Models `gpt-4o`.
-
-3. **Deploy:** `npx wrangler deploy` → note the worker URL, e.g.
-   `https://moonlit-story-proxy.<you>.workers.dev`.
-
-4. **Point the app at it:** build the site with the env var set, e.g.
-   `VITE_AI_PROXY_URL=https://moonlit-story-proxy.<you>.workers.dev npm run build`
-   (or add it to the deploy step). Redeploy Pages. The Loom now shows
-   **“Sign in with GitHub for AI-written stories.”**
+Azure Functions serve under `/api`, so the routes are
+`/api/login`, `/api/callback`, `/api/me`, `/api/story`, `/api/logout`.
+Set `VITE_AI_PROXY_URL` to `https://<app>.azurewebsites.net/api`.
 
 ## Model backend
 
-Default: **GitHub Models** (`gpt-4o`) — the supported "your GitHub token talks to
-a GPT model" API, which fits "sign in with GitHub" cleanly.
+- **`MODEL_BACKEND=azure` (default, recommended on Azure):** the Function calls
+  **Azure OpenAI** (`gpt-4o`) with its own key — reuses your AI resource, most
+  reliable. GitHub sign-in is just the identity gate.
+- **`MODEL_BACKEND=github`:** calls **GitHub Models** with the signed-in user's
+  GitHub token (for the pure "talk to a GitHub model with my token" path).
 
-To use the **Copilot API** instead: in `worker.js`, swap the `generate()` call to
-first exchange the GitHub token for a Copilot token at
-`https://api.github.com/copilot_internal/v2/token`, then POST to
-`https://api.githubcopilot.com/chat/completions` with that token and the
-`Copilot-Integration-Id` / editor headers. Note this is an internal editor
-endpoint and is not intended for third-party web apps (ToS-gray, brittle).
+## Setup (≈10 minutes)
+
+1. **A chat model.** In your Azure OpenAI / AI resource (e.g. `chgu-4562-resource`),
+   deploy a chat model named `gpt-4o`. Note the **endpoint** (e.g.
+   `https://chgu-4562-resource.openai.azure.com`) and a **key**.
+
+2. **GitHub OAuth App** — https://github.com/settings/developers → *New OAuth App*
+   - Homepage: `https://asamadiya.github.io/kids-stuff/`
+   - Callback URL: `https://<your-func-app>.azurewebsites.net/api/callback`
+   - Copy the **Client ID** and generate a **Client secret**.
+
+3. **Create + deploy the Function app** (Node 20):
+   ```bash
+   az functionapp create -g <rg> -n <your-func-app> \
+     --consumption-plan-location eastus2 --runtime node --runtime-version 20 \
+     --functions-version 4 --storage-account <storage>
+   cd proxy && npm install
+   func azure functionapp publish <your-func-app>      # or: az functionapp deployment ...
+   ```
+
+4. **Configure app settings** (Function App → Configuration, or `az functionapp config appsettings set`):
+   `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `APP_ORIGIN=https://asamadiya.github.io`,
+   `APP_PATH=/kids-stuff/`, `MODEL_BACKEND=azure`,
+   `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`, `AZURE_OPENAI_DEPLOYMENT=gpt-4o`.
+
+5. **CORS with credentials.** The Function returns explicit CORS headers scoped to
+   `APP_ORIGIN`. Make sure the portal's Function App → CORS list does **not** also
+   add `*` (a wildcard there disables credentialed CORS). Leaving the portal CORS
+   list empty lets the code's headers through.
+
+6. **Point the app at it:** build Pages with
+   `VITE_AI_PROXY_URL=https://<your-func-app>.azurewebsites.net/api npm run build`,
+   then redeploy Pages. The Loom now shows **"Sign in with GitHub for AI stories."**
+
+## Local dev
+
+Copy `local.settings.sample.json` → `local.settings.json`, fill it in, then
+`func start`. (Do not commit `local.settings.json`.)
 
 ## Security notes
 
 - The token lives only in an httpOnly, Secure, SameSite=None cookie scoped to the
-  worker; the web app never sees it. For extra hardening, encrypt the cookie
-  value or store a session id + the token in Workers KV.
-- CORS is locked to `APP_ORIGIN`.
+  Function; the web app never sees it. For extra hardening, encrypt the cookie or
+  store a session id + token server-side.
+- With `MODEL_BACKEND=azure`, the model key stays in Function config and never
+  reaches the browser; GitHub sign-in gates who may call `/story`.

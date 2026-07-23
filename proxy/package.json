@@ -1,0 +1,10 @@
+{
+  "name": "moonlit-story-proxy",
+  "version": "1.0.0",
+  "description": "Azure Functions proxy: GitHub sign-in + httpOnly cookie + model call for the Story Loom.",
+  "main": "src/proxy.js",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  }
+}
