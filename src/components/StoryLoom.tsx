@@ -93,11 +93,11 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
       try {
         setAiResult(await aiStory(things));
         setTelling(true);
-      } catch {
+      } catch (e) {
         setAiResult(null);
         setVariant(0);
         setTelling(true);
-        setNote('The AI helper was sleepy, so the Loom wove this one. ✨');
+        setNote(`AI didn't run (${(e as Error).message || 'error'}). The Loom wove this one instead. ✨`);
       } finally {
         setBusy(false);
       }
@@ -114,8 +114,8 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
       setBusy(true);
       try {
         setAiResult(await aiStory(things));
-      } catch {
-        setNote('Could not reach the AI helper this time. ✨');
+      } catch (e) {
+        setNote(`AI couldn't run this time (${(e as Error).message || 'error'}). ✨`);
       } finally {
         setBusy(false);
       }
