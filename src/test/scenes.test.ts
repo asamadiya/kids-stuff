@@ -19,5 +19,5 @@ describe('scenes data', () => {
       for (const o of opts) expect(getSceneFeedback(r, o).length).toBeGreaterThan(0);
     });
   });
-  it('labels capitalize', () => expect(sceneLabel('happy')).toBe('Happy'));
+  it('labels capitalize', () => expect(sceneLabel('frustrated')).toBe('Frustrated'));
 });

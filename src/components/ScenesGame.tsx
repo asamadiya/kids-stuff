@@ -5,20 +5,19 @@ import {
   getSceneOptions,
   sceneLabel,
 } from '../games/scenes';
-import type { Feeling } from '../games/feelings';
 
 const BASE = import.meta.env.BASE_URL;
 
 export function ScenesGame() {
   const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<Feeling | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
   const [score, setScore] = useState(0);
 
   const round = SCENE_ROUNDS[index % SCENE_ROUNDS.length];
   const options = useMemo(() => getSceneOptions(index), [index]);
   const answered = selected !== null;
 
-  const choose = (feeling: Feeling) => {
+  const choose = (feeling: string) => {
     if (answered) return;
     setSelected(feeling);
     setScore((s) => s + 1);

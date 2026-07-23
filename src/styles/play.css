@@ -630,3 +630,20 @@ button.game-card:focus-visible {
   background: #fffdf7;
 }
 .mini-game__options .mini-option span { text-align: center; }
+
+/* -------------------------------------------------------------- big feelings -- */
+.mini-face-big {
+  width: 100%;
+  max-width: 15rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+.big-feelings__story {
+  max-width: 26rem;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  text-align: center;
+  color: var(--c-ink);
+}

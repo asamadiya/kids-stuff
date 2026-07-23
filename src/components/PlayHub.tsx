@@ -13,6 +13,7 @@ import WhichHasMoreGame from './WhichHasMoreGame';
 import NumberOrderGame from './NumberOrderGame';
 import MemoryPairsGame from './MemoryPairsGame';
 import NameTheFeelingGame from './NameTheFeelingGame';
+import BigFeelingsGame from './BigFeelingsGame';
 import TensAndOnesGame from './TensAndOnesGame';
 import CountByTensGame from './CountByTensGame';
 import SkipCountGame from './SkipCountGame';
@@ -58,6 +59,7 @@ import { WHICH_HAS_MORE_META } from '../games/which-has-more';
 import { NUMBER_ORDER_META } from '../games/number-order';
 import { MEMORY_PAIRS_META } from '../games/memory-pairs';
 import { NAMETHEFEELING_META } from '../games/feelings';
+import { BIG_FEELINGS_META } from '../games/emotions';
 import { TENS_AND_ONES_META } from '../games/tens-and-ones';
 import { COUNT_BY_TENS_META } from '../games/count-by-tens';
 import { SKIP_COUNT_META } from '../games/skip-count';
@@ -112,6 +114,7 @@ const GAMES: readonly GameEntry[] = [
   { meta: NUMBER_ORDER_META, Component: NumberOrderGame, cat: 'early' },
   { meta: MEMORY_PAIRS_META, Component: MemoryPairsGame, cat: 'early' },
   { meta: NAMETHEFEELING_META, Component: NameTheFeelingGame, cat: 'feelings' },
+  { meta: BIG_FEELINGS_META, Component: BigFeelingsGame, cat: 'feelings' },
   { meta: TENS_AND_ONES_META, Component: TensAndOnesGame, cat: 'math' },
   { meta: COUNT_BY_TENS_META, Component: CountByTensGame, cat: 'math' },
   { meta: SKIP_COUNT_META, Component: SkipCountGame, cat: 'math' },
