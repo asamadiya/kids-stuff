@@ -6,7 +6,6 @@ import {
   CALM_WORDS,
   FORBIDDEN_WORDS,
 } from '../stories/validate';
-import { STORY_DOMAINS } from '../types';
 import type { Story, StoryPage } from '../types';
 
 const wordCount = (text: string): number =>
@@ -22,19 +21,20 @@ const normalize = (text: string): string =>
   text.toLowerCase().replace(/\s+/g, ' ').trim();
 
 describe('story library content', () => {
-  it('publishes exactly eight fully authored stories', () => {
-    expect(STORIES).toHaveLength(STORY_RULES.storyCount);
+  it('publishes at least the minimum number of stories', () => {
+    expect(STORIES.length).toBeGreaterThanOrEqual(STORY_RULES.minStoryCount);
   });
 
-  it('uses eight unique slugs', () => {
+  it('uses unique slugs', () => {
     const slugs = STORIES.map((story) => story.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
-    expect(slugs).toHaveLength(STORY_RULES.storyCount);
   });
 
-  it('spans all eight learning domains exactly once', () => {
-    const domains = STORIES.map((story) => story.domain).sort();
-    expect(domains).toEqual([...STORY_DOMAINS].sort());
+  it('ships the first historical batch alongside the fiction shelf', () => {
+    const historical = STORIES.filter((story) => story.collection === 'historical');
+    const fiction = STORIES.filter((story) => story.collection === 'fiction');
+    expect(historical.length).toBeGreaterThanOrEqual(11);
+    expect(fiction.length).toBeGreaterThanOrEqual(9);
   });
 
   it('passes full validation with no errors', () => {
@@ -131,9 +131,9 @@ describe('validateStories', () => {
     expect(validateStories(STORIES)).toEqual([]);
   });
 
-  it('flags a library that does not hold exactly nine stories', () => {
-    const errors = validateStories(STORIES.slice(0, 7));
-    expect(errors).toContain('Library must contain exactly 9 stories (found 7).');
+  it('flags a library below the minimum story count', () => {
+    const errors = validateStories(STORIES.slice(0, 5));
+    expect(errors).toContain('Library must contain at least 9 stories (found 5).');
   });
 
   it('flags duplicate slugs', () => {
@@ -154,13 +154,13 @@ describe('validateStories', () => {
     );
   });
 
-  it('flags a story outside the 500-850 word range', () => {
+  it('flags a story outside the 300-850 word range', () => {
     const tiny: StoryPage = { ...STORIES[0].pages[0], text: 'Too short.' };
     const broken = STORIES.map((story, index) =>
       index === 0 ? { ...story, pages: [tiny] } : story,
     );
     expect(validateStories(broken)).toContain(
-      'the-tallest-sunflower: read-aloud words out of range (found 2, need 500-850).',
+      'the-tallest-sunflower: read-aloud words out of range (found 2, need 300-850).',
     );
   });
 
@@ -248,9 +248,12 @@ describe('character-name consistency', () => {
   });
 
   it('never leaks a protagonist name from another story (e.g. Ada into Ana\'s story)', () => {
+    // Scoped to the original nine authored stories whose casts are declared
+    // above; the wider library legitimately reuses common given names.
     const everyName = new Set(Object.values(PROTAGONISTS).flat());
-    for (const story of STORIES) {
-      const own = new Set(PROTAGONISTS[story.slug] ?? []);
+    for (const slug of Object.keys(PROTAGONISTS)) {
+      const story = getStory(slug)!;
+      const own = new Set(PROTAGONISTS[slug] ?? []);
       const text = storyText(story);
       for (const name of everyName) {
         if (own.has(name)) continue;
@@ -416,7 +419,7 @@ describe('validateStories rejects shallow filler', () => {
       })),
     }));
     expect(validateStories(broken)).toContain(
-      'the-tallest-sunflower: story text is missing measurement evidence: measure, count, tall.',
+      'the-tallest-sunflower: story text is missing measurement evidence (expected one of: measure, count, tall).',
     );
   });
 });

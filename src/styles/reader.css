@@ -51,7 +51,7 @@
   max-width: 880px;
 }
 
-.reader__figure .scene {
+.reader__figure .story-image {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lift);
 }
@@ -386,38 +386,5 @@
   line-height: 1.5;
 }
 
-/* --------------------------------------------------- gated page motion -- */
-
-/*
- * Applied only when a future motion toggle sets data-motion="on" AND the reader
- * has no reduced-motion preference. By default (data-motion="off") there is no
- * animation at all — the content simply renders and controls give instant,
- * non-animated hover feedback.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .reader[data-motion='on'] .reader__spread {
-    animation: reader-page-turn var(--turn-duration) var(--turn-ease) both;
-    transform-origin: left center;
-  }
-  .reader-controls[data-motion='on'] .reader-controls__btn {
-    transition:
-      transform 160ms var(--turn-ease),
-      background 160ms var(--turn-ease),
-      border-color 160ms var(--turn-ease),
-      opacity 160ms var(--turn-ease);
-  }
-  .reader-controls[data-motion='on'] .reader-controls__btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-  }
-}
-
-@keyframes reader-page-turn {
-  from {
-    opacity: 0;
-    transform: perspective(1600px) rotateY(7deg) translate3d(2.5%, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: perspective(1600px) rotateY(0) translate3d(0, 0, 0);
-  }
-}
+/* Generated raster illustration in the reader. Static — no motion. */
+.reader__figure .story-image { display: block; width: 100%; height: auto; }

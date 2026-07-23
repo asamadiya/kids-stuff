@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Library } from './components/Library';
 import { Reader } from './components/Reader';
-import { MotionToggle } from './components/MotionToggle';
-import { useMotionPreference } from './hooks/useMotionPreference';
 import { useBookProgress } from './hooks/useBookProgress';
 import { STORIES, getStory } from './stories';
 import type { Story } from './types';
@@ -52,11 +50,14 @@ function parseHash(rawHash: string): Route {
   return { kind: 'library' };
 }
 
-/** A gently rotating "Tonight's pick" so a returning parent sees something new. */
+/** A gently rotating "Tonight's pick" so a returning parent sees something new.
+ *  Prefers the historical shelf (the headline collection) when it has stories. */
 function pickTonight(stories: readonly Story[]): string | undefined {
-  if (stories.length === 0) return undefined;
-  const dayIndex = Math.floor(Date.now() / 86_400_000) % stories.length;
-  return stories[dayIndex].slug;
+  const pool = stories.filter((story) => story.collection === 'historical');
+  const from = pool.length > 0 ? pool : stories;
+  if (from.length === 0) return undefined;
+  const dayIndex = Math.floor(Date.now() / 86_400_000) % from.length;
+  return from[dayIndex].slug;
 }
 
 function App() {
@@ -64,8 +65,6 @@ function App() {
     parseHash(window.location.hash),
   );
 
-  // Motion is session-only and always honours the device preference.
-  const { motionEnabled, motionAllowed, toggleMotion } = useMotionPreference();
   // Bookmarks + completed slugs live in guarded, versioned localStorage.
   const { completedSlugs, getBookmark, saveBookmark, clearBookmark, markComplete } =
     useBookProgress();
@@ -160,13 +159,6 @@ function App() {
       <a className="skip-link" href="#main-content" onClick={focusMainContent}>
         Skip to the story
       </a>
-      <div className="app-chrome">
-        <MotionToggle
-          motionEnabled={motionEnabled}
-          motionAllowed={motionAllowed}
-          onToggle={toggleMotion}
-        />
-      </div>
 
       {route.kind === 'reader' && readerStory ? (
         <Reader
@@ -178,7 +170,6 @@ function App() {
           onNavigate={(nextPage) => setPage(readerStory.slug, nextPage)}
           onExit={exitToLibrary}
           onComplete={handleComplete}
-          motionEnabled={motionEnabled}
           announce={announce}
         />
       ) : (
@@ -187,7 +178,6 @@ function App() {
           onOpenStory={openStory}
           tonightPickSlug={tonightPickSlug}
           completedSlugs={completedSlugs}
-          motionEnabled={motionEnabled}
         />
       )}
 

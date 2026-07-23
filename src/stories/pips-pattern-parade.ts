@@ -5,6 +5,7 @@ export const pipsPatternParade: Story = {
   title: "Pip's Pattern Parade",
   subtitle: 'Pip and Ada line up a button parade that keeps repeating.',
   domain: 'patterns',
+  collection: 'fiction',
   repeatedPhrase: 'Find the part that repeats, and you know what comes next',
   readAloudMinutes: 6,
   learningTakeaway:

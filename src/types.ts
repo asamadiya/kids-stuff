@@ -8,9 +8,24 @@ export const STORY_DOMAINS = [
   'navigation',
   'simple-machines',
   'displacement',
+  // Added for the historical-figure collection (Phase B):
+  'numbers',
+  'sky',
+  'earth',
+  'materials',
 ] as const;
 
 export type StoryDomain = (typeof STORY_DOMAINS)[number];
+
+/**
+ * Which shelf a story lives on. `historical` stories are the real-figure,
+ * fact-checked entries that count toward the 200-story goal; `fiction` stories
+ * are the whimsical invented-character tales kept as a separate, uncounted
+ * collection.
+ */
+export const STORY_COLLECTIONS = ['historical', 'fiction'] as const;
+
+export type StoryCollection = (typeof STORY_COLLECTIONS)[number];
 
 export interface StoryScene {
   /** Unique composition id across the whole library; scene modules map on this. */
@@ -41,6 +56,8 @@ export interface Story {
   /** Short hook shown on the story card. */
   readonly subtitle: string;
   readonly domain: StoryDomain;
+  /** Which shelf this story belongs to (historical counts toward the 200). */
+  readonly collection: StoryCollection;
   /** The warm phrase repeated through the story. */
   readonly repeatedPhrase: string;
   /** Estimated read-aloud time in minutes. */

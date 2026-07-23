@@ -13,8 +13,6 @@ export interface ReaderControlsProps {
   readonly canRestart: boolean;
   /** Accessible name for the next control; defaults to "Next page". */
   readonly nextLabel?: string;
-  /** Motion hook, mirrored to `data-motion` so hover transitions can be gated. */
-  readonly motionEnabled?: boolean;
   /**
    * Ref to the primary "Next"/"Finish" button so the reader can move focus there
    * when a just-used control (Previous/Start over) disables at a boundary,
@@ -36,7 +34,6 @@ export function ReaderControls({
   canGoNext,
   canRestart,
   nextLabel = 'Next page',
-  motionEnabled = false,
   nextRef,
   onPrevious,
   onNext,
@@ -47,7 +44,6 @@ export function ReaderControls({
     <nav
       className="reader-controls"
       aria-label="Reading controls"
-      data-motion={motionEnabled ? 'on' : 'off'}
     >
       <p
         className="reader-controls__progress"

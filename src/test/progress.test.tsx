@@ -203,8 +203,10 @@ describe('useBookProgress storage diagnostics', () => {
 /* -------------------------------------------------------------------------- */
 
 const cardFor = (title: string): HTMLElement => {
-  const heading = screen.getByRole('heading', { name: title });
-  const card = heading.closest('article');
+  const button = screen.getByRole('button', {
+    name: new RegExp(`^Read ${title}( again)?$`, 'i'),
+  });
+  const card = button.closest('article');
   if (!card) throw new Error(`no <article> wraps the card titled "${title}"`);
   return card as HTMLElement;
 };
