@@ -88,10 +88,12 @@ describe('Reader flow (through the app)', () => {
   it('returns to the library from the reader', async () => {
     const user = userEvent.setup();
     openApp(2);
-    expect(screen.queryByRole('heading', { name: /moonlit storybook/i })).toBeNull();
+    expect(
+      screen.queryByRole('heading', { name: /rikki's learn & play center/i }),
+    ).toBeNull();
     await user.click(screen.getByRole('button', { name: /library/i }));
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki's learn & play center/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 2 of 7/i)).toBeNull();
   });
@@ -131,7 +133,7 @@ describe('Reader flow (through the app)', () => {
     window.location.hash = '#/read/not-a-real-story/1';
     render(<App />);
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki's learn & play center/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });
@@ -212,7 +214,7 @@ describe('App hash routing resilience', () => {
     window.location.hash = '#/read/%E0%A4%A/1';
     expect(() => render(<App />)).not.toThrow();
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki's learn & play center/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });

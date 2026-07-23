@@ -1,42 +1,42 @@
-/*
- * Design tokens for Moonlit Storybook.
- *
- * A warm, dusk-leaning palette and a calm, large type scale tuned for a parent
- * reading on a phone in a dim room. Everything downstream (library, reader,
- * cards) composes from these custom properties so the mood stays consistent.
- */
+/* Bright, warm learning-center tokens shared by every zone. */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Night surfaces */
-  --c-night-900: #0d0f18;
-  --c-night-800: #12141f;
-  --c-night-700: #191c2b;
-  --c-surface: #1b1e2e;
-  --c-surface-raised: #232741;
+  /* Legacy surface names are retained so the reader and loom stay compatible. */
+  --c-night-900: #fffaf1;
+  --c-night-800: #f7efe2;
+  --c-night-700: #ece5f5;
+  --c-surface: #ffffff;
+  --c-surface-raised: #fffdf8;
 
-  --c-line: rgba(244, 239, 230, 0.12);
-  --c-line-strong: rgba(244, 239, 230, 0.24);
+  --c-line: rgba(42, 49, 71, 0.13);
+  --c-line-strong: rgba(42, 49, 71, 0.25);
 
-  /* Ink */
-  --c-ink: #f5f0e6;
-  --c-ink-soft: #cdc9dc;
-  --c-ink-faint: #9a97ad;
+  --c-ink: #2a3147;
+  --c-ink-soft: #5c6479;
+  --c-ink-faint: #777f91;
 
-  /* Warm moonlight accent */
-  --c-moon: #f0c67a;
-  --c-moon-soft: #f7d9a2;
-  --c-moon-ink: #2a1e0b;
-  --c-glow: rgba(240, 198, 122, 0.16);
+  --c-moon: #f5b942;
+  --c-moon-soft: #fff0b8;
+  --c-moon-ink: #44300b;
+  --c-glow: rgba(245, 185, 66, 0.18);
+  --c-sun: #f7c94c;
+  --c-sun-deep: #bd7419;
+  --c-berry: #d95f7b;
+  --c-berry-deep: #a43f5a;
+  --c-teal: #3f9fa0;
+  --c-teal-deep: #247475;
+  --c-sky: #69aeda;
+  --c-leaf: #6da64b;
 
-  --focus: #a9ccff;
+  --focus: #315ca8;
 
-  /* Typefaces: a storybook serif for prose, a clean sans for chrome. */
-  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial,
+  --font-sans: 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, Roboto,
+    Helvetica, Arial,
     sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino,
-    'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --font-serif: 'Avenir Next Rounded', 'Trebuchet MS', 'Iowan Old Style',
+    Georgia, serif;
 
   /* Fluid type scale (mobile-first, grows gently with the viewport). */
   --step--1: clamp(0.82rem, 0.78rem + 0.2vw, 0.92rem);
@@ -66,8 +66,8 @@
   /* Minimum comfortable touch target. */
   --touch: 48px;
 
-  --shadow-soft: 0 18px 40px -24px rgba(0, 0, 0, 0.8);
-  --shadow-lift: 0 26px 60px -28px rgba(0, 0, 0, 0.85);
+  --shadow-soft: 0 18px 42px -28px rgba(63, 64, 90, 0.42);
+  --shadow-lift: 0 26px 60px -30px rgba(63, 64, 90, 0.5);
 
   /* Motion values are consumed only under [data-motion="on"] (Task 5). */
   --turn-duration: 460ms;

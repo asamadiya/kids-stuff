@@ -1,5 +1,5 @@
 /*
- * Reader: a distraction-free spread. The illustration stays dominant while the
+ * Reader: a calm, distraction-free learning-story spread. The illustration stays dominant while the
  * read-aloud text lives in its own calm, selectable panel outside the SVG.
  * Controls are a sticky, thumb-friendly bar with 48px targets.
  *
@@ -53,6 +53,7 @@
 
 .reader__figure .story-image {
   border-radius: var(--radius-lg);
+  border: 5px solid rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-lift);
 }
 
@@ -63,7 +64,7 @@
 
 .reader__title {
   margin-bottom: var(--space-3);
-  color: var(--c-moon-soft);
+  color: var(--c-teal-deep);
   font-family: var(--font-serif);
   font-size: var(--step-1);
   font-weight: 600;
@@ -84,13 +85,13 @@
   gap: 5px;
   margin-top: var(--space-5);
   padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
-  border-left: 3px solid var(--c-moon);
+  border-left: 4px solid var(--c-sun-deep);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  background: var(--c-glow);
+  background: #fff2c9;
 }
 
 .reader__cue-label {
-  color: var(--c-moon);
+  color: var(--c-sun-deep);
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.18em;
@@ -173,7 +174,7 @@
   padding: var(--space-4) 0 max(var(--space-4), env(safe-area-inset-bottom, 0));
   background: linear-gradient(
     180deg,
-    rgba(13, 15, 24, 0) 0%,
+    rgba(255, 250, 241, 0) 0%,
     var(--c-night-900) 42%
   );
 }
@@ -232,12 +233,12 @@
 
 .reader-controls__btn--next {
   border-color: transparent;
-  background: var(--c-moon);
-  color: var(--c-moon-ink);
+  background: var(--c-teal);
+  color: #fff;
 }
 
 .reader-controls__btn--next:hover:not(:disabled) {
-  background: var(--c-moon-soft);
+  background: var(--c-teal-deep);
 }
 
 .reader-controls__btn--ghost {
@@ -249,7 +250,7 @@
 }
 
 .reader-controls__btn--ghost:hover:not(:disabled) {
-  background: var(--c-night-700);
+  background: #e9f2f1;
   color: var(--c-ink);
 }
 
@@ -296,7 +297,7 @@
 }
 
 .story-complete__kicker {
-  color: var(--c-moon);
+  color: var(--c-berry);
   font-size: var(--step-2);
   line-height: 1;
 }
@@ -328,16 +329,16 @@
   padding: var(--space-4) var(--space-5);
   border: 1px solid var(--c-line);
   border-radius: var(--radius);
-  background: rgba(27, 30, 46, 0.6);
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .story-complete__note--grownup {
   border-color: rgba(240, 198, 122, 0.24);
-  background: var(--c-glow);
+  background: #fff2c9;
 }
 
 .story-complete__note-label {
-  color: var(--c-moon);
+  color: var(--c-teal-deep);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -372,7 +373,7 @@
 }
 
 .story-complete__prompt-label {
-  color: var(--c-moon);
+  color: var(--c-berry);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.18em;

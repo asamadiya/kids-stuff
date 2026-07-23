@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { LearningCenterWelcome } from './LearningCenterWelcome';
 import { ViewSwitcher } from './ViewSwitcher';
 import type { ViewKind } from './ViewSwitcher';
 import { FilterBar } from './FilterBar';
@@ -24,10 +25,17 @@ export interface LibraryProps {
   readonly stories: readonly Story[];
   readonly onOpenStory: (slug: string) => void;
   readonly onMakeStory?: () => void;
+  readonly onPlay?: () => void;
   readonly completedSlugs?: ReadonlySet<string>;
 }
 
-export function Library({ stories, onOpenStory, onMakeStory, completedSlugs }: LibraryProps) {
+export function Library({
+  stories,
+  onOpenStory,
+  onMakeStory,
+  onPlay,
+  completedSlugs,
+}: LibraryProps) {
   const done = completedSlugs ?? new Set<string>();
   const [view, setView] = useState<ViewKind>('shelf');
   const [topics, setTopics] = useState<ReadonlySet<StoryDomain>>(new Set());
@@ -112,83 +120,113 @@ export function Library({ stories, onOpenStory, onMakeStory, completedSlugs }: L
   const placeCaption = (s: Story) => getMeta(s.slug)?.yearLabel;
   const topicCaption = (s: Story) => getMeta(s.slug)?.place;
 
+  const scrollToExplorer = () => {
+    const explorer = document.getElementById('story-explorer');
+    if (typeof explorer?.scrollIntoView === 'function') {
+      explorer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const exploreSubject = (domain: StoryDomain) => {
+    setTopics(new Set([domain]));
+    setRegions(new Set());
+    setView('topic');
+    scrollToExplorer();
+  };
+
   return (
-    <main id="main-content" className="library" aria-label="Story library" tabIndex={-1}>
-      <header className="home__hero">
-        <p className="library__eyebrow">A calm bedtime library</p>
-        <h1 className="library__title">Moonlit Storybook</h1>
-        <p className="library__lede">
-          {historicalCount} true tales from across history — and 20 make-believe friends.
-          Explore them by time, place, or topic.
+    <main
+      id="main-content"
+      className="library"
+      aria-label="Rikki's Learn & Play Center"
+      tabIndex={-1}
+    >
+      <LearningCenterWelcome
+        historicalCount={Math.max(historicalCount, HISTORICAL_GOAL)}
+        onOpenLibrary={scrollToExplorer}
+        onPlay={onPlay}
+        onMakeStory={onMakeStory}
+        onExploreSubject={exploreSubject}
+      />
+
+      <section
+        id="story-explorer"
+        className="library-explorer"
+        aria-labelledby="library-explorer-title"
+      >
+        <header className="library-explorer__head">
+          <p className="library-explorer__eyebrow">The story lab</p>
+          <h2 id="library-explorer-title" className="library-explorer__title">
+            Choose how you want to explore
+          </h2>
+          <p className="library-explorer__lede">
+            Open the shelf, travel through time, visit the map, or follow a
+            favorite subject.
+          </p>
+        </header>
+
+        <div className="home__controls">
+          <ViewSwitcher value={view} onChange={setView} />
+          <FilterBar
+            topics={topics}
+            regions={regions}
+            onToggleTopic={(t) => setTopics((s) => toggle(s, t))}
+            onToggleRegion={(r) => setRegions((s) => toggle(s, r))}
+            onClear={() => {
+              setTopics(new Set());
+              setRegions(new Set());
+            }}
+            availableRegions={availableRegions}
+            showRegions={view !== 'map'}
+          />
+        </div>
+
+        <p className="home__resultcount" role="status">
+          {filtered.length} {filtered.length === 1 ? 'story' : 'stories'} ready to
+          explore
         </p>
-        <p className="home__progress" aria-hidden="true">
-          {historicalCount} of {HISTORICAL_GOAL} true tales
-        </p>
-        {onMakeStory ? (
-          <button type="button" className="home__make" onClick={onMakeStory}>
-            ✨ Make me a story
-          </button>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={view}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22 }}
+            className="home__view"
+          >
+            {view === 'shelf' ? (
+              <GroupedView groups={shelfGroups} onOpen={onOpenStory} completedSlugs={done} />
+            ) : null}
+            {view === 'topic' ? (
+              <GroupedView
+                groups={topicGroups}
+                onOpen={onOpenStory}
+                completedSlugs={done}
+                caption={topicCaption}
+              />
+            ) : null}
+            {view === 'place' ? (
+              <GroupedView
+                groups={placeGroups}
+                onOpen={onOpenStory}
+                completedSlugs={done}
+                caption={placeCaption}
+              />
+            ) : null}
+            {view === 'timeline' ? (
+              <TimelineView stories={filtered} onOpen={onOpenStory} completedSlugs={done} />
+            ) : null}
+            {view === 'map' ? <MapView stories={filtered} onOpen={onOpenStory} /> : null}
+          </motion.div>
+        </AnimatePresence>
+
+        {filtered.length === 0 ? (
+          <p className="home__empty">
+            No stories match those filters yet — try clearing a few.
+          </p>
         ) : null}
-      </header>
-
-      <div className="home__controls">
-        <ViewSwitcher value={view} onChange={setView} />
-        <FilterBar
-          topics={topics}
-          regions={regions}
-          onToggleTopic={(t) => setTopics((s) => toggle(s, t))}
-          onToggleRegion={(r) => setRegions((s) => toggle(s, r))}
-          onClear={() => {
-            setTopics(new Set());
-            setRegions(new Set());
-          }}
-          availableRegions={availableRegions}
-          showRegions={view !== 'map'}
-        />
-      </div>
-
-      <p className="home__resultcount" role="status">
-        {filtered.length} {filtered.length === 1 ? 'story' : 'stories'}
-      </p>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={view}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.22 }}
-          className="home__view"
-        >
-          {view === 'shelf' ? (
-            <GroupedView groups={shelfGroups} onOpen={onOpenStory} completedSlugs={done} />
-          ) : null}
-          {view === 'topic' ? (
-            <GroupedView
-              groups={topicGroups}
-              onOpen={onOpenStory}
-              completedSlugs={done}
-              caption={topicCaption}
-            />
-          ) : null}
-          {view === 'place' ? (
-            <GroupedView
-              groups={placeGroups}
-              onOpen={onOpenStory}
-              completedSlugs={done}
-              caption={placeCaption}
-            />
-          ) : null}
-          {view === 'timeline' ? (
-            <TimelineView stories={filtered} onOpen={onOpenStory} completedSlugs={done} />
-          ) : null}
-          {view === 'map' ? <MapView stories={filtered} onOpen={onOpenStory} /> : null}
-        </motion.div>
-      </AnimatePresence>
-
-      {filtered.length === 0 ? (
-        <p className="home__empty">No stories match those filters yet — try clearing a few.</p>
-      ) : null}
+      </section>
     </main>
   );
 }

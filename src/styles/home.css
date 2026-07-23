@@ -1,8 +1,4 @@
-/*
- * Home page: a view switcher (shelf / timeline / map / topic / place), a filter
- * bar, and the shared tile grid. Motion is functional (framer-motion layout) —
- * tiles glide as filters and views change. Warm, dark, bedtime palette.
- */
+/* Library explorer controls, story grids, timeline, and map. */
 
 .home__hero {
   max-width: 60ch;
@@ -43,7 +39,7 @@
   align-items: center;
   padding: var(--space-3) 0;
   margin-bottom: var(--space-2);
-  background: linear-gradient(180deg, var(--c-night-900) 70%, rgba(15, 17, 27, 0));
+  background: linear-gradient(180deg, var(--c-night-900) 75%, rgba(255, 250, 241, 0));
   backdrop-filter: blur(6px);
 }
 
@@ -52,7 +48,7 @@
   gap: 2px;
   padding: 4px;
   border-radius: 999px;
-  background: var(--c-surface);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--c-line);
   max-width: 100%;
   overflow-x: auto;
@@ -72,12 +68,12 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.viewswitch__btn.is-active { color: var(--c-moon-ink); }
+.viewswitch__btn.is-active { color: #fff; }
 .viewswitch__pill {
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: var(--c-moon);
+  background: var(--c-teal);
   z-index: 0;
 }
 .viewswitch__label {
@@ -130,9 +126,9 @@
 }
 .chip:hover { border-color: var(--c-line-strong); }
 .chip.is-on {
-  background: var(--c-glow);
-  border-color: var(--c-moon);
-  color: var(--c-moon-soft);
+  background: #dff3f0;
+  border-color: var(--c-teal);
+  color: var(--c-teal-deep);
 }
 .chip__dot {
   width: 0.6rem;
@@ -143,7 +139,7 @@
 .filterbar__clear {
   border: none;
   background: none;
-  color: var(--c-moon-soft);
+  color: var(--c-berry-deep);
   font-size: var(--step--1);
   text-decoration: underline;
   cursor: pointer;
@@ -184,7 +180,7 @@
   padding: 0;
   text-align: left;
   cursor: pointer;
-  background: linear-gradient(180deg, var(--c-surface-raised) 0%, var(--c-surface) 100%);
+  background: #fff;
   border: 1px solid var(--c-line);
   border-top: 2px solid var(--accent, var(--c-line));
   border-radius: var(--radius-lg);
@@ -198,7 +194,7 @@
   position: relative;
   display: block;
   aspect-ratio: 1152 / 896;
-  background: var(--c-night-700);
+  background: #e8eef4;
 }
 .tile__cover .story-image { display: block; width: 100%; height: 100%; object-fit: cover; }
 .tile__check {
@@ -211,7 +207,7 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 999px;
-  background: rgba(13, 15, 24, 0.72);
+  background: rgba(42, 49, 71, 0.86);
   border: 1px solid var(--c-line-strong);
   color: var(--c-moon);
   font-size: 0.8rem;
@@ -264,6 +260,7 @@
   background: var(--accent);
 }
 .grouped__count { flex: none; color: var(--c-moon-soft); font-size: var(--step--1); font-weight: 600; }
+.grouped__count { color: var(--c-berry-deep); }
 .grouped__blurb { margin: var(--space-3) 0 var(--space-4); color: var(--c-ink-soft); font-size: var(--step-0); }
 
 /* -------------------------------------------------------------- timeline -- */
@@ -277,7 +274,7 @@
   top: 0.35rem;
   bottom: -1.5rem;
   width: 2px;
-  background: linear-gradient(180deg, var(--c-moon) 0%, var(--c-line) 100%);
+  background: linear-gradient(180deg, var(--c-teal) 0%, var(--c-line) 100%);
   opacity: 0.5;
 }
 .timeline__band:last-child .timeline__spine::before { bottom: 40%; }
@@ -288,8 +285,8 @@
   height: 0.9rem;
   margin-top: 0.2rem;
   border-radius: 999px;
-  background: var(--c-moon);
-  box-shadow: 0 0 0 4px var(--c-glow);
+  background: var(--c-teal);
+  box-shadow: 0 0 0 4px rgba(63, 159, 160, 0.16);
 }
 .timeline__head {
   display: flex;
@@ -310,12 +307,11 @@
   max-width: 62rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--c-line);
-  background:
-    radial-gradient(120% 80% at 50% 0%, #1b2036 0%, #12141f 70%);
+  background: linear-gradient(180deg, #d9f1f4 0%, #b9dfe6 100%);
   overflow: hidden;
 }
-.mapview__land { fill: #2b3352; stroke: #10121b; stroke-width: 0.4; outline: none; }
-.mapview__land:hover { fill: #333c60; }
+.mapview__land { fill: #94bd79; stroke: #70965c; stroke-width: 0.4; outline: none; }
+.mapview__land:hover { fill: #82af67; }
 .mapview__pin {
   stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 0.8;
@@ -333,13 +329,13 @@
   max-width: 16rem;
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
-  background: rgba(13, 15, 24, 0.94);
+  background: rgba(42, 49, 71, 0.96);
   border: 1px solid var(--c-line-strong);
-  color: var(--c-ink);
+  color: #fff;
   font-size: var(--step--1);
   box-shadow: var(--shadow-lift);
 }
-.mapview__tip span { color: var(--c-ink-soft); font-size: 0.72rem; }
+.mapview__tip span { color: #dce3ef; font-size: 0.72rem; }
 .mapview__hint { color: var(--c-ink-faint); font-size: var(--step--1); }
 .mapview__legend {
   display: flex;
