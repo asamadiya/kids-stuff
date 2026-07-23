@@ -39,7 +39,7 @@ export const DOMAIN_EVIDENCE: Record<StoryDomain, readonly string[]> = {
   numbers: ['number', 'count', 'zero', 'circle', 'pile', 'pattern'],
   sky: ['sky', 'spin', 'turn', 'star', 'sun', 'earth', 'world'],
   earth: ['earth', 'ground', 'shake', 'shook', 'tremor', 'dragon'],
-  materials: ['paper', 'block', 'press', 'fiber', 'print', 'word', 'pulp', 'type'],
+  materials: ['paper', 'block', 'press', 'fiber', 'print', 'word', 'pulp', 'type', 'metal', 'clay', 'cloth', 'thread', 'weave', 'mold', 'melt', 'stone', 'glass', 'dye', 'brick'],
 };
 
 /** Soothing words; the final page of every story must contain at least one. */
