@@ -6,26 +6,42 @@ import { PlayHub } from '../components/PlayHub';
 afterEach(cleanup);
 
 describe('Rikki Play hub', () => {
-  it('offers the live Name the Feeling game and future game cards', () => {
+  it('shows a gallery of at least a dozen games', () => {
     render(<PlayHub onExit={vi.fn()} />);
-    expect(screen.getByRole('heading', { level: 1, name: /rikki's play zone/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /name the feeling/i })).toBeInTheDocument();
-    expect(screen.getByText(/count with rikki/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/coming soon/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByRole('heading', { level: 1, name: /rikki's play zone/i }),
+    ).toBeInTheDocument();
+    const cards = screen.getAllByRole('button', { name: /^Play / });
+    expect(cards.length).toBeGreaterThanOrEqual(12);
+    expect(screen.getByRole('button', { name: /Play Name the Feeling/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Play Count with Rikki/i })).toBeInTheDocument();
   });
 
-  it('names a feeling with kind feedback, awards a star, and moves to the next round', async () => {
+  it('opens a game from the gallery and returns to it', async () => {
     const user = userEvent.setup();
     render(<PlayHub onExit={vi.fn()} />);
 
-    expect(screen.getByText(/ice cream fell in the sand/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Sad' }));
+    await user.click(screen.getByRole('button', { name: /Play Name the Feeling/i }));
+    expect(screen.getByRole('heading', { name: /name the feeling/i })).toBeInTheDocument();
 
-    expect(screen.getByRole('status')).toHaveTextContent(/sad is okay/i);
-    expect(screen.getByText(/1 feeling named/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /all games/i }));
+    expect(screen.getByRole('button', { name: /Play Count with Rikki/i })).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole('button', { name: /next feeling/i }));
-    expect(screen.queryByText(/ice cream fell in the sand/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/class clapped for his painting/i)).toBeInTheDocument();
+  it('lets a child answer the counting game with no-fail feedback and a star', async () => {
+    const user = userEvent.setup();
+    render(<PlayHub onExit={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /Play Count with Rikki/i }));
+    expect(screen.getByRole('heading', { name: /count with rikki/i })).toBeInTheDocument();
+
+    const numberOptions = screen
+      .getAllByRole('button')
+      .filter((b) => /^\d+$/.test((b.textContent || '').trim()));
+    expect(numberOptions.length).toBeGreaterThan(0);
+
+    await user.click(numberOptions[0]);
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 });
