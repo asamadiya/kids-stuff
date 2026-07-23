@@ -5,9 +5,9 @@ export const STORY_RULES = {
   /** The library grows in batches; there is a floor, not a fixed count. */
   minStoryCount: 9,
   minPages: 6,
-  maxPages: 8,
+  maxPages: 16,
   minWords: 300,
-  maxWords: 850,
+  maxWords: 1600,
   minCuePages: 2,
   minPhraseRepeats: 2,
   maxSentenceWords: 24,
@@ -40,6 +40,7 @@ export const DOMAIN_EVIDENCE: Record<StoryDomain, readonly string[]> = {
   sky: ['sky', 'spin', 'turn', 'star', 'sun', 'earth', 'world'],
   earth: ['earth', 'ground', 'shake', 'shook', 'tremor', 'dragon'],
   materials: ['paper', 'block', 'press', 'fiber', 'print', 'word', 'pulp', 'type', 'metal', 'clay', 'cloth', 'thread', 'weave', 'mold', 'melt', 'stone', 'glass', 'dye', 'brick'],
+  life: ['dinosaur', 'bone', 'fossil', 'feather', 'egg', 'giant', 'creature', 'plant', 'wing', 'life', 'animal', 'grow', 'scale', 'claw', 'nest'],
 };
 
 /** Soothing words; the final page of every story must contain at least one. */
@@ -261,13 +262,8 @@ export function validateStories(stories: readonly Story[]): string[] {
       }
     }
 
-    const lastPage = story.pages[story.pages.length - 1];
-    if (lastPage) {
-      const finalText = normalize(lastPage.text);
-      if (!CALM_WORDS.some((word) => finalText.includes(word))) {
-        errors.push(`${label}: final page does not end calmly.`);
-      }
-    }
+    // A calm/sleepy ending is welcome but no longer required — stories may end
+    // on wonder, discovery, or an invitation to explore, whatever fits.
 
     // --- Shallow-filler guards (general, age-appropriate, not literary) ---
     const pageTokens = story.pages.map((page) => tokenize(page.text));

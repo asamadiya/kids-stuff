@@ -19,6 +19,7 @@ export interface StoryMeta {
 
 /** Era bands, oldest → newest. Drives the timeline ordering. */
 export const ERA_BANDS = [
+  'Age of dinosaurs (deep time)',
   'Deep past (before 1000 BCE)',
   'Ancient (1000 BCE–1 CE)',
   'Classical (1–500 CE)',
@@ -74,6 +75,7 @@ export const CATEGORY_LABEL: Record<StoryDomain, string> = {
   sound: 'Sound',
   wind: 'Wind',
   'plant-growth': 'Growing things',
+  life: 'Living things',
 };
 
 /** Display order for the by-topic view. */
@@ -86,6 +88,7 @@ export const CATEGORY_ORDER: readonly StoryDomain[] = [
   'navigation',
   'sky',
   'earth',
+  'life',
   'displacement',
   'shadows',
   'sound',
@@ -99,10 +102,12 @@ export function getMeta(slug: string): StoryMeta | undefined {
 
 /** Which era band a year falls into. */
 export function eraOf(year: number): string {
-  if (year < -1000) return ERA_BANDS[0];
-  if (year < 1) return ERA_BANDS[1];
-  if (year < 500) return ERA_BANDS[2];
-  if (year < 1400) return ERA_BANDS[3];
-  if (year < 1700) return ERA_BANDS[4];
-  return ERA_BANDS[5];
+  // Years in the millions (deep negative) are prehistoric / dinosaur time.
+  if (year < -100000) return ERA_BANDS[0];
+  if (year < -1000) return ERA_BANDS[1];
+  if (year < 1) return ERA_BANDS[2];
+  if (year < 500) return ERA_BANDS[3];
+  if (year < 1400) return ERA_BANDS[4];
+  if (year < 1700) return ERA_BANDS[5];
+  return ERA_BANDS[6];
 }

@@ -32,6 +32,8 @@ const CONVERSATION_PROMPT: Record<StoryDomain, string> = {
     'As you settle down, wonder together: how might people far away tell that the ground has trembled, even when we did not feel a thing?',
   materials:
     'Tomorrow, look together: how many things around us are made from something else first — like paper that began as soft, wet fibers?',
+  life:
+    'Snuggle in and wonder together: dinosaurs are gone, but we know them from fossils — what clue would you dig up to learn about a creature you never met?',
 };
 
 export interface StoryCompleteProps {

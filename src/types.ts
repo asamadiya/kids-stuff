@@ -13,6 +13,8 @@ export const STORY_DOMAINS = [
   'sky',
   'earth',
   'materials',
+  // Living things & deep time (dinosaurs, fossils, biology):
+  'life',
 ] as const;
 
 export type StoryDomain = (typeof STORY_DOMAINS)[number];

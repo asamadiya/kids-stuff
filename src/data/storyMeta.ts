@@ -188,4 +188,12 @@ export const STORY_META: Record<string, StoryMeta> = {
   'two-sticks-and-the-whole-round-earth': { year: -240, yearLabel: 'c. 240 BCE', lat: 31.2, lng: 29.9, place: 'Alexandria, Egypt', region: 'Mediterranean', era: 'Ancient (1000 BCE–1 CE)' },
   'when-the-moon-hid-the-sun': { year: -470, yearLabel: 'c. 470 BCE', lat: 38.4, lng: 27.15, place: 'Ionia', region: 'Mediterranean', era: 'Ancient (1000 BCE–1 CE)' },
   'zhang-heng-earth-dragon': { year: 132, yearLabel: '132 CE', lat: 34.62, lng: 112.45, place: 'Luoyang, China', region: 'East Asia', era: 'Classical (1–500 CE)' },
+  'the-long-necked-giants': { year: -150000000, yearLabel: '≈150 million years ago', lat: 39.5, lng: -108.0, place: 'Morrison Formation, North America', region: 'North America', era: 'Age of dinosaurs (deep time)' },
+  'the-king-of-the-cretaceous': { year: -66000000, yearLabel: '≈66 million years ago', lat: 47.5, lng: -106.9, place: 'Hell Creek, North America', region: 'North America', era: 'Age of dinosaurs (deep time)' },
+  'the-dinosaurs-that-grew-feathers': { year: -125000000, yearLabel: '≈125 million years ago', lat: 41.6, lng: 120.9, place: 'Liaoning, China', region: 'East Asia', era: 'Age of dinosaurs (deep time)' },
+  'the-three-horned-face': { year: -66000000, yearLabel: '≈66 million years ago', lat: 45.9, lng: -104.5, place: 'Western North America', region: 'North America', era: 'Age of dinosaurs (deep time)' },
+  'the-plated-dinosaur': { year: -150000000, yearLabel: '≈150 million years ago', lat: 39.0, lng: -108.5, place: 'Morrison Formation, North America', region: 'North America', era: 'Age of dinosaurs (deep time)' },
+  'the-day-the-world-changed': { year: -66000000, yearLabel: '≈66 million years ago', lat: 21.4, lng: -89.5, place: 'Chicxulub, Yucatán', region: 'Mesoamerica', era: 'Age of dinosaurs (deep time)' },
+  'the-tiny-first-mammals': { year: -200000000, yearLabel: '≈200 million years ago', lat: 51.6, lng: -3.6, place: 'Early Mesozoic Earth', region: 'Europe', era: 'Age of dinosaurs (deep time)' },
+  'the-girl-who-found-sea-dragons': { year: 1811, yearLabel: '1811 CE', lat: 50.72, lng: -2.94, place: 'Lyme Regis, England', region: 'Europe', era: 'Later (after 1700 CE)' },
 };

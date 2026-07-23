@@ -16,6 +16,7 @@ const DOMAIN_LABEL: Record<StoryDomain, string> = {
   sky: 'Sky & stars',
   earth: 'Our Earth',
   materials: 'Making things',
+  life: 'Living things',
 };
 
 export interface StoryCardProps {
