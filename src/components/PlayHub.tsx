@@ -36,6 +36,16 @@ import MoneyCoinsGame from './MoneyCoinsGame';
 import TenMoreTenLessGame from './TenMoreTenLessGame';
 import WhatsMissingGame from './WhatsMissingGame';
 import ScenesGame from './ScenesGame';
+import SharingTurnsGame from './SharingTurnsGame';
+import CalmDownGame from './CalmDownGame';
+import KindFriendGame from './KindFriendGame';
+import MakingFriendsGame from './MakingFriendsGame';
+import SayingSorryGame from './SayingSorryGame';
+import EveryoneIncludedGame from './EveryoneIncludedGame';
+import BraveFeelingsGame from './BraveFeelingsGame';
+import TellingTruthGame from './TellingTruthGame';
+import HelpingHandsGame from './HelpingHandsGame';
+import WinOrLoseGame from './WinOrLoseGame';
 import { COUNT_WITH_RIKKI_META } from '../games/count-with-rikki';
 import { PATTERN_PARADE_META } from '../games/pattern-parade';
 import { SHAPE_HUNT_META } from '../games/shape-hunt';
@@ -71,27 +81,23 @@ import { MONEY_COINS_META } from '../games/money-coins';
 import { TEN_MORE_TEN_LESS_META } from '../games/ten-more-ten-less';
 import { WHATS_MISSING_META } from '../games/whats-missing';
 import { SCENES_META } from '../games/scenes';
+import { SHARING_TURNS_META } from '../games/sharing-turns';
+import { CALM_DOWN_META } from '../games/calm-down';
+import { KIND_FRIEND_META } from '../games/kind-friend';
+import { MAKING_FRIENDS_META } from '../games/making-friends';
+import { SAYING_SORRY_META } from '../games/saying-sorry';
+import { EVERYONE_INCLUDED_META } from '../games/everyone-included';
+import { BRAVE_FEELINGS_META } from '../games/brave-feelings';
+import { TELLING_TRUTH_META } from '../games/telling-truth';
+import { HELPING_HANDS_META } from '../games/helping-hands';
+import { WIN_OR_LOSE_META } from '../games/win-or-lose';
 import '../styles/play.css';
 
 const BASE = import.meta.env.BASE_URL;
 
-export interface PlayHubProps {
-  readonly onExit: () => void;
-}
-
-interface GameMeta {
-  readonly id: string;
-  readonly title: string;
-  readonly icon: string;
-  readonly color: string;
-  readonly tagline: string;
-}
-
-interface GameEntry {
-  readonly meta: GameMeta;
-  readonly Component: ComponentType;
-  readonly cat: string;
-}
+export interface PlayHubProps { readonly onExit: () => void; }
+interface GameMeta { readonly id: string; readonly title: string; readonly icon: string; readonly color: string; readonly tagline: string; }
+interface GameEntry { readonly meta: GameMeta; readonly Component: ComponentType; readonly cat: string; }
 
 const GAMES: readonly GameEntry[] = [
   { meta: COUNT_WITH_RIKKI_META, Component: CountWithRikkiGame, cat: 'early' },
@@ -105,7 +111,7 @@ const GAMES: readonly GameEntry[] = [
   { meta: WHICH_HAS_MORE_META, Component: WhichHasMoreGame, cat: 'early' },
   { meta: NUMBER_ORDER_META, Component: NumberOrderGame, cat: 'early' },
   { meta: MEMORY_PAIRS_META, Component: MemoryPairsGame, cat: 'early' },
-  { meta: NAMETHEFEELING_META, Component: NameTheFeelingGame, cat: 'early' },
+  { meta: NAMETHEFEELING_META, Component: NameTheFeelingGame, cat: 'feelings' },
   { meta: TENS_AND_ONES_META, Component: TensAndOnesGame, cat: 'math' },
   { meta: COUNT_BY_TENS_META, Component: CountByTensGame, cat: 'math' },
   { meta: SKIP_COUNT_META, Component: SkipCountGame, cat: 'math' },
@@ -129,10 +135,19 @@ const GAMES: readonly GameEntry[] = [
   { meta: TEN_MORE_TEN_LESS_META, Component: TenMoreTenLessGame, cat: 'math' },
   { meta: WHATS_MISSING_META, Component: WhatsMissingGame, cat: 'math' },
   { meta: SCENES_META, Component: ScenesGame, cat: 'feelings' },
+  { meta: SHARING_TURNS_META, Component: SharingTurnsGame, cat: 'feelings' },
+  { meta: CALM_DOWN_META, Component: CalmDownGame, cat: 'feelings' },
+  { meta: KIND_FRIEND_META, Component: KindFriendGame, cat: 'feelings' },
+  { meta: MAKING_FRIENDS_META, Component: MakingFriendsGame, cat: 'feelings' },
+  { meta: SAYING_SORRY_META, Component: SayingSorryGame, cat: 'feelings' },
+  { meta: EVERYONE_INCLUDED_META, Component: EveryoneIncludedGame, cat: 'feelings' },
+  { meta: BRAVE_FEELINGS_META, Component: BraveFeelingsGame, cat: 'feelings' },
+  { meta: TELLING_TRUTH_META, Component: TellingTruthGame, cat: 'feelings' },
+  { meta: HELPING_HANDS_META, Component: HelpingHandsGame, cat: 'feelings' },
+  { meta: WIN_OR_LOSE_META, Component: WinOrLoseGame, cat: 'feelings' },
 ];
-
 const CATEGORIES: readonly { key: string; title: string; blurb: string }[] = [
-  { key: 'feelings', title: "Feelings & Friends", blurb: "Notice and name feelings, and be a kind friend." },
+  { key: 'feelings', title: "Feelings & Friends", blurb: "Notice feelings, be a kind friend, and grow your heart." },
   { key: 'math', title: "Numbers & Math", blurb: "Tens, adding, take-away, times, sharing, and fractions." },
   { key: 'early', title: "First Learning", blurb: "Letters, shapes, colors, patterns, and memory." },
 ];
@@ -140,7 +155,6 @@ const CATEGORIES: readonly { key: string; title: string; blurb: string }[] = [
 export function PlayHub({ onExit }: PlayHubProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = GAMES.find((g) => g.meta.id === activeId) ?? null;
-
   return (
     <main id="main-content" className="play-hub" aria-label="Rikki's Play Zone" tabIndex={-1}>
       <header className="play-hub__hero">
@@ -178,23 +192,12 @@ export function PlayHub({ onExit }: PlayHubProps) {
                 </div>
                 <div className="play-grid">
                   {games.map(({ meta }) => (
-                    <button
-                      key={meta.id}
-                      type="button"
-                      className={`play-card play-card--${meta.color}`}
-                      onClick={() => setActiveId(meta.id)}
-                      aria-label={`Play ${meta.title}`}
-                    >
+                    <button key={meta.id} type="button" className={`play-card play-card--${meta.color}`}
+                      onClick={() => setActiveId(meta.id)} aria-label={`Play ${meta.title}`}>
                       <span className="play-card__pic">
                         <span className="play-card__icon" aria-hidden="true">{meta.icon}</span>
-                        <img
-                          src={`${BASE}games/covers/${meta.id}.png`}
-                          alt=""
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.visibility = 'hidden';
-                          }}
-                        />
+                        <img src={`${BASE}games/covers/${meta.id}.png`} alt="" loading="lazy"
+                          onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
                       </span>
                       <span className="play-card__title">{meta.title}</span>
                     </button>

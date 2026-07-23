@@ -618,3 +618,15 @@ button.game-card:focus-visible {
   color: var(--c-ink);
 }
 @media (max-width: 30rem) { .play-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ------------------------------------------------------------- comic strips -- */
+.comic-image {
+  width: 100%;
+  max-width: 34rem;
+  aspect-ratio: 1152 / 896;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  background: #fffdf7;
+}
+.mini-game__options .mini-option span { text-align: center; }
