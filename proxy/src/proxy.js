@@ -8,23 +8,20 @@
  * credentials), so the child signs in once and everything works via the cookie.
  *
  * Model backend (set MODEL_BACKEND):
- *   "azure"  (default) — Azure OpenAI, using this Function's own key. Simplest on
- *                        Azure; reuses your AI resource. GitHub sign-in is the gate.
- *   "github"           — GitHub Models, using the signed-in user's GitHub token.
+ *   "copilot" (default) — the GitHub Copilot API, using the signed-in user's
+ *                         GitHub token (exchanged for a Copilot token). Requires
+ *                         a Copilot subscription on that account.
+ *   "github"            — GitHub Models, using the user's GitHub token.
+ *   "azure"             — Azure OpenAI, using this Function's own key.
  *
- * App settings (Function App → Configuration):
+ * App settings (Function App -> Configuration):
  *   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET   — your GitHub OAuth App
  *   APP_ORIGIN   e.g. https://asamadiya.github.io
  *   APP_PATH     e.g. /kids-stuff/
- *   MODEL_BACKEND                             — "azure" | "github"  (default azure)
- *   # when MODEL_BACKEND=azure:
- *   AZURE_OPENAI_ENDPOINT   e.g. https://chgu-4562-resource.openai.azure.com
- *   AZURE_OPENAI_KEY
- *   AZURE_OPENAI_DEPLOYMENT e.g. gpt-4o
- *   AZURE_OPENAI_API_VERSION (default 2024-08-01-preview)
- *   # when MODEL_BACKEND=github:
- *   GITHUB_MODEL  (default gpt-4o)
- *   GITHUB_MODELS_URL (default https://models.github.ai/inference/chat/completions)
+ *   MODEL_BACKEND                             — default "copilot"
+ *   # copilot: COPILOT_MODEL (default gpt-4o), COPILOT_INTEGRATION_ID (default vscode-chat)
+ *   # github:  GITHUB_MODEL, GITHUB_MODELS_URL
+ *   # azure:   AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT
  */
 
 const { app } = require('@azure/functions');
@@ -73,9 +70,39 @@ function messages(things) {
 }
 
 async function callModel(userToken, things) {
-  const backend = env('MODEL_BACKEND', 'azure');
+  const backend = env('MODEL_BACKEND', 'copilot');
+
+  // --- GitHub Copilot API (default) ---------------------------------------
+  // Exchange the user's GitHub OAuth token for a short-lived Copilot token,
+  // then call the Copilot chat endpoint. Requires the signed-in user to have a
+  // Copilot subscription; GitHub may restrict which OAuth apps can mint Copilot
+  // tokens (set COPILOT_INTEGRATION_ID accordingly). Falls back cleanly on error.
+  if (backend === 'copilot') {
+    const cop = await fetch('https://api.github.com/copilot_internal/v2/token', {
+      headers: { Authorization: `token ${userToken}`, 'User-Agent': 'moonlit-storybook', Accept: 'application/json' },
+    }).then((r) => (r.ok ? r.json() : null));
+    if (!cop || !cop.token) {
+      return { ok: false, status: 401, detail: 'Could not get a Copilot token (needs an active Copilot subscription / allowed app).' };
+    }
+    const res = await fetch('https://api.githubcopilot.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${cop.token}`,
+        'Content-Type': 'application/json',
+        'Copilot-Integration-Id': env('COPILOT_INTEGRATION_ID', 'vscode-chat'),
+        'Editor-Version': env('COPILOT_EDITOR_VERSION', 'MoonlitStorybook/1.0'),
+        'Editor-Plugin-Version': 'MoonlitStorybook/1.0',
+        'User-Agent': 'moonlit-storybook',
+      },
+      body: JSON.stringify({ model: env('COPILOT_MODEL', 'gpt-4o'), messages: messages(things), temperature: 0.9, max_tokens: 600 }),
+    });
+    if (!res.ok) return { ok: false, status: res.status, detail: (await res.text()).slice(0, 300) };
+    return parseStory(await res.json());
+  }
+
+  // --- Alternatives (config fallbacks) ------------------------------------
   let url;
-  let headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   let model;
   if (backend === 'github') {
     url = env('GITHUB_MODELS_URL', 'https://models.github.ai/inference/chat/completions');
@@ -94,7 +121,10 @@ async function callModel(userToken, things) {
     body: JSON.stringify({ model, messages: messages(things), temperature: 0.9, max_tokens: 600 }),
   });
   if (!res.ok) return { ok: false, status: res.status, detail: (await res.text()).slice(0, 300) };
-  const data = await res.json();
+  return parseStory(await res.json());
+}
+
+function parseStory(data) {
   const content = data?.choices?.[0]?.message?.content ?? '';
   let story;
   try {
