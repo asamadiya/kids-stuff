@@ -64,7 +64,15 @@ export async function aiStory(things: readonly Thing[]): Promise<WovenStory> {
       max_tokens: 600,
     }),
   });
-  if (!res.ok) throw new Error(`AI story failed (${res.status})`);
+  if (!res.ok) {
+    let detail = '';
+    try {
+      detail = (await res.text()).slice(0, 160);
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`${res.status}${detail ? `: ${detail}` : ''}`);
+  }
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   const content = data.choices?.[0]?.message?.content ?? '';
   let story: WovenStory;
