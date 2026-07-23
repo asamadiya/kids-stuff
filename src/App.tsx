@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Library } from './components/Library';
 import { Reader } from './components/Reader';
 import { useBookProgress } from './hooks/useBookProgress';
 import { STORIES, getStory } from './stories';
-import type { Story } from './types';
 import './styles/tokens.css';
 import './styles/app.css';
 
@@ -48,16 +47,6 @@ function parseHash(rawHash: string): Route {
     return { kind: 'reader', slug, page };
   }
   return { kind: 'library' };
-}
-
-/** A gently rotating "Tonight's pick" so a returning parent sees something new.
- *  Prefers the historical shelf (the headline collection) when it has stories. */
-function pickTonight(stories: readonly Story[]): string | undefined {
-  const pool = stories.filter((story) => story.collection === 'historical');
-  const from = pool.length > 0 ? pool : stories;
-  if (from.length === 0) return undefined;
-  const dayIndex = Math.floor(Date.now() / 86_400_000) % from.length;
-  return from[dayIndex].slug;
 }
 
 function App() {
@@ -149,8 +138,6 @@ function App() {
     [markComplete, clearBookmark],
   );
 
-  const tonightPickSlug = useMemo(() => pickTonight(STORIES), []);
-
   // Unknown slugs fall through to the library rather than showing an error.
   const readerStory = route.kind === 'reader' ? getStory(route.slug) : undefined;
 
@@ -176,7 +163,6 @@ function App() {
         <Library
           stories={STORIES}
           onOpenStory={openStory}
-          tonightPickSlug={tonightPickSlug}
           completedSlugs={completedSlugs}
         />
       )}

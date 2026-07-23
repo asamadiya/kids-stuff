@@ -202,14 +202,11 @@ describe('useBookProgress storage diagnostics', () => {
 /* App integration — resume, completion, and completed styling                 */
 /* -------------------------------------------------------------------------- */
 
-const cardFor = (title: string): HTMLElement => {
-  const button = screen.getByRole('button', {
+const cardFor = (title: string): HTMLElement =>
+  // A story tile is itself the button; its data-completed reflects progress.
+  screen.getByRole('button', {
     name: new RegExp(`^Read ${title}( again)?$`, 'i'),
   });
-  const card = button.closest('article');
-  if (!card) throw new Error(`no <article> wraps the card titled "${title}"`);
-  return card as HTMLElement;
-};
 
 describe('App resumes from bookmarks and records completion', () => {
   it('resumes a story at its saved page when opened from the library', async () => {
