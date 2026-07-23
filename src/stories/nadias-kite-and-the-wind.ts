@@ -5,6 +5,7 @@ export const nadiasKiteAndTheWind: Story = {
   title: "Nadia's Kite and the Wind",
   subtitle: 'Nadia learns to read the wind to lift her kite high.',
   domain: 'wind',
+  collection: 'fiction',
   repeatedPhrase: 'You cannot see the wind, but you can see what it moves',
   readAloudMinutes: 6,
   learningTakeaway:

@@ -5,11 +5,10 @@ export interface StoryImageProps {
   /** 0-based page index, or 'cover' for the library cover art. */
   readonly page: number | 'cover';
   readonly alt: string;
-  readonly motionEnabled?: boolean;
 }
 
 /** One story illustration as a pre-generated raster image from public/art/<slug>/. */
-export function StoryImage({ story, page, alt, motionEnabled = false }: StoryImageProps) {
+export function StoryImage({ story, page, alt }: StoryImageProps) {
   const file = page === 'cover' ? 'cover' : `page-${page + 1}`;
   const src = `${import.meta.env.BASE_URL}art/${story.slug}/${file}.png`;
   return (
@@ -22,7 +21,6 @@ export function StoryImage({ story, page, alt, motionEnabled = false }: StoryIma
       loading={page === 'cover' ? 'lazy' : 'eager'}
       decoding="async"
       draggable={false}
-      data-motion={motionEnabled ? 'on' : 'off'}
     />
   );
 }

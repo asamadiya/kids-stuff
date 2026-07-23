@@ -5,6 +5,7 @@ export const chasingMyShadow: Story = {
   title: 'Chasing My Shadow',
   subtitle: 'Leo plays all day with the shadow that copies everything he does.',
   domain: 'shadows',
+  collection: 'fiction',
   repeatedPhrase: 'My shadow goes wherever I go',
   readAloudMinutes: 6,
   learningTakeaway:

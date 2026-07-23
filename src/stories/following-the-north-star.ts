@@ -5,6 +5,7 @@ export const followingTheNorthStar: Story = {
   title: 'Following the North Star',
   subtitle: 'Mira and Uncle Ben find their way home under the night sky.',
   domain: 'navigation',
+  collection: 'fiction',
   repeatedPhrase: 'Find something that stays still, and it will show you the way',
   readAloudMinutes: 6,
   learningTakeaway:

@@ -5,6 +5,7 @@ export const theEchoInTheCanyon: Story = {
   title: 'The Echo in the Canyon',
   subtitle: 'Theo calls out at dusk and the canyon answers back.',
   domain: 'sound',
+  collection: 'fiction',
   repeatedPhrase: 'Call it out, and the canyon calls back',
   readAloudMinutes: 6,
   learningTakeaway:

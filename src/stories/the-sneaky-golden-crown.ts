@@ -5,6 +5,7 @@ export const theSneakyGoldenCrown: Story = {
   title: 'The Sneaky Golden Crown',
   subtitle: 'Delia tests a king\'s crown by watching the water climb in a bowl.',
   domain: 'displacement',
+  collection: 'fiction',
   repeatedPhrase: 'Fill it up and watch it rise',
   readAloudMinutes: 5,
   learningTakeaway:

@@ -24,12 +24,18 @@ const CONVERSATION_PROMPT: Record<StoryDomain, string> = {
     'Tomorrow, look around together: what heavy thing could we move more easily with a ramp, a wheel, or a little pulley?',
   displacement:
     'At bath time, try it together: fill a cup to the brim, then lower in a toy. Where does the water go, and why does it climb?',
+  numbers:
+    'Snuggle in and wonder together: how could we count something really big — like all the stars — by sorting it into little groups first?',
+  sky:
+    'Before sleep, wonder together: the Sun and stars seem to move across the sky — but what if it is really our own Earth, gently turning?',
+  earth:
+    'As you settle down, wonder together: how might people far away tell that the ground has trembled, even when we did not feel a thing?',
+  materials:
+    'Tomorrow, look together: how many things around us are made from something else first — like paper that began as soft, wet fibers?',
 };
 
 export interface StoryCompleteProps {
   readonly story: Story;
-  /** Reserved motion hook. No animation in this task. */
-  readonly motionEnabled?: boolean;
 }
 
 export function StoryComplete({ story }: StoryCompleteProps) {

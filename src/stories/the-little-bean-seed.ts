@@ -5,6 +5,7 @@ export const theLittleBeanSeed: Story = {
   title: 'The Little Bean Seed',
   subtitle: 'Sam plants a bean and learns the hardest part is waiting.',
   domain: 'plant-growth',
+  collection: 'fiction',
   repeatedPhrase: 'Grow, little bean, grow',
   readAloudMinutes: 6,
   learningTakeaway:

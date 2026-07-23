@@ -5,6 +5,7 @@ export const theRampToTheTreehouse: Story = {
   title: 'The Ramp to the Treehouse',
   subtitle: 'Kwame and Ana lift a heavy basket with a ramp and a pulley.',
   domain: 'simple-machines',
+  collection: 'fiction',
   repeatedPhrase: 'A little machine makes a big job easy',
   readAloudMinutes: 6,
   learningTakeaway:

@@ -297,26 +297,6 @@ describe('Reader component contract (for Task 5)', () => {
     void first;
   });
 
-  it('keeps motion off by default and honours the motion hook', () => {
-    const off = renderReader(0);
-    expect(off.container.querySelector('[data-motion="on"]')).toBeNull();
-    cleanup();
-    const on = renderReader(0, { motionEnabled: true });
-    expect(on.container.querySelector('[data-motion="on"]')).not.toBeNull();
-  });
-
-  it('threads the motion state onto the reading controls', () => {
-    renderReader(1);
-    expect(
-      screen.getByRole('navigation', { name: /reading controls/i }),
-    ).toHaveAttribute('data-motion', 'off');
-    cleanup();
-    renderReader(1, { motionEnabled: true });
-    expect(
-      screen.getByRole('navigation', { name: /reading controls/i }),
-    ).toHaveAttribute('data-motion', 'on');
-  });
-
   it('disables Start over at the first page and enables it later', () => {
     renderReader(0);
     expect(screen.getByRole('button', { name: /start over/i })).toBeDisabled();

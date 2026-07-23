@@ -5,6 +5,7 @@ export const theTallestSunflower: Story = {
   title: 'The Tallest Sunflower',
   subtitle: 'Milo measures a flower that grew taller than the fence.',
   domain: 'measurement',
+  collection: 'fiction',
   repeatedPhrase: 'Start at the bottom and count all the way up',
   readAloudMinutes: 6,
   learningTakeaway:

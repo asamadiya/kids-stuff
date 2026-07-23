@@ -28,14 +28,13 @@ const crown = () => {
 const storyText = (): string => crown().pages.map((page) => page.text).join(' ');
 
 describe('The Sneaky Golden Crown — library membership', () => {
-  it('publishes nine stories in total', () => {
-    expect(STORIES).toHaveLength(9);
-    expect(STORY_RULES.storyCount).toBe(9);
+  it('keeps the crown among a growing library', () => {
+    expect(STORIES.length).toBeGreaterThanOrEqual(STORY_RULES.minStoryCount);
+    expect(getStory(SLUG)).toBeDefined();
   });
 
-  it('registers a ninth learning domain: displacement', () => {
+  it('registers the displacement learning domain', () => {
     expect(STORY_DOMAINS).toContain('displacement');
-    expect(STORY_DOMAINS).toHaveLength(9);
   });
 
   it('exposes the crown story by its exact slug', () => {

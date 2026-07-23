@@ -21,8 +21,6 @@ export interface ReaderProps {
    * defaults to a no-op so the reader works standalone.
    */
   readonly onComplete?: (slug: string) => void;
-  /** Reserved motion hook, threaded to <Scene> and page transitions. */
-  readonly motionEnabled?: boolean;
   /**
    * Optional live-region writer. The reader calls it on page/view changes so
    * Task 5 can add announcements without rewriting navigation. Defaults to a
@@ -72,7 +70,6 @@ export function Reader({
   onNavigate,
   onExit,
   onComplete = noop,
-  motionEnabled = false,
   announce = noop,
 }: ReaderProps) {
   const pageCount = story.pages.length;
@@ -108,8 +105,6 @@ export function Reader({
     // Start over disables at page 0; move focus to Next once the DOM commits.
     pendingFocusNext.current = true;
   };
-
-  const motion = motionEnabled ? 'on' : 'off';
 
   // Arrow keys turn pages from anywhere, so reading never depends on focus —
   // but they must never hijack text entry or an in-progress text selection.
@@ -191,7 +186,6 @@ export function Reader({
       id="main-content"
       className="reader"
       aria-label={`Reading: ${story.title}`}
-      data-motion={motion}
       tabIndex={-1}
     >
       <div className="reader__stage">
@@ -200,16 +194,14 @@ export function Reader({
             key="complete"
             ref={completionRef}
             className="reader__spread reader__spread--complete"
-            data-motion={motion}
             tabIndex={-1}
           >
-            <StoryComplete story={story} motionEnabled={motionEnabled} />
+            <StoryComplete story={story} />
           </div>
         ) : (
           <article
             key={current}
             className="reader__spread"
-            data-motion={motion}
             aria-labelledby="reader-story-title"
           >
             <figure className="reader__figure">
@@ -217,7 +209,6 @@ export function Reader({
                 story={story}
                 page={current}
                 alt={story.pages[current].alt}
-                motionEnabled={motionEnabled}
               />
             </figure>
 
@@ -247,7 +238,6 @@ export function Reader({
         canGoNext={canGoNext}
         canRestart={canRestart}
         nextLabel={nextLabel}
-        motionEnabled={motionEnabled}
         nextRef={nextButtonRef}
         onPrevious={goPrevious}
         onNext={goNext}
