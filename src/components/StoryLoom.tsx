@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ALL_INGREDIENTS,
@@ -8,8 +8,14 @@ import {
 import type { Thing } from '../loom/ingredients';
 import { MIN_THINGS, weaveStory } from '../loom/weave';
 import type { WovenStory } from '../loom/weave';
-import { aiEnabled, aiStory, getMe, loginUrl, signOut } from '../loom/ai';
-import type { AiUser } from '../loom/ai';
+import {
+  DEFAULT_MODEL,
+  aiConfigured,
+  aiStory,
+  clearConfig,
+  getModel,
+  saveConfig,
+} from '../loom/ai';
 import '../styles/loom.css';
 
 const MAX_THINGS = 8;
@@ -25,16 +31,15 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
   const [variant, setVariant] = useState(0);
   const [telling, setTelling] = useState(false);
 
-  // Optional AI mode (only if the app was built with a proxy URL).
-  const [ai, setAi] = useState<AiUser>({ signedIn: false });
+  // Optional AI mode (GitHub Models, direct from the browser; a grown-up sets a token).
+  const [configured, setConfigured] = useState(aiConfigured());
   const [useAi, setUseAi] = useState(true);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [tokenInput, setTokenInput] = useState('');
+  const [modelInput, setModelInput] = useState(getModel());
   const [aiResult, setAiResult] = useState<WovenStory | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
-
-  useEffect(() => {
-    if (aiEnabled()) getMe().then(setAi);
-  }, []);
 
   const has = (t: Thing) => things.some((x) => x.label === t.label);
   const add = (t: Thing) => {
@@ -58,8 +63,22 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
     setCustom('');
   };
 
+  const saveAi = () => {
+    saveConfig(tokenInput, modelInput);
+    setConfigured(aiConfigured());
+    setTokenInput('');
+    setSetupOpen(false);
+    setUseAi(true);
+  };
+  const clearAi = () => {
+    clearConfig();
+    setConfigured(false);
+    setUseAi(false);
+    setModelInput(DEFAULT_MODEL);
+  };
+
   const ready = things.length >= MIN_THINGS;
-  const aiOn = aiEnabled() && ai.signedIn && useAi;
+  const aiOn = configured && useAi;
 
   const proceduralStory = useMemo(
     () => (telling && ready && !aiResult ? weaveStory(things, variant) : null),
@@ -72,8 +91,7 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
     if (aiOn) {
       setBusy(true);
       try {
-        const s = await aiStory(things);
-        setAiResult(s);
+        setAiResult(await aiStory(things));
         setTelling(true);
       } catch {
         setAiResult(null);
@@ -127,34 +145,66 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
             you a bedtime tale that has every one of them in it.
           </p>
 
-          {aiEnabled() ? (
-            <div className="loom__ai">
-              {ai.signedIn ? (
-                <>
-                  <label className="loom__ai-toggle">
-                    <input
-                      type="checkbox"
-                      checked={useAi}
-                      onChange={(e) => setUseAi(e.target.checked)}
-                    />
-                    🪄 Use AI stories
-                  </label>
-                  <span className="loom__ai-who">
-                    signed in as {ai.login}
-                    <button
-                      type="button"
-                      className="loom__ai-out"
-                      onClick={() => signOut().then(() => setAi({ signedIn: false }))}
-                    >
-                      sign out
-                    </button>
-                  </span>
-                </>
-              ) : (
-                <a className="loom__ai-in" href={loginUrl()}>
-                  🪄 Sign in with GitHub for AI-written stories
+          <div className="loom__ai">
+            {configured ? (
+              <label className="loom__ai-toggle">
+                <input type="checkbox" checked={useAi} onChange={(e) => setUseAi(e.target.checked)} />
+                🪄 Use AI stories
+              </label>
+            ) : null}
+            <button type="button" className="loom__ai-in" onClick={() => setSetupOpen((v) => !v)}>
+              {configured ? 'AI settings' : '🪄 AI stories (grown-up setup)'}
+            </button>
+          </div>
+
+          {setupOpen ? (
+            <div className="loom__setup">
+              <p>
+                AI-written stories use <strong>GitHub Models</strong> straight from your browser — no
+                server. Paste a GitHub token (kept only on this device) and pick a model.
+              </p>
+              <label className="loom__setup-row">
+                <span>GitHub token</span>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  className="loom__input"
+                  placeholder="ghp_… or github_pat_…"
+                  value={tokenInput}
+                  onChange={(e) => setTokenInput(e.target.value)}
+                />
+              </label>
+              <label className="loom__setup-row">
+                <span>Model</span>
+                <input
+                  type="text"
+                  className="loom__input"
+                  placeholder={DEFAULT_MODEL}
+                  value={modelInput}
+                  onChange={(e) => setModelInput(e.target.value)}
+                />
+              </label>
+              <p className="loom__setup-hint">
+                Need a token? Create a fine-grained token with <strong>Models: read</strong> at{' '}
+                <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noreferrer">
+                  github.com/settings/personal-access-tokens/new
                 </a>
-              )}
+                . Browse model ids at{' '}
+                <a href="https://github.com/marketplace/models" target="_blank" rel="noreferrer">
+                  github.com/marketplace/models
+                </a>
+                .
+              </p>
+              <div className="loom__setup-actions">
+                <button type="button" className="loom__add" onClick={saveAi} disabled={!tokenInput.trim()}>
+                  Save
+                </button>
+                {configured ? (
+                  <button type="button" className="loom__ai-out" onClick={clearAi}>
+                    Remove token
+                  </button>
+                ) : null}
+              </div>
             </div>
           ) : null}
 

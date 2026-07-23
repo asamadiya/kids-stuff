@@ -246,3 +246,26 @@
   font-size: var(--step--1);
 }
 
+.loom__setup {
+  max-width: 40rem;
+  margin: 0 auto var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+.loom__setup-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: var(--space-3) 0;
+}
+.loom__setup-row > span { color: var(--c-ink-faint); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.loom__setup-hint { color: var(--c-ink-faint); }
+.loom__setup-hint a { color: var(--c-moon-soft); }
+.loom__setup-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: var(--space-3); }
+
+
