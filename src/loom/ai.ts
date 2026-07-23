@@ -57,12 +57,9 @@ export async function aiStory(things: readonly Thing[]): Promise<WovenStory> {
   const res = await fetch(ENDPOINT, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: getModel(),
-      messages: messages(things),
-      temperature: 0.9,
-      max_tokens: 600,
-    }),
+    // No max_tokens / temperature: gpt-5 rejects the legacy names, and defaults
+    // are fine for a short bedtime story — keeps every model happy.
+    body: JSON.stringify({ model: getModel(), messages: messages(things) }),
   });
   if (!res.ok) {
     let detail = '';
