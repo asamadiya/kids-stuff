@@ -10,7 +10,7 @@ import type { WovenStory } from './weave';
 const ENDPOINT = 'https://models.github.ai/inference/chat/completions';
 const LS_TOKEN = 'ks.ai.token';
 const LS_MODEL = 'ks.ai.model';
-export const DEFAULT_MODEL = 'openai/gpt-5.6';
+export const DEFAULT_MODEL = 'openai/gpt-5';
 
 const ls = (): Storage | null => {
   try {
