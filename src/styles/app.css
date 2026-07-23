@@ -1,7 +1,4 @@
-/*
- * Global base styles. Kept intentionally small: a gentle reset, the night sky
- * backdrop, sensible typography defaults, and an obvious focus ring.
- */
+/* Global reset, sunny learning-center backdrop, and accessible focus treatment. */
 
 *,
 *::before,
@@ -21,8 +18,9 @@ body {
   line-height: 1.55;
   color: var(--c-ink);
   background:
-    radial-gradient(130% 90% at 50% -12%, #262a4b 0%, rgba(38, 42, 75, 0) 55%),
-    linear-gradient(180deg, #14162200 0%, var(--c-night-800) 24%, var(--c-night-900) 100%),
+    radial-gradient(circle at 8% 2%, rgba(255, 218, 159, 0.48), transparent 22rem),
+    radial-gradient(circle at 94% 12%, rgba(178, 226, 221, 0.48), transparent 24rem),
+    radial-gradient(circle at 40% 100%, rgba(239, 207, 231, 0.35), transparent 28rem),
     var(--c-night-900);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
@@ -84,7 +82,7 @@ button {
   border: 0;
 }
 
-/* Skip link: off-screen until focused, then a clear moonlit pill top-left. It
+/* Skip link: off-screen until focused, then a clear sunshine pill top-left. It
    moves via a static transform only (no transition), so it works instantly and
    is unaffected by reduced-motion. */
 .skip-link {
@@ -94,8 +92,8 @@ button {
   z-index: 50;
   padding: 0.75rem 1.25rem;
   border-radius: 999px;
-  background: var(--c-moon);
-  color: var(--c-moon-ink);
+  background: var(--c-ink);
+  color: #fff;
   font-weight: 700;
   text-decoration: none;
   transform: translateY(-250%);
