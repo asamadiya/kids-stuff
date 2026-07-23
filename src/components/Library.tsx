@@ -23,10 +23,11 @@ const HISTORICAL_GOAL = 200;
 export interface LibraryProps {
   readonly stories: readonly Story[];
   readonly onOpenStory: (slug: string) => void;
+  readonly onMakeStory?: () => void;
   readonly completedSlugs?: ReadonlySet<string>;
 }
 
-export function Library({ stories, onOpenStory, completedSlugs }: LibraryProps) {
+export function Library({ stories, onOpenStory, onMakeStory, completedSlugs }: LibraryProps) {
   const done = completedSlugs ?? new Set<string>();
   const [view, setView] = useState<ViewKind>('shelf');
   const [topics, setTopics] = useState<ReadonlySet<StoryDomain>>(new Set());
@@ -123,6 +124,11 @@ export function Library({ stories, onOpenStory, completedSlugs }: LibraryProps) 
         <p className="home__progress" aria-hidden="true">
           {historicalCount} of {HISTORICAL_GOAL} true tales
         </p>
+        {onMakeStory ? (
+          <button type="button" className="home__make" onClick={onMakeStory}>
+            ✨ Make me a story
+          </button>
+        ) : null}
       </header>
 
       <div className="home__controls">
