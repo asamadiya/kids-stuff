@@ -517,3 +517,104 @@ button.game-card:focus-visible {
 .mini-card.is-up { background: var(--c-glow); border-color: var(--c-teal); }
 .mini-card.is-done { background: #e9f4dd; border-color: var(--c-leaf); cursor: default; }
 @media (max-width: 30rem) { .mini-game__grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------------------------------------------------- scenes (picture game) -- */
+.scene-image {
+  width: 100%;
+  max-width: 30rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  background: var(--c-glow);
+}
+.mini-game__options--faces {
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+.mini-option--face {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.4rem;
+}
+.mini-option--face img {
+  width: 100%;
+  max-width: 5.5rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 999px;
+  background: var(--c-surface);
+}
+.mini-option--face span { font-size: var(--step--1); font-weight: 700; }
+@media (max-width: 34rem) { .mini-game__options--faces { grid-template-columns: repeat(2, 1fr); } }
+
+/* ======================================================= image game cards == */
+.play-cats { display: flex; flex-direction: column; gap: var(--space-6); margin-top: var(--space-4); }
+.play-cat__head { margin-bottom: var(--space-3); }
+.play-cat__title { font-family: var(--font-serif); font-size: var(--step-3); }
+.play-cat__blurb { color: var(--c-ink-soft); font-size: var(--step-0); margin-top: 0.15rem; }
+.play-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--space-4);
+}
+.play-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.7rem;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface-raised);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  font: inherit;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.play-card:hover, .play-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--c-teal);
+  box-shadow: 0 14px 30px rgba(20, 40, 60, 0.16);
+  outline: none;
+}
+.play-card__pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--c-glow), var(--c-surface));
+}
+.play-card__icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 2.6rem;
+  opacity: 0.55;
+}
+.play-card__pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.play-card--sun .play-card__pic { background: linear-gradient(135deg, #fff0b8, #ffe08a); }
+.play-card--berry .play-card__pic { background: linear-gradient(135deg, #fbdbe6, #f6bcd0); }
+.play-card--sky .play-card__pic { background: linear-gradient(135deg, #d7ecfb, #b6dbf5); }
+.play-card--leaf .play-card__pic { background: linear-gradient(135deg, #e0f2cf, #c6e6a6); }
+.play-card--grape .play-card__pic { background: linear-gradient(135deg, #eaddf7, #d7bff0); }
+.play-card--coral .play-card__pic { background: linear-gradient(135deg, #ffe0d3, #ffc4ad); }
+.play-card--aqua .play-card__pic { background: linear-gradient(135deg, #d3efed, #aee0dc); }
+.play-card--plum .play-card__pic { background: linear-gradient(135deg, #ecdce9, #dcbfd6); }
+.play-card__title {
+  font-family: var(--font-serif);
+  font-size: var(--step-0);
+  line-height: 1.15;
+  text-align: center;
+  color: var(--c-ink);
+}
+@media (max-width: 30rem) { .play-grid { grid-template-columns: repeat(2, 1fr); } }
