@@ -6,20 +6,21 @@
 export const EXPECTED = {
   canonical: 'https://asamadiya.github.io/kids-stuff/',
   description:
-    'Illustrated bedtime stories for children \u2014 read at your own pace, bookmark your place, and return any night.',
-  themeColor: '#0f0c29',
+    'Read true stories, explore time and the world, play learning games, and make your own stories with Rikki.',
+  themeColor: '#fffaf1',
   robots: 'noindex, nofollow, noarchive, nosnippet',
   googlebot: 'noindex, nofollow, noarchive, nosnippet',
   bingbot: 'noindex, nofollow, noarchive, nosnippet',
   ogType: 'website',
-  ogTitle: 'Moonlit Storybook',
+  ogTitle: "Rikki's Learn & Play Center",
   ogDescription:
-    'Illustrated bedtime stories for children \u2014 read at your own pace, bookmark your place, and return any night.',
+    'Read true stories, explore time and the world, play learning games, and make your own stories with Rikki.',
   ogUrl: 'https://asamadiya.github.io/kids-stuff/',
   ogImage: 'https://asamadiya.github.io/kids-stuff/social-card.svg',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Moonlit Storybook',
-  twitterDescription: 'Illustrated bedtime stories for children.',
+  twitterTitle: "Rikki's Learn & Play Center",
+  twitterDescription:
+    'Stories, learning games, world exploration, and creative play with Rikki.',
   twitterImage: 'https://asamadiya.github.io/kids-stuff/social-card.svg',
 };
 

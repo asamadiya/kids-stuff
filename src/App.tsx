@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Library } from './components/Library';
+import { PlayHub } from './components/PlayHub';
 import { Reader } from './components/Reader';
 import { StoryLoom } from './components/StoryLoom';
 import { useBookProgress } from './hooks/useBookProgress';
@@ -17,6 +18,7 @@ import './styles/app.css';
 type Route =
   | { kind: 'library' }
   | { kind: 'make' }
+  | { kind: 'play' }
   | { kind: 'reader'; slug: string; page: number };
 
 const READ_SEGMENT = 'read';
@@ -24,6 +26,7 @@ const READ_SEGMENT = 'read';
 function toHash(route: Route): string {
   if (route.kind === 'library') return '#/';
   if (route.kind === 'make') return '#/make';
+  if (route.kind === 'play') return '#/play';
   // 1-based page number reads naturally in a shared/deep link.
   return `#/${READ_SEGMENT}/${encodeURIComponent(route.slug)}/${route.page + 1}`;
 }
@@ -35,6 +38,7 @@ function parseHash(rawHash: string): Route {
     .replace(/\/+$/, '');
   if (clean === '') return { kind: 'library' };
   if (clean === 'make') return { kind: 'make' };
+  if (clean === 'play') return { kind: 'play' };
 
   const parts = clean.split('/');
   if (parts[0] === READ_SEGMENT && parts[1]) {
@@ -122,6 +126,12 @@ function App() {
     setRoute(next);
   }, []);
 
+  const openPlay = useCallback(() => {
+    const next: Route = { kind: 'play' };
+    window.history.pushState(null, '', toHash(next));
+    setRoute(next);
+  }, []);
+
   // Page turns replace history so Back always returns to the library, not a
   // page-by-page rewind.
   const setPage = useCallback(
@@ -154,7 +164,7 @@ function App() {
   return (
     <>
       <a className="skip-link" href="#main-content" onClick={focusMainContent}>
-        Skip to the story
+        Skip to main content
       </a>
 
       {route.kind === 'reader' && readerStory ? (
@@ -171,11 +181,14 @@ function App() {
         />
       ) : route.kind === 'make' ? (
         <StoryLoom onExit={exitToLibrary} />
+      ) : route.kind === 'play' ? (
+        <PlayHub onExit={exitToLibrary} />
       ) : (
         <Library
           stories={STORIES}
           onOpenStory={openStory}
           onMakeStory={openMake}
+          onPlay={openPlay}
           completedSlugs={completedSlugs}
         />
       )}

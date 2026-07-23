@@ -64,16 +64,39 @@ export const CATEGORY_LABEL: Record<StoryDomain, string> = {
   numbers: 'Numbers',
   measurement: 'Measuring',
   patterns: 'Patterns',
-  'simple-machines': 'Simple machines',
+  'simple-machines': 'Machines & motion',
   materials: 'Making things',
-  navigation: 'Finding the way',
+  navigation: 'Maps & finding the way',
   sky: 'Sky & stars',
   earth: 'Our Earth',
-  displacement: 'Water rising',
-  shadows: 'Shadows',
-  sound: 'Sound',
-  wind: 'Wind',
-  'plant-growth': 'Growing things',
+  displacement: 'Water & floating',
+  shadows: 'Light & shadows',
+  sound: 'Sound & music',
+  wind: 'Weather & wind',
+  'plant-growth': 'Living things',
+};
+
+export interface SubjectDetail {
+  readonly icon: string;
+  readonly prompt: string;
+  readonly color: string;
+}
+
+/** Playful presentation details for the home-page subject explorer. */
+export const SUBJECT_DETAILS: Record<StoryDomain, SubjectDetail> = {
+  numbers: { icon: '123', prompt: 'Count, calculate, and spot clever ideas.', color: '#f06f6b' },
+  measurement: { icon: '↔', prompt: 'Compare size, distance, time, and weight.', color: '#ee9d38' },
+  patterns: { icon: '◇', prompt: 'Find shapes and rhythms that repeat.', color: '#9b72cf' },
+  'simple-machines': { icon: '⚙', prompt: 'See how simple tools help us move things.', color: '#4ca6a8' },
+  materials: { icon: '✂', prompt: 'Build, shape, join, and invent.', color: '#e36f9f' },
+  navigation: { icon: '⌖', prompt: 'Use maps, stars, and clues to find the way.', color: '#3f8dc9' },
+  sky: { icon: '★', prompt: 'Look up at planets, stars, light, and space.', color: '#5d70c9' },
+  earth: { icon: '◎', prompt: 'Explore rocks, rivers, weather, and our planet.', color: '#49a56f' },
+  displacement: { icon: '≈', prompt: 'Experiment with water, floating, and sinking.', color: '#2f9fc2' },
+  shadows: { icon: '◐', prompt: 'Play with light, darkness, and reflection.', color: '#8668b4' },
+  sound: { icon: '♪', prompt: 'Listen for vibration, rhythm, and music.', color: '#db6f82' },
+  wind: { icon: '≋', prompt: 'Watch air move clouds, sails, and seeds.', color: '#5597b7' },
+  'plant-growth': { icon: '♧', prompt: 'Discover how plants and living things grow.', color: '#69a844' },
 };
 
 /** Display order for the by-topic view. */
