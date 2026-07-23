@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Library } from './components/Library';
 import { Reader } from './components/Reader';
+import { StoryLoom } from './components/StoryLoom';
 import { useBookProgress } from './hooks/useBookProgress';
 import { STORIES, getStory } from './stories';
 import './styles/tokens.css';
@@ -15,12 +16,14 @@ import './styles/app.css';
  */
 type Route =
   | { kind: 'library' }
+  | { kind: 'make' }
   | { kind: 'reader'; slug: string; page: number };
 
 const READ_SEGMENT = 'read';
 
 function toHash(route: Route): string {
   if (route.kind === 'library') return '#/';
+  if (route.kind === 'make') return '#/make';
   // 1-based page number reads naturally in a shared/deep link.
   return `#/${READ_SEGMENT}/${encodeURIComponent(route.slug)}/${route.page + 1}`;
 }
@@ -31,6 +34,7 @@ function parseHash(rawHash: string): Route {
     .replace(/^\/+/, '')
     .replace(/\/+$/, '');
   if (clean === '') return { kind: 'library' };
+  if (clean === 'make') return { kind: 'make' };
 
   const parts = clean.split('/');
   if (parts[0] === READ_SEGMENT && parts[1]) {
@@ -112,6 +116,12 @@ function App() {
     setRoute(next);
   }, []);
 
+  const openMake = useCallback(() => {
+    const next: Route = { kind: 'make' };
+    window.history.pushState(null, '', toHash(next));
+    setRoute(next);
+  }, []);
+
   // Page turns replace history so Back always returns to the library, not a
   // page-by-page rewind.
   const setPage = useCallback(
@@ -159,10 +169,13 @@ function App() {
           onComplete={handleComplete}
           announce={announce}
         />
+      ) : route.kind === 'make' ? (
+        <StoryLoom onExit={exitToLibrary} />
       ) : (
         <Library
           stories={STORIES}
           onOpenStory={openStory}
+          onMakeStory={openMake}
           completedSlugs={completedSlugs}
         />
       )}

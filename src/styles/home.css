@@ -16,6 +16,20 @@
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+.home__make {
+  margin-top: var(--space-4);
+  min-height: var(--touch);
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--c-moon) 0%, #f6b45e 100%);
+  color: var(--c-moon-ink);
+  font-size: var(--step-0);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 26px -12px rgba(240, 198, 122, 0.8);
+}
+.home__make:hover { filter: brightness(1.05); }
 
 /* ---------------------------------------------------------- controls bar -- */
 
