@@ -7,53 +7,65 @@ export const theTriangleOfGrowingNumbers: Story = {
   domain: 'numbers',
   collection: 'historical',
   repeatedPhrase: 'Two above help one below',
-  readAloudMinutes: 5,
+  readAloudMinutes: 9,
   learningTakeaway:
-    'In a triangle of numbers, each number in the middle is made by adding the two numbers just above it. The edges stay as ones, and the pattern grows one careful row at a time.',
+    'In a triangle of numbers, each middle number is made by adding the two numbers just above it. The edges stay as ones, and the pattern grows one careful row at a time. The same triangle also helps count choices and find the sides of squares and cubes.',
   heartTakeaway:
     'Sharing what you learn, and giving thanks to the people who taught you first, is a kind and honest thing to do.',
   grownUpFact:
-    'Yang Hui was a real mathematician who lived in China during the Southern Song dynasty, around 1238 to 1298. In 1261 CE he published a book explaining older counting methods, and in it he printed a triangle of numbers. Yang Hui honestly credited an earlier mathematician named Jia Xian, who lived about two hundred years before him. In this triangle the edges are ones, and every inside number is the sum of the two numbers just above it. In Europe the same triangle later became known as Pascal’s triangle, but Chinese scholars had written it down centuries earlier.',
+    'Yang Hui was a real mathematician who lived in China during the Southern Song dynasty, around 1238 to 1298. In 1261 CE he published a book, often called the Detailed Analysis of the Nine Chapters, explaining older counting methods, and in it he printed a triangle of numbers. Yang Hui honestly credited an earlier mathematician named Jia Xian, who lived in the eleventh century, about two hundred years before him. In this triangle the edges are ones, and every inside number is the sum of the two numbers just above it. Each row also lists the coefficients you get when a sum like (a plus b) is multiplied by itself again and again, and Chinese scholars used these rows as a tool for extracting square and cube roots. In Europe the same triangle later became known as Pascal’s triangle, after Blaise Pascal wrote about it in 1653, but Chinese scholars had written it down centuries earlier.',
   pages: [
     {
-      text: 'Long ago in China, in the time of the Southern Song, there lived a real mathematician named Yang Hui. He loved numbers and careful counting. One quiet evening, by the warm light of a lamp, he smoothed a fresh sheet of paper. At the very top he brushed a single number: one. Then he began to build a small triangle of numbers below it, one gentle row at a time.',
-      cue: 'Hold up one finger, like the single number at the top. Can you count to one with Yang Hui?',
+      text: 'Long ago in China, in the time of the Southern Song, there lived a real mathematician named Yang Hui. He loved numbers and careful counting more than almost anything. In those days there were no calculators and no printed math books for children. Wise people wrote sums by hand and taught them out loud. One quiet evening, by the warm light of a lamp, Yang Hui smoothed a fresh sheet of paper. He wanted to draw a pattern so simple that anyone could learn it.',
+      cue: 'Hold up one finger. Can you find one thing in your room, just one, like Yang Hui’s first number?',
       scene: {
         id: 'the-triangle-of-growing-numbers-p1-lamplit-desk',
-        focus: 'Yang Hui at a low desk brushing a single number one at the top of a paper triangle',
+        focus: 'Yang Hui at a low desk smoothing a fresh sheet of paper by warm lamplight',
         composition:
-          'Foreground: a low desk with a paper triangle and a single brushed number at its peak; midground: Yang Hui in a scholar’s robe leaning in with a brush; background: a calm Southern Song study with shelves of scrolls under warm lamplight',
+          'Foreground: a low desk with a blank sheet of paper, an inkstone, and a resting brush; midground: Yang Hui in a scholar’s robe leaning in with quiet excitement; background: a calm Southern Song study with shelves of scrolls under warm lamplight',
         palette: 'paper cream, ink black, lamp amber, and quiet evening blue',
       },
-      alt: 'A Chinese scholar brushes a single number at the top of a paper triangle by warm lamplight.',
+      alt: 'A Chinese scholar smooths a fresh sheet of paper at a low desk by warm lamplight, ready to begin.',
     },
     {
-      text: 'Under the top number, Yang Hui wrote two ones, side by side, holding the edges of the triangle. Then he looked at the little gap between them. "Two above help one below," he said softly. He added the two ones together, one and one, and wrote their answer in the middle: two. The edges stayed as ones, and the middle number grew from its two helpers above.',
-      cue: 'Touch one finger on each hand, then bring them together. How many do the two ones make below?',
+      text: 'At the very top of the page he brushed a single number: one. Just one, all alone, like a tiny seed at the peak of a hill. Under it he wrote two more ones, side by side, to hold the two edges. Every row he built would keep a one on each end, like two gateposts. "The edges are always ones," he told himself. Then he looked at the little gap waiting between the two ones below.',
+      cue: 'Draw a dot at the top, then two dots below it. Point to the gap in the middle where a new number will go.',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p2-first-row',
-        focus: 'two ones on the edges and a two written in the middle just below them',
+        id: 'the-triangle-of-growing-numbers-p2-seed-one',
+        focus: 'a single number one at the top with two ones beneath holding the edges',
         composition:
-          'Foreground: a paper row showing one, then two, then one, with a soft arc joining the two ones above; midground: Yang Hui’s hand resting near the fresh middle number; background: the calm study softening into dusk',
+          'Foreground: a paper showing one number at the peak and two ones below it, with a soft gap between them; midground: Yang Hui’s hand hovering over the empty middle; background: the calm study softening into dusk',
         palette: 'paper cream, ink black, lamp amber, and quiet evening blue',
       },
-      alt: 'A row of numbers reads one, two, one, with the middle two made by joining the two ones above.',
+      alt: 'A paper triangle begins with one number at the top and two ones below it, a gap waiting in the middle.',
     },
     {
-      text: 'On the next row, two numbers waited above a new gap: a one and a two. "Two above help one below." Yang Hui counted them together, one and two, and quietly wrote three in the pocket between them. The edges stayed as ones, so the row read one, three, three, one. The triangle grew a little wider, yet kept its steady, tidy shape.',
+      text: '"Two above help one below," Yang Hui said softly. He added the two ones together, one and one, and wrote their answer in the middle: two. That was the whole secret, small enough to fit in a whisper. Look up at the two numbers above a gap, add them, and write what they make below. The edges stayed as ones, and the middle number grew from its two helpers. A pattern had begun, one careful step at a time.',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p3-third-row',
-        focus: 'a one and a two above joining to make three in the row below',
+        id: 'the-triangle-of-growing-numbers-p3-first-sum',
+        focus: 'two ones on the edges joining to make a two written in the middle below them',
+        composition:
+          'Foreground: a paper row reading one, two, one, with a soft arc joining the two ones above; midground: Yang Hui’s hand resting near the fresh middle number; background: the calm study deepening into dusk',
+        palette: 'paper cream, ink black, lamp amber, and quiet evening blue',
+      },
+      alt: 'A row reads one, two, one, with the middle two made by joining the two ones just above it.',
+    },
+    {
+      text: 'On the next row, two numbers waited above a new gap: a one and a two. "Two above help one below." Yang Hui counted them together, one and two, and quietly wrote three in the pocket between them. Then he found the next gap, with a two and a one above, and wrote three again. The edges stayed as ones, so the whole row read one, three, three, one. The triangle grew wider, yet kept its steady, tidy shape.',
+      cue: 'Add one and two on your fingers. Do you get the same three that Yang Hui wrote?',
+      scene: {
+        id: 'the-triangle-of-growing-numbers-p4-third-row',
+        focus: 'a one and a two above joining to make three across a widening row',
         composition:
           'Foreground: a paper row reading one, three, three, one, with soft arcs showing which pairs above were added; midground: Yang Hui counting on his fingers; background: the study in a deeper dusk glow',
         palette: 'paper cream, ink black, lamp amber, and quiet evening blue',
       },
-      alt: 'A row of numbers reads one, three, three, one, each middle number made by adding the pair above it.',
+      alt: 'A row reads one, three, three, one, each middle number made by adding the pair above it.',
     },
     {
-      text: 'For a moment, Yang Hui paused. One middle number looked a little wrong, as if he had rushed it. He did not guess, and he did not scribble over the whole page. Instead he looked back at just the two numbers directly above the gap. He added them again, slowly and honestly, and mended the row with a calm, careful hand.',
+      text: 'For a moment, Yang Hui paused. One middle number looked a little wrong, as if he had rushed it. He did not guess, and he did not scribble over the whole page. Instead he looked back at just the two numbers directly above that one gap. He added them again, slowly and honestly, and mended the number with a calm hand. Checking his work was not a scary thing to him. It was simply part of counting well.',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p4-careful-check',
+        id: 'the-triangle-of-growing-numbers-p5-careful-check',
         focus: 'Yang Hui checking the two numbers just above one uncertain middle number',
         composition:
           'Foreground: a paper row with one number gently circled for checking and two helpers highlighted above it; midground: Yang Hui pointing to the pair above with a thoughtful look; background: the quiet study in gloaming light',
@@ -62,32 +74,78 @@ export const theTriangleOfGrowingNumbers: Story = {
       alt: 'A scholar checks the two numbers directly above one uncertain middle number to mend the row.',
     },
     {
-      text: 'The next gap had a one and a three waiting above it. "Two above help one below." Yang Hui joined them, one and three, and wrote four below. The pattern was clear now: every inside number was simply its two neighbors, added. He did not need a grand new rule. He only needed to look at the two numbers right above each pocket.',
-      cue: 'Which two numbers does Yang Hui look at before he writes the one below?',
+      text: 'The next row was wider still, and Yang Hui filled each gap the same way. One and three made four. Three and three made six. Three and one made four. The row read one, four, six, four, one, tidy as beads on a string. The rule never changed, no matter how big the triangle grew. He did not need a grand new trick for each row. He only needed to look at the two numbers right above each pocket.',
+      cue: 'Which two numbers did Yang Hui add to make the six? Look just above it and try.',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p5-add-neighbors',
-        focus: 'a one and a three above joining to make four in the row below',
+        id: 'the-triangle-of-growing-numbers-p6-add-neighbors',
+        focus: 'a three and a three above joining to make six in a wider row',
         composition:
-          'Foreground: a paper row with a four freshly brushed, arcs pointing up to the one and three that made it; midground: Yang Hui tracing the two helpers with a finger; background: the study in soft gloaming',
+          'Foreground: a paper row reading one, four, six, four, one, with arcs pointing up to each pair that made a number; midground: Yang Hui tracing two helpers with a finger; background: the study in soft gloaming',
         palette: 'paper cream, ink black, lamp amber, and quiet evening blue',
       },
-      alt: 'A one and a three above are joined to make four in the row below the growing triangle.',
+      alt: 'A row reads one, four, six, four, one, with the middle six made from the two threes above it.',
     },
     {
-      text: 'Yang Hui finished only the few rows his small page could hold. Then he did a kind thing. He wrote down the name of Jia Xian, an older mathematician who had counted this way long before him. Yang Hui shared the pattern in his book so others could learn it too. "Two above help one below," he wrote, for every child yet to come.',
+      text: 'Then Yang Hui saw something wonderful hidden in the rows. Suppose you had four friends and could invite only two to tea. How many different pairs could you pick? The answer was already sitting there: six, the middle of that very row. The triangle did not only grow numbers. It quietly counted choices, all the little ways things can be gathered. A simple pattern of adding had a surprise folded neatly inside it.',
+      cue: 'Imagine three toys and you may carry two. Can you name every different pair you could choose?',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p6-credit-teacher',
+        id: 'the-triangle-of-growing-numbers-p7-counting-choices',
+        focus: 'the number six in the triangle glowing beside four small friends choosing pairs for tea',
+        composition:
+          'Foreground: the row one, four, six, four, one with the six softly aglow; midground: four tiny friends at a low table forming pairs, with faint arcs linking them; background: the warm study with a steaming teapot',
+        palette: 'paper cream, ink black, warm tea amber, and quiet evening blue',
+      },
+      alt: 'The number six in the triangle glows beside four small friends pairing up for tea, showing hidden choices.',
+    },
+    {
+      text: 'The triangle held one more helpful gift. Long ago, before easy machines, people used these rows to find the side of a square or a cube. If you knew the space inside a square garden, the numbers guided you to the length of its edge. It was slow, patient work, done bead by bead on a counting board. Yang Hui gathered these old, clever methods so they would not be forgotten. A pattern of adding could help build and measure real things.',
+      scene: {
+        id: 'the-triangle-of-growing-numbers-p8-roots-and-squares',
+        focus: 'the number rows beside a small square garden as Yang Hui works a counting board',
+        composition:
+          'Foreground: rows of the triangle drawn near a neat square garden plot; midground: Yang Hui sliding beads on a wooden counting board; background: the study window opening to a moonlit courtyard garden',
+        palette: 'paper cream, ink black, garden green, and quiet moon silver',
+      },
+      alt: 'Rows of the number triangle sit beside a small square garden as a scholar counts with a bead board.',
+    },
+    {
+      text: 'Yang Hui finished only the few rows his small page could hold. Then he did a truly kind thing. He wrote down the name of Jia Xian, an older mathematician who had counted this way about two hundred years before. Yang Hui did not pretend the idea was all his own. "Two above help one below," he wrote, giving honest thanks to the one who came first. Then he set the pattern down in his book so others could learn it too.',
+      scene: {
+        id: 'the-triangle-of-growing-numbers-p9-credit-teacher',
         focus: 'a completed small triangle beside a written note honoring the earlier mathematician',
         composition:
           'Foreground: a finished number triangle with a small brushed note of thanks beside it; midground: Yang Hui setting his brush down with a peaceful smile; background: the study lit by a rising moon',
         palette: 'paper cream, ink black, lamp amber, and quiet moon silver',
       },
-      alt: 'A finished triangle of numbers rests beside a written note honoring the earlier mathematician.',
+      alt: 'A finished triangle of numbers rests beside a written note honoring the earlier mathematician Jia Xian.',
     },
     {
-      text: 'At last Yang Hui rinsed his brush and let the fresh ink dry. He rolled the paper triangle gently and set it on the shelf with his other scrolls. The lamp burned low and soft. "Two above help one below," he whispered, as the round moon rose over the quiet town. The numbers rested, the study grew still, and everything was calm. Goodnight.',
+      text: 'His book traveled far and lasted a very long time. Hundreds of years later, in a faraway land, a young thinker named Blaise Pascal studied the same triangle. In Europe people began to call it Pascal’s triangle, after him. But the rows had been brushed onto Chinese paper long, long before. Good ideas do not belong to only one person or one place. They pass from hand to hand, like a lantern shared down a dark hallway.',
       scene: {
-        id: 'the-triangle-of-growing-numbers-p7-moonlit-rest',
+        id: 'the-triangle-of-growing-numbers-p10-travels-far',
+        focus: 'the same triangle appearing on two pages, one Chinese and one European, joined by a soft path of light',
+        composition:
+          'Foreground: two open books showing the identical number triangle, one brushed in ink, one printed in a distant land; midground: a gentle ribbon of light linking them across the page; background: a wide starlit sky bridging two rooftops far apart',
+        palette: 'paper cream, ink black, starlit indigo, and warm lantern gold',
+      },
+      alt: 'The same number triangle appears in two books far apart, linked by a soft ribbon of light under a starlit sky.',
+    },
+    {
+      text: 'You can grow this triangle yourself, right now. Start with one at the top, then two ones below. In every new row, keep a one at each end. For each gap, look at the two numbers above and add them. "Two above help one below." Soon your own page fills with one, two, one, then one, three, three, one, then more. The same pattern Yang Hui brushed by lamplight can bloom under your hand.',
+      cue: 'Write one at the top and two ones below. Can you add your way to the next row together?',
+      scene: {
+        id: 'the-triangle-of-growing-numbers-p11-you-try-it',
+        focus: 'a child’s hand adding numbers to build a fresh triangle on paper',
+        composition:
+          'Foreground: a bright sheet with a growing number triangle and a child’s hand writing the newest number; midground: a grown-up pointing to the two helpers above; background: a cozy room with a small lamp echoing Yang Hui’s',
+        palette: 'paper cream, ink black, cheerful lamp amber, and soft evening blue',
+      },
+      alt: 'A child’s hand adds a number to a growing triangle while a grown-up points to the two helpers above it.',
+    },
+    {
+      text: 'At last Yang Hui rinsed his brush and let the fresh ink dry. He rolled the paper triangle gently and set it on the shelf with his other scrolls. The lamp burned low and soft. "Two above help one below," he whispered, as the round moon rose over the quiet town. Somewhere far ahead in time, a child would draw this very triangle and smile. The numbers rested, the study grew still, and the good idea slept, ready to grow again tomorrow.',
+      scene: {
+        id: 'the-triangle-of-growing-numbers-p12-moonlit-rest',
         focus: 'the rolled paper triangle resting on a shelf as the lamp dims under a round moon',
         composition:
           'Foreground: a rolled scroll of the number triangle settled on a shelf; midground: Yang Hui putting away his brush and lowering the lamp; background: a still Southern Song town under a round, calm moon',
