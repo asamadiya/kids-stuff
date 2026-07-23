@@ -7,9 +7,8 @@
     "GITHUB_CLIENT_SECRET": "",
     "APP_ORIGIN": "https://asamadiya.github.io",
     "APP_PATH": "/kids-stuff/",
-    "MODEL_BACKEND": "copilot",
-    "COPILOT_MODEL": "gpt-4o",
-    "COPILOT_INTEGRATION_ID": "vscode-chat"
+    "MODEL_BACKEND": "github",
+    "GITHUB_MODEL": "gpt-4o"
   },
   "Host": { "CORS": "", "CORSCredentials": false }
 }

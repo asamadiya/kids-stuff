@@ -17,15 +17,11 @@ Set `VITE_AI_PROXY_URL` to `https://<app>.azurewebsites.net/api`.
 
 ## Model backend
 
-- **`MODEL_BACKEND=copilot` (default):** the Function exchanges the signed-in
-  user's GitHub token for a **Copilot token** and calls the **GitHub Copilot
-  chat API**. Requires that account to have an active **Copilot subscription**.
-  Note: GitHub may restrict which OAuth apps can mint Copilot tokens and which
-  `Copilot-Integration-Id` values are accepted — this is an internal/editor API,
-  so if it rejects the custom app, switch to `github` (GitHub Models) as a
-  drop-in fallback.
-- **`github`:** GitHub Models (`gpt-4o`) with the user's token — supported, no
-  Copilot subscription needed.
+- **`MODEL_BACKEND=github` (default):** the Function calls **GitHub Models**
+  (`gpt-4o`) with the signed-in user's GitHub token. Supported API; no Copilot
+  subscription needed. This is the recommended path.
+- **`copilot`:** the GitHub Copilot chat API (needs a Copilot subscription; it's
+  an internal editor endpoint and may reject a custom OAuth app's token).
 - **`azure`:** Azure OpenAI with the Function's own key (use your *personal*
   Azure only — never LinkedIn infra).
 
@@ -35,7 +31,6 @@ Set `VITE_AI_PROXY_URL` to `https://<app>.azurewebsites.net/api`.
    - Homepage: `https://asamadiya.github.io/kids-stuff/`
    - Callback URL: `https://<your-func-app>.azurewebsites.net/api/callback`
    - Copy the **Client ID** and generate a **Client secret**.
-   - Sign in with a GitHub account that **has Copilot** (for `copilot` mode).
 
 2. **Create + deploy the Function app** (Node 20) on your **personal** Azure:
    ```bash

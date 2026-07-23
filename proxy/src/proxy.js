@@ -8,19 +8,19 @@
  * credentials), so the child signs in once and everything works via the cookie.
  *
  * Model backend (set MODEL_BACKEND):
- *   "copilot" (default) — the GitHub Copilot API, using the signed-in user's
- *                         GitHub token (exchanged for a Copilot token). Requires
- *                         a Copilot subscription on that account.
- *   "github"            — GitHub Models, using the user's GitHub token.
+ *   "github" (default)  — GitHub Models (gpt-4o) with the signed-in user's GitHub
+ *                         token. Supported API; no Copilot subscription needed.
+ *   "copilot"           — the GitHub Copilot API (needs a Copilot subscription;
+ *                         internal editor endpoint, may reject custom OAuth apps).
  *   "azure"             — Azure OpenAI, using this Function's own key.
  *
  * App settings (Function App -> Configuration):
  *   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET   — your GitHub OAuth App
  *   APP_ORIGIN   e.g. https://asamadiya.github.io
  *   APP_PATH     e.g. /kids-stuff/
- *   MODEL_BACKEND                             — default "copilot"
- *   # copilot: COPILOT_MODEL (default gpt-4o), COPILOT_INTEGRATION_ID (default vscode-chat)
- *   # github:  GITHUB_MODEL, GITHUB_MODELS_URL
+ *   MODEL_BACKEND                             — default "github"
+ *   # github:  GITHUB_MODEL (default gpt-4o), GITHUB_MODELS_URL
+ *   # copilot: COPILOT_MODEL, COPILOT_INTEGRATION_ID
  *   # azure:   AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT
  */
 
@@ -70,7 +70,7 @@ function messages(things) {
 }
 
 async function callModel(userToken, things) {
-  const backend = env('MODEL_BACKEND', 'copilot');
+  const backend = env('MODEL_BACKEND', 'github');
 
   // --- GitHub Copilot API (default) ---------------------------------------
   // Exchange the user's GitHub OAuth token for a short-lived Copilot token,
