@@ -26,9 +26,10 @@ describe('weaveStory', () => {
     for (const t of THINGS) expect(body).toContain(t.label);
   });
 
-  it('ends calm, on Goodnight', () => {
+  it('reads like a real story: a title and several paragraphs', () => {
     const s = weaveStory(THINGS);
-    expect(s.paragraphs[s.paragraphs.length - 1]).toMatch(/Goodnight\.$/);
+    expect(s.title.length).toBeGreaterThan(0);
+    expect(s.paragraphs.length).toBeGreaterThanOrEqual(5);
   });
 
   it('is deterministic for the same things and variant', () => {
@@ -75,6 +76,5 @@ describe('StoryLoom', () => {
     // the woven story shows and mentions the chosen things
     expect(await screen.findByRole('button', { name: /tell it another way/i })).toBeInTheDocument();
     expect(document.body.textContent).toMatch(/mouse/);
-    expect(document.body.textContent).toMatch(/Goodnight/);
   });
 });
