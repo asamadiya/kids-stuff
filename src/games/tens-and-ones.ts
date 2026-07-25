@@ -90,9 +90,9 @@ export function getTensOnesFeedback(round: TensOnesRound, selected: number): str
   const explain = `${tensWord} and ${onesWord} make ${answer}.`;
 
   if (selected === answer) {
-    return `Yes! ${explain}`;
+    return `Correct. ${explain}`;
   }
-  return `Nice thinking! ${explain} Each ten is worth 10, so ${round.tens}×10 is ${round.tens * 10}, plus ${round.ones} more.`;
+  return `Not quite. ${explain} Each ten is worth 10, so ${round.tens}×10 is ${round.tens * 10}, plus ${round.ones} more.`;
 }
 
 /** Short reusable prompt string. */

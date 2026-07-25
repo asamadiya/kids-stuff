@@ -96,7 +96,7 @@ export function getAddFeedback(round: TwoDigitAddRound, selected: number): strin
   const tensSum = Math.floor(round.a / 10) + Math.floor(round.b / 10);
   const why = `Ones ${round.a % 10}+${round.b % 10}=${onesSum}, tens ${Math.floor(round.a / 10)}+${Math.floor(round.b / 10)}=${tensSum}, so ${tensSum}${onesSum} = ${round.answer}.`;
   if (selected === round.answer) {
-    return `Yes! ${round.a} + ${round.b} = ${round.answer}. ${why}`;
+    return `Correct. ${round.a} + ${round.b} = ${round.answer}. ${why}`;
   }
-  return `Nice try! The answer is ${round.answer}. ${why}`;
+  return `Not quite. The answer is ${round.answer}. ${why}`;
 }

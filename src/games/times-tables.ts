@@ -100,7 +100,7 @@ export function getTimesOptions(index: number): number[] {
 export function getTimesFeedback(round: TimesRound, selected: number): string {
   const answer = timesProduct(round);
   if (selected === answer) {
-    return `Yes! ${round.a} × ${round.b} = ${answer}. That's ${round.b} group${round.b === 1 ? '' : 's'} of ${round.a}.`;
+    return `Correct. ${round.a} × ${round.b} = ${answer}. That's ${round.b} group${round.b === 1 ? '' : 's'} of ${round.a}.`;
   }
-  return `Nice try! ${round.a} × ${round.b} = ${answer} — count by ${round.a}s ${round.b} time${round.b === 1 ? '' : 's'}: you land on ${answer}.`;
+  return `Not quite. ${round.a} × ${round.b} = ${answer} — count by ${round.a}s ${round.b} time${round.b === 1 ? '' : 's'}: you land on ${answer}.`;
 }

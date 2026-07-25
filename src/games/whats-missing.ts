@@ -112,7 +112,7 @@ export function getMissingFeedback(round: MissingRound, selected: number): strin
       ? 'addition and subtraction are partners — you can subtract to find a missing part.'
       : 'you can add or subtract to uncover the missing piece.';
   if (selected === round.answer) {
-    return `Yes! ${round.answer} fits perfectly: ${full}. Nice number detective work.`;
+    return `Correct. ${round.answer} fits perfectly: ${full}. Nice number detective work.`;
   }
-  return `Great try! The missing number is ${round.answer}, so ${full}. Remember: ${why}`;
+  return `The missing number is ${round.answer}, so ${full}. Remember: ${why}`;
 }

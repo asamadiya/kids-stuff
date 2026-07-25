@@ -20,7 +20,7 @@ export const SHARING_TURNS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'excited', label: 'Excited', face: 'excited' },
     ],
     answerId: 'sad',
-    feedbackCorrect: 'Yes, waiting can feel sad and hard, and taking a slow breath helps the wait pass.',
+    feedbackCorrect: 'Correct. waiting can feel sad and hard, and taking a slow breath helps the wait pass.',
     feedbackOther: 'That could happen too. But waiting so long feels sad for Leo, and that is okay to feel.',
   },
   {
@@ -63,7 +63,7 @@ export const SHARING_TURNS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'proud', label: 'Proud', face: 'proud' },
     ],
     answerId: 'excited',
-    feedbackCorrect: 'Yes! Waiting for your turn feels so exciting when it is finally your go.',
+    feedbackCorrect: 'Correct. Waiting for your turn feels so exciting when it is finally your go.',
     feedbackOther: 'Good thinking. Leo is proud he waited, and mostly he feels excited that his turn is here.',
   },
 ];

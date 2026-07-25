@@ -64,7 +64,7 @@ export function getShapeOptions(index: number): readonly Shape[] {
 
 export function getShapeFeedback(round: ShapeRound, selected: Shape): string {
   if (selected === round.shape) {
-    return `Yes! That is a ${round.shape}. ${round.example}`;
+    return `Correct. That is a ${round.shape}. ${round.example}`;
   }
-  return `Nice looking! You picked ${shapeLabel(selected)}. This one is a ${round.shape}. ${round.example}`;
+  return `Not quite. You picked ${shapeLabel(selected)}. This one is a ${round.shape}. ${round.example}`;
 }

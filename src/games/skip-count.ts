@@ -76,7 +76,7 @@ export function getSkipCountFeedback(round: SkipCountRound, selected: number): s
   const correct = selected === round.answer;
   const last = round.shown[round.shown.length - 1];
   if (correct) {
-    return `Yes! ${last} + ${round.step} = ${round.answer}. You are counting by ${round.step}s like a pro!`;
+    return `Correct. ${last} + ${round.step} = ${round.answer}. You are counting by ${round.step}s like a pro!`;
   }
-  return `Nice try! When we skip count by ${round.step}s we add ${round.step} each jump, so ${last} + ${round.step} = ${round.answer} comes next.`;
+  return `Not quite. When we skip count by ${round.step}s we add ${round.step} each jump, so ${last} + ${round.step} = ${round.answer} comes next.`;
 }

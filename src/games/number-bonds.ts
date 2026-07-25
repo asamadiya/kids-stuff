@@ -94,7 +94,7 @@ export function getBondHint(round: BondRound): string {
 export function getBondFeedback(round: BondRound, selected: number): string {
   const answer = bondAnswer(round);
   if (selected === answer) {
-    return `Yes! ${round.part} and ${answer} snap together to make ${round.whole}. That is a number bond you can keep in your head!`;
+    return `Correct. ${round.part} and ${answer} snap together to make ${round.whole}. That is a number bond you can keep in your head!`;
   }
-  return `Nice thinking! The partner is ${answer}, because ${round.part} + ${answer} = ${round.whole} — the frame is full. Now you know this bond!`;
+  return `Not quite. The partner is ${answer}, because ${round.part} + ${answer} = ${round.whole} — the frame is full. Now you know this bond!`;
 }

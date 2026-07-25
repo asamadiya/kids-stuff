@@ -134,7 +134,7 @@ describe('getHalvesFeedback', () => {
   it('affirms the correct pick and always explains what one half means', () => {
     for (const round of HALVES_ROUNDS) {
       const fb = getHalvesFeedback(round, round.answerId);
-      expect(fb.toLowerCase()).toContain('yes');
+      expect(fb.toLowerCase()).toContain('correct');
       expect(fb).toContain('2 equal parts');
     }
   });

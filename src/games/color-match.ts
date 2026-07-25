@@ -80,7 +80,7 @@ export function getColorOptions(roundIndex: number): readonly Color[] {
 export function getColorFeedback(round: ColorRound, selected: Color): string {
   const name = colorLabel(round.color);
   if (selected === round.color) {
-    return `Yes! ${name} like ${round.example}.`;
+    return `Correct. ${name} like ${round.example}.`;
   }
   return `Nice pick, ${colorLabel(selected)} is a great color too! This one is ${name}, like ${round.example}.`;
 }

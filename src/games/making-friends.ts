@@ -20,7 +20,7 @@ export const MAKING_FRIENDS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'angry', label: 'Angry', face: 'angry' },
     ],
     answerId: 'shy',
-    feedbackCorrect: 'Yes, Leo feels shy. Feeling shy around someone new is okay, and it can get smaller when you take one small step.',
+    feedbackCorrect: 'Correct. Leo feels shy. Feeling shy around someone new is okay, and it can get smaller when you take one small step.',
     feedbackOther: 'What a kind guess! Leo is peeking from behind the slide because he feels shy about someone new, and that feeling is okay.',
   },
   {
@@ -49,7 +49,7 @@ export const MAKING_FRIENDS_SCENARIOS: readonly ComicScenario[] = [
     ],
     answerId: 'proud',
     feedbackCorrect: 'Leo feels proud! He was brave and said hi, and being brave feels wonderful.',
-    feedbackOther: 'Kind thinking! After his brave hello and that friendly smile, Leo feels proud that he tried.',
+    feedbackOther: 'Not quite. After his brave hello and that friendly smile, Leo feels proud that he tried.',
   },
   {
     id: 'join-in',

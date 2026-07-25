@@ -92,7 +92,7 @@ export function getNumberFeedback(round: NumberRound, selected: number): string 
   const correct = selected === round.answer;
   const pattern = kindLabel(round.kind);
   if (correct) {
-    return `Yes! ${round.answer} comes next. You are great at ${pattern}!`;
+    return `Correct. ${round.answer} comes next. You are great at ${pattern}!`;
   }
-  return `Nice counting! You picked ${selected}. When we are ${pattern}, the next number is ${round.answer}.`;
+  return `Not quite. You picked ${selected}. When we are ${pattern}, the next number is ${round.answer}.`;
 }

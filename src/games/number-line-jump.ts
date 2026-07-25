@@ -112,9 +112,9 @@ export function getJumpFeedback(round: JumpRound, selected: number): string {
   const answer = landOn(round);
   const verb = round.dir === 'forward' ? 'up' : 'down';
   if (selected === answer) {
-    return `Yes! Starting at ${round.start} and hopping ${round.jump} ${verb} lands you right on ${answer}. Super jumping!`;
+    return `Correct. Starting at ${round.start} and hopping ${round.jump} ${verb} lands you right on ${answer}. Super jumping!`;
   }
-  return `Nice try! Let's count together: from ${round.start}, hop ${round.jump} ${verb} and you land on ${answer}. Every hop moves you one spot — you're getting it!`;
+  return `Not quite. Let's count together: from ${round.start}, hop ${round.jump} ${verb} and you land on ${answer}. Every hop moves you one spot — you're getting it!`;
 }
 
 /** Label used on option buttons. */

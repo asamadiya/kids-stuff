@@ -192,7 +192,7 @@ export function getOddOptions(round: OddRound, index: number): readonly OddItem[
 export function getOddFeedback(round: OddRound, selected: OddItem): string {
   const oddLabel = itemLabel(round.odd);
   if (selected.emoji === round.odd.emoji) {
-    return `Yes! ${oddLabel} ${round.odd.emoji} is the odd one out — the others are all ${round.group}. ${oddLabel} belongs with ${round.oddGroup}!`;
+    return `Correct. ${oddLabel} ${round.odd.emoji} is the odd one out — the others are all ${round.group}. ${oddLabel} belongs with ${round.oddGroup}!`;
   }
-  return `Nice looking! ${itemLabel(selected)} ${selected.emoji} is a lovely ${round.group}. The odd one is ${oddLabel} ${round.odd.emoji}, which belongs with ${round.oddGroup}.`;
+  return `Not quite. ${itemLabel(selected)} ${selected.emoji} is a lovely ${round.group}. The odd one is ${oddLabel} ${round.odd.emoji}, which belongs with ${round.oddGroup}.`;
 }

@@ -86,7 +86,7 @@ export function getSubtractFeedback(round: SubtractRound, selected: number): str
   const ones = onesT - onesB;
   const tens = tensT - tensB;
   if (selected === answer) {
-    return `Yes! ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens, so ${top} − ${bottom} = ${answer}. Sharp work!`;
+    return `Correct. ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens, so ${top} − ${bottom} = ${answer}.`;
   }
-  return `Nice try! Take away each column: ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens. Put them together: ${top} − ${bottom} = ${answer}.`;
+  return `Not quite. Take away each column: ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens. Put them together: ${top} − ${bottom} = ${answer}.`;
 }

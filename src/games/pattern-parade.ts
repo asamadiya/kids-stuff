@@ -147,7 +147,7 @@ export function getPatternFeedback(round: PatternRound, selected: string): strin
   const repeatLen = TYPE_LENGTH[round.type];
   const start = round.sequence.slice(0, repeatLen).join(' ');
   if (selected === round.answer) {
-    return `Yes! It is a ${unit} pattern that goes ${start} again and again, so ${round.answer} comes next.`;
+    return `Correct. It is a ${unit} pattern that goes ${start} again and again, so ${round.answer} comes next.`;
   }
-  return `Nice looking! You spotted ${selected}. This is a ${unit} pattern — it keeps going ${start}, so ${round.answer} marches in next.`;
+  return `Not quite. You spotted ${selected}. This is a ${unit} pattern — it keeps going ${start}, so ${round.answer} marches in next.`;
 }

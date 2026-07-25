@@ -206,7 +206,7 @@ export function getFaceOptions(roundIndex: number): readonly Feeling[] {
 
 export function getFaceFeedback(round: FaceRound, selected: Feeling): string {
   if (selected === round.feeling) {
-    return `Yes! ${round.face} shows ${feelingLabel(round.feeling)}. ${SUPPORT[round.feeling]}`;
+    return `Correct. ${round.face} shows ${feelingLabel(round.feeling)}. ${SUPPORT[round.feeling]}`;
   }
   return `You saw ${feelingLabel(selected)}. That is a great guess! This face ${round.face} is showing ${feelingLabel(
     round.feeling,

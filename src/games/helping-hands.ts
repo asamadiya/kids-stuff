@@ -34,7 +34,7 @@ export const HELPING_HANDS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'scared', label: 'Scared', face: 'scared' },
     ],
     answerId: 'proud',
-    feedbackCorrect: 'Yes! Doing a helping job all by himself fills Leo up with proud, happy feelings.',
+    feedbackCorrect: 'Correct. Doing a helping job all by himself fills Leo up with proud, happy feelings.',
     feedbackOther: 'He is actually feeling proud. Helping his family gave Leo a warm, proud glow inside.',
   },
   {

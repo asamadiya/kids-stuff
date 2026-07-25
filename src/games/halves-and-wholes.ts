@@ -198,23 +198,23 @@ export function getHalvesFeedback(round: HalvesRound, selectedId: string): strin
   const picked = round.options.find((o) => o.id === selectedId);
   const base = 'One half means 2 equal parts, one shaded.';
   if (picked && isOneHalf(picked)) {
-    return `Yes! ${base} You found it.`;
+    return `Correct. ${base} You found it.`;
   }
   if (!picked || !answer) return base;
   if (!picked.equal) {
-    return `Nice try! Those parts are not the same size, so it is not a fair half. ${base}`;
+    return `Not quite. Those parts are not the same size, so it is not a fair half. ${base}`;
   }
   if (picked.parts === 3) {
     return `Good look! That one is split into 3 equal parts, so each piece is a third. ${base}`;
   }
   if (picked.parts === 4) {
-    return `Good thinking! That shape has 4 equal parts, so a shaded piece is a quarter. ${base}`;
+    return `Not quite. That shape has 4 equal parts, so a shaded piece is a quarter. ${base}`;
   }
   if (picked.parts === 1) {
     return `Cozy try! That whole shape is not cut yet, so nothing is a half. ${base}`;
   }
   if (picked.parts === 2 && picked.shaded !== 1) {
-    return `Great effort! A half needs just one of the two parts shaded. ${base}`;
+    return `Not quite. A half needs just one of the two parts shaded. ${base}`;
   }
-  return `Great effort! ${base} The glowing shape is the true half.`;
+  return `Not quite. ${base} The glowing shape is the true half.`;
 }

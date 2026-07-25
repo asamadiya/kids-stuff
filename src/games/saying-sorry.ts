@@ -21,7 +21,7 @@ export const SAYING_SORRY_SCENARIOS: readonly ComicScenario[] = [
       { id: 'proud', label: 'Proud', face: 'proud' },
     ],
     answerId: 'sad',
-    feedbackCorrect: 'Yes, his friend feels sad. When we knock something down, it can hurt a friend’s heart.',
+    feedbackCorrect: 'Correct. his friend feels sad. When we knock something down, it can hurt a friend’s heart.',
     feedbackOther: 'Such a caring guess! His friend really feels sad that the tower fell, and Leo can help by saying sorry.',
   },
   {
@@ -64,7 +64,7 @@ export const SAYING_SORRY_SCENARIOS: readonly ComicScenario[] = [
       { id: 'sad', label: 'Sad', face: 'sad' },
     ],
     answerId: 'happy',
-    feedbackCorrect: 'Yes, Leo feels happy! Making things right fills our hearts up with warm, good feelings.',
+    feedbackCorrect: 'Correct. Leo feels happy! Making things right fills our hearts up with warm, good feelings.',
     feedbackOther: 'Sweet guess! After saying sorry and helping, Leo feels happy and light because his friend forgave him.',
   },
 ];

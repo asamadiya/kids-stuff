@@ -138,7 +138,7 @@ export function getMoneyFeedback(index: number, selected: number): string {
   const answer = roundTotal(round);
   const breakdown = roundBreakdown(round);
   if (selected === answer) {
-    return `Yes! ${breakdown} adds up to ${answer}c. Sharp counting!`;
+    return `Correct. ${breakdown} adds up to ${answer}c.`;
   }
-  return `Nice try! Count them up: ${breakdown} makes ${answer}c. Dimes are 10, nickels 5, pennies 1 — add them all!`;
+  return `Not quite. Count them up: ${breakdown} makes ${answer}c. Dimes are 10, nickels 5, pennies 1 — add them all!`;
 }

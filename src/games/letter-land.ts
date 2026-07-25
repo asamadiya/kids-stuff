@@ -82,7 +82,7 @@ export function getLetterFeedback(round: LetterRound, selected: Letter): string 
   const L = round.letter;
   const teach = `${title} starts with ${L}. ${L} ${L.toLowerCase()} ${round.word}!`;
   if (selected === L) {
-    return `Yes! ${teach}`;
+    return `Correct. ${teach}`;
   }
   return `Nice try with ${selected}! Look here: ${teach}`;
 }

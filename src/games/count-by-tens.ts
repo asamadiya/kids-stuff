@@ -57,7 +57,7 @@ export function getCountByTensOptions(i: number): readonly number[] {
 export function getCountByTensFeedback(round: CountByTensRound, selected: number): string {
   const last = round.sequence[round.sequence.length - 1];
   if (selected === round.answer) {
-    return `Yes! ${last} + 10 = ${round.answer}. Every jump adds one more ten.`;
+    return `Correct. ${last} + 10 = ${round.answer}. Every jump adds one more ten.`;
   }
-  return `Nice try! We add 10 each time, so ${last} + 10 = ${round.answer}. The ones digit stays the same — only the tens grow.`;
+  return `Not quite. We add 10 each time, so ${last} + 10 = ${round.answer}. The ones digit stays the same — only the tens grow.`;
 }

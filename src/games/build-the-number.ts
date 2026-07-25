@@ -118,9 +118,9 @@ export function getBuildFeedback(round: BuildRound, selected: number): string {
   const words = partsInWords(round.parts);
   const sum = partsAsSum(round.parts);
   if (selected === round.answer) {
-    return `Yes! ${sum} builds ${built}. You stacked ${words} perfectly!`;
+    return `Correct. ${sum} builds ${built}. The digits sit in their places: ${words}.`;
   }
-  return `Nice try! ${words} is ${sum}, which builds ${built}. Every place adds its own digit.`;
+  return `Not quite. ${words} is ${sum}, which builds ${built}. Every place adds its own digit.`;
 }
 
 /**

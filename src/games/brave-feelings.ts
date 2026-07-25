@@ -21,7 +21,7 @@ export const BRAVE_FEELINGS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'excited', label: 'Excited', face: 'excited' },
     ],
     answerId: 'scared',
-    feedbackCorrect: 'Yes, the big slide looks scary from up high, and feeling scared is okay before you try.',
+    feedbackCorrect: 'Correct. the big slide looks scary from up high, and feeling scared is okay before you try.',
     feedbackOther: 'He might feel a little of that too, but way up high his tummy feels wobbly and scared first.',
   },
   {
@@ -65,7 +65,7 @@ export const BRAVE_FEELINGS_SCENARIOS: readonly ComicScenario[] = [
       { id: 'shy', label: 'Shy', face: 'shy' },
     ],
     answerId: 'proud',
-    feedbackCorrect: 'Yes! Leo felt scared, tried anyway, and now he feels proud and brave, that is what courage feels like.',
+    feedbackCorrect: 'Correct. Leo felt scared, tried anyway, and now he feels proud and brave, that is what courage feels like.',
     feedbackOther: 'He felt that before he tried, but after being so brave on the slide Leo feels proud of himself.',
   },
 ];

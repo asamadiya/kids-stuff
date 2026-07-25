@@ -21,7 +21,7 @@ export const WIN_OR_LOSE_SCENARIOS: readonly ComicScenario[] = [
       { id: 'excited', label: 'Excited', face: 'excited' },
     ],
     answerId: 'sad',
-    feedbackCorrect: 'Yes, Leo feels sad that he did not win, and it is okay to feel sad for a little while.',
+    feedbackCorrect: 'Correct. Leo feels sad that he did not win, and it is okay to feel sad for a little while.',
     feedbackOther: 'Losing can bring big feelings. Leo feels sad he did not win, and that feeling will get smaller soon.',
   },
   {

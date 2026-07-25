@@ -21,7 +21,7 @@ export const CALM_DOWN_SCENARIOS: readonly ComicScenario[] = [
       { id: 'proud', label: 'Proud', face: 'proud' },
     ],
     answerId: 'angry',
-    feedbackCorrect: 'Yes, his tower fell and he feels angry. Feeling angry is okay, and we can notice it.',
+    feedbackCorrect: 'Correct. his tower fell and he feels angry. Feeling angry is okay, and we can notice it.',
     feedbackOther: 'A crash can feel like lots of things! Leo feels angry that his tall tower fell, and noticing that is the first step to feeling better.',
   },
   {

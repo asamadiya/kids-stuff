@@ -53,7 +53,7 @@ export function getRhymeFeedback(round: RhymeRound, selected: string): string {
   const target = rhymeLabel(round.target);
   const rhyme = rhymeLabel(round.rhyme);
   if (selected === round.rhyme) {
-    return `Yes! ${target} and ${rhyme} rhyme — they end with the same sound.`;
+    return `Correct. ${target} and ${rhyme} rhyme — they end with the same sound.`;
   }
   return `${rhymeLabel(selected)} is a fun word! ${target} rhymes with ${rhyme} — they end with the same sound.`;
 }

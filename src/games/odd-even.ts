@@ -66,11 +66,11 @@ export const getOddEvenFeedback = (round: OddEvenRound, selected: Parity): strin
   if (round.answer === 'even') {
     const why = `Line up the ${round.n} ${round.noun} two-by-two and you get ${pairs} full ${pairWord} with nobody left over — that’s EVEN.`;
     return correct
-      ? `Yes! ${round.n} is even. ${why}`
-      : `Nice try! ${round.n} is actually even. ${why}`;
+      ? `Correct. ${round.n} is even. ${why}`
+      : `Not quite. ${round.n} is actually even. ${why}`;
   }
   const why = `Pair up the ${round.n} ${round.noun} two-by-two and you make ${pairs} ${pairWord} with exactly 1 left over — one leftover means ODD.`;
   return correct
-    ? `Yes! ${round.n} is odd. ${why}`
-    : `Good thinking! ${round.n} is actually odd. ${why}`;
+    ? `Correct. ${round.n} is odd. ${why}`
+    : `Not quite. ${round.n} is actually odd. ${why}`;
 };

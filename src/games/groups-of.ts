@@ -90,9 +90,9 @@ export function getGroupsFeedback(round: GroupsRound, selected: number): string 
   const answer = productOf(round);
   const eq = `${round.groups} × ${round.per} = ${answer}`;
   if (selected === answer) {
-    return `Yes! ${round.groups} equal groups of ${round.per} makes ${answer}. That is exactly what ${eq} means.`;
+    return `Correct. ${round.groups} equal groups of ${round.per} makes ${answer}. That is exactly what ${eq} means.`;
   }
-  return `Nice thinking! Count the equal groups: ${round.groups} groups, ${round.per} in each. Add them up and you get ${answer}, because ${eq}.`;
+  return `Not quite. Count the equal groups: ${round.groups} groups, ${round.per} in each. Add them up and you get ${answer}, because ${eq}.`;
 }
 
 /** Short hint shown before answering. */

@@ -80,9 +80,9 @@ export function getShareFeedback(round: ShareRound, selected: number): string {
   const answer = shareAnswer(round);
   const each = `${answer} ${round.itemName} on each ${round.plateName}`;
   if (selected === answer) {
-    return `Yes! ${round.total} shared into ${round.plates} equal groups is ${answer} each — every ${round.plateName} gets the same. That's dividing!`;
+    return `Correct. ${round.total} shared into ${round.plates} equal groups is ${answer} each — every ${round.plateName} gets the same. That's dividing!`;
   }
-  return `Nice try! When you share ${round.total} ${round.itemName} fairly across ${round.plates} ${round.plateName}s, it's ${each}. ${round.plates} groups of ${answer} makes ${round.plates} × ${answer} = ${round.total}.`;
+  return `Not quite. When you share ${round.total} ${round.itemName} fairly across ${round.plates} ${round.plateName}s, it's ${each}. ${round.plates} groups of ${answer} makes ${round.plates} × ${answer} = ${round.total}.`;
 }
 
 /** Short hint shown before answering. */

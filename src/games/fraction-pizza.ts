@@ -97,7 +97,7 @@ export function getFractionFeedback(round: PizzaRound, selected: FractionValue):
         ? 'the pizza is cut into 3 equal slices, so one slice is one third'
         : 'the pizza is cut into 4 equal slices, so one slice is one quarter';
   if (correct) {
-    return `Yum! That is ${info.word} (${round.answer}) — ${why}. Great slicing!`;
+    return `Yum! That is ${info.word} (${round.answer}) — ${why}. `;
   }
   const selInfo = fractionInfo(selected);
   return `Nice try picking ${selInfo.word}! The tasty answer is ${info.word} (${round.answer}) — ${why}.`;

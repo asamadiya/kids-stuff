@@ -45,7 +45,7 @@ export function getOppositeOptions(index: number): readonly string[] {
 export function getOppositeFeedback(round: OppositeRound, selected: string): string {
   const wordLower = round.word.toLowerCase();
   if (selected === round.opposite) {
-    return `Yes! The opposite of ${wordLower} is ${round.opposite}. What a perfect pair!`;
+    return `Correct. The opposite of ${wordLower} is ${round.opposite}. What a perfect pair!`;
   }
-  return `Nice thinking! ${oppositeLabel(selected)} is a fun word. The opposite of ${wordLower} is ${round.opposite} — ${wordLower} and ${round.opposite} go together!`;
+  return `Not quite. ${oppositeLabel(selected)} is a fun word. The opposite of ${wordLower} is ${round.opposite} — ${wordLower} and ${round.opposite} go together!`;
 }

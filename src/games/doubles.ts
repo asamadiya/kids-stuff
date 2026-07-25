@@ -84,7 +84,7 @@ export function getDoublePrompt(round: DoubleRound): string {
 export function getDoubleFeedback(round: DoubleRound, selected: number): string {
   const { n, answer } = round;
   if (selected === answer) {
-    return `Yes! ${n} and ${n} together make ${answer}. Doubling means two equal groups.`;
+    return `Correct. ${n} and ${n} together make ${answer}. Doubling means two equal groups.`;
   }
-  return `Nice try! Double means ${n} + ${n}, and that lands on ${answer}. Two equal groups of ${n} join up to make ${answer}.`;
+  return `Not quite. Double means ${n} + ${n}, and that lands on ${answer}. Two equal groups of ${n} join up to make ${answer}.`;
 }

@@ -81,9 +81,9 @@ export function getAddFeedback(round: AddRound, selected: number): string {
   const answer = sumOf(round);
   const { left, right, name } = round;
   if (selected === answer) {
-    return `Yes! ${left} ${name} and ${right} more make ${answer} altogether.`;
+    return `Correct. ${left} ${name} and ${right} more make ${answer} altogether.`;
   }
-  return `Nice try! Count them all: ${left} plus ${right} is ${answer} ${name} in total.`;
+  return `Not quite. Count them all: ${left} plus ${right} is ${answer} ${name} in total.`;
 }
 
 /** Hint shown before answering. */

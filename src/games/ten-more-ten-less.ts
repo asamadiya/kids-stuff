@@ -98,7 +98,7 @@ export function getTenFeedback(round: TenRound, selected: number): string {
   const answer = tenAnswer(round);
   const move = round.direction === 'more' ? 'up' : 'down';
   if (selected === answer) {
-    return `Yes! ${round.start} jumps ${move} by ten to ${answer}. The tens digit moved and the ones digit stayed put.`;
+    return `Correct. ${round.start} jumps ${move} by ten to ${answer}. The tens digit moved and the ones digit stayed put.`;
   }
-  return `Nice try! 10 ${round.direction} than ${round.start} is ${answer}. Just move the tens digit ${move} by one and keep the ones digit — that's ${answer}.`;
+  return `Not quite. 10 ${round.direction} than ${round.start} is ${answer}. Just move the tens digit ${move} by one and keep the ones digit — that's ${answer}.`;
 }

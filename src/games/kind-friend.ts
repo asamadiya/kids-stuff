@@ -21,7 +21,7 @@ export const KIND_FRIEND_SCENARIOS: readonly ComicScenario[] = [
       { id: 'excited', label: 'Excited', face: 'excited' },
     ],
     answerId: 'sad',
-    feedbackCorrect: 'Yes, he feels sad that his tower fell. A kind friend notices sad feelings and helps.',
+    feedbackCorrect: 'Correct. he feels sad that his tower fell. A kind friend notices sad feelings and helps.',
     feedbackOther: 'His tower crashed down, so he feels sad. When we see a friend is sad, we can help them feel better.',
   },
   {

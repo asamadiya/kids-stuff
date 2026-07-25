@@ -41,6 +41,6 @@ export function comicFeedback(scn: ComicScenario, chosenId: string): string {
   const answer = scn.options.find((o) => o.id === scn.answerId);
   return (
     scn.feedbackOther ??
-    `Good thinking! ${answer ? answer.label + '.' : ''} That fits this story well.`
+    `Not quite. ${answer ? answer.label + '.' : ''} That fits this story well.`
   );
 }

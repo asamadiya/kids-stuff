@@ -81,7 +81,7 @@ export function getCompareFeedback(round: CompareRound, selected: CompareChoice)
     const t = tensCount(round.a);
     const o = onesCount(round.a);
     const same = `Both have ${t} ten${t === 1 ? '' : 's'} and ${o} one${o === 1 ? '' : 's'}, so ${round.a} = ${round.b} — they are equal!`;
-    return correct ? `Yes! ${same}` : `Good thinking! ${same}`;
+    return correct ? `Correct. ${same}` : `Not quite. ${same}`;
   }
 
   const big = answer;
@@ -94,5 +94,5 @@ export function getCompareFeedback(round: CompareRound, selected: CompareChoice)
       ? `Both have ${bigT} ten${bigT === 1 ? '' : 's'}, so we check the ones: ${onesCount(big)} beats ${onesCount(small)}. That makes ${big} bigger than ${small}.`
       : `${big} has ${bigT} ten${bigT === 1 ? '' : 's'} and ${small} has only ${smallT} ten${smallT === 1 ? '' : 's'}, so ${big} is bigger.`;
 
-  return correct ? `That's it! ${why}` : `Nice try! ${big} is the bigger one. ${why}`;
+  return correct ? `That's it! ${why}` : `Not quite. ${big} is the bigger one. ${why}`;
 }

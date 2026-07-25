@@ -83,9 +83,9 @@ export function getTakeAwayFeedback(round: TakeAwayRound, selected: number): str
   const answer = difference(round);
   const { total, takeAway, noun } = round;
   if (selected === answer) {
-    return `Yes! ${total} take away ${takeAway} leaves ${answer} ${noun}. You counted the ones still there!`;
+    return `Correct. ${total} take away ${takeAway} leaves ${answer} ${noun}. You counted the ones still there!`;
   }
-  return `Nice try! Start with ${total} ${noun}, cross out ${takeAway}, and count what stays — that leaves ${answer}. ${total} − ${takeAway} = ${answer}.`;
+  return `Not quite. Start with ${total} ${noun}, cross out ${takeAway}, and count what stays — that leaves ${answer}. ${total} − ${takeAway} = ${answer}.`;
 }
 
 /** Short label helper (kept simple; always non-empty). */

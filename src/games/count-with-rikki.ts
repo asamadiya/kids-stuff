@@ -56,7 +56,7 @@ export function getCountOptions(index: number): readonly number[] {
 
 export function getCountFeedback(round: CountRound, selected: number): string {
   if (selected === round.count) {
-    return `Yes! There are ${round.count} ${round.name}. Great counting!`;
+    return `Correct. There are ${round.count} ${round.name}.`;
   }
   return `Nice try picking ${selected}! Let's count together — there are ${round.count} ${round.name}.`;
 }

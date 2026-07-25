@@ -21,7 +21,7 @@ export const TELLING_TRUTH_SCENARIOS: readonly ComicScenario[] = [
       { id: 'proud', label: 'Proud', face: 'proud' },
     ],
     answerId: 'scared',
-    feedbackCorrect: 'Yes, Leo feels scared about what will happen. Scary feelings are okay, and the truth can still come out.',
+    feedbackCorrect: 'Correct. Leo feels scared about what will happen. Scary feelings are okay, and the truth can still come out.',
     feedbackOther: 'That is a kind guess. Right when something breaks, Leo mostly feels scared about what will happen next.',
   },
   {
@@ -50,7 +50,7 @@ export const TELLING_TRUTH_SCENARIOS: readonly ComicScenario[] = [
       { id: 'shy', label: 'Shy', face: 'shy' },
     ],
     answerId: 'calm',
-    feedbackCorrect: 'Yes! After the truth is out, Leo feels calm and light. Honesty gives our hearts a big relief.',
+    feedbackCorrect: 'Correct. After the truth is out, Leo feels calm and light. Honesty gives our hearts a big relief.',
     feedbackOther: 'A gentle guess. Once the truth is told and Mom hugs him, Leo mostly feels calm and relieved.',
   },
   {

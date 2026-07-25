@@ -21,7 +21,7 @@ export const EVERYONE_INCLUDED_SCENARIOS: readonly ComicScenario[] = [
       { id: 'proud', label: 'Proud', face: 'proud' },
     ],
     answerId: 'sad',
-    feedbackCorrect: 'Yes, he feels sad and lonely watching from the bench. Noticing that feeling is the first step to including him.',
+    feedbackCorrect: 'Correct. he feels sad and lonely watching from the bench. Noticing that feeling is the first step to including him.',
     feedbackOther: 'It can be hard to tell from far away. Sitting alone while others play often feels sad and lonely, and now Leo can help.',
   },
   {

@@ -54,7 +54,7 @@ export const CARDS_PER_ROUND = PAIRS_PER_ROUND * 2;
 export function matchFeedback(matched: boolean): string {
   return matched
     ? 'Yay, a match! You remembered where it was.'
-    : 'Nice try! Take a peek and remember these two for later.';
+    : 'Not quite. Take a peek and remember these two for later.';
 }
 
 /** Message shown once every pair is found. */

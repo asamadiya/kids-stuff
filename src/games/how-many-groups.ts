@@ -80,9 +80,9 @@ export function getGroupFeedback(round: GroupRound, selected: number): string {
   const answer = groupAnswer(round);
   const plural = answer === 1 ? round.groupWord : round.groupWordPlural;
   if (selected === answer) {
-    return `Yes! ${round.total} shared ${round.per} at a time makes ${answer} ${plural}. ➗`;
+    return `Correct. ${round.total} shared ${round.per} at a time makes ${answer} ${plural}. ➗`;
   }
-  return `Good thinking! Count by ${round.per}s: it takes ${answer} ${plural} to hold all ${round.total}. That's why the answer is ${answer}.`;
+  return `Not quite. Count by ${round.per}s: it takes ${answer} ${plural} to hold all ${round.total}. That's why the answer is ${answer}.`;
 }
 
 /** Label shown on an option button. */

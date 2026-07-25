@@ -54,7 +54,7 @@ export function getCompareFeedback(round: CompareRound, selected: Side): string 
   const lessCount = sideCount(round, answer === 'left' ? 'right' : 'left');
   const moreName = sideLabel(answer);
   if (selected === answer) {
-    return `Yes! ${moreName} has ${moreCount}, and ${moreCount} is more than ${lessCount}. Nice counting!`;
+    return `Correct. ${moreName} has ${moreCount}, and ${moreCount} is more than ${lessCount}.`;
   }
-  return `Good looking! You picked a side with ${sideCount(round, selected)}. ${moreName} has more — ${moreCount} is more than ${lessCount}.`;
+  return `Not quite. You picked a side with ${sideCount(round, selected)}. ${moreName} has more — ${moreCount} is more than ${lessCount}.`;
 }
