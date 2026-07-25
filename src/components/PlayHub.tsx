@@ -150,26 +150,26 @@ const GAMES: readonly GameEntry[] = [
   { meta: WIN_OR_LOSE_META, Component: WinOrLoseGame, cat: 'feelings' },
 ];
 const CATEGORIES: readonly { key: string; title: string; blurb: string }[] = [
-  { key: 'feelings', title: "Feelings & Friends", blurb: "Notice feelings, be a kind friend, and grow your heart." },
-  { key: 'math', title: "Numbers & Math", blurb: "Tens, adding, take-away, times, sharing, and fractions." },
-  { key: 'early', title: "First Learning", blurb: "Letters, shapes, colors, patterns, and memory." },
+  { key: 'feelings', title: "Emotions & Other People", blurb: "Name what you feel with precision, and read what other people feel." },
+  { key: 'math', title: "Number & Quantity", blurb: "Place value, addition and subtraction, multiplication, division, fractions, money and the number line." },
+  { key: 'early', title: "Letters, Shapes & Patterns", blurb: "Sounds and letters, plane shapes, colour, sequence and recall." },
 ];
 
 export function PlayHub({ onExit }: PlayHubProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = GAMES.find((g) => g.meta.id === activeId) ?? null;
   return (
-    <main id="main-content" className="play-hub" aria-label="Rikki's Play Zone" tabIndex={-1}>
+    <main id="main-content" className="play-hub" aria-label="Practice" tabIndex={-1}>
       <header className="play-hub__hero">
         <div className="play-hub__copy">
           <button type="button" className="play-hub__back" onClick={onExit}>
-            <span aria-hidden="true">&larr;</span> Back to the learning center
+            <span aria-hidden="true">&larr;</span> Contents
           </button>
-          <p className="play-hub__eyebrow">Learn by doing</p>
-          <h1 className="play-hub__title">Rikki's Play Zone</h1>
+          <p className="play-hub__eyebrow">Exercises</p>
+          <h1 className="play-hub__title">Practice</h1>
           <p className="play-hub__lede">
-            {GAMES.length} playful games for feelings, friends, and real math. Nobody
-            ever loses &mdash; every try counts.
+            {GAMES.length} exercises. Work at whichever you like, for as long as it
+            holds your attention; the tally counts what you get right.
           </p>
         </div>
         <RikkiMascot className="play-hub__rikki" />
@@ -178,7 +178,7 @@ export function PlayHub({ onExit }: PlayHubProps) {
       {active ? (
         <section aria-label={active.meta.title}>
           <button type="button" className="mini-game__back" onClick={() => setActiveId(null)}>
-            <span aria-hidden="true">&larr;</span> All games
+            <span aria-hidden="true">&larr;</span> All exercises
           </button>
           <active.Component />
         </section>

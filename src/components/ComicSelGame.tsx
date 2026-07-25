@@ -22,7 +22,7 @@ export function ComicSelGame({ meta, scenarios, eyebrow = 'Friends & feelings' }
   const choose = (id: string) => {
     if (answered) return;
     setChosen(id);
-    setScore((s) => s + 1);
+    if (id === scn.answerId) setScore((s) => s + 1);
   };
   const next = () => {
     setIndex((i) => (i + 1) % scenarios.length);
@@ -36,9 +36,9 @@ export function ComicSelGame({ meta, scenarios, eyebrow = 'Friends & feelings' }
           <p className="mini-game__eyebrow">{eyebrow}</p>
           <h3 id={`${meta.id}-title`} className="mini-game__title">{meta.title}</h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} done`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">done</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

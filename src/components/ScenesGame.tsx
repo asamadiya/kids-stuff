@@ -20,7 +20,7 @@ export function ScenesGame() {
   const choose = (feeling: string) => {
     if (answered) return;
     setSelected(feeling);
-    setScore((s) => s + 1);
+    if (feeling === round.feeling) setScore((s) => s + 1);
   };
   const next = () => {
     setIndex((i) => (i + 1) % SCENE_ROUNDS.length);
@@ -34,9 +34,9 @@ export function ScenesGame() {
           <p className="mini-game__eyebrow">Friends &amp; feelings</p>
           <h3 id="scenes-title" className="mini-game__title">Feeling Scenes</h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} named`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">named</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

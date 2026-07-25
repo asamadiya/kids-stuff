@@ -78,7 +78,7 @@ export function TensAndOnesGame(): JSX.Element {
   function choose(o: number): void {
     if (answered) return;
     setChosen(o);
-    setScore((s) => s + 1);
+    if (o === answer) setScore((s) => s + 1);
   }
 
   function next(): void {
@@ -95,9 +95,9 @@ export function TensAndOnesGame(): JSX.Element {
             {TENS_AND_ONES_META.title}
           </h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} solved`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">solved</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

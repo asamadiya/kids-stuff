@@ -157,9 +157,9 @@ export function NameTheFeelingGame() {
             {NAMETHEFEELING_META.title}
           </h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} found`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">found</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

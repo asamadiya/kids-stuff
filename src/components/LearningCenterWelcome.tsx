@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { CATEGORY_LABEL, CATEGORY_ORDER, SUBJECT_DETAILS } from '../data/meta';
+import { COLLECTION, era } from '../data/collection';
 import type { StoryDomain } from '../types';
 import { RikkiMascot } from './RikkiMascot';
 
-const FACTS = [
+const NOTES = [
   'The word mathematics comes from an ancient Greek word meaning learning or knowledge.',
   'Honeybees use a waggle dance to show their hive-mates where flowers are growing.',
   'A shadow changes size when an object moves closer to or farther from a light.',
@@ -32,41 +33,48 @@ export function LearningCenterWelcome({
     <>
       <header className="learning-hero">
         <div className="learning-hero__copy">
-          <p className="learning-hero__eyebrow">Read, wonder, make, and play</p>
-          <h1 className="learning-hero__title">Rikki's Learn &amp; Play Center</h1>
+          <p className="learning-hero__eyebrow">An illustrated field guide</p>
+          <h1 className="learning-hero__title">Rikki&rsquo;s Field Guide</h1>
           <p className="learning-hero__lede">
-            Hi, I&rsquo;m Rikki! We can meet real people from history, travel across
-            time and around the world, discover big ideas, and make a brand-new
-            story together.
+            {COLLECTION.accounts} illustrated accounts of real people working
+            something out &mdash; from {era(COLLECTION.earliestYear)} to{' '}
+            {era(COLLECTION.latestYear)}, across {COLLECTION.places} places. Plus
+            exercises in number, letter and feeling, and a workshop for composing
+            your own.
           </p>
+          <dl className="learning-hero__stats">
+            <div><dt>Accounts</dt><dd>{COLLECTION.accounts}</dd></div>
+            <div><dt>Places</dt><dd>{COLLECTION.places}</dd></div>
+            <div><dt>Subjects</dt><dd>{COLLECTION.subjects}</dd></div>
+            <div><dt>Deep time</dt><dd>{COLLECTION.deepTime}</dd></div>
+          </dl>
           <button type="button" className="learning-hero__start" onClick={onOpenLibrary}>
-            Start exploring
-            <span aria-hidden="true"> &darr;</span>
+            Open the library
+            <span aria-hidden="true"> &rarr;</span>
           </button>
         </div>
         <div className="learning-hero__mascot">
-          <span className="learning-hero__bubble">What will we discover today?</span>
           <RikkiMascot />
         </div>
       </header>
 
-      <section className="learning-zones" aria-label="Choose a learning zone">
+      <section className="learning-zones" aria-label="Sections">
         <button
           type="button"
           className="learn-zone learn-zone--library"
           onClick={onOpenLibrary}
         >
           <span className="learn-zone__icon" aria-hidden="true">
-            &#128218;
+            I
           </span>
           <span className="learn-zone__copy">
-            <span className="learn-zone__kicker">Read &amp; discover</span>
+            <span className="learn-zone__kicker">Read</span>
             <span className="learn-zone__title" role="heading" aria-level={2}>
-              The Library
+              Library
             </span>
             <span className="learn-zone__text">
-              Explore {historicalCount}+ illustrated true stories by shelf, time,
-              place, map, or subject.
+              {historicalCount} accounts, arranged by shelf, timeline, map,
+              subject or place.
             </span>
           </span>
           <span className="learn-zone__arrow" aria-hidden="true">
@@ -79,19 +87,19 @@ export function LearningCenterWelcome({
             type="button"
             className="learn-zone learn-zone--play"
             onClick={onPlay}
-            aria-label="Play games with Rikki"
+            aria-label="Open practice"
           >
             <span className="learn-zone__icon" aria-hidden="true">
-              &#9733;
+              II
             </span>
             <span className="learn-zone__copy">
-              <span className="learn-zone__kicker">Play &amp; practice</span>
+              <span className="learn-zone__kicker">Work</span>
               <span className="learn-zone__title" role="heading" aria-level={2}>
-                Play Games
+                Practice
               </span>
               <span className="learn-zone__text">
-                Name feelings, build patterns, count, and learn by trying things
-                yourself.
+                46 exercises: place value, multiplication, fractions, letters
+                and patterns, and the vocabulary of feeling.
               </span>
             </span>
             <span className="learn-zone__arrow" aria-hidden="true">
@@ -105,19 +113,19 @@ export function LearningCenterWelcome({
             type="button"
             className="learn-zone learn-zone--make"
             onClick={onMakeStory}
-            aria-label="Make a story with Rikki"
+            aria-label="Open the workshop"
           >
             <span className="learn-zone__icon" aria-hidden="true">
-              &#10024;
+              III
             </span>
             <span className="learn-zone__copy">
-              <span className="learn-zone__kicker">Imagine &amp; create</span>
+              <span className="learn-zone__kicker">Compose</span>
               <span className="learn-zone__title" role="heading" aria-level={2}>
-                Make a Story
+                Workshop
               </span>
               <span className="learn-zone__text">
-                Pick a few favorite things and the Story Loom will weave them into
-                your own tale.
+                Name three or more things. The Loom composes an adventure that
+                uses every one of them.
               </span>
             </span>
             <span className="learn-zone__arrow" aria-hidden="true">
@@ -129,36 +137,35 @@ export function LearningCenterWelcome({
 
       <aside className="fact-card" aria-labelledby="fact-title">
         <div className="fact-card__badge" aria-hidden="true">
-          ?
+          &sect;
         </div>
         <div className="fact-card__copy">
           <p id="fact-title" className="fact-card__title">
-            Rikki&rsquo;s did-you-know corner
+            From the notebook
           </p>
           <p className="fact-card__fact" aria-live="polite">
-            {FACTS[factIndex]}
+            {NOTES[factIndex]}
           </p>
         </div>
         <button
           type="button"
           className="fact-card__next"
-          onClick={() => setFactIndex((current) => (current + 1) % FACTS.length)}
+          onClick={() => setFactIndex((current) => (current + 1) % NOTES.length)}
         >
-          Show another fact
+          Next note
         </button>
       </aside>
 
       <section className="subject-zone" aria-labelledby="subject-zone-title">
         <div className="subject-zone__head">
           <div>
-            <p className="subject-zone__eyebrow">Follow your curiosity</p>
+            <p className="subject-zone__eyebrow">Index</p>
             <h2 id="subject-zone-title" className="subject-zone__title">
-              Explore by Subject
+              By subject
             </h2>
           </div>
           <p className="subject-zone__lede">
-            Choose something you wonder about. Rikki will gather stories that help
-            you investigate it.
+            Choose a subject to see every account that touches it.
           </p>
         </div>
         <div className="subject-grid">
@@ -170,7 +177,7 @@ export function LearningCenterWelcome({
                 type="button"
                 className="subject-card"
                 onClick={() => onExploreSubject(domain)}
-                aria-label={`Explore ${CATEGORY_LABEL[domain]} stories`}
+                aria-label={`${CATEGORY_LABEL[domain]} — see accounts`}
                 style={({ ['--subject-accent' as string]: detail.color })}
               >
                 <span className="subject-card__icon" aria-hidden="true">

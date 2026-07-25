@@ -2,16 +2,20 @@ export interface RikkiMascotProps {
   readonly className?: string;
 }
 
-/** Rikki is a friendly red-panda learning guide drawn entirely with inline SVG. */
+/**
+ * Rikki, a red panda (Ailurus fulgens), drawn as a plate in inline SVG.
+ * A colophon mark: it identifies whose field guide this is. It does not
+ * speak, greet, congratulate, or narrate.
+ */
 export function RikkiMascot({ className = '' }: RikkiMascotProps) {
   return (
     <svg
       className={`rikki${className ? ` ${className}` : ''}`}
       viewBox="0 0 220 220"
       role="img"
-      aria-label="Rikki, your learning buddy"
+      aria-label="Colophon: a red panda"
     >
-      <title>Rikki, your learning buddy</title>
+      <title>Colophon: a red panda</title>
       <path
         className="rikki__tail"
         d="M163 140c42 4 47 49 15 61-19 7-38-3-45-18 23 7 42-2 39-17-2-10-11-14-22-14z"

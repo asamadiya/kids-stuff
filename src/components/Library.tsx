@@ -138,7 +138,7 @@ export function Library({
     <main
       id="main-content"
       className="library"
-      aria-label="Rikki's Learn & Play Center"
+      aria-label="Rikki's Field Guide"
       tabIndex={-1}
     >
       <LearningCenterWelcome

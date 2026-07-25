@@ -31,7 +31,7 @@ export function BigFeelingsGame() {
   const choose = (key: string) => {
     if (answered) return;
     setChosen(key);
-    setScore((s) => s + 1);
+    if (key === answer) setScore((s) => s + 1);
   };
   const next = () => {
     setIndex((i) => (i + 1) % roundCount);
@@ -57,9 +57,9 @@ export function BigFeelingsGame() {
           <p className="mini-game__eyebrow">Feelings words</p>
           <h3 id="big-feelings-title" className="mini-game__title">Big Feelings</h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} named`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">named</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

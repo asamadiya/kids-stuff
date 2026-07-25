@@ -24,7 +24,7 @@ export function TimesTablesGame() {
   function choose(value: number) {
     if (answered) return;
     setChosen(value);
-    setScore((s) => s + 1);
+    if (value === answer) setScore((s) => s + 1);
   }
 
   function next() {
@@ -61,9 +61,9 @@ export function TimesTablesGame() {
             {TIMES_TABLES_META.title}
           </h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} solved`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">solved</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

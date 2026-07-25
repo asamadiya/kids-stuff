@@ -29,45 +29,45 @@ const tiles = () =>
 afterEach(cleanup);
 
 describe('Library home', () => {
-  it("welcomes children to Rikki's learning center", () => {
+  it("states what the collection contains", () => {
     renderLib();
     expect(
-      screen.getByRole('heading', { level: 1, name: /rikki's learn & play center/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('main', { name: /rikki's learn & play center/i }),
+      screen.getByRole('main', { name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: /rikki, your learning buddy/i }),
+      screen.getByRole('img', { name: /colophon: a red panda/i }),
     ).toBeInTheDocument();
   });
 
-  it('offers library, play, story-making, and subject learning zones', () => {
+  it('offers the library, practice, workshop and subject sections', () => {
     renderLib();
-    expect(screen.getByRole('heading', { name: 'The Library' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Play Games' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Make a Story' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Explore by Subject' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Library' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Practice' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Workshop' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'By subject' })).toBeInTheDocument();
   });
 
-  it('opens the Play hub from the Play Games zone', async () => {
+  it('opens Practice from the Practice section', async () => {
     const user = userEvent.setup();
     const { onPlay } = renderLib();
-    await user.click(screen.getByRole('button', { name: /play games with rikki/i }));
+    await user.click(screen.getByRole('button', { name: /open practice/i }));
     expect(onPlay).toHaveBeenCalledTimes(1);
   });
 
-  it('opens the Story Loom from the Make a Story zone', async () => {
+  it('opens the Loom from the Workshop section', async () => {
     const user = userEvent.setup();
     const { onMakeStory } = renderLib();
-    await user.click(screen.getByRole('button', { name: /make a story with rikki/i }));
+    await user.click(screen.getByRole('button', { name: /open the workshop/i }));
     expect(onMakeStory).toHaveBeenCalledTimes(1);
   });
 
   it('moves into the topic view when a subject card is chosen', async () => {
     const user = userEvent.setup();
     renderLib();
-    await user.click(screen.getByRole('button', { name: /explore numbers stories/i }));
+    await user.click(screen.getByRole('button', { name: /number . see accounts/i }));
     expect(screen.getByRole('tab', { name: /by topic/i })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -75,11 +75,11 @@ describe('Library home', () => {
     expect(tiles()).toHaveLength(STORIES.filter((s) => s.domain === 'numbers').length);
   });
 
-  it('lets the child rotate through real facts', async () => {
+  it('rotates through the notebook', async () => {
     const user = userEvent.setup();
     renderLib();
     expect(screen.getByText(/the word mathematics comes from/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /show another fact/i }));
+    await user.click(screen.getByRole('button', { name: /next note/i }));
     expect(screen.queryByText(/the word mathematics comes from/i)).not.toBeInTheDocument();
     expect(screen.getByText(/honeybees use a waggle dance/i)).toBeInTheDocument();
   });
@@ -102,7 +102,7 @@ describe('Library home', () => {
     const user = userEvent.setup();
     renderLib();
     const before = tiles().length;
-    await user.click(screen.getByRole('button', { name: 'Numbers' }));
+    await user.click(screen.getByRole('button', { name: 'Number' }));
     const after = tiles().length;
     expect(after).toBeGreaterThan(0);
     expect(after).toBeLessThan(before);
@@ -120,7 +120,7 @@ describe('Library home', () => {
     const user = userEvent.setup();
     renderLib();
     await user.click(screen.getByRole('tab', { name: /by topic/i }));
-    expect(await screen.findByRole('heading', { name: 'Numbers' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Number' })).toBeInTheDocument();
   });
 
   it('opens a story from its tile', async () => {

@@ -8,10 +8,10 @@ describe('App', () => {
     window.history.replaceState(null, '', '#/');
   });
 
-  it("renders Rikki's Learn & Play Center title", () => {
+  it("renders the field guide masthead", () => {
     render(<App />);
     expect(
-      screen.getByRole('heading', { name: /rikki's learn & play center/i }),
+      screen.getByRole('heading', { name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
   });
 
@@ -20,25 +20,25 @@ describe('App', () => {
     expect(screen.getByRole('main')).toBeInTheDocument();
   });
 
-  it('main landmark has an accessible learning center name', () => {
+  it('main landmark has an accessible name', () => {
     render(<App />);
     expect(
-      screen.getByRole('main', { name: /rikki's learn & play center/i }),
+      screen.getByRole('main', { name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
   });
 
-  it('navigates to the Play hub at #/play and back to the learning center', async () => {
+  it('navigates to Practice at #/play and back to the contents', async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /play games with rikki/i }));
+    await user.click(screen.getByRole('button', { name: /open practice/i }));
     expect(window.location.hash).toBe('#/play');
-    expect(screen.getByRole('main', { name: /rikki's play zone/i })).toBeInTheDocument();
+    expect(screen.getByRole('main', { name: /practice/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /back to the learning center/i }));
+    await user.click(screen.getByRole('button', { name: /contents/i }));
     expect(window.location.hash).toBe('#/');
     expect(
-      screen.getByRole('main', { name: /rikki's learn & play center/i }),
+      screen.getByRole('main', { name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
   });
 });

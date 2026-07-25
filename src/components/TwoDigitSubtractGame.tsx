@@ -26,7 +26,7 @@ export function TwoDigitSubtractGame() {
   function choose(o: number) {
     if (answered) return;
     setChosen(o);
-    setScore((s) => s + 1);
+    if (o === answer) setScore((s) => s + 1);
   }
 
   function next() {
@@ -41,9 +41,9 @@ export function TwoDigitSubtractGame() {
           <p className="mini-game__eyebrow">{EYEBROW}</p>
           <h3 id="two-digit-subtract-title" className="mini-game__title">{TITLE}</h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} solved`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">solved</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

@@ -24,7 +24,7 @@ export function OppositesGame() {
   function choose(option: string) {
     if (answered) return;
     setChosen(option);
-    setScore((s) => s + 1);
+    if (option === answer) setScore((s) => s + 1);
   }
 
   function next() {
@@ -41,9 +41,9 @@ export function OppositesGame() {
             {TITLE}
           </h3>
         </div>
-        <div className="mini-game__tally" aria-label={`${score} found`}>
+        <div className="mini-game__tally" aria-label={`${score} correct`}>
           <span className="mini-game__tally-count">{score}</span>
-          <span className="mini-game__tally-label">found</span>
+          <span className="mini-game__tally-label">correct</span>
         </div>
       </div>
 

@@ -9,7 +9,7 @@ describe('Rikki Play hub', () => {
   it('shows a gallery of at least a dozen games', () => {
     render(<PlayHub onExit={vi.fn()} />);
     expect(
-      screen.getByRole('heading', { level: 1, name: /rikki's play zone/i }),
+      screen.getByRole('heading', { level: 1, name: /practice/i }),
     ).toBeInTheDocument();
     const cards = screen.getAllByRole('button', { name: /^Play / });
     expect(cards.length).toBeGreaterThanOrEqual(12);
@@ -24,7 +24,7 @@ describe('Rikki Play hub', () => {
     await user.click(screen.getByRole('button', { name: /Play Name the Feeling/i }));
     expect(screen.getByRole('heading', { name: /name the feeling/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /all games/i }));
+    await user.click(screen.getByRole('button', { name: /all exercises/i }));
     expect(screen.getByRole('button', { name: /Play Count with Rikki/i })).toBeInTheDocument();
   });
 
