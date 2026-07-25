@@ -155,9 +155,9 @@ export function Library({
         aria-labelledby="library-explorer-title"
       >
         <header className="library-explorer__head">
-          <p className="library-explorer__eyebrow">The story lab</p>
+          <p className="library-explorer__eyebrow">The collection</p>
           <h2 id="library-explorer-title" className="library-explorer__title">
-            Choose how you want to explore
+            Five ways into the collection
           </h2>
           <p className="library-explorer__lede">
             Open the shelf, travel through time, visit the map, or follow a

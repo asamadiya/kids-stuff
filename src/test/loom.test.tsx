@@ -63,7 +63,7 @@ describe('StoryLoom', () => {
     const user = userEvent.setup();
     render(<StoryLoom onExit={vi.fn()} />);
 
-    const weave = screen.getByRole('button', { name: /weave the story/i });
+    const weave = screen.getByRole('button', { name: /compose the story/i });
     expect(weave).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: /mouse/i }));
@@ -74,7 +74,7 @@ describe('StoryLoom', () => {
     await user.click(weave);
 
     // the woven story shows and mentions the chosen things
-    expect(await screen.findByRole('button', { name: /tell it another way/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /compose again/i })).toBeInTheDocument();
     expect(document.body.textContent).toMatch(/mouse/);
   });
 });
