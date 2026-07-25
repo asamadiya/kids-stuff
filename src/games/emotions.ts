@@ -117,8 +117,8 @@ export const EMOTION_STORY_ROUNDS: readonly EmotionStoryRound[] = [
 
 export const BIG_FEELINGS_META = {
   id: 'big-feelings',
-  title: 'Big Feelings',
+  title: 'Twenty-Eight Feelings',
   icon: '🎭',
   color: 'grape',
-  tagline: 'Grow your feelings words — 28 feelings, from calm to curious to grateful.',
+  tagline: 'Twenty-eight feelings, from grateful to overwhelmed — and the difference between them.',
 } as const;

@@ -5,10 +5,10 @@
 
 export const FRACTIONPIZZA_META = {
   id: 'fraction-pizza',
-  title: 'Fraction Pizza',
+  title: 'Fractions: Equal Parts',
   icon: '🍕',
   color: 'sun',
-  tagline: 'Slice it up and name the fraction — halves, thirds, and quarters made tasty!',
+  tagline: 'Halves, thirds and quarters — equal parts of one whole.',
 } as const;
 
 // The three fractions this game teaches. denom = number of equal slices.

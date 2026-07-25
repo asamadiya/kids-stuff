@@ -5,7 +5,7 @@ export const MAKING_FRIENDS_META: ComicMeta = {
   title: 'Making a New Friend',
   icon: '👋',
   color: 'coral',
-  tagline: 'Feeling shy is okay, and a brave little hello can start a whole new friendship.',
+  tagline: 'The moment before saying hello, and saying it anyway.',
 };
 
 export const MAKING_FRIENDS_SCENARIOS: readonly ComicScenario[] = [

@@ -3,10 +3,10 @@
 
 export const COMPARE_NUMBERS_META = {
   id: 'compare-numbers',
-  title: 'Which Is Bigger?',
+  title: 'Comparing Numbers',
   icon: '⚖',
   color: 'sky',
-  tagline: 'Line up the tens and ones to spot the bigger number.',
+  tagline: 'Thirty-four or forty-three: read the tens first.',
 } as const;
 
 // A round compares two numbers. The answer is the value that is bigger,

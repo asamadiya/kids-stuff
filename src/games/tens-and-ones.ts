@@ -6,7 +6,7 @@ export const TENS_AND_ONES_META = {
   title: 'Tens and Ones',
   icon: '\u{1F51F}',
   color: 'sky',
-  tagline: 'Stack up tens and ones to build big two-digit numbers!',
+  tagline: 'Three rods and four cubes are thirty-four. Place value, seen.',
 } as const;
 
 export interface TensOnesRound {

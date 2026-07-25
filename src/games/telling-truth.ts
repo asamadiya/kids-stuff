@@ -5,7 +5,7 @@ export const TELLING_TRUTH_META: ComicMeta = {
   title: 'Telling the Truth',
   icon: '🫖',
   color: 'sky',
-  tagline: 'Telling the truth can feel hard, but it makes hearts feel light again.',
+  tagline: 'Telling the truth when a lie would be easier.',
 };
 
 export const TELLING_TRUTH_SCENARIOS: readonly ComicScenario[] = [

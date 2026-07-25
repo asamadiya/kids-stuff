@@ -3,10 +3,10 @@
 
 export const DOUBLES_META = {
   id: 'doubles',
-  title: 'Double It',
+  title: 'Doubling',
   icon: '✌',
   color: 'grape',
-  tagline: 'Two equal groups make a double — snap the total together!',
+  tagline: 'Double six. Two equal groups, counted once.',
 } as const;
 
 export interface DoubleRound {

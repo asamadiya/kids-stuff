@@ -1,9 +1,9 @@
 export const RHYME_TIME_META = {
   id: 'rhyme-time',
-  title: 'Rhyme Time',
+  title: 'Rhymes',
   icon: '🎵',
   color: 'grape',
-  tagline: 'Find the words that end with the same sound and rhyme!',
+  tagline: 'Words that end with the same sound.',
 } as const;
 
 export interface RhymeRound {

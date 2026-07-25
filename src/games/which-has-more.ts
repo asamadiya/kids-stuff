@@ -1,9 +1,9 @@
 export const WHICH_HAS_MORE_META = {
   id: 'which-has-more',
-  title: 'Which Has More?',
+  title: 'Comparing Amounts',
   icon: '⚖',
   color: 'leaf',
-  tagline: 'Peek at two groups and pick the side with more!',
+  tagline: 'Two groups, compared. Which holds more, and by how many.',
 } as const;
 
 export type Side = 'left' | 'right';

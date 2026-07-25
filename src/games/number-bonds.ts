@@ -1,9 +1,9 @@
 export const NUMBER_BONDS_META = {
   id: 'number-bonds',
-  title: 'Make Ten',
+  title: 'Number Bonds to Ten',
   icon: '🔟',
   color: 'aqua',
-  tagline: 'Snap two numbers together to fill the ten-frame — the secret to fast, in-your-head math.',
+  tagline: 'Which number joins six to make ten. The ten-frame shows it.',
 } as const;
 
 /**

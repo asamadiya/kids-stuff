@@ -7,7 +7,7 @@ export const TEN_MORE_TEN_LESS_META = {
   title: 'Ten More, Ten Less',
   icon: '🔟',
   color: 'plum',
-  tagline: 'Jump by ten in your head — watch the tens digit hop up and down!',
+  tagline: 'Ten more than thirty-four, and ten less. Only the tens move.',
 } as const;
 
 export type TenDirection = 'more' | 'less';

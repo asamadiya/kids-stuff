@@ -3,10 +3,10 @@
 
 export const ADD_WITH_THINGS_META = {
   id: 'add-with-things',
-  title: 'Adding Fun',
+  title: 'Addition',
   icon: '➕',
   color: 'coral',
-  tagline: 'Push two groups together and count how many you get!',
+  tagline: 'Two groups pushed together, and how many that makes.',
 } as const;
 
 export interface AddRound {

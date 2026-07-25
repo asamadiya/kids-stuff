@@ -5,7 +5,7 @@ export const SCENES_META = {
   title: 'Feeling Scenes',
   icon: '🎬',
   color: 'berry',
-  tagline: 'Real situations with friends and little sister — how does everyone feel?',
+  tagline: 'Ordinary situations with friends and a small sister. What is each person feeling?',
 } as const;
 
 export interface Scene {

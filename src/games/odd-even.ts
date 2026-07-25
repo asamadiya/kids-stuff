@@ -18,7 +18,7 @@ export const ODD_EVEN_META = {
   title: 'Odd or Even',
   icon: '⚋',
   color: 'coral',
-  tagline: 'Pair things up — if everyone has a buddy it’s even, if one is left over it’s odd!',
+  tagline: 'Pair them off. Whether one is left over decides odd or even.',
 } as const;
 
 /** True odd/even from the number itself — the single source of truth. */

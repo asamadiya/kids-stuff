@@ -3,7 +3,7 @@ export const MEMORY_PAIRS_META = {
   title: 'Memory Match',
   icon: '🃏',
   color: 'plum',
-  tagline: 'Flip the cards and find the matching pairs!',
+  tagline: 'Cards face down. Remember where each one is.',
 } as const;
 
 /** Emoji pools — one pool per round. Each pool must hold exactly 4 emojis

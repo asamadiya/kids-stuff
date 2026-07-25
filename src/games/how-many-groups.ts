@@ -7,7 +7,7 @@ export const HOW_MANY_GROUPS_META = {
   title: 'How Many Groups?',
   icon: '➗',
   color: 'aqua',
-  tagline: 'Share things into equal groups and count how many groups you make!',
+  tagline: 'Twelve socks in pairs. Division as counting the groups.',
 } as const;
 
 export interface GroupRound {

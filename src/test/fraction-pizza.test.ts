@@ -19,7 +19,7 @@ const NUMERIC: Record<FractionValue, number> = {
 describe('fraction-pizza meta', () => {
   it('has the required META shape', () => {
     expect(FRACTIONPIZZA_META.id).toBe('fraction-pizza');
-    expect(FRACTIONPIZZA_META.title).toBe('Fraction Pizza');
+    expect(FRACTIONPIZZA_META.title).toBe('Fractions: Equal Parts');
     expect(FRACTIONPIZZA_META.color).toBe('sun');
     expect(FRACTIONPIZZA_META.icon.length).toBeGreaterThan(0);
     expect(FRACTIONPIZZA_META.tagline.length).toBeGreaterThan(0);

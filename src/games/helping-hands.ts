@@ -5,7 +5,7 @@ export const HELPING_HANDS_META: ComicMeta = {
   title: 'Helping Hands',
   icon: '🧹',
   color: 'leaf',
-  tagline: 'Little hands can do big kind things at home, especially for the people we love.',
+  tagline: 'Work shared at home, and why it counts.',
 };
 
 export const HELPING_HANDS_SCENARIOS: readonly ComicScenario[] = [

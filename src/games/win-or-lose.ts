@@ -5,7 +5,7 @@ export const WIN_OR_LOSE_META: ComicMeta = {
   title: 'Win or Lose',
   icon: '🏅',
   color: 'plum',
-  tagline: 'Winning is fun, but being kind and cheering others on makes everyone a champion.',
+  tagline: 'Losing well, and winning without making it worse.',
 };
 
 export const WIN_OR_LOSE_SCENARIOS: readonly ComicScenario[] = [

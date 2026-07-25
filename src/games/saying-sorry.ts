@@ -5,7 +5,7 @@ export const SAYING_SORRY_META: ComicMeta = {
   title: 'Saying Sorry',
   icon: '🩹',
   color: 'berry',
-  tagline: 'Everyone makes mistakes, and a kind sorry helps put hearts back together.',
+  tagline: 'Owning a mistake, and repairing what it broke.',
 };
 
 export const SAYING_SORRY_SCENARIOS: readonly ComicScenario[] = [

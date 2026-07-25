@@ -2,10 +2,10 @@ import type { ComicScenario, ComicMeta } from './comic';
 
 export const CALM_DOWN_META: ComicMeta = {
   id: 'calm-down',
-  title: 'When I Feel Big',
+  title: 'Strong Feelings',
   icon: '🌬️',
   color: 'sky',
-  tagline: 'Big feelings are okay, and a slow breath helps them float away.',
+  tagline: 'Noticing anger before it arrives, and what steadies it.',
 };
 
 export const CALM_DOWN_SCENARIOS: readonly ComicScenario[] = [

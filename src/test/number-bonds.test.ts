@@ -12,7 +12,7 @@ import {
 describe('number-bonds meta', () => {
   it('has the expected identity', () => {
     expect(NUMBER_BONDS_META.id).toBe('number-bonds');
-    expect(NUMBER_BONDS_META.title).toBe('Make Ten');
+    expect(NUMBER_BONDS_META.title).toBe('Number Bonds to Ten');
     expect(NUMBER_BONDS_META.icon.length).toBeGreaterThan(0);
     expect(NUMBER_BONDS_META.color).toBe('aqua');
     expect(NUMBER_BONDS_META.tagline.length).toBeGreaterThan(0);

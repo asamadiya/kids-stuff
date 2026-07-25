@@ -6,7 +6,7 @@ export const WHATS_MISSING_META = {
   title: "What's Missing?",
   icon: '❓',
   color: 'sun',
-  tagline: 'Find the secret number that makes the equation true!',
+  tagline: 'Six and what makes ten. Finding the number that is hidden.',
 } as const;
 
 // Each round is one equation with exactly one blank (the answer).

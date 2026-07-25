@@ -14,7 +14,7 @@ describe('Rikki Play hub', () => {
     const cards = screen.getAllByRole('button', { name: /^Play / });
     expect(cards.length).toBeGreaterThanOrEqual(12);
     expect(screen.getByRole('button', { name: /Play Name the Feeling/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Play Count with Rikki/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Play Counting to Ten/i })).toBeInTheDocument();
   });
 
   it('opens a game from the gallery and returns to it', async () => {
@@ -25,14 +25,14 @@ describe('Rikki Play hub', () => {
     expect(screen.getByRole('heading', { name: /name the feeling/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /all exercises/i }));
-    expect(screen.getByRole('button', { name: /Play Count with Rikki/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Play Counting to Ten/i })).toBeInTheDocument();
   });
 
   it('lets a child answer the counting game with no-fail feedback and a star', async () => {
     const user = userEvent.setup();
     render(<PlayHub onExit={vi.fn()} />);
 
-    await user.click(screen.getByRole('button', { name: /Play Count with Rikki/i }));
+    await user.click(screen.getByRole('button', { name: /Play Counting to Ten/i }));
     expect(screen.getByRole('heading', { name: /count with rikki/i })).toBeInTheDocument();
 
     const numberOptions = screen

@@ -5,7 +5,7 @@ export const SHARING_TURNS_META: ComicMeta = {
   title: 'Sharing & Taking Turns',
   icon: '🤝',
   color: 'aqua',
-  tagline: 'Sharing toys and waiting for your turn helps everyone play together and feel happy.',
+  tagline: 'Waiting, sharing, and what it costs to do either.',
 };
 
 export const SHARING_TURNS_SCENARIOS: readonly ComicScenario[] = [

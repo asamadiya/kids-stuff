@@ -5,7 +5,7 @@ export const KIND_FRIEND_META: ComicMeta = {
   title: 'Being a Kind Friend',
   icon: '💛',
   color: 'sun',
-  tagline: 'Little acts of kindness make big smiles for the people we care about.',
+  tagline: 'What kindness looks like when someone is having a hard time.',
 };
 
 export const KIND_FRIEND_SCENARIOS: readonly ComicScenario[] = [

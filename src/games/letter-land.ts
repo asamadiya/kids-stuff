@@ -1,9 +1,9 @@
 export const LETTER_LAND_META = {
   id: 'letter-land',
-  title: 'Letter Land',
+  title: 'First Letters',
   icon: 'Aa',
   color: 'leaf',
-  tagline: 'Match each friendly picture to the letter it starts with!',
+  tagline: 'The sound a word starts with, and the letter that writes it.',
 } as const;
 
 export type Letter =

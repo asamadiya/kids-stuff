@@ -5,7 +5,7 @@ export const EVERYONE_INCLUDED_META: ComicMeta = {
   title: 'Everyone Included',
   icon: '🌈',
   color: 'grape',
-  tagline: 'Notice when someone is left out, and open the circle to let them in.',
+  tagline: 'Noticing who has been left out, and asking them in.',
 };
 
 export const EVERYONE_INCLUDED_SCENARIOS: readonly ComicScenario[] = [

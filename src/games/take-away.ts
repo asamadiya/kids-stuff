@@ -3,10 +3,10 @@
 
 export const TAKE_AWAY_META = {
   id: 'take-away',
-  title: 'Take Away',
+  title: 'Subtraction',
   icon: '➖',
   color: 'berry',
-  tagline: 'Cross some out and count what stays — that\'s subtraction!',
+  tagline: 'Five, with two taken away. What is left, and why.',
 } as const;
 
 export interface TakeAwayRound {

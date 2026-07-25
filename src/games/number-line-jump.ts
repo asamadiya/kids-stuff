@@ -4,10 +4,10 @@
 
 export const NUMBER_LINE_JUMP_META = {
   id: 'number-line-jump',
-  title: 'Number Line Jumps',
+  title: 'The Number Line',
   icon: '📏',
   color: 'leaf',
-  tagline: 'Hop along the number line to add and subtract your way to the answer!',
+  tagline: 'Start at five, move three. Addition as distance travelled.',
 } as const;
 
 export const NUMBER_LINE_MIN = 0;

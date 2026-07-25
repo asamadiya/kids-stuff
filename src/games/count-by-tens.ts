@@ -3,7 +3,7 @@ export const COUNT_BY_TENS_META = {
   title: 'Count by Tens',
   icon: '🔢',
   color: 'leaf',
-  tagline: 'Jump by tens like a pro — 10, 20, 30, what comes next?',
+  tagline: 'Ten, twenty, thirty — counting in tens, and what follows.',
 } as const;
 
 export interface CountByTensRound {

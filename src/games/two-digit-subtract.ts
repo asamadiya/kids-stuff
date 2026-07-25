@@ -4,10 +4,10 @@
 
 export const TWO_DIGIT_SUBTRACT_META = {
   id: 'two-digit-subtract',
-  title: 'Two-Digit Take Away',
+  title: 'Two-Digit Subtraction',
   icon: '➖',
   color: 'grape',
-  tagline: 'Line up the tens and ones, then take away — no borrowing needed!',
+  tagline: 'Subtracting column by column, without regrouping.',
 } as const;
 
 export interface SubtractRound {

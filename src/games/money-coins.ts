@@ -4,10 +4,10 @@
 
 export const MONEY_COINS_META = {
   id: 'money-coins',
-  title: 'Coin Counter',
+  title: 'Money',
   icon: '🪙',
   color: 'aqua',
-  tagline: 'Stack up dimes, nickels, and pennies to count real cents!',
+  tagline: 'Dimes, nickels and pennies, added up in cents.',
 } as const;
 
 export type CoinKind = 'dime' | 'nickel' | 'penny';

@@ -7,7 +7,7 @@ export const SKIP_COUNT_META = {
   title: 'Skip Counting',
   icon: '⏭',
   color: 'grape',
-  tagline: 'Jump by 2s and 5s to find the number that comes next!',
+  tagline: 'Counting in twos and fives, and the pattern each one leaves.',
 } as const;
 
 export interface SkipCountRound {

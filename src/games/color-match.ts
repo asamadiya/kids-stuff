@@ -1,9 +1,9 @@
 export const COLOR_MATCH_META = {
   id: 'color-match',
-  title: 'Color Match',
+  title: 'Color Names',
   icon: '🎨',
   color: 'aqua',
-  tagline: 'Look at the big circle and name its color!',
+  tagline: 'Naming colours, from a plate of flat washes.',
 } as const;
 
 export const COLORS = [

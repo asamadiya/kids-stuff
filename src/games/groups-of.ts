@@ -1,9 +1,9 @@
 export const GROUPS_OF_META = {
   id: 'groups-of',
-  title: 'Groups Of',
+  title: 'Equal Groups',
   icon: '✖',
   color: 'leaf',
-  tagline: 'Count equal groups to discover how multiplication really works!',
+  tagline: 'Three baskets of four. Equal groups are what multiplication counts.',
 } as const;
 
 export interface GroupsRound {

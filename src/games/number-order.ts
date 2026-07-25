@@ -1,9 +1,9 @@
 export const NUMBER_ORDER_META = {
   id: 'number-order',
-  title: 'What Comes Next?',
+  title: 'Sequences',
   icon: '🔢',
   color: 'sky',
-  tagline: 'Count along and find the number that comes next!',
+  tagline: 'A sequence with a gap. Work out the number that fills it.',
 } as const;
 
 export type SeqKind = 'up1' | 'up2' | 'down1';

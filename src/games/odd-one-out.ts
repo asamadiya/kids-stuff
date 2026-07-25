@@ -3,7 +3,7 @@ export const ODDONEOUT_META = {
   title: 'Odd One Out',
   icon: '🔍',
   color: 'sun',
-  tagline: 'Spot the one that does not belong with its friends!',
+  tagline: 'Four things, one of which belongs to a different set.',
 } as const;
 
 export interface OddItem {

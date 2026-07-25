@@ -6,7 +6,7 @@ export const HALVES_AND_WHOLES_META = {
   title: 'Halves and Wholes',
   icon: '½',
   color: 'berry',
-  tagline: 'Spot the shape split into two fair, equal parts with one shaded.',
+  tagline: 'A half means two equal parts, and one of them shaded.',
 } as const;
 
 // A shape drawn as an inline SVG. `parts` = how many pieces the whole is cut

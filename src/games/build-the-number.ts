@@ -6,7 +6,7 @@ export const BUILD_THE_NUMBER_META = {
   title: 'Build the Number',
   icon: '🧱',
   color: 'sun',
-  tagline: 'Snap tens and ones together to build big numbers!',
+  tagline: 'Forty and seven make forty-seven. Numbers taken apart and rebuilt.',
 } as const;
 
 /** A single part of the number, e.g. 3 hundreds, 4 tens, 7 ones. */

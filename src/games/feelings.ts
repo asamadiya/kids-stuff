@@ -23,7 +23,7 @@ export const NAMETHEFEELING_META = {
   title: 'Name the Feeling',
   icon: '😊',
   color: 'berry',
-  tagline: 'Notice and name feelings in five playful ways.',
+  tagline: 'Reading a feeling from a face, a word, or a situation.',
 } as const;
 
 /** A big, friendly emoji face for each feeling, used by the picture-based modes. */

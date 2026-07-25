@@ -3,10 +3,10 @@
 
 export const SHARE_FAIRLY_META = {
   id: 'share-fairly',
-  title: 'Share It Fairly',
+  title: 'Sharing Equally',
   icon: '➗',
   color: 'coral',
-  tagline: "Split the treats so every plate gets the same — that's what dividing means!",
+  tagline: 'Twelve biscuits across four plates. Division as fair sharing.',
 } as const;
 
 export interface ShareRound {

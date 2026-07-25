@@ -15,7 +15,7 @@ import {
 describe('money-coins meta', () => {
   it('has expected identity', () => {
     expect(MONEY_COINS_META.id).toBe('money-coins');
-    expect(MONEY_COINS_META.title).toBe('Coin Counter');
+    expect(MONEY_COINS_META.title).toBe('Money');
     expect(MONEY_COINS_META.color).toBe('aqua');
     expect(MONEY_COINS_META.icon.length).toBeGreaterThan(0);
     expect(MONEY_COINS_META.tagline.length).toBeGreaterThan(0);

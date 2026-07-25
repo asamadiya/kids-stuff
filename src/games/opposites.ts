@@ -1,9 +1,9 @@
 export const OPPOSITES_META = {
   id: 'opposites',
-  title: 'Opposite Day',
+  title: 'Opposites',
   icon: '↔',
   color: 'coral',
-  tagline: 'Spot the word that means the exact opposite!',
+  tagline: 'Big and small, hot and cold — pairs that sit at either end.',
 } as const;
 
 export interface OppositeRound {

@@ -1,9 +1,9 @@
 export const PATTERN_PARADE_META = {
   id: 'pattern-parade',
-  title: 'Pattern Parade',
+  title: 'Patterns',
   icon: '◇○',
   color: 'berry',
-  tagline: 'Spot the beat and pick what comes next in the parade!',
+  tagline: 'A sequence repeats. Work out what comes next.',
 } as const;
 
 export type PatternType = 'AB' | 'AABB' | 'ABC' | 'AAB' | 'ABB';

@@ -5,7 +5,7 @@ export const BRAVE_FEELINGS_META: ComicMeta = {
   title: 'Being Brave',
   icon: '🦁',
   color: 'leaf',
-  tagline: 'Sometimes our tummy feels wobbly and scared, and being brave means trying anyway.',
+  tagline: 'Being afraid and going ahead — the two happen together.',
 };
 
 export const BRAVE_FEELINGS_SCENARIOS: readonly ComicScenario[] = [

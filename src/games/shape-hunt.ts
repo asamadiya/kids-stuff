@@ -1,9 +1,9 @@
 export const SHAPE_HUNT_META = {
   id: 'shape-hunt',
-  title: 'Shape Hunt',
+  title: 'Shapes',
   icon: '▲●■',
   color: 'sky',
-  tagline: 'Spot the shape and learn where it hides in the world!',
+  tagline: 'Circle, square, triangle, hexagon — naming plane shapes.',
 } as const;
 
 export const SHAPES = [

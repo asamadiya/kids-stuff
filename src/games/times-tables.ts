@@ -1,9 +1,9 @@
 export const TIMES_TABLES_META = {
   id: 'times-tables',
-  title: 'Times Fun (2, 5, 10)',
+  title: 'Multiplication: 2s, 5s, 10s',
   icon: '✖',
   color: 'sun',
-  tagline: 'Skip-count your way to multiplication with 2s, 5s, and 10s!',
+  tagline: 'The twos, fives and tens, shown as rows and columns of dots.',
 } as const;
 
 export interface TimesRound {

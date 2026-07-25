@@ -4,10 +4,10 @@
 
 export const TWO_DIGIT_ADD_META = {
   id: 'two-digit-add',
-  title: 'Two-Digit Adding',
+  title: 'Two-Digit Addition',
   icon: '➕',
   color: 'sky',
-  tagline: 'Stack the tens and ones, then add them up like a pro!',
+  tagline: 'Adding tens to tens and ones to ones, in columns.',
 } as const;
 
 export interface TwoDigitAddRound {

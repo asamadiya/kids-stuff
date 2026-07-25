@@ -1,9 +1,9 @@
 export const COUNT_WITH_RIKKI_META = {
   id: 'count-with-rikki',
-  title: 'Count with Rikki',
+  title: 'Counting to Ten',
   icon: '123',
   color: 'sun',
-  tagline: 'Count the friendly critters and treats from one all the way to ten!',
+  tagline: 'Counting from one to ten, one object at a time.',
 } as const;
 
 export interface CountRound {
