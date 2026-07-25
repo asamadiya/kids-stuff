@@ -240,7 +240,7 @@ describe('App resumes from bookmarks and records completion', () => {
     window.location.hash = `#/read/${SLUG}/${PAGE_COUNT}`;
     render(<App />);
     await user.click(screen.getByRole('button', { name: /finish/i }));
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     const stored = readStored();
     expect(stored.completed).toContain(SLUG);
     expect(stored.bookmarks[SLUG]).toBeUndefined();
@@ -267,7 +267,7 @@ describe('App resumes from bookmarks and records completion', () => {
     window.location.hash = `#/read/${SLUG}/${PAGE_COUNT}`;
     expect(() => render(<App />)).not.toThrow();
     await user.click(screen.getByRole('button', { name: /finish/i }));
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     expect(warn).toHaveBeenCalled();
   });
 });
@@ -291,7 +291,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: /the end/i })).toBeNull();
+    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
     // Completion persistence must never fire for an invalid resume.
     expect(readStored().completed).not.toContain(SLUG);
     expect(readStored().bookmarks[SLUG]).toBeUndefined();
@@ -306,7 +306,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: /the end/i })).toBeNull();
+    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
     expect(readStored().completed).not.toContain(SLUG);
     expect(readStored().bookmarks[SLUG]).toBeUndefined();
   });
@@ -333,7 +333,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: /the end/i })).toBeNull();
+    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
   });
 
   it('still resumes a valid in-range bookmark unchanged', async () => {

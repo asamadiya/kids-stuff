@@ -103,7 +103,7 @@ describe('Reader flow (through the app)', () => {
     openApp(PAGE_COUNT); // last story page (index 6)
     const finish = screen.getByRole('button', { name: /finish/i });
     await user.click(finish);
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     expect(screen.getByText(story.learningTakeaway)).toBeInTheDocument();
     expect(screen.getByText(story.grownUpFact)).toBeInTheDocument();
     expect(screen.getByText(/what else could we measure/i)).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('Reader flow (through the app)', () => {
 
   it('treats the completion view as a disabled Next boundary', () => {
     openApp(PAGE_COUNT + 1); // completion index 7
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
   });
 
@@ -140,7 +140,7 @@ describe('Reader flow (through the app)', () => {
 
   it('clamps an out-of-range page onto the completion view', () => {
     openApp(999);
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
   });
 });
 
