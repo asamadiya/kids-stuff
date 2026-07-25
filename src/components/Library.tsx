@@ -19,7 +19,6 @@ import type { Story, StoryDomain } from '../types';
 import '../styles/library.css';
 import '../styles/home.css';
 
-const HISTORICAL_GOAL = 200;
 
 export interface LibraryProps {
   readonly stories: readonly Story[];
@@ -142,7 +141,7 @@ export function Library({
       tabIndex={-1}
     >
       <LearningCenterWelcome
-        historicalCount={Math.max(historicalCount, HISTORICAL_GOAL)}
+        historicalCount={historicalCount}
         onOpenLibrary={scrollToExplorer}
         onPlay={onPlay}
         onMakeStory={onMakeStory}

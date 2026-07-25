@@ -495,3 +495,30 @@
   height: var(--space-2);
   border-radius: var(--radius-round);
 }
+
+/* Masthead statistics: a row of small figures, like a museum label. */
+.learning-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin: var(--space-5) 0 var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+}
+.learning-hero__stats > div { display: flex; flex-direction: column-reverse; gap: 0.1rem; }
+.learning-hero__stats dt {
+  font-family: var(--font-sans);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.learning-hero__stats dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--step-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+  line-height: 1.05;
+}

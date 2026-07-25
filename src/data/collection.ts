@@ -27,6 +27,8 @@ export const COLLECTION = {
 
 /** "20,000 BCE" / "1831 CE" — plain, with a thousands separator. */
 export function era(year: number): string {
-  const n = Math.abs(year).toLocaleString('en-US');
+  const abs = Math.abs(year);
+  // Years are written plainly (1831 CE); only deep-time figures take a separator.
+  const n = abs >= 10000 ? abs.toLocaleString('en-US') : String(abs);
   return year < 0 ? `${n} BCE` : `${n} CE`;
 }
