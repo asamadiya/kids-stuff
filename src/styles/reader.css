@@ -1,35 +1,20 @@
-/*
- * Reader: a calm, distraction-free learning-story spread. The illustration stays dominant while the
- * read-aloud text lives in its own calm, selectable panel outside the SVG.
- * Controls are a sticky, thumb-friendly bar with 48px targets.
- *
- * Motion is OFF by default. The 3D page-turn/fade below is applied ONLY under
- * `.reader[data-motion="on"]`, a hook Task 5 will flip on. Nothing animates now.
- */
+/* Reader: a calm field-guide spread with a reference plate and book measure. */
 
 .reader {
+  --reader-controls-clearance: 12rem;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: var(--page-max);
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(0.75rem, 0.4rem + 2vw, 2rem)
-    clamp(0.9rem, 0.5rem + 2vw, 2.5rem) 0;
-  /*
-   * Scroll clearance a cue reserves so it can be brought fully clear of the
-   * sticky controls bar. Sized to the stacked bar (buttons wrap, ~173px). The
-   * single-row bar (>= 48rem) needs less, and the shorter desktop bar (>= 60rem)
-   * needs less again — but the controls exist at every width, so the clearance
-   * is never zero.
-   */
-  --reader-controls-clearance: 12rem;
+  padding: var(--space-3) var(--space-4) 0;
 }
 
 .reader__stage {
-  flex: 1 1 auto;
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
 }
 
@@ -37,9 +22,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1rem, 0.6rem + 2vw, 2rem);
+  gap: var(--space-5);
   width: 100%;
-  padding-block: clamp(0.75rem, 0.4rem + 2vw, 2rem);
+  padding-block: var(--space-4);
 }
 
 .reader__spread--complete {
@@ -48,13 +33,18 @@
 
 .reader__figure {
   width: 100%;
-  max-width: 880px;
+  max-width: 55rem;
 }
 
 .reader__figure .story-image {
-  border-radius: var(--radius-lg);
-  border: 5px solid rgba(255, 255, 255, 0.82);
-  box-shadow: var(--shadow-lift);
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--paper-sunken);
 }
 
 .reader__panel {
@@ -64,65 +54,50 @@
 
 .reader__title {
   margin-bottom: var(--space-3);
-  color: var(--c-teal-deep);
+  color: var(--teal);
   font-family: var(--font-serif);
   font-size: var(--step-1);
   font-weight: 600;
-  letter-spacing: 0.01em;
+  line-height: var(--leading-tight);
   text-align: center;
 }
 
 .reader__text {
-  color: var(--c-ink);
+  color: var(--ink);
   font-family: var(--font-serif);
   font-size: var(--reading-size);
-  line-height: 1.72;
+  line-height: var(--leading-body);
 }
 
 .reader__cue {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-top: var(--space-5);
-  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
-  border-left: 4px solid var(--c-sun-deep);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  background: #fff2c9;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  scroll-margin-block-end: var(--reader-controls-clearance);
+  border-left: 3px solid var(--ochre);
+  border-radius: var(--radius-sm);
+  background: var(--paper-sunken);
 }
 
 .reader__cue-label {
-  color: var(--c-sun-deep);
+  color: var(--ochre);
   font-family: var(--font-sans);
-  font-size: 0.7rem;
-  letter-spacing: 0.18em;
+  font-size: var(--label-size);
+  font-weight: 600;
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
 }
 
 .reader__cue-text {
-  color: var(--c-ink-soft);
+  color: var(--ink-soft);
   font-size: var(--step-0);
-  line-height: 1.55;
-}
-
-/* ----------------------------------------- cue clears the sticky controls -- */
-
-/*
- * On the stacked layout the read-aloud panel sits under the illustration, so a
- * page carrying both body text and a "Try together" cue runs past the viewport,
- * and the sticky, opaque `.reader-controls` bar would paint over the cue (it is
- * occluded at rest and the browser's own scroll-into-view lands it fully behind
- * the bar). Reserve scroll clearance equal to the bar height via
- * `scroll-margin-block-end` so the cue can always be scrolled fully clear of it,
- * plus a little physical room below the reading column to scroll into. Clearance
- * is scoped to the cue, never the whole scroll root, so it cannot scroll the
- * sticky controls when the Next button takes focus.
- */
-.reader__cue {
-  scroll-margin-block-end: var(--reader-controls-clearance);
+  line-height: var(--leading-body);
 }
 
 .reader__spread:has(.reader__cue) {
-  padding-block-end: 2rem;
+  padding-block-end: var(--space-6);
 }
 
 @media (min-width: 48rem) {
@@ -135,55 +110,51 @@
   .reader {
     --reader-controls-clearance: 6rem;
   }
-}
 
-/* --------------------------------------------------------- wide spreads -- */
-
-@media (min-width: 60rem) {
   .reader__spread {
     flex-direction: row;
     align-items: center;
-    gap: clamp(1.75rem, 1rem + 3vw, 3.5rem);
-    max-width: 1120px;
+    gap: var(--space-6);
+    max-width: 70rem;
     margin: 0 auto;
   }
+
   .reader__spread--complete {
     flex-direction: column;
   }
+
   .reader__figure {
     flex: 1 1 58%;
     max-width: none;
   }
+
   .reader__panel {
     flex: 1 1 42%;
   }
+
   .reader__title {
     text-align: left;
   }
 }
 
-/* ------------------------------------------------------------- controls -- */
-
 .reader-controls {
   position: sticky;
   bottom: 0;
-  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4) 0 max(var(--space-4), env(safe-area-inset-bottom, 0));
-  background: linear-gradient(
-    180deg,
-    rgba(255, 250, 241, 0) 0%,
-    var(--c-night-900) 42%
-  );
+  margin-top: auto;
+  padding: var(--space-3) 0 max(var(--space-3), env(safe-area-inset-bottom, 0));
+  border-top: 1px solid var(--rule);
+  background: var(--paper);
 }
 
 .reader-controls__progress {
   order: 1;
-  color: var(--c-ink-faint);
-  font-size: var(--step--1);
-  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  font-size: var(--label-size);
+  font-weight: 600;
+  letter-spacing: var(--label-tracking);
   text-align: center;
   text-transform: uppercase;
 }
@@ -206,24 +177,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  min-height: var(--touch);
+  gap: var(--space-2);
   min-width: var(--touch);
-  padding: 0.65rem 1.2rem;
-  border: 1px solid var(--c-line);
-  border-radius: 999px;
-  background: var(--c-surface-raised);
-  color: var(--c-ink);
+  min-height: var(--touch);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
   cursor: pointer;
 }
 
 .reader-controls__btn:hover:not(:disabled) {
-  border-color: var(--c-line-strong);
+  border-color: var(--rule-strong);
 }
 
 .reader-controls__btn:disabled {
-  opacity: 0.36;
   cursor: default;
+  opacity: 0.36;
 }
 
 .reader-controls__btn--turn {
@@ -232,30 +203,31 @@
 }
 
 .reader-controls__btn--next {
-  border-color: transparent;
-  background: var(--c-teal);
-  color: #fff;
+  border-color: var(--teal);
+  background: var(--paper-raised);
+  color: var(--teal);
 }
 
 .reader-controls__btn--next:hover:not(:disabled) {
-  background: var(--c-teal-deep);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .reader-controls__btn--ghost {
-  min-width: 0;
-  padding: 0.55rem 0.9rem;
-  border-color: transparent;
-  background: transparent;
-  color: var(--c-ink-soft);
+  min-width: var(--touch);
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--rule);
+  background: var(--paper);
+  color: var(--ink-soft);
 }
 
 .reader-controls__btn--ghost:hover:not(:disabled) {
-  background: #e9f2f1;
-  color: var(--c-ink);
+  background: var(--paper-sunken);
+  color: var(--ink);
 }
 
 .reader-controls__glyph {
-  font-size: 1.05em;
+  font-size: var(--step-0);
   line-height: 1;
 }
 
@@ -265,39 +237,41 @@
     align-items: center;
     gap: var(--space-5);
   }
+
   .reader-controls__meta {
     order: 1;
     flex: 1 1 0;
     justify-content: flex-start;
     gap: var(--space-4);
   }
+
   .reader-controls__progress {
     order: 2;
     flex: 0 0 auto;
   }
+
   .reader-controls__turn {
     order: 3;
     flex: 1 1 0;
     justify-content: flex-end;
   }
+
   .reader-controls__btn--turn {
     flex: 0 0 auto;
     min-width: 9rem;
   }
 }
 
-/* ----------------------------------------------------- completion panel -- */
-
 .story-complete {
   width: 100%;
-  max-width: 56ch;
+  max-width: var(--measure-tight);
   margin: 0 auto;
+  padding-block: var(--space-5);
   text-align: center;
-  padding-block: clamp(1rem, 0.5rem + 3vw, 2.5rem);
 }
 
 .story-complete__kicker {
-  color: var(--c-berry);
+  color: var(--terracotta);
   font-size: var(--step-2);
   line-height: 1;
 }
@@ -306,12 +280,12 @@
   margin-top: var(--space-3);
   font-family: var(--font-serif);
   font-size: var(--step-3);
-  letter-spacing: 0.01em;
+  font-weight: 600;
 }
 
 .story-complete__story {
   margin-top: var(--space-2);
-  color: var(--c-ink-soft);
+  color: var(--ink-soft);
   font-family: var(--font-serif);
   font-size: var(--step-1);
   font-style: italic;
@@ -320,72 +294,65 @@
 .story-complete__notes {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-top: clamp(1.5rem, 1rem + 3vw, 2.5rem);
+  gap: var(--space-3);
+  margin-top: var(--space-5);
   text-align: left;
 }
 
 .story-complete__note {
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--c-line);
+  padding: var(--space-4);
+  border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--paper-raised);
 }
 
 .story-complete__note--grownup {
-  border-color: rgba(240, 198, 122, 0.24);
-  background: #fff2c9;
+  border-left: 3px solid var(--ochre);
+  background: var(--paper-sunken);
 }
 
 .story-complete__note-label {
-  color: var(--c-teal-deep);
-  font-size: 0.72rem;
+  color: var(--teal);
+  font-size: var(--label-size);
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
 }
 
 .story-complete__note-body {
   margin-top: var(--space-2);
-  color: var(--c-ink);
+  color: var(--ink);
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: var(--leading-body);
 }
 
 .story-complete__note--grownup .story-complete__note-body {
-  color: var(--c-ink-soft);
+  color: var(--ink-soft);
 }
 
 .story-complete__prompt {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-top: clamp(1.5rem, 1rem + 3vw, 2.5rem);
-  padding: var(--space-5);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: linear-gradient(
-    180deg,
-    var(--c-surface-raised) 0%,
-    var(--c-surface) 100%
-  );
-  border: 1px solid var(--c-line);
+  background: var(--paper-raised);
   text-align: center;
 }
 
 .story-complete__prompt-label {
-  color: var(--c-berry);
-  font-size: 0.72rem;
+  color: var(--terracotta);
+  font-size: var(--label-size);
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
 }
 
 .story-complete__prompt-body {
-  color: var(--c-ink);
+  color: var(--ink);
   font-family: var(--font-serif);
   font-size: var(--step-1);
-  line-height: 1.5;
+  line-height: var(--leading-body);
 }
-
-/* Generated raster illustration in the reader. Static — no motion. */
-.reader__figure .story-image { display: block; width: 100%; height: auto; }

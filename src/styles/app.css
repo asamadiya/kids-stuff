@@ -1,4 +1,4 @@
-/* Global reset, sunny learning-center backdrop, and accessible focus treatment. */
+/* Global field-guide foundation and accessible focus treatment. */
 
 *,
 *::before,
@@ -8,6 +8,7 @@
 
 html {
   min-height: 100%;
+  background: var(--paper);
 }
 
 body {
@@ -15,14 +16,9 @@ body {
   min-height: 100vh;
   font-family: var(--font-sans);
   font-size: var(--step-0);
-  line-height: 1.55;
-  color: var(--c-ink);
-  background:
-    radial-gradient(circle at 8% 2%, rgba(255, 218, 159, 0.48), transparent 22rem),
-    radial-gradient(circle at 94% 12%, rgba(178, 226, 221, 0.48), transparent 24rem),
-    radial-gradient(circle at 40% 100%, rgba(239, 207, 231, 0.35), transparent 28rem),
-    var(--c-night-900);
-  background-attachment: fixed;
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background: var(--paper);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -45,6 +41,15 @@ blockquote {
   margin: 0;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
 ul,
 ol {
   margin: 0;
@@ -58,16 +63,28 @@ svg {
   max-width: 100%;
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
+}
+
+button,
+[role='button'],
+input,
+select {
+  min-height: var(--touch);
+}
+
+button {
   margin: 0;
 }
 
 :focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-  border-radius: 8px;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .visually-hidden {
@@ -82,19 +99,20 @@ button {
   border: 0;
 }
 
-/* Skip link: off-screen until focused, then a clear sunshine pill top-left. It
-   moves via a static transform only (no transition), so it works instantly and
-   is unaffected by reduced-motion. */
 .skip-link {
   position: absolute;
   top: var(--space-4);
   left: var(--space-4);
   z-index: 50;
-  padding: 0.75rem 1.25rem;
-  border-radius: 999px;
-  background: var(--c-ink);
-  color: #fff;
-  font-weight: 700;
+  min-height: var(--touch);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
   text-decoration: none;
   transform: translateY(-250%);
 }
@@ -103,7 +121,6 @@ button {
   transform: translateY(0);
 }
 
-/* Respect a reader's reduced-motion preference everywhere. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
