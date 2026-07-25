@@ -780,3 +780,7 @@ button.game-card:focus-visible {
   line-height: var(--leading-body);
   text-align: center;
 }
+
+/* The colophon is a mark, not an exhibit: small, quiet, out of the way. */
+.play-hub__rikki { width: 96px; align-self: flex-start; }
+.play-hub__rikki .rikki__caption { font-size: var(--label-size); }

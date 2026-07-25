@@ -522,3 +522,20 @@
   color: var(--ink);
   line-height: 1.05;
 }
+
+/* Colophon plate: sized as a mark beside the masthead, never taller than the text. */
+.rikki { margin: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.rikki__plate {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+.rikki__caption {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+}
+.learning-hero__mascot { width: min(240px, 26vw); align-self: start; }
