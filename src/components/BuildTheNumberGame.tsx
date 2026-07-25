@@ -103,8 +103,9 @@ export function BuildTheNumberGame(): JSX.Element {
             {TITLE}
           </h3>
         </div>
-        <div className="mini-game__streak" aria-label={`${score} solved`}>
-          <span aria-hidden="true">{'★'.repeat(Math.min(score, 5)) || '☆'}</span> {score}
+        <div className="mini-game__tally" aria-label={`${score} solved`}>
+          <span className="mini-game__tally-count">{score}</span>
+          <span className="mini-game__tally-label">solved</span>
         </div>
       </div>
 

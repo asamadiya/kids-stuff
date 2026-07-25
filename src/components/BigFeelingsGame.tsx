@@ -57,8 +57,9 @@ export function BigFeelingsGame() {
           <p className="mini-game__eyebrow">Feelings words</p>
           <h3 id="big-feelings-title" className="mini-game__title">Big Feelings</h3>
         </div>
-        <div className="mini-game__streak" aria-label={`${score} named`}>
-          <span aria-hidden="true">{'★'.repeat(Math.min(score, 5)) || '☆'}</span> {score}
+        <div className="mini-game__tally" aria-label={`${score} named`}>
+          <span className="mini-game__tally-count">{score}</span>
+          <span className="mini-game__tally-label">named</span>
         </div>
       </div>
 

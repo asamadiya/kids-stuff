@@ -42,8 +42,9 @@ export function RhymeTimeGame() {
             {TITLE}
           </h3>
         </div>
-        <div className="mini-game__streak" aria-label={`${score} found`}>
-          <span aria-hidden="true">{'★'.repeat(Math.min(score, 5)) || '☆'}</span> {score}
+        <div className="mini-game__tally" aria-label={`${score} found`}>
+          <span className="mini-game__tally-count">{score}</span>
+          <span className="mini-game__tally-label">found</span>
         </div>
       </div>
 

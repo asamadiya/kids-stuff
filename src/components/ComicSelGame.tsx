@@ -36,8 +36,9 @@ export function ComicSelGame({ meta, scenarios, eyebrow = 'Friends & feelings' }
           <p className="mini-game__eyebrow">{eyebrow}</p>
           <h3 id={`${meta.id}-title`} className="mini-game__title">{meta.title}</h3>
         </div>
-        <div className="mini-game__streak" aria-label={`${score} done`}>
-          <span aria-hidden="true">{'★'.repeat(Math.min(score, 5)) || '☆'}</span> {score}
+        <div className="mini-game__tally" aria-label={`${score} done`}>
+          <span className="mini-game__tally-count">{score}</span>
+          <span className="mini-game__tally-label">done</span>
         </div>
       </div>
 

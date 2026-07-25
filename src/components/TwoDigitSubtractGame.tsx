@@ -41,8 +41,9 @@ export function TwoDigitSubtractGame() {
           <p className="mini-game__eyebrow">{EYEBROW}</p>
           <h3 id="two-digit-subtract-title" className="mini-game__title">{TITLE}</h3>
         </div>
-        <div className="mini-game__streak" aria-label={`${score} solved`}>
-          <span aria-hidden="true">{'★'.repeat(Math.min(score, 5)) || '☆'}</span> {score}
+        <div className="mini-game__tally" aria-label={`${score} solved`}>
+          <span className="mini-game__tally-count">{score}</span>
+          <span className="mini-game__tally-label">solved</span>
         </div>
       </div>
 
