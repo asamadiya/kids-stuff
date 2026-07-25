@@ -79,7 +79,7 @@ export function WhichHasMoreGame() {
               answered && o === answer ? ' is-correct' : ''
             }`}
             aria-pressed={chosen === o}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             {sideLabel(o)} ({sideCount(round, o)})

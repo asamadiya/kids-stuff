@@ -176,7 +176,7 @@ export function HalvesAndWholesGame(): JSX.Element {
             className={`mini-option${chosen === o.id ? ' is-chosen' : ''}${answered && o.id === answerId ? ' is-correct' : ''}`}
             aria-pressed={chosen === o.id}
             aria-label={`Shape ${i + 1}: ${fractionLabel(o)}`}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o.id)}
           >
             <Shape shape={o} />

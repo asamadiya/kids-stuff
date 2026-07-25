@@ -70,7 +70,7 @@ export function PatternParadeGame() {
               answered && o === answer ? ' is-correct' : ''
             }`}
             aria-pressed={chosen === o}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             {o}

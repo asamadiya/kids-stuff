@@ -64,7 +64,7 @@ export function ComicSelGame({ meta, scenarios, eyebrow = 'Friends & feelings' }
               chosen === o.id ? ' is-chosen' : ''
             }${answered && o.id === scn.answerId ? ' is-correct' : ''}`}
             aria-pressed={chosen === o.id}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o.id)}
           >
             {o.face ? <img src={`${BASE}games/faces/${o.face}.png`} alt="" aria-hidden="true" /> : null}

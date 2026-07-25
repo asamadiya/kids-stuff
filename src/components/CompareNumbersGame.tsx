@@ -128,7 +128,7 @@ export function CompareNumbersGame(): JSX.Element {
             type="button"
             className={`mini-option${chosen === o ? ' is-chosen' : ''}${answered && o === answer ? ' is-correct' : ''}`}
             aria-pressed={chosen === o}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             {getCompareLabel(o)}

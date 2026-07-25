@@ -66,7 +66,7 @@ export function OddOneOutGame() {
             }`}
             aria-pressed={chosen?.emoji === o.emoji}
             aria-label={itemLabel(o)}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             <span aria-hidden="true">{o.emoji}</span>

@@ -61,7 +61,7 @@ export function ScenesGame() {
               answered && feeling === round.feeling ? ' is-correct' : ''
             }`}
             aria-pressed={selected === feeling}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(feeling)}
           >
             <img src={`${BASE}games/faces/${feeling}.png`} alt="" aria-hidden="true" />

@@ -190,7 +190,7 @@ export function NameTheFeelingGame() {
               answered && option === view.answer ? ' is-correct' : ''
             }`}
             aria-pressed={chosen === option}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(option)}
           >
             {view.label(option)}

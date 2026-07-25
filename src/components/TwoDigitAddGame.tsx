@@ -75,7 +75,7 @@ export function TwoDigitAddGame() {
             type="button"
             className={`mini-option${chosen === o ? ' is-chosen' : ''}${answered && o === round.answer ? ' is-correct' : ''}`}
             aria-pressed={chosen === o}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             {label(o)}

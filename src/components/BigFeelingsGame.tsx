@@ -105,7 +105,7 @@ export function BigFeelingsGame() {
               chosen === o ? ' is-chosen' : ''
             }${answered && o === answer ? ' is-correct' : ''}`}
             aria-pressed={chosen === o}
-            disabled={answered}
+            aria-disabled={answered}
             onClick={() => choose(o)}
           >
             {mode === 'stories' ? <img src={`${BASE}games/faces/${o}.png`} alt="" aria-hidden="true" /> : null}
