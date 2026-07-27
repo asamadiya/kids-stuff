@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 // Two-Digit Take Away — pure typed logic module (no React).
 // Two-digit subtraction WITHOUT regrouping: for every round, each column's
 // top digit >= bottom digit, so tens and ones can be subtracted independently.
@@ -70,7 +71,11 @@ export function getSubtractOptions(i: number): number[] {
     if (pad >= 0 && !set.has(pad)) set.add(pad);
     pad += 1;
   }
-  return [...set].sort((x, y) => x - y);
+  const rest = [...set].filter((v) => v !== a);
+  return placeOptions({
+    gameId: 'two-digit-subtract', roundIndex: i % SUBTRACT_ROUNDS.length, answer: a,
+    distractors: rest, count: SUBTRACT_OPTION_COUNT,
+  });
 }
 
 /**

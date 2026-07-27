@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 // Pure typed logic for the "How Many Groups?" mini-game.
 // Division seen as grouping: total items shared into equal-sized groups.
 // No React here — just data + deterministic pure helpers.
@@ -72,7 +73,11 @@ export function getGroupOptions(index: number): number[] {
     if (filler !== answer) opts.add(filler);
     filler += 1;
   }
-  return Array.from(opts).sort((a, b) => a - b);
+  const rest = Array.from(opts).filter((v) => v !== answer);
+  return placeOptions({
+    gameId: 'how-many-groups', roundIndex: index % GROUP_ROUNDS.length, answer,
+    distractors: rest, count: GROUP_OPTION_COUNT,
+  });
 }
 
 /** Warm, never-negative feedback for any choice. */
