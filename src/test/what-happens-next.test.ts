@@ -75,7 +75,9 @@ describe('what-happens-next: the strip shape is closed', () => {
     for (const s of STRIPS) {
       expect(panelsOf(s)).toHaveLength(7);
       for (const r of s.roads) {
-        expect(Object.keys(r).sort()).toEqual(['action', 'after', 'afterWord', 'id', 'later', 'laterWord']);
+        expect(Object.keys(r).sort()).toEqual([
+          'action', 'actionWord', 'after', 'afterWord', 'id', 'later', 'laterWord',
+        ]);
       }
       expect(Object.keys(s).sort()).toEqual(['id', 'place', 'roads', 'setup', 'setupWord']);
     }

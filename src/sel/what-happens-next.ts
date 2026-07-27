@@ -39,6 +39,8 @@ export type RoadId = (typeof ROAD_IDS)[number];
 export interface Road {
   readonly id: RoadId;
   readonly action: Panel;
+  /** Short second-person label for the choice, legible before the picture is read. */
+  readonly actionWord: string;
   readonly after: Panel;
   readonly later: Panel;
   /** World-state after the action. Second person, past tense. */
@@ -76,6 +78,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'a',
         action: panel('last-truck-p1a', 'Your hands closing around the truck and pulling it in against your chest.'),
+        actionWord: 'You hold on to the truck.',
         after: panel('last-truck-p2a', 'You holding the truck on the carpet while the boy stands a little way off, watching.'),
         later: panel('last-truck-p3a', 'Tidy-up time: the truck still in your hands, the boy and a girl building together across the room.'),
         afterWord: 'You kept the truck. He watched for a while. Then he went to play with someone else.',
@@ -84,6 +87,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'b',
         action: panel('last-truck-p1b', 'Your hands holding the truck out flat towards the other boy.'),
+        actionWord: 'You hold the truck out to him.',
         after: panel('last-truck-p2b', 'The boy walking off with the truck under his arm, your empty hands in the near frame.'),
         later: panel('last-truck-p3b', 'The boy handing you a small digger with a bent arm, the truck still tucked under his elbow.'),
         afterWord: 'You gave him the truck. He took it and turned away. You had nothing in your hands.',
@@ -103,6 +107,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'a',
         action: panel('dinosaur-mia-p1a', 'Your hands lifting the half-built dinosaur high onto a shelf, out of your sister’s reach.'),
+        actionWord: 'You put it up high.',
         after: panel('dinosaur-mia-p2a', 'Your sister sitting on the rug crying with her arms down, a grown-up standing in the doorway.'),
         later: panel('dinosaur-mia-p3a', 'Bedtime: the whole dinosaur on the shelf, your sister playing alone by the door with her back to you.'),
         afterWord: 'You lifted it onto the high shelf. Mia cried. Dad came in and stood in the doorway.',
@@ -111,6 +116,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'b',
         action: panel('dinosaur-mia-p1b', 'Your hands opening and letting the dinosaur go into your sister’s two hands.'),
+        actionWord: 'You let her have it.',
         after: panel('dinosaur-mia-p2b', 'Your sister laughing with the dinosaur’s tail snapped off in her fist, the body tipped over on the rug.'),
         later: panel('dinosaur-mia-p3b', 'Bedtime: your sister sitting in your lap holding the body in one hand and the loose tail in the other.'),
         afterWord: 'You let her hold it. She pulled, and the tail came off in her hand. She laughed.',
@@ -130,6 +136,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'a',
         action: panel('broken-lid-p1a', 'Your hand pointing down at the broken pieces while a grown-up leans in to look.'),
+        actionWord: 'You point at the broken pieces.',
         after: panel('broken-lid-p2a', 'The grown-up sweeping the pieces into a bin, your friend turned away with his chin down.'),
         later: panel('broken-lid-p3a', 'Home time at the door: your friend walking out beside another boy, not turning round.'),
         afterWord: 'You told his mum. He would not look at you. She swept the pieces into the bin.',
@@ -138,6 +145,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'b',
         action: panel('broken-lid-p1b', 'Your hands folded in your lap and your mouth closed while the grown-up looks around the table.'),
+        actionWord: 'You say nothing.',
         after: panel('broken-lid-p2b', 'A grown-up standing at the table asking the whole table a question, every child quiet, nobody with a raised hand.'),
         later: panel('broken-lid-p3b', 'Snack time: your friend sitting close beside you, the broken lid visible in the bin behind you both.'),
         afterWord: 'You said nothing. She asked everyone at the table who did it. Nobody answered.',
@@ -157,6 +165,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'a',
         action: panel('winning-game-p1a', 'Your hand moving the last counter along the board to the end square.'),
+        actionWord: 'You move your counter to the end.',
         after: panel('winning-game-p2a', 'The finished board with your counters home, the boy with his hands under the table looking towards the door.'),
         later: panel('winning-game-p3a', 'After lunch: the boy playing a new game with another child, two heads bent over it, you at the edge of the frame.'),
         afterWord: 'You finished the game. You won. He put his hands under the table and looked at the door.',
@@ -165,6 +174,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'b',
         action: panel('winning-game-p1b', 'Your hands lifting away from the board and resting flat on the carpet, the counters left where they are.'),
+        actionWord: 'You take your hands off the board.',
         after: panel('winning-game-p2b', 'The boy already standing up and walking off, the unfinished board still laid out on the carpet.'),
         later: panel('winning-game-p3b', 'Later: you standing by the unfinished board, the boy on the carpet reading a book with his back half turned.'),
         afterWord: 'You stopped the game. He got up straight away. The counters stayed where they were.',
@@ -184,6 +194,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'a',
         action: panel('promised-mia-p1a', 'Your hands pushing your shoes on at the door while your friend waits on the step.'),
+        actionWord: 'You put your shoes on and go.',
         after: panel('promised-mia-p2a', 'Seen back through the doorway: your sister still at the low table with the beads, alone.'),
         later: panel('promised-mia-p3a', 'Coming back in: the bead tin closed on the table, your sister asleep on the sofa under a blanket.'),
         afterWord: 'You went outside with him. Mia stayed at the table with the beads. She did not call after you.',
@@ -192,6 +203,7 @@ export const STRIPS: readonly Strip[] = [
       {
         id: 'b',
         action: panel('promised-mia-p1b', 'Your hands threading a bead onto a string at the low table beside your sister.'),
+        actionWord: 'You stay and thread a bead.',
         after: panel('promised-mia-p2b', 'The bead tin tipped over across the table, your sister walking off towards a grown-up in the next room.'),
         later: panel('promised-mia-p3b', 'The empty front step through the open door, no shoes on the mat, the street beyond it quiet.'),
         afterWord: 'You stayed and threaded beads. Mia tipped the tin over after two minutes and went to find Dad.',

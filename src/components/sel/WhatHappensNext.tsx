@@ -89,58 +89,42 @@ export function WhatHappensNext() {
     });
   };
 
-  const roadRow = (road: Road) => {
+  /**
+   * The two roads sit side by side so the fork reads as one choice rather than
+   * two sequential steps, and each is captioned with what the hands actually do
+   * — a caption of "what your hands did" on both is no help in choosing.
+   */
+  const roadChoice = (road: Road) => {
     const isChosen = chosen === road.id;
     const faded = chosen !== null && !isChosen;
     return (
-      <div className="bench__row" key={road.id}>
-        <div className="bench__figure" style={faded ? { opacity: 0.3, filter: 'grayscale(1)' } : undefined}>
-          <button
-            type="button"
-            className={`bench-part${isChosen ? ' is-set' : ''}`}
-            aria-pressed={isChosen}
-            aria-label={`Walk this road. ${road.action.alt}`}
-            onClick={() => walk(road.id)}
-          >
-            <img
-              src={src(road.action)}
-              alt={road.action.alt}
-              width={180}
-              height={140}
-              style={{ display: 'block', border: `1px solid ${RULE}` }}
-            />
-          </button>
-          <p className="bench__figure-caption">{faded ? 'the road not taken' : 'what your hands did'}</p>
-        </div>
-
-        {isChosen && (
-          <div className="bench__figure">
-            <img
-              src={src(road.after)}
-              alt={road.after.alt}
-              width={180}
-              height={140}
-              style={{ display: 'block', border: `1px solid ${RULE}` }}
-            />
-            <p className="bench__figure-caption">{road.afterWord}</p>
-          </div>
-        )}
-
-        {isChosen && extended && (
-          <div className="bench__figure">
-            <img
-              src={src(road.later)}
-              alt={road.later.alt}
-              width={180}
-              height={140}
-              style={{ display: 'block', border: `1px solid ${RULE}` }}
-            />
-            <p className="bench__figure-caption">{road.laterWord}</p>
-          </div>
-        )}
+      <div
+        className="bench__figure"
+        key={road.id}
+        style={faded ? { opacity: 0.3, filter: 'grayscale(1)' } : undefined}
+      >
+        <button
+          type="button"
+          className={`bench-part${isChosen ? ' is-set' : ''}`}
+          aria-pressed={isChosen}
+          aria-label={`${road.actionWord} ${road.action.alt}`}
+          onClick={() => walk(road.id)}
+        >
+          <img
+            src={src(road.action)}
+            alt={road.action.alt}
+            width={200}
+            height={156}
+            style={{ display: 'block', border: `1px solid ${RULE}` }}
+          />
+        </button>
+        <p className="bench__figure-caption">{road.actionWord}</p>
+        {faded && <p className="bench__figure-caption">the road not taken</p>}
       </div>
     );
   };
+
+  const walkedRoad = strip.roads.find((r) => r.id === chosen);
 
   // ------------------------------------------------------- the two-road map
   const W = 560;
@@ -176,7 +160,35 @@ export function WhatHappensNext() {
           </button>
         </div>
 
-        {strip.roads.map(roadRow)}
+        <div className="bench__row">{strip.roads.map(roadChoice)}</div>
+
+        {walkedRoad && (
+          <div className="bench__row">
+            <div className="bench__figure">
+              <img
+                src={src(walkedRoad.after)}
+                alt={walkedRoad.after.alt}
+                width={200}
+                height={156}
+                style={{ display: 'block', border: `1px solid ${RULE}` }}
+              />
+              <p className="bench__figure-caption">{walkedRoad.afterWord}</p>
+            </div>
+
+            {extended && (
+              <div className="bench__figure">
+                <img
+                  src={src(walkedRoad.later)}
+                  alt={walkedRoad.later.alt}
+                  width={200}
+                  height={156}
+                  style={{ display: 'block', border: `1px solid ${RULE}` }}
+                />
+                <p className="bench__figure-caption">{walkedRoad.laterWord}</p>
+              </div>
+            )}
+          </div>
+        )}
 
         <svg
           ref={svgRef}
