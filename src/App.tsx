@@ -9,6 +9,7 @@ import { STORIES, getStory } from './stories';
 import './styles/tokens.css';
 import './styles/app.css';
 import './styles/workshop.css';
+import './styles/sel.css';
 import './styles/print.css';
 
 /**

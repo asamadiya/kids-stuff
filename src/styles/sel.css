@@ -1,0 +1,40 @@
+/*
+ * The social exercises. Their stage is photographs of a life rather than one
+ * drawing, so panels want room and a row to sit in. Everything else is
+ * inherited from the bench.
+ */
+
+.bench__stage > .bench__row {
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+/* Panels are plates: sized generously, ruled, on paper. */
+.bench__figure { max-width: 20rem; }
+.bench__figure img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+.bench__figure-caption {
+  max-width: 20rem;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+/* A road not walked stays on the paper, visible and unopened. */
+.bench__figure[data-walked='false'] img { opacity: 0.35; filter: grayscale(1); }
+
+/* One crowded room wants the width it was drawn at. */
+.bench__stage img[alt*='Many people'] { max-width: 54rem; }
+
+@media (max-width: 44rem) {
+  .bench__figure, .bench__figure-caption { max-width: 100%; }
+}

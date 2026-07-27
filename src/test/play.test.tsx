@@ -13,7 +13,7 @@ describe('Rikki Play hub', () => {
     ).toBeInTheDocument();
     const cards = screen.getAllByRole('button', { name: /^Play / });
     expect(cards.length).toBeGreaterThanOrEqual(12);
-    expect(screen.getByRole('button', { name: /Play Name the Feeling/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Play What Happens Next/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Play Counting to Ten/i })).toBeInTheDocument();
   });
 
@@ -21,8 +21,8 @@ describe('Rikki Play hub', () => {
     const user = userEvent.setup();
     render(<PlayHub onExit={vi.fn()} />);
 
-    await user.click(screen.getByRole('button', { name: /Play Name the Feeling/i }));
-    expect(screen.getByRole('heading', { name: /name the feeling/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Play What Happens Next/i }));
+    expect(screen.getByRole('heading', { name: /what happens next/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /all exercises/i }));
     expect(screen.getByRole('button', { name: /Play Counting to Ten/i })).toBeInTheDocument();

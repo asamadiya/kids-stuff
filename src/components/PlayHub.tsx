@@ -12,8 +12,6 @@ import OddOneOutGame from './OddOneOutGame';
 import WhichHasMoreGame from './WhichHasMoreGame';
 import NumberOrderGame from './NumberOrderGame';
 import MemoryPairsGame from './MemoryPairsGame';
-import NameTheFeelingGame from './NameTheFeelingGame';
-import BigFeelingsGame from './BigFeelingsGame';
 import TensAndOnesGame from './TensAndOnesGame';
 import CountByTensGame from './CountByTensGame';
 import SkipCountGame from './SkipCountGame';
@@ -36,17 +34,6 @@ import OddEvenGame from './OddEvenGame';
 import MoneyCoinsGame from './MoneyCoinsGame';
 import TenMoreTenLessGame from './TenMoreTenLessGame';
 import WhatsMissingGame from './WhatsMissingGame';
-import ScenesGame from './ScenesGame';
-import SharingTurnsGame from './SharingTurnsGame';
-import CalmDownGame from './CalmDownGame';
-import KindFriendGame from './KindFriendGame';
-import MakingFriendsGame from './MakingFriendsGame';
-import SayingSorryGame from './SayingSorryGame';
-import EveryoneIncludedGame from './EveryoneIncludedGame';
-import BraveFeelingsGame from './BraveFeelingsGame';
-import TellingTruthGame from './TellingTruthGame';
-import HelpingHandsGame from './HelpingHandsGame';
-import WinOrLoseGame from './WinOrLoseGame';
 import { COUNT_WITH_RIKKI_META } from '../games/count-with-rikki';
 import { PATTERN_PARADE_META } from '../games/pattern-parade';
 import { SHAPE_HUNT_META } from '../games/shape-hunt';
@@ -58,8 +45,6 @@ import { ODDONEOUT_META } from '../games/odd-one-out';
 import { WHICH_HAS_MORE_META } from '../games/which-has-more';
 import { NUMBER_ORDER_META } from '../games/number-order';
 import { MEMORY_PAIRS_META } from '../games/memory-pairs';
-import { NAMETHEFEELING_META } from '../games/feelings';
-import { BIG_FEELINGS_META } from '../games/emotions';
 import { TENS_AND_ONES_META } from '../games/tens-and-ones';
 import { COUNT_BY_TENS_META } from '../games/count-by-tens';
 import { SKIP_COUNT_META } from '../games/skip-count';
@@ -82,17 +67,30 @@ import { ODD_EVEN_META } from '../games/odd-even';
 import { MONEY_COINS_META } from '../games/money-coins';
 import { TEN_MORE_TEN_LESS_META } from '../games/ten-more-ten-less';
 import { WHATS_MISSING_META } from '../games/whats-missing';
-import { SCENES_META } from '../games/scenes';
-import { SHARING_TURNS_META } from '../games/sharing-turns';
-import { CALM_DOWN_META } from '../games/calm-down';
-import { KIND_FRIEND_META } from '../games/kind-friend';
-import { MAKING_FRIENDS_META } from '../games/making-friends';
-import { SAYING_SORRY_META } from '../games/saying-sorry';
-import { EVERYONE_INCLUDED_META } from '../games/everyone-included';
-import { BRAVE_FEELINGS_META } from '../games/brave-feelings';
-import { TELLING_TRUTH_META } from '../games/telling-truth';
-import { HELPING_HANDS_META } from '../games/helping-hands';
-import { WIN_OR_LOSE_META } from '../games/win-or-lose';
+import WhatHappensNext from './sel/WhatHappensNext';
+import TheWideView from './sel/TheWideView';
+import BorrowedEyes from './sel/BorrowedEyes';
+import MeantAndLanded from './sel/MeantAndLanded';
+import BeforeYouDecide from './sel/BeforeYouDecide';
+import HoldTheLine from './sel/HoldTheLine';
+import OneSwingTwoKids from './sel/OneSwingTwoKids';
+import FiveCookies from './sel/FiveCookies';
+import NotTheSameRule from './sel/NotTheSameRule';
+import BodyCheck from './sel/BodyCheck';
+import PutItBackTogether from './sel/PutItBackTogether';
+import TheFeelingRule from './sel/TheFeelingRule';
+import { WHATHAPPENSNEXT_META } from '../sel/what-happens-next';
+import { THE_WIDE_VIEW_META } from '../sel/the-wide-view';
+import { BORROWED_EYES_META } from '../sel/borrowed-eyes';
+import { MEANT_AND_LANDED_META } from '../sel/meant-and-landed';
+import { BEFORE_YOU_DECIDE_META } from '../sel/before-you-decide';
+import { HOLDTHELINE_META } from '../sel/hold-the-line';
+import { ONE_SWING_TWO_KIDS_META } from '../sel/one-swing-two-kids';
+import { FIVE_COOKIES_META } from '../sel/five-cookies';
+import { NOT_THE_SAME_RULE_META } from '../sel/not-the-same-rule';
+import { BODYCHECK_META } from '../sel/body-check';
+import { PUT_IT_BACK_TOGETHER_META } from '../sel/put-it-back-together';
+import { THE_FEELING_RULE_META } from '../sel/the-feeling-rule';
 import '../styles/play.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -101,7 +99,30 @@ export interface PlayHubProps { readonly onExit: () => void; }
 interface GameMeta { readonly id: string; readonly title: string; readonly icon: string; readonly color: string; readonly tagline: string; }
 interface GameEntry { readonly meta: GameMeta; readonly Component: ComponentType; readonly cat: string; }
 
+
+/**
+ * The social exercises describe themselves differently from the drills: they
+ * have a note rather than a tagline, and none of them is scored. This shapes
+ * one into a card without pretending it is a quiz.
+ */
+interface SelMeta { readonly id: string; readonly title: string; readonly eyebrow: string; readonly note: string }
+const asCard = (m: SelMeta, color: string): GameMeta => ({
+  id: m.id, title: m.title, icon: '', color, tagline: m.note,
+});
+
 const GAMES: readonly GameEntry[] = [
+  { meta: asCard(WHATHAPPENSNEXT_META, 'berry'), Component: WhatHappensNext, cat: 'feelings' },
+  { meta: asCard(THE_WIDE_VIEW_META, 'teal'), Component: TheWideView, cat: 'feelings' },
+  { meta: asCard(BORROWED_EYES_META, 'slate'), Component: BorrowedEyes, cat: 'feelings' },
+  { meta: asCard(MEANT_AND_LANDED_META, 'olive'), Component: MeantAndLanded, cat: 'feelings' },
+  { meta: asCard(BEFORE_YOU_DECIDE_META, 'ochre'), Component: BeforeYouDecide, cat: 'feelings' },
+  { meta: asCard(HOLDTHELINE_META, 'terracotta'), Component: HoldTheLine, cat: 'feelings' },
+  { meta: asCard(ONE_SWING_TWO_KIDS_META, 'plum'), Component: OneSwingTwoKids, cat: 'feelings' },
+  { meta: asCard(FIVE_COOKIES_META, 'sky'), Component: FiveCookies, cat: 'feelings' },
+  { meta: asCard(NOT_THE_SAME_RULE_META, 'leaf'), Component: NotTheSameRule, cat: 'feelings' },
+  { meta: asCard(BODYCHECK_META, 'grape'), Component: BodyCheck, cat: 'feelings' },
+  { meta: asCard(PUT_IT_BACK_TOGETHER_META, 'coral'), Component: PutItBackTogether, cat: 'feelings' },
+  { meta: asCard(THE_FEELING_RULE_META, 'aqua'), Component: TheFeelingRule, cat: 'feelings' },
   { meta: COUNT_WITH_RIKKI_META, Component: CountWithRikkiGame, cat: 'early' },
   { meta: PATTERN_PARADE_META, Component: PatternParadeGame, cat: 'early' },
   { meta: SHAPE_HUNT_META, Component: ShapeHuntGame, cat: 'early' },
@@ -113,8 +134,6 @@ const GAMES: readonly GameEntry[] = [
   { meta: WHICH_HAS_MORE_META, Component: WhichHasMoreGame, cat: 'early' },
   { meta: NUMBER_ORDER_META, Component: NumberOrderGame, cat: 'early' },
   { meta: MEMORY_PAIRS_META, Component: MemoryPairsGame, cat: 'early' },
-  { meta: NAMETHEFEELING_META, Component: NameTheFeelingGame, cat: 'feelings' },
-  { meta: BIG_FEELINGS_META, Component: BigFeelingsGame, cat: 'feelings' },
   { meta: TENS_AND_ONES_META, Component: TensAndOnesGame, cat: 'math' },
   { meta: COUNT_BY_TENS_META, Component: CountByTensGame, cat: 'math' },
   { meta: SKIP_COUNT_META, Component: SkipCountGame, cat: 'math' },
@@ -137,20 +156,9 @@ const GAMES: readonly GameEntry[] = [
   { meta: MONEY_COINS_META, Component: MoneyCoinsGame, cat: 'math' },
   { meta: TEN_MORE_TEN_LESS_META, Component: TenMoreTenLessGame, cat: 'math' },
   { meta: WHATS_MISSING_META, Component: WhatsMissingGame, cat: 'math' },
-  { meta: SCENES_META, Component: ScenesGame, cat: 'feelings' },
-  { meta: SHARING_TURNS_META, Component: SharingTurnsGame, cat: 'feelings' },
-  { meta: CALM_DOWN_META, Component: CalmDownGame, cat: 'feelings' },
-  { meta: KIND_FRIEND_META, Component: KindFriendGame, cat: 'feelings' },
-  { meta: MAKING_FRIENDS_META, Component: MakingFriendsGame, cat: 'feelings' },
-  { meta: SAYING_SORRY_META, Component: SayingSorryGame, cat: 'feelings' },
-  { meta: EVERYONE_INCLUDED_META, Component: EveryoneIncludedGame, cat: 'feelings' },
-  { meta: BRAVE_FEELINGS_META, Component: BraveFeelingsGame, cat: 'feelings' },
-  { meta: TELLING_TRUTH_META, Component: TellingTruthGame, cat: 'feelings' },
-  { meta: HELPING_HANDS_META, Component: HelpingHandsGame, cat: 'feelings' },
-  { meta: WIN_OR_LOSE_META, Component: WinOrLoseGame, cat: 'feelings' },
 ];
 const CATEGORIES: readonly { key: string; title: string; blurb: string }[] = [
-  { key: 'feelings', title: "Emotions & Other People", blurb: "Name what you feel with precision, and read what other people feel." },
+  { key: 'feelings', title: "People & What Happens Next", blurb: "Watch what people do, decide what you do, and see what follows. Nothing here is marked." },
   { key: 'math', title: "Number & Quantity", blurb: "Place value, addition and subtraction, multiplication, division, fractions, money and the number line." },
   { key: 'early', title: "Letters, Shapes & Patterns", blurb: "Sounds and letters, plane shapes, colour, sequence and recall." },
 ];
@@ -169,7 +177,7 @@ export function PlayHub({ onExit }: PlayHubProps) {
           <h1 className="play-hub__title">Practice</h1>
           <p className="play-hub__lede">
             {GAMES.length} exercises. Work at whichever you like, for as long as it
-            holds your attention; the tally counts what you get right.
+            holds your attention.
           </p>
         </div>
         <RikkiMascot className="play-hub__rikki" />
