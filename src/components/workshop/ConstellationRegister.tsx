@@ -17,7 +17,7 @@ interface Figure extends Kept {
 }
 const rack = drawer<Figure>('constellation-register');
 
-const NIGHT = '#22211b', PAPER = '#f4f0e6', FAINT = '#6b6757', RULE = '#ddd6c4', OCHRE = '#8a6416';
+const NIGHT = '#22211b', PAPER = '#f4f0e6', OCHRE = '#8a6416';
 
 export function ConstellationRegister() {
   const [mode, setMode] = useState<Arrangement>('time');
