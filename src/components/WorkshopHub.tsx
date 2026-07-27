@@ -3,8 +3,10 @@ import type { ComponentType } from 'react';
 import { StoryLoom } from './StoryLoom';
 import NumberMill from './workshop/NumberMill';
 import Quadrat from './workshop/Quadrat';
+import SortingKey from './workshop/SortingKey';
 import { NUMBER_MILL_META } from '../workshop/number-mill';
 import { QUADRAT_META } from '../workshop/quadrat';
+import { SORTINGKEY_META } from '../workshop/sorting-key';
 import '../styles/workshop.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -33,6 +35,7 @@ interface ToolEntry {
 const TOOLS: readonly ToolEntry[] = [
   { meta: NUMBER_MILL_META, Component: NumberMill },
   { meta: QUADRAT_META, Component: Quadrat },
+  { meta: SORTINGKEY_META, Component: SortingKey },
 ];
 
 const LOOM: ToolMeta = {
