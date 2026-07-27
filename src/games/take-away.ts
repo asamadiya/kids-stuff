@@ -1,5 +1,10 @@
 // Take Away — subtraction within 10 with objects.
 // Pure typed logic module. No React.
+//
+// The objects come from the vetted NOUNS table rather than being typed inline.
+// A round here once carried U+1F38E JAPANESE DOLLS while calling them "eggs",
+// and because that glyph draws two figures, nine "eggs" rendered as eighteen.
+import { NOUNS, counted, type Noun } from './nouns';
 
 export const TAKE_AWAY_META = {
   id: 'take-away',
@@ -14,10 +19,8 @@ export interface TakeAwayRound {
   total: number;
   /** How many get crossed out / taken away. */
   takeAway: number;
-  /** The emoji used to draw the objects. */
-  emoji: string;
-  /** Friendly noun (plural) for the objects. */
-  noun: string;
+  /** The object being counted: glyph and both word forms, from NOUNS. */
+  item: Noun;
 }
 
 /** The answer is always total - takeAway. */
@@ -26,20 +29,20 @@ export function difference(round: TakeAwayRound): number {
 }
 
 export const TAKE_AWAY_ROUNDS: readonly TakeAwayRound[] = [
-  { total: 5, takeAway: 2, emoji: '🍪', noun: 'cookies' },
-  { total: 4, takeAway: 1, emoji: '🍎', noun: 'apples' },
-  { total: 6, takeAway: 3, emoji: '🎈', noun: 'balloons' },
-  { total: 3, takeAway: 2, emoji: '🐟', noun: 'fish' },
-  { total: 7, takeAway: 4, emoji: '⭐', noun: 'stars' },
-  { total: 8, takeAway: 5, emoji: '🍓', noun: 'strawberries' },
-  { total: 5, takeAway: 5, emoji: '🍩', noun: 'donuts' },
-  { total: 9, takeAway: 3, emoji: '🎎', noun: 'eggs' },
-  { total: 6, takeAway: 2, emoji: '🐢', noun: 'turtles' },
-  { total: 10, takeAway: 6, emoji: '🍇', noun: 'grapes' },
-  { total: 4, takeAway: 0, emoji: '🦋', noun: 'butterflies' },
-  { total: 7, takeAway: 2, emoji: '🍌', noun: 'bananas' },
-  { total: 8, takeAway: 3, emoji: '🔵', noun: 'buttons' },
-  { total: 9, takeAway: 4, emoji: '🌼', noun: 'flowers' },
+  { total: 5, takeAway: 2, item: NOUNS.seed },
+  { total: 4, takeAway: 1, item: NOUNS.shell },
+  { total: 6, takeAway: 3, item: NOUNS.stone },
+  { total: 3, takeAway: 2, item: NOUNS.feather },
+  { total: 7, takeAway: 4, item: NOUNS.brick },
+  { total: 8, takeAway: 5, item: NOUNS.chestnut },
+  { total: 5, takeAway: 5, item: NOUNS.spoon },
+  { total: 9, takeAway: 3, item: NOUNS.egg },
+  { total: 6, takeAway: 2, item: NOUNS.key },
+  { total: 10, takeAway: 6, item: NOUNS.leaf },
+  { total: 4, takeAway: 0, item: NOUNS.carrot },
+  { total: 7, takeAway: 2, item: NOUNS.bolt },
+  { total: 8, takeAway: 3, item: NOUNS.sock },
+  { total: 9, takeAway: 4, item: NOUNS.candle },
 ] as const;
 
 /**
@@ -81,11 +84,11 @@ export function getTakeAwayOptions(index: number): number[] {
 /** Warm feedback for ANY choice. Never says wrong/incorrect/no. */
 export function getTakeAwayFeedback(round: TakeAwayRound, selected: number): string {
   const answer = difference(round);
-  const { total, takeAway, noun } = round;
+  const { total, takeAway, item } = round;
   if (selected === answer) {
-    return `Correct. ${total} take away ${takeAway} leaves ${answer} ${noun}. You counted the ones still there!`;
+    return `Correct. ${total} take away ${takeAway} leaves ${counted(answer, item)}. You counted the ones still there!`;
   }
-  return `Not quite. Start with ${total} ${noun}, cross out ${takeAway}, and count what stays — that leaves ${answer}. ${total} − ${takeAway} = ${answer}.`;
+  return `Not quite. Start with ${counted(total, item)}, cross out ${takeAway}, and count what stays — that leaves ${answer}. ${total} − ${takeAway} = ${answer}.`;
 }
 
 /** Short label helper (kept simple; always non-empty). */

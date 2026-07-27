@@ -24,8 +24,8 @@ describe('take-away logic module', () => {
       expect(r.total).toBeLessThanOrEqual(10);
       expect(r.takeAway).toBeGreaterThanOrEqual(0);
       expect(r.takeAway).toBeLessThanOrEqual(r.total);
-      expect(r.emoji.length).toBeGreaterThan(0);
-      expect(r.noun.length).toBeGreaterThan(0);
+      expect(r.item.glyph.length).toBeGreaterThan(0);
+      expect(r.item.plural.length).toBeGreaterThan(0);
     }
   });
 

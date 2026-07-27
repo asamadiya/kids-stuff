@@ -1,3 +1,4 @@
+import { counted } from '../games/nouns';
 import { useState } from 'react';
 import {
   SHARE_FAIRLY_META,
@@ -21,7 +22,7 @@ export function ShareFairlyGame() {
   const opts = getShareOptions(index);
   const answered = chosen !== null;
 
-  const question = `Share ${round.total} ${round.itemName} on ${round.plates} ${round.plateName}s. How many on each?`;
+  const question = `Share ${counted(round.total, round.item)} on ${counted(round.plates, round.vessel)}. How many on each?`;
   const hint = getShareHint(round);
   const feedback = answered ? getShareFeedback(round, chosen) : '';
 
@@ -55,19 +56,19 @@ export function ShareFairlyGame() {
       <div className="mini-game__stage">
         <p>
           <span className="mini-game__emoji">{round.total}</span>
-          <span aria-hidden="true"> {round.item} </span>
+          <span aria-hidden="true"> {round.item.glyph} </span>
           <span className="mini-game__emoji"> ÷ </span>
           <span className="mini-game__emoji">{round.plates}</span>
-          <span aria-hidden="true"> {round.plate}</span>
+          <span aria-hidden="true"> {round.vessel.glyph}</span>
         </p>
-        <div className="mini-game__seq" aria-label={`${round.total} ${round.itemName}`}>
+        <div className="mini-game__seq" aria-label={counted(round.total, round.item)}>
           {items.map((i) => (
-            <span key={`item-${i}`} className="mini-game__emoji" aria-hidden="true">{round.item}</span>
+            <span key={`item-${i}`} className="mini-game__emoji" aria-hidden="true">{round.item.glyph}</span>
           ))}
         </div>
-        <div className="mini-game__seq" aria-label={`${round.plates} ${round.plateName}s to share onto`}>
+        <div className="mini-game__seq" aria-label={`${counted(round.plates, round.vessel)} to share onto`}>
           {plates.map((i) => (
-            <span key={`plate-${i}`} className="mini-game__emoji" aria-hidden="true">{round.plate}</span>
+            <span key={`plate-${i}`} className="mini-game__emoji" aria-hidden="true">{round.vessel.glyph}</span>
           ))}
         </div>
       </div>

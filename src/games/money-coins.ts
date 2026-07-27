@@ -24,6 +24,13 @@ export const COIN_LABEL: Record<CoinKind, string> = {
   penny: 'Penny',
 };
 
+/** Written out, never derived: "penny" pluralises to "pennies", not "pennys". */
+export const COIN_PLURAL: Record<CoinKind, string> = {
+  dime: 'Dimes',
+  nickel: 'Nickels',
+  penny: 'Pennies',
+};
+
 export interface CoinCount {
   kind: CoinKind;
   count: number;
@@ -126,7 +133,7 @@ export function centsLabel(cents: number): string {
 export function roundBreakdown(round: MoneyRound): string {
   const parts = round.coins.map((c) => {
     const name = COIN_LABEL[c.kind].toLowerCase();
-    const plural = c.count === 1 ? name : `${name}s`;
+    const plural = c.count === 1 ? name : COIN_PLURAL[c.kind].toLowerCase();
     return `${c.count} ${plural}`;
   });
   return parts.join(' + ');
