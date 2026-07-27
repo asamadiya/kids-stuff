@@ -20,8 +20,8 @@ export function TakeAwayGame() {
   const opts = getTakeAwayOptions(index);
   const answered = chosen !== null;
 
-  const question = `How many ${round.noun} are left?`;
-  const hint = `Count only the ${round.noun} that are NOT crossed out.`;
+  const question = `How many ${round.item.plural} are left?`;
+  const hint = `Count only the ${round.item.plural} that are NOT crossed out.`;
   const feedback = answered ? getTakeAwayFeedback(round, chosen) : '';
 
   function choose(value: number) {
@@ -66,7 +66,7 @@ export function TakeAwayGame() {
                   filter: takenAway ? 'grayscale(1)' : 'none',
                 }}
               >
-                {round.emoji}
+                {round.item.glyph}
                 {takenAway ? (
                   <svg
                     viewBox="0 0 100 100"

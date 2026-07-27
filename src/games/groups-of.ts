@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 export const GROUPS_OF_META = {
   id: 'groups-of',
   title: 'Equal Groups',
@@ -82,7 +83,11 @@ export function getGroupsOptions(index: number): number[] {
     pad += 1;
   }
 
-  return opts.sort((a, b) => a - b);
+  const [, ...rest] = opts;
+  return placeOptions({
+    gameId: 'groups-of', roundIndex: index % GROUPS_ROUNDS.length, answer,
+    distractors: rest, count: OPTION_COUNT,
+  });
 }
 
 /** Warm, no-fail feedback for any selection. */

@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 // Coin Counter — pure typed logic module (no React).
 // Practical money math: count dimes (10c), nickels (5c), pennies (1c).
 // Totals kept <= 50c. Deterministic options always include the correct answer.
@@ -22,6 +23,13 @@ export const COIN_LABEL: Record<CoinKind, string> = {
   dime: 'Dime',
   nickel: 'Nickel',
   penny: 'Penny',
+};
+
+/** Written out, never derived: "penny" pluralises to "pennies", not "pennys". */
+export const COIN_PLURAL: Record<CoinKind, string> = {
+  dime: 'Dimes',
+  nickel: 'Nickels',
+  penny: 'Pennies',
 };
 
 export interface CoinCount {
@@ -112,9 +120,11 @@ export function getMoneyOptions(index: number): number[] {
     bump += 1;
   }
 
-  return Array.from(opts)
-    .slice(0, MONEY_OPTION_COUNT)
-    .sort((a, b) => a - b);
+  const rest = Array.from(opts).filter((v) => v !== answer);
+  return placeOptions({
+    gameId: 'money-coins', roundIndex: index % MONEY_ROUNDS.length, answer,
+    distractors: rest, count: MONEY_OPTION_COUNT,
+  });
 }
 
 /** Format a cents value as a friendly label, e.g. 16 -> "16c". */
@@ -126,7 +136,7 @@ export function centsLabel(cents: number): string {
 export function roundBreakdown(round: MoneyRound): string {
   const parts = round.coins.map((c) => {
     const name = COIN_LABEL[c.kind].toLowerCase();
-    const plural = c.count === 1 ? name : `${name}s`;
+    const plural = c.count === 1 ? name : COIN_PLURAL[c.kind].toLowerCase();
     return `${c.count} ${plural}`;
   });
   return parts.join(' + ');

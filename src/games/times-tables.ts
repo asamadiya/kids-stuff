@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 export const TIMES_TABLES_META = {
   id: 'times-tables',
   title: 'Multiplication: 2s, 5s, 10s',
@@ -91,9 +92,11 @@ export function getTimesOptions(index: number): number[] {
     filler += 1;
   }
 
-  // Deterministic ordering: sort ascending so the position of the answer is
-  // stable/reproducible for tests but not always first.
-  return opts.slice(0, TIMES_OPTION_COUNT).sort((x, y) => x - y);
+  const [, ...rest] = opts;
+  return placeOptions({
+    gameId: 'times-tables', roundIndex: index % TIMES_ROUNDS.length, answer,
+    distractors: rest, count: TIMES_OPTION_COUNT,
+  });
 }
 
 /** Warm, no-fail feedback. Never says wrong/incorrect/no. */

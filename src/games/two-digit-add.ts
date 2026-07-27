@@ -1,3 +1,4 @@
+import { placeOptions } from './options';
 // Two-Digit Adding — pure typed logic module (no React).
 // Two-digit addition WITHOUT regrouping: every column sum stays < 10,
 // so tens add to tens and ones add to ones with no carrying.
@@ -50,7 +51,7 @@ const clampOption = (n: number): number => (n < 0 ? 0 : n);
 
 // Build a round: verify no-regroup, compute the true sum, and assemble
 // a deterministic, sorted option list that always contains the answer.
-function buildRound(raw: RawRound): TwoDigitAddRound {
+function buildRound(raw: RawRound, index: number): TwoDigitAddRound {
   const onesA = raw.a % 10;
   const onesB = raw.b % 10;
   const tensA = Math.floor(raw.a / 10);
@@ -65,12 +66,15 @@ function buildRound(raw: RawRound): TwoDigitAddRound {
     uniq.add(clampOption(d));
   }
   uniq.delete(answer);
-  const options = [answer, ...Array.from(uniq)].sort((x, y) => x - y);
+  const options = placeOptions({
+    gameId: 'two-digit-add', roundIndex: index, answer,
+    distractors: Array.from(uniq), count: 3,
+  });
   return { a: raw.a, b: raw.b, answer, options };
 }
 
 export const TWO_DIGIT_ADD_ROUNDS: readonly TwoDigitAddRound[] =
-  RAW_ROUNDS.map(buildRound);
+  RAW_ROUNDS.map((raw, i) => buildRound(raw, i));
 
 /** Deterministic options for round `i` (modulo-safe). Always includes the answer. */
 export function getAddOptions(i: number): readonly number[] {

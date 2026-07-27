@@ -1,3 +1,4 @@
+import { NOUNS, VESSELS, counted, type Noun } from './nouns';
 // Share It Fairly — division as fair sharing (exact division only).
 // Pure typed logic module. No React.
 
@@ -14,32 +15,28 @@ export interface ShareRound {
   total: number;
   /** Number of groups (plates) to share across. */
   plates: number;
-  /** Emoji for the thing being shared. */
-  item: string;
-  /** Plural noun for the thing being shared. */
-  itemName: string;
-  /** Emoji used to draw each plate/group. */
-  plate: string;
-  /** Singular noun for the group (e.g. "plate", "basket"). */
-  plateName: string;
+  /** The thing being shared: glyph and both word forms, from NOUNS. */
+  item: Noun;
+  /** What it is shared onto: glyph and both word forms, from VESSELS. */
+  vessel: Noun;
 }
 
 /** total must be exactly divisible by plates for every round. */
 export const SHARE_ROUNDS: readonly ShareRound[] = [
-  { total: 12, plates: 4, item: '🍪', itemName: 'cookies', plate: '🍽️', plateName: 'plate' },
-  { total: 6, plates: 2, item: '🍎', itemName: 'apples', plate: '🧺', plateName: 'basket' },
-  { total: 10, plates: 5, item: '🍌', itemName: 'bananas', plate: '🐒', plateName: 'monkey' },
-  { total: 8, plates: 2, item: '🍕', itemName: 'pizza slices', plate: '🍽️', plateName: 'plate' },
-  { total: 9, plates: 3, item: '🎈', itemName: 'balloons', plate: '🧒', plateName: 'kid' },
-  { total: 15, plates: 3, item: '🍓', itemName: 'strawberries', plate: '🥣', plateName: 'bowl' },
-  { total: 12, plates: 3, item: '🐟', itemName: 'fish', plate: '🐱', plateName: 'cat' },
-  { total: 16, plates: 4, item: '🧁', itemName: 'cupcakes', plate: '🎂', plateName: 'party table' },
-  { total: 14, plates: 2, item: '🦴', itemName: 'bones', plate: '🐶', plateName: 'dog' },
-  { total: 20, plates: 5, item: '⭐', itemName: 'stickers', plate: '📓', plateName: 'notebook' },
-  { total: 18, plates: 3, item: '🍇', itemName: 'grapes', plate: '🐦', plateName: 'bird' },
-  { total: 21, plates: 3, item: '🥕', itemName: 'carrots', plate: '🐰', plateName: 'bunny' },
-  { total: 24, plates: 4, item: '🍬', itemName: 'candies', plate: '👜', plateName: 'bag' },
-  { total: 12, plates: 6, item: '🥚', itemName: 'eggs', plate: '🍳', plateName: 'pan' },
+  { total: 12, plates: 4, item: NOUNS.seed, vessel: VESSELS.bowl },
+  { total: 6, plates: 2, item: NOUNS.shell, vessel: VESSELS.basket },
+  { total: 10, plates: 5, item: NOUNS.stone, vessel: VESSELS.bucket },
+  { total: 8, plates: 2, item: NOUNS.brick, vessel: VESSELS.box },
+  { total: 9, plates: 3, item: NOUNS.spoon, vessel: VESSELS.jar },
+  { total: 15, plates: 3, item: NOUNS.chestnut, vessel: VESSELS.bowl },
+  { total: 12, plates: 3, item: NOUNS.key, vessel: VESSELS.box },
+  { total: 16, plates: 4, item: NOUNS.leaf, vessel: VESSELS.basket },
+  { total: 14, plates: 2, item: NOUNS.feather, vessel: VESSELS.jar },
+  { total: 20, plates: 5, item: NOUNS.bolt, vessel: VESSELS.box },
+  { total: 18, plates: 3, item: NOUNS.egg, vessel: VESSELS.basket },
+  { total: 21, plates: 3, item: NOUNS.carrot, vessel: VESSELS.bucket },
+  { total: 24, plates: 4, item: NOUNS.sock, vessel: VESSELS.shelf },
+  { total: 12, plates: 6, item: NOUNS.candle, vessel: VESSELS.shelf },
 ];
 
 /** The exact fair-share quotient for a round. */
@@ -78,14 +75,14 @@ export function getShareOptions(index: number): number[] {
 /** Warm, no-fail feedback for any selection. */
 export function getShareFeedback(round: ShareRound, selected: number): string {
   const answer = shareAnswer(round);
-  const each = `${answer} ${round.itemName} on each ${round.plateName}`;
+  const each = `${counted(answer, round.item)} on each ${round.vessel.singular}`;
   if (selected === answer) {
-    return `Correct. ${round.total} shared into ${round.plates} equal groups is ${answer} each — every ${round.plateName} gets the same. That's dividing!`;
+    return `Correct. ${round.total} shared into ${round.plates} equal groups is ${answer} each — every ${round.vessel.singular} gets the same. That's dividing!`;
   }
-  return `Not quite. When you share ${round.total} ${round.itemName} fairly across ${round.plates} ${round.plateName}s, it's ${each}. ${round.plates} groups of ${answer} makes ${round.plates} × ${answer} = ${round.total}.`;
+  return `Not quite. When you share ${counted(round.total, round.item)} fairly across ${counted(round.plates, round.vessel)}, it's ${each}. ${round.plates} groups of ${answer} makes ${round.plates} × ${answer} = ${round.total}.`;
 }
 
 /** Short hint shown before answering. */
 export function getShareHint(round: ShareRound): string {
-  return `Give one ${round.itemName.replace(/s$/, '')} to each ${round.plateName}, then go around again until they're gone. Equal piles!`;
+  return `Give one ${round.item.singular} to each ${round.vessel.singular}, then go around again until they are gone. Equal piles.`;
 }
