@@ -24,7 +24,7 @@ export interface StoryLoomProps {
   readonly onExit: () => void;
 }
 
-/** A playful "give me 3+ things and I'll weave a bedtime tale" screen. */
+/** The workshop: name three or more things, and the Loom composes a story using all of them. */
 export function StoryLoom({ onExit }: StoryLoomProps) {
   const [things, setThings] = useState<Thing[]>([]);
   const [custom, setCustom] = useState('');
@@ -135,14 +135,15 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
         <button type="button" className="loom__back" onClick={onExit}>
           <span aria-hidden="true">&#8249;</span> Back to stories
         </button>
-        <h1 className="loom__title">The Story Loom</h1>
+        <h1 className="loom__title">Workshop</h1>
       </header>
 
       {!telling ? (
         <>
           <p className="loom__lede">
-            Drop <strong>three or more things</strong> into the pot, and I&rsquo;ll weave
-            you a bedtime tale that has every one of them in it.
+            Name <strong>three or more things</strong>. The Loom composes an
+            adventure that uses every one of them &mdash; a journey, a discovery,
+            weather that turns.
           </p>
 
           <div className="loom__ai">
@@ -236,16 +237,16 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
                   ))}
                 </AnimatePresence>
                 {things.length === 0 ? (
-                  <li className="loom__chips-empty">Tap some things below…</li>
+                  <li className="loom__chips-empty">Choose from the lists below.</li>
                 ) : null}
               </ul>
             </div>
             <div className="loom__actions">
               <button type="button" className="loom__surprise" onClick={surprise}>
-                🎲 Surprise me
+                Choose for me
               </button>
               <button type="button" className="loom__weave" disabled={!ready || busy} onClick={weave}>
-                {busy ? '✨ Weaving…' : '✨ Weave the story'}
+                {busy ? 'Composing…' : 'Compose the story'}
                 {!ready ? (
                   <span className="loom__weave-hint"> ({MIN_THINGS - things.length} more)</span>
                 ) : null}
@@ -313,10 +314,10 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
 
           <div className="loom__story-actions">
             <button type="button" className="loom__again" onClick={again} disabled={busy}>
-              {busy ? '…' : '🔄 Tell it another way'}
+              {busy ? '…' : 'Compose again'}
             </button>
             <button type="button" className="loom__edit" onClick={backToPicker}>
-              ✏️ Change the things
+              Change the things
             </button>
             <button
               type="button"
@@ -326,7 +327,7 @@ export function StoryLoom({ onExit }: StoryLoomProps) {
                 backToPicker();
               }}
             >
-              🧺 Start over
+              Start over
             </button>
           </div>
         </section>

@@ -3,7 +3,6 @@ import { STORIES, getStory } from '../stories';
 import {
   validateStories,
   STORY_RULES,
-  CALM_WORDS,
   FORBIDDEN_WORDS,
 } from '../stories/validate';
 import type { Story, StoryPage } from '../types';
@@ -95,11 +94,6 @@ describe('story library content', () => {
         expect(hits).toBeGreaterThanOrEqual(STORY_RULES.minPhraseRepeats);
       });
 
-      it('ends on a calm final page', () => {
-        const finalText = normalize(story.pages[story.pages.length - 1].text);
-        expect(CALM_WORDS.some((word) => finalText.includes(word))).toBe(true);
-      });
-
       it('keeps every read-aloud sentence short', () => {
         for (const page of story.pages) {
           const sentences = page.text
@@ -150,7 +144,7 @@ describe('validateStories', () => {
       index === 0 ? { ...story, pages: story.pages.slice(0, 3) } : story,
     );
     expect(validateStories(broken)).toContain(
-      'the-tallest-sunflower: needs 6-8 pages (found 3).',
+      'the-tallest-sunflower: needs 6-16 pages (found 3).',
     );
   });
 
@@ -160,7 +154,7 @@ describe('validateStories', () => {
       index === 0 ? { ...story, pages: [tiny] } : story,
     );
     expect(validateStories(broken)).toContain(
-      'the-tallest-sunflower: read-aloud words out of range (found 2, need 300-850).',
+      'the-tallest-sunflower: read-aloud words out of range (found 2, need 300-1600).',
     );
   });
 
@@ -197,21 +191,6 @@ describe('validateStories', () => {
     );
     expect(validateStories(broken)).toContain(
       'the-tallest-sunflower: missing learning takeaway.',
-    );
-  });
-
-  it('flags a final page that is not calm', () => {
-    const broken = STORIES.map((story, index) => {
-      if (index !== 0) return story;
-      const pages = story.pages.map((page, pageIndex) =>
-        pageIndex === story.pages.length - 1
-          ? { ...page, text: 'Then the loud drum went BANG and everyone leaped and cheered.' }
-          : page,
-      );
-      return { ...story, pages };
-    });
-    expect(validateStories(broken)).toContain(
-      'the-tallest-sunflower: final page does not end calmly.',
     );
   });
 });

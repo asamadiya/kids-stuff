@@ -207,6 +207,14 @@ import { theYearOfThreeHundredSixtyFive } from './the-year-of-three-hundred-sixt
 import { twoSticksAndTheWholeRoundEarth } from './two-sticks-and-the-whole-round-earth';
 import { whenTheMoonHidTheSun } from './when-the-moon-hid-the-sun';
 import { zhangHengEarthDragon } from './zhang-heng-earth-dragon';
+import { theLongNeckedGiants } from './the-long-necked-giants';
+import { theKingOfTheCretaceous } from './the-king-of-the-cretaceous';
+import { theDinosaursThatGrewFeathers } from './the-dinosaurs-that-grew-feathers';
+import { theThreeHornedFace } from './the-three-horned-face';
+import { thePlatedDinosaur } from './the-plated-dinosaur';
+import { theDayTheWorldChanged } from './the-day-the-world-changed';
+import { theTinyFirstMammals } from './the-tiny-first-mammals';
+import { theGirlWhoFoundSeaDragons } from './the-girl-who-found-sea-dragons';
 
 export const STORIES: readonly Story[] = [
   theTallestSunflower,
@@ -416,6 +424,14 @@ export const STORIES: readonly Story[] = [
   twoSticksAndTheWholeRoundEarth,
   whenTheMoonHidTheSun,
   zhangHengEarthDragon,
+  theLongNeckedGiants,
+  theKingOfTheCretaceous,
+  theDinosaursThatGrewFeathers,
+  theThreeHornedFace,
+  thePlatedDinosaur,
+  theDayTheWorldChanged,
+  theTinyFirstMammals,
+  theGirlWhoFoundSeaDragons,
 ];
 
 export function getStory(slug: string): Story | undefined {

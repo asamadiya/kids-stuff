@@ -1,22 +1,6 @@
 import { StoryImage } from './StoryImage';
-import type { Story, StoryDomain } from '../types';
-
-/** Warm, child-facing labels for each learning domain shown on a cover. */
-const DOMAIN_LABEL: Record<StoryDomain, string> = {
-  measurement: 'Measuring',
-  patterns: 'Patterns',
-  sound: 'Sound',
-  wind: 'Wind',
-  'plant-growth': 'Growing things',
-  shadows: 'Shadows',
-  navigation: 'Finding the way',
-  'simple-machines': 'Simple machines',
-  displacement: 'Water rising',
-  numbers: 'Numbers',
-  sky: 'Sky & stars',
-  earth: 'Our Earth',
-  materials: 'Making things',
-};
+import type { Story } from '../types';
+import { CATEGORY_LABEL } from '../data/meta';
 
 export interface StoryCardProps {
   readonly story: Story;
@@ -58,7 +42,7 @@ export function StoryCard({
           ) : null}
         </span>
         <span className="story-card__body">
-          <span className="story-card__domain">{DOMAIN_LABEL[story.domain]}</span>
+          <span className="story-card__domain">{CATEGORY_LABEL[story.domain]}</span>
           <span className="story-card__title">{story.title}</span>
           <span className="story-card__subtitle">{story.subtitle}</span>
         </span>

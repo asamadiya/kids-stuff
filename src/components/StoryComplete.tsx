@@ -32,6 +32,8 @@ const CONVERSATION_PROMPT: Record<StoryDomain, string> = {
     'As you settle down, wonder together: how might people far away tell that the ground has trembled, even when we did not feel a thing?',
   materials:
     'Tomorrow, look together: how many things around us are made from something else first — like paper that began as soft, wet fibers?',
+  life:
+    'Snuggle in and wonder together: dinosaurs are gone, but we know them from fossils — what clue would you dig up to learn about a creature you never met?',
 };
 
 export interface StoryCompleteProps {
@@ -47,22 +49,22 @@ export function StoryComplete({ story }: StoryCompleteProps) {
       <p className="story-complete__kicker" aria-hidden="true">
         &#10022;
       </p>
-      <h1 className="story-complete__heading">The End</h1>
+      <h1 className="story-complete__heading">{story.title}</h1>
       <p className="story-complete__story">
-        You read &ldquo;{story.title}&rdquo;.
+        You reached the end of this account.
       </p>
 
       <dl className="story-complete__notes">
         <div className="story-complete__note">
-          <dt className="story-complete__note-label">What you discovered</dt>
+          <dt className="story-complete__note-label">What this shows</dt>
           <dd className="story-complete__note-body">{story.learningTakeaway}</dd>
         </div>
         <div className="story-complete__note">
-          <dt className="story-complete__note-label">A little heart skill</dt>
+          <dt className="story-complete__note-label">What it asks of us</dt>
           <dd className="story-complete__note-body">{story.heartTakeaway}</dd>
         </div>
         <div className="story-complete__note story-complete__note--grownup">
-          <dt className="story-complete__note-label">For the grown-up</dt>
+          <dt className="story-complete__note-label">For the curious</dt>
           <dd className="story-complete__note-body">{story.grownUpFact}</dd>
         </div>
       </dl>

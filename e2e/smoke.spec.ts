@@ -10,7 +10,7 @@ test('serves the app shell with a 200 under the /kids-stuff/ base', async ({ req
   const response = await request.get('./');
   expect(response.ok()).toBeTruthy();
   const body = await response.text();
-  expect(body).toContain('Moonlit Storybook');
+  expect(body).toContain("Rikki's Learn &amp; Play Center");
   // The built script and favicon must reference the production base path.
   expect(body).toContain('/kids-stuff/');
 });

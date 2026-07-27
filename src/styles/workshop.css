@@ -1,0 +1,86 @@
+/*
+ * The workshop bench. Every tool is laid out the same way: a head, a stage
+ * where the thing being made is drawn, a tray of parts, and a shelf of what
+ * has been kept. Paper, ink and hairlines, as everywhere else in the guide.
+ */
+
+.workshop { width: 100%; max-width: var(--page-max); margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-8); }
+
+.workshop__head { display: flex; justify-content: space-between; align-items: flex-start;
+  gap: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--rule); }
+.workshop__eyebrow { font-family: var(--font-sans); font-size: var(--label-size);
+  letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--terracotta); }
+.workshop__title { font-family: var(--font-serif); font-size: var(--step-3); margin-top: var(--space-1); }
+.workshop__lede { margin-top: var(--space-2); color: var(--ink-soft); max-width: var(--measure-tight, 46ch); }
+.workshop__back { border: none; background: none; color: var(--teal); font-family: var(--font-sans);
+  font-size: var(--step--1); font-weight: 600; cursor: pointer; padding: 0 0 var(--space-3); }
+
+/* ------------------------------------------------------------------ bench -- */
+.bench { margin-top: var(--space-5); }
+.bench__head { display: flex; justify-content: space-between; align-items: flex-start;
+  gap: var(--space-4); flex-wrap: wrap; }
+.bench__eyebrow { font-family: var(--font-sans); font-size: var(--label-size);
+  letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--ink-faint); }
+.bench__title { font-family: var(--font-serif); font-size: var(--step-2); margin-top: var(--space-1); }
+.bench__note { color: var(--ink-soft); font-size: var(--step-0); margin-top: var(--space-2);
+  max-width: var(--measure-tight, 46ch); }
+
+.bench__stage { margin: var(--space-5) 0; padding: var(--space-4);
+  border: 1px solid var(--rule); background: var(--paper-raised); display: grid; place-items: center; }
+.bench__stage svg { display: block; width: 100%; height: auto; max-width: 100%; }
+
+.bench__tray { display: flex; flex-wrap: wrap; gap: var(--space-3);
+  padding: var(--space-4); border: 1px solid var(--rule); background: var(--paper-sunken); }
+.bench__tray-label { width: 100%; font-family: var(--font-sans); font-size: var(--label-size);
+  letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--ink-faint); }
+
+.bench__row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.bench__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+
+/* Parts, controls and chips all share one restrained button form. */
+.bench-btn, .bench-part {
+  min-height: var(--touch); padding: 0.55rem 1rem;
+  border: 1px solid var(--rule-strong); border-radius: var(--radius);
+  background: var(--paper-raised); color: var(--ink);
+  font-family: var(--font-sans); font-size: var(--step-0); font-weight: 500; cursor: pointer;
+}
+.bench-btn:hover, .bench-part:hover { border-color: var(--teal); }
+.bench-btn:focus-visible, .bench-part:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.bench-btn--primary { background: var(--teal); border-color: var(--teal); color: #fff; font-weight: 600; }
+.bench-btn[aria-disabled='true'], .bench-btn:disabled { opacity: 0.55; cursor: default; }
+.bench-part.is-set { border-color: var(--teal); background: var(--accent-quiet); }
+.bench-part--wide { flex: 1 1 12rem; text-align: left; }
+
+.bench__figure { display: grid; gap: 0.35rem; place-items: center; }
+.bench__figure-caption { font-family: var(--font-sans); font-size: var(--label-size);
+  letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--ink-faint); }
+
+/* Numbers that change in place must not jitter. */
+.bench__readout { font-family: var(--font-sans); font-variant-numeric: tabular-nums lining-nums;
+  font-size: var(--step-1); color: var(--ink); }
+
+/* ------------------------------------------------------------------ shelf -- */
+.bench__shelf { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+.bench__shelf-title { font-family: var(--font-sans); font-size: var(--label-size);
+  letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--ink-faint); }
+.bench__shelf-list { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3);
+  list-style: none; padding: 0; }
+.bench__kept { display: flex; align-items: center; gap: var(--space-2);
+  border: 1px solid var(--rule); background: var(--paper-raised); padding: var(--space-2) var(--space-3); }
+.bench__kept-name { font-family: var(--font-serif); font-size: var(--step-0); }
+.bench__kept-meta { font-family: var(--font-sans); font-size: var(--label-size); color: var(--ink-faint); }
+
+/* ------------------------------------------------------- the workshop bench -- */
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: var(--space-4); margin-top: var(--space-5); }
+.tool-card { display: flex; flex-direction: column; gap: var(--space-2); padding: 0.5rem 0.5rem 0.75rem;
+  border: 1px solid var(--rule); background: var(--paper-raised); cursor: pointer; font: inherit;
+  text-align: left; transition: transform 120ms ease, border-color 120ms ease; }
+.tool-card:hover, .tool-card:focus-visible { transform: translateY(-3px); border-color: var(--teal); outline: none; }
+.tool-card__pic { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden;
+  background: var(--paper-sunken); border: 1px solid var(--rule); }
+.tool-card__pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tool-card__title { font-family: var(--font-serif); font-size: var(--step-1); }
+.tool-card__note { font-family: var(--font-sans); font-size: var(--step--1); color: var(--ink-soft); line-height: 1.4; }
+@media (max-width: 30rem) { .tool-grid { grid-template-columns: repeat(2, 1fr); } }

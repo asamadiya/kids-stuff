@@ -88,10 +88,12 @@ describe('Reader flow (through the app)', () => {
   it('returns to the library from the reader', async () => {
     const user = userEvent.setup();
     openApp(2);
-    expect(screen.queryByRole('heading', { name: /moonlit storybook/i })).toBeNull();
+    expect(
+      screen.queryByRole('heading', { name: /rikki.s field guide/i }),
+    ).toBeNull();
     await user.click(screen.getByRole('button', { name: /library/i }));
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 2 of 7/i)).toBeNull();
   });
@@ -101,7 +103,7 @@ describe('Reader flow (through the app)', () => {
     openApp(PAGE_COUNT); // last story page (index 6)
     const finish = screen.getByRole('button', { name: /finish/i });
     await user.click(finish);
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     expect(screen.getByText(story.learningTakeaway)).toBeInTheDocument();
     expect(screen.getByText(story.grownUpFact)).toBeInTheDocument();
     expect(screen.getByText(/what else could we measure/i)).toBeInTheDocument();
@@ -109,7 +111,7 @@ describe('Reader flow (through the app)', () => {
 
   it('treats the completion view as a disabled Next boundary', () => {
     openApp(PAGE_COUNT + 1); // completion index 7
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
   });
 
@@ -131,14 +133,14 @@ describe('Reader flow (through the app)', () => {
     window.location.hash = '#/read/not-a-real-story/1';
     render(<App />);
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });
 
   it('clamps an out-of-range page onto the completion view', () => {
     openApp(999);
-    expect(screen.getByRole('heading', { name: /the end/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
   });
 });
 
@@ -212,7 +214,7 @@ describe('App hash routing resilience', () => {
     window.location.hash = '#/read/%E0%A4%A/1';
     expect(() => render(<App />)).not.toThrow();
     expect(
-      screen.getByRole('heading', { level: 1, name: /moonlit storybook/i }),
+      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });

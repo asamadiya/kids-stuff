@@ -1,0 +1,27 @@
+/*
+ * Printing. What the child made should be able to leave the screen and become
+ * a sheet of paper he can pin up, so printing renders the plate alone.
+ */
+@page { size: auto; margin: 16mm; }
+
+@media print {
+  :root { --paper: #ffffff; }
+  html, body { background: #fff; }
+
+  /* Hide the guide's furniture. */
+  .app__skip, .workshop__back, .bench__tray, .bench__actions,
+  .bench__shelf, .play-hub__hero, .learning-hero__start, nav, footer { display: none !important; }
+
+  .workshop, .bench { padding: 0; margin: 0; max-width: none; }
+  .bench__stage { border: 1px solid #ccc; background: #fff; padding: 0; break-inside: avoid; }
+  .bench__stage svg { width: 100%; height: auto; }
+
+  /* A caption block only shown on paper. */
+  .plate-print { display: block !important; margin-top: 8mm; font-family: Georgia, serif; color: #000; }
+  .plate-print__title { font-size: 16pt; font-weight: 600; }
+  .plate-print__line { font-size: 10pt; color: #444; }
+  a[href]::after { content: ''; }
+}
+
+/* The print caption is invisible on screen. */
+.plate-print { display: none; }

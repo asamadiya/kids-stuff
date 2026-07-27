@@ -8,93 +8,152 @@ export const theLighthouseThatThrewLight: Story = {
   domain: 'navigation',
   collection: 'historical',
   repeatedPhrase: 'Turn the light toward home',
-  readAloudMinutes: 5,
+  readAloudMinutes: 9,
   learningTakeaway:
-    'A shiny mirror can catch a fire’s glow and send it far across dark water. When the mirror turns, the bright path turns too, so a ship far away can spot the light and know which way to point.',
+    'A tall tower with a fire on top gives sailors a fixed mark to steer by. A polished mirror catches the fire and throws its glow far across the sea. When the light is high, ships far away can spot it and know which way to navigate home.',
   heartTakeaway:
     'Careful, patient work can guide someone safely home, even when you never meet the sailors you help.',
   grownUpFact:
-    'Long ago in Alexandria, Egypt, a real builder named Sostratus of Cnidus is remembered for the Pharos lighthouse, begun about 280 BCE under the Ptolemy kings. It rose more than 100 metres tall, and a fire burned at its top each night. Ancient writers say a polished metal mirror helped throw the light out to sea, though its exact shape is uncertain. Stories that the mirror could burn far-off ships are only legend, not fact.',
+    'The Pharos of Alexandria, in Egypt, was one of the Seven Wonders of the ancient world. It was begun about 280 BCE under the Ptolemy kings, on a small island called Pharos joined to the city by a long causeway. Ancient writers credit Sostratus of Cnidus, who is said to have left a proud dedication carved in the stone. The tower rose in three tiers and stood over 100 metres tall, with a fire burning at its top each night. Writers describe a polished mirror that helped throw the light seaward, though its exact shape is unknown. Tales that the mirror could burn far-off ships are legend, not fact. Earthquakes slowly toppled the tower over many centuries, and its fallen stones were later built into a harbor fort that still stands.',
   pages: [
     {
-      text: 'Long ago, in the sunny city of Alexandria in Egypt, a builder named Sostratus of Cnidus watched the harbor. He had helped raise a great stone tower called the Pharos. It stood taller than almost anything in the world. Far out on the dark water, small boats crept home along the coast. Sailors could lose their way in the night. Sostratus wanted to help them. So each evening he climbed the tall tower steps to tend the light.',
-      cue: 'Look up high, like Sostratus. Can you imagine a tower taller than the tallest tree you know?',
+      text: 'Long ago, in the sunny city of Alexandria in Egypt, ships crept in from a wide, dark sea. The coast here was low and flat, with hidden rocks near the shore. On dark nights, sailors could not tell the land from the water. Many good boats had come to grief on those quiet rocks. So the kings of the city ordered a wonder to be built. It would be a tower of light to guide ships home.',
+      cue: 'Look out a window at night. How would a sailor know where the safe shore is?',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p1-pharos-rooftop',
-        focus: 'Sostratus centered at the top of the Pharos tower, watching the harbor below',
+        id: 'the-lighthouse-that-threw-light-p1-dark-coast',
+        focus: 'A small ship approaching a flat, dark coastline dotted with hidden rocks',
         composition:
-          'Foreground: cool stone parapet and a wooden mirror frame; midground: Sostratus centered in a plain tunic; background: the tall Pharos tower base, purple harbor, and tiny returning boats',
-        palette: 'warm ochre, pale limestone, and late-sun gold',
+          'Foreground: dark waves and a low rock just under the surface; midground: a small sailing boat leaning in the wind; background: the faint flat shore of Alexandria under a deep evening sky',
+        palette: 'deep sea-blue, slate grey, and faint dusk gold',
       },
-      alt: 'A builder stands at the top of a tall stone lighthouse, watching small boats cross a purple harbor below.',
+      alt: 'A small ship leans in the wind near a flat dark coast with hidden rocks just beneath the water.',
     },
     {
-      text: 'At the very top, a small fire glowed behind stone, safe from the wind. Beside it stood a large mirror of polished bronze. When Sostratus set the mirror just so, it caught the fire’s glow. A bright stripe leaped out across the dark water. “Turn the light toward home,” he said softly. He was old and steady, and he worked with great care. The fire was warm, but he kept his hands well back and let the mirror do the reaching.',
-      cue: 'Cup your hands near a warm light and feel the glow. Sostratus kept his hands safe, just like that.',
+      text: 'A builder named Sostratus of Cnidus took up the great task. First his workers laid a huge stone base, wide and square and strong. Upon it they raised a second tier, shaped with eight flat sides. On top of that went a round tier, slender and tall. Higher and higher the pale stone climbed toward the sky. It grew taller than almost anything in the whole world. People came from far away just to tip their heads back and stare.',
+      cue: 'Stack three blocks: a square, then a shape with many sides, then a round one. That is the Pharos!',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p2-bronze-mirror',
-        focus: 'The polished bronze mirror catching firelight and throwing a bright stripe seaward',
+        id: 'the-lighthouse-that-threw-light-p2-three-tiers',
+        focus: 'The three-tiered Pharos tower rising over the harbor as workers climb it',
         composition:
-          'Foreground: a broad bronze mirror on a wooden frame; midground: Sostratus adjusting the frame, a screened fire beside him; background: the harbor mouth between two breakwaters',
-        palette: 'dusty rose, blue-grey, and fading amber',
+          'Foreground: stone blocks and a wooden ramp with workers; midground: the square base, the eight-sided middle, and the round top tier; background: pale sky, gulls, and the wide blue harbor',
+        palette: 'warm ochre, pale limestone, and clear sky-blue',
       },
-      alt: 'A polished bronze mirror catches firelight and sends a bright stripe out across the water while a builder adjusts its frame.',
+      alt: 'A giant three-part stone tower rises over a harbor while tiny workers climb wooden ramps along its side.',
     },
     {
-      text: 'The bright stripe slid across a pale wall, then out over the sea. When Sostratus turned the mirror, the stripe turned too. He watched the light pass a marker buoy and settle by the harbor opening. A boat far out could see the glow and know just where to point. Below, the water went lap-lap against the stones. The path of light lay straight and calm, like a road only ships could travel. Sostratus nodded and held the mirror still.',
-      cue: 'Which way does the bright stripe point? Trace the path with your finger to someone beside you.',
+      text: 'The tower stood on a small island, and the island was called Pharos. A long stone road ran out from the city to reach it. Fresh water and firewood traveled along that road every single day. For the tower had a great appetite, and it must never go hungry. Its hunger was for fire, up at the very top. Sostratus climbed the winding steps to see the work done well. From so high, the whole harbor looked like a map spread flat below.',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p3-bright-stripe',
-        focus: 'A straight stripe of light aligned from the mirror to the harbor opening',
+        id: 'the-lighthouse-that-threw-light-p3-causeway-island',
+        focus: 'The long causeway linking the city to the island of Pharos and its tower',
         composition:
-          'Foreground: the mirror edge catching warm light; midground: a straight bright stripe crossing the scene; background: a marker buoy, the harbor mouth, and a small distant boat',
-        palette: 'dusty rose, blue-grey, and fading amber',
+          'Foreground: carts of firewood on a long stone causeway; midground: the island and the base of the tower; background: the twin curves of the harbor and the sea beyond',
+        palette: 'sandy gold, sea-green, and soft white stone',
       },
-      alt: 'A narrow stripe of light runs straight from a lighthouse mirror toward a harbor entrance past a marker buoy.',
+      alt: 'Carts of wood cross a long stone road to a small island where a great tower stands by the sea.',
     },
     {
-      text: 'Then a soft ribbon of sea mist drifted in. The bright stripe grew faint, and a little boat’s sail slipped behind the grey. Sostratus felt his heart pinch. He wanted to swing the mirror fast, back and forth, to find the boat. But a jumping light might only confuse the tired rowers. So he took a slow breath and kept the mirror steady. He looked again, patient and calm, waiting for the mist to thin.',
+      text: 'At the very top, a fire was lit each evening behind thick stone. The stone kept the wind from blowing the flames about. All night, workers fed the fire and kept it bright and steady. But a fire alone is small when the sea is very wide. Its glow would fade long before it reached a faraway boat. Sostratus wanted the light to travel much, much farther. He had a clever plan waiting beside the flames.',
+      cue: 'Light a small flashlight in a big room. Does its glow reach every far corner? How could you help it?',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p4-sea-mist',
-        focus: 'Sostratus holding the mirror steady as mist drifts across the faint beam',
+        id: 'the-lighthouse-that-threw-light-p4-rooftop-fire',
+        focus: 'A sheltered fire glowing at the top of the tower with workers tending it',
         composition:
-          'Foreground: still gloved hands on the mirror frame; midground: a faint beam meeting a grey mist band; background: a boat half hidden, harbor lights beginning to glow',
+          'Foreground: stone screens shielding a bright fire; midground: workers adding wood, Sostratus watching; background: the dark sea, tiny far-off boat lights, and rising sparks',
+        palette: 'ember orange, deep night blue, and smoky grey',
+      },
+      alt: 'A sheltered fire burns brightly at the top of a tall tower while workers feed it wood under a dark sky.',
+    },
+    {
+      text: 'Beside the fire stood a large mirror of polished bronze. It was rubbed and rubbed until it shone like still water. When Sostratus set the mirror just so, it caught the fire’s glow. All the scattered light gathered up and leaped into one bright beam. A shining stripe shot out straight across the dark water. “Turn the light toward home,” he said softly, guiding the frame. The fire was warm, so he kept his hands well back and let the mirror reach for him.',
+      cue: 'Wonder together: why does a shiny mirror throw light farther than a plain wall does?',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p5-bronze-mirror',
+        focus: 'The polished bronze mirror gathering firelight into one bright seaward beam',
+        composition:
+          'Foreground: a broad bronze mirror on a wooden frame; midground: Sostratus adjusting the frame, the screened fire beside him; background: the harbor mouth between two breakwaters',
+        palette: 'dusty rose, blue-grey, and glowing amber',
+      },
+      alt: 'A polished bronze mirror gathers firelight into a single bright beam that shoots out across the water.',
+    },
+    {
+      text: 'This was the true wonder, and Sostratus loved to watch it work. A mirror does not make light, but it catches light and sends it on. It takes a soft, spreading glow and aims it like a thrown ball. So the small fire, caught and aimed, could travel far out to sea. When Sostratus turned the mirror slowly, the bright stripe turned too. He could sweep it left, then right, across the whole dark harbor. The beam became a tool for sailors to navigate by.',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p6-sweeping-beam',
+        focus: 'Sostratus turning the mirror so the beam sweeps across the harbor',
+        composition:
+          'Foreground: the mirror edge and Sostratus’s steady hands; midground: a wide beam swinging over the water; background: several small boats at different distances, each catching the light',
+        palette: 'dusty rose, deep blue-grey, and fading amber',
+      },
+      alt: 'A builder turns a mirror so a wide beam of light sweeps slowly across a harbor full of small boats.',
+    },
+    {
+      text: 'One night, far out, a little boat had lost its way in the dark. Its rowers pulled this way, then that, unsure which way was home. Then a warm stripe of light slid over their gray sail. They lifted their heads and saw the great tower glowing high above. Now they knew exactly where the safe harbor lay. “That way,” the steersman called, and pointed straight at the beam. The tired rowers cheered and turned their little boat toward the light.',
+      cue: 'Point the way home like the steersman. Can you spot a light that helps you find your own front door?',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p7-lost-boat-finds-light',
+        focus: 'A lost boat’s crew spotting the tower’s beam and turning toward it',
+        composition:
+          'Foreground: rowers in a small boat looking up, a gray sail catching light; midground: the bright beam crossing the water; background: the tall glowing tower far off on its island',
         palette: 'plum shadow, muted teal, and ember gold',
+      },
+      alt: 'Rowers in a small boat look up and cheer as a beam of light from a distant glowing tower touches their sail.',
+    },
+    {
+      text: 'Then a soft ribbon of sea mist drifted across the harbor mouth. The bright stripe grew faint, and the little sail slipped behind the gray. Sostratus felt his heart pinch, for the boat was so close now. He wanted to swing the mirror fast, back and forth, to find it. But a jumping light might only confuse the tired, hopeful rowers. So he took a slow breath and held the mirror steady and calm. “Turn the light toward home,” he whispered, and waited for the mist to thin.',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p8-sea-mist',
+        focus: 'Sostratus holding the mirror steady as mist softens the beam',
+        composition:
+          'Foreground: still hands on the mirror frame; midground: a faint beam meeting a gray mist band; background: the boat half hidden, harbor lights beginning to glow',
+        palette: 'plum shadow, muted teal, and quiet gold',
       },
       alt: 'Sea mist softens the beam of light while a builder keeps his mirror perfectly steady above the harbor.',
     },
     {
-      text: 'Slowly the mist thinned, and the marker buoy showed again below it. Sostratus held the light beside the buoy and made one small turn. The bright path settled right at the harbor mouth. “Turn the light toward home,” he whispered once more. Out on the water, a tiny lantern blinked back from the boat. The rowers had seen the glow. They knew now which way to point, straight along the calm road of light toward the safe stone quay.',
+      text: 'Slowly the mist thinned, and a marker buoy showed again below. Sostratus held the light beside the buoy and made one small turn. The bright path settled gently right at the harbor opening. Out on the water, a tiny lantern blinked back from the boat. The rowers had found the glow, and they knew which way to point. They slid between the breakwaters and drifted to the quiet quay. Somewhere below, sailors he would never meet stepped safely onto stone.',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p5-answering-lantern',
-        focus: 'The beam held beside the buoy while a tiny boat lantern answers',
+        id: 'the-lighthouse-that-threw-light-p9-safe-return',
+        focus: 'The beam resting at the harbor mouth as the boat reaches the quay',
         composition:
-          'Foreground: the mirror braced by steady hands; midground: the beam ending beside a marker buoy; background: a small boat lantern glowing, sheltered harbor water',
-        palette: 'plum shadow, muted teal, and ember gold',
-      },
-      alt: 'A lighthouse beam rests beside a marker buoy as a tiny lantern on a distant boat blinks back an answer.',
-    },
-    {
-      text: 'Soon the little boat crossed between the breakwaters. The rowers lifted their oars and drifted to the quiet quay. They were safely home. Sostratus covered the fire with a bronze cap and let the mirror face the sky. The long bright path faded away, its work all done. Somewhere below, sailors he would never meet stepped onto solid stone. He had guided them, quietly, from high in the tower. “Turn the light toward home,” he said, now as a gentle thank-you.',
-      scene: {
-        id: 'the-lighthouse-that-threw-light-p6-safe-return',
-        focus: 'The boat arriving at the quay as Sostratus covers the beacon',
-        composition:
-          'Foreground: a closed bronze fire cap; midground: Sostratus, the mirror tilted skyward; background: the boat between the breakwaters, a calm quay, first stars',
+          'Foreground: the mirror braced by steady hands; midground: the beam ending beside a marker buoy; background: the small boat arriving at a calm stone quay, first stars',
         palette: 'indigo, silver-blue, and soft clay',
       },
-      alt: 'A small boat reaches a calm quay while a builder covers the lighthouse fire and tilts the mirror toward the sky.',
+      alt: 'A lighthouse beam rests at a harbor mouth as a small boat drifts safely to a calm stone quay under first stars.',
     },
     {
-      text: 'The harbor softened to quiet silver under a rising moon. Sostratus wrapped the cool mirror in soft cloth for the night. The great Pharos tower would keep its patient watch until morning. Its light had thrown a road across the dark, and ships had followed it home. Sostratus climbed slowly down the long stone steps. His careful work was finished, and the sea lay calm and still. He was ready to rest. The moon glowed gently on the water. Goodnight.',
+      text: 'Down at the base of the tower, words were carved deep in the stone. Sostratus, the story goes, had asked that his own name be cut there. He wanted people to remember who had built this gift of light. Year after year, the fire burned and the mirror threw its beam. Ships from many lands learned to trust the tall glowing tower. Sailors far out at sea would spot it and steer straight for its glow. The Pharos became the most famous helper any harbor ever had.',
+      cue: 'If you built something to help strangers, would you carve your name? Talk about why or why not.',
       scene: {
-        id: 'the-lighthouse-that-threw-light-p7-moonlit-rest',
-        focus: 'The wrapped mirror and the quiet tower under a soft rising moon',
+        id: 'the-lighthouse-that-threw-light-p10-carved-name',
+        focus: 'Sostratus’s dedication carved into the stone base of the tower',
         composition:
-          'Foreground: the mirror wrapped in folded cloth; midground: Sostratus stepping down the tower stairs; background: a moonlit silver harbor, moored boats, the dark tower edge',
-        palette: 'deep navy, moon silver, and quiet umber',
+          'Foreground: deep letters carved in pale stone; midground: Sostratus resting a hand on the wall; background: the towering Pharos and ships gathering in the harbor',
+        palette: 'warm limestone, soft shadow, and gentle gold',
       },
-      alt: 'A builder wraps a mirror in cloth and steps down a lighthouse under a soft moon as the silver harbor rests quietly.',
+      alt: 'Deep letters are carved into the pale stone base of a great tower as ships gather in the harbor beyond.',
+    },
+    {
+      text: 'For hundreds and hundreds of years, the great tower kept its watch. It stood so long that it grew old, far older than any person. Now and then the ground would tremble and shake beneath it. Each shaking loosened a few stones and made the tall tower lean. Over slow centuries, tier by tier, the wonder came down. At last only its scattered stones lay by the shining sea. But people did not let those good stones go to waste.',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p11-old-tower-crumbles',
+        focus: 'The aged tower leaning after long years, some stones fallen at its base',
+        composition:
+          'Foreground: fallen blocks scattered on the shore; midground: the weathered, leaning tower with cracked tiers; background: a wide gray-blue sea and drifting clouds',
+        palette: 'faded stone gray, weathered ochre, and cool sea-blue',
+      },
+      alt: 'A very old leaning tower with cracked tiers stands above fallen stone blocks scattered along a gray-blue shore.',
+    },
+    {
+      text: 'Long after, builders came and gathered the old fallen stones. From them they raised a strong stone fort right by the harbor edge. That fort still stands today, on the very spot the tower knew. Divers even find great carved blocks resting on the sea floor. So a piece of the wonder is still there, waiting to be found. Next time you see a lighthouse blinking out across dark water, remember. “Turn the light toward home,” the old tower still seems to say.',
+      cue: 'Wonder together: what could you build so that people far in the future still find pieces of it?',
+      scene: {
+        id: 'the-lighthouse-that-threw-light-p12-fort-and-legacy',
+        focus: 'A harbor fort built from the tower’s stones, with carved blocks resting underwater',
+        composition:
+          'Foreground: waves over great carved blocks on the sea floor; midground: a solid stone fort on the shore; background: a modern lighthouse blinking far out under an evening sky',
+        palette: 'twilight blue, warm lamp-gold, and silver sea-foam',
+      },
+      alt: 'A stone harbor fort stands on the shore above carved blocks resting underwater, with a lighthouse blinking far out to sea.',
     },
   ],
 };

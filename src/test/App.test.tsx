@@ -1,11 +1,18 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, it, expect } from 'vitest';
 import App from '../App';
 
 describe('App', () => {
-  it('renders the Moonlit Storybook title', () => {
+  beforeEach(() => {
+    window.history.replaceState(null, '', '#/');
+  });
+
+  it("renders the field guide masthead", () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /moonlit storybook/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /rikki.s field guide/i }),
+    ).toBeInTheDocument();
   });
 
   it('renders the main library landmark', () => {
@@ -13,8 +20,25 @@ describe('App', () => {
     expect(screen.getByRole('main')).toBeInTheDocument();
   });
 
-  it('main landmark has accessible name "Story library"', () => {
+  it('main landmark has an accessible name', () => {
     render(<App />);
-    expect(screen.getByRole('main', { name: /story library/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('main', { name: /rikki.s field guide/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('navigates to Practice at #/play and back to the contents', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /open practice/i }));
+    expect(window.location.hash).toBe('#/play');
+    expect(screen.getByRole('main', { name: /practice/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /contents/i }));
+    expect(window.location.hash).toBe('#/');
+    expect(
+      screen.getByRole('main', { name: /rikki.s field guide/i }),
+    ).toBeInTheDocument();
   });
 });

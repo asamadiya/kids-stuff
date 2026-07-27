@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { STORIES } from '../src/stories/index';
 
 /**
- * Real, in-browser Chromium end-to-end coverage for Moonlit Storybook.
+ * Real, in-browser Chromium end-to-end coverage for Rikki's Learn & Play Center.
  *
  * The suite runs against the built app served by `vite preview` under the
  * production base path (/kids-stuff/) at three viewport projects — a 390x844
@@ -174,7 +174,7 @@ test.describe('Library', () => {
     await page.goto('./');
 
     await expect(
-      page.getByRole('heading', { name: 'Moonlit Storybook', level: 1 }),
+      page.getByRole('heading', { name: "Rikki's Learn & Play Center", level: 1 }),
     ).toBeVisible();
     await expect(page.getByRole('main', { name: 'Story library' })).toBeVisible();
 
@@ -545,7 +545,7 @@ test.describe('Malformed storage resilience', () => {
 
     await page.goto('./');
     await expect(
-      page.getByRole('heading', { name: 'Moonlit Storybook', level: 1 }),
+      page.getByRole('heading', { name: "Rikki's Learn & Play Center", level: 1 }),
     ).toBeVisible();
     // A corrupt store must degrade gracefully — no uncaught error, app usable.
     expect(pageErrors).toEqual([]);
@@ -630,7 +630,7 @@ test.describe('Public base path', () => {
 
     await page.goto('./');
     await expect(
-      page.getByRole('heading', { name: 'Moonlit Storybook', level: 1 }),
+      page.getByRole('heading', { name: "Rikki's Learn & Play Center", level: 1 }),
     ).toBeVisible();
 
     expect(page.url()).toContain('/kids-stuff/');

@@ -1,6 +1,8 @@
-# Moonlit Storybook
+# Rikki's Learn & Play Center
 
-Illustrated bedtime stories for children. Read at your own pace, bookmark your place, and return any night.
+A warm educational hub where children can read illustrated true stories, explore
+history and the world, play gentle learning games, and make their own stories
+with Rikki.
 
 **Live:** https://asamadiya.github.io/kids-stuff/
 

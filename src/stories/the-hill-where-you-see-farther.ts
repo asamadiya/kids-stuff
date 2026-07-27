@@ -3,32 +3,32 @@ import type { Story } from '../types';
 export const theHillWhereYouSeeFarther: Story = {
   slug: 'the-hill-where-you-see-farther',
   title: 'The Hill Where You See Farther',
-  subtitle: 'Al-Biruni, a scholar in Ghazni long ago, climbed a hill to see farther.',
+  subtitle: 'Al-Biruni, a scholar in the Ghaznavid lands long ago, climbed a hill to measure the whole round Earth.',
   domain: 'measurement',
   collection: 'historical',
   repeatedPhrase: 'Higher up, you see farther',
-  readAloudMinutes: 5,
+  readAloudMinutes: 9,
   learningTakeaway:
-    'A higher viewpoint can reveal more distant land. When you climb, the far line where land meets sky moves away, so you see over things that once blocked your view.',
+    'A higher viewpoint reveals more distant land. From a mountain you can even measure the whole round Earth, because you can see just how far the far line where land meets sky slips down and away.',
   heartTakeaway:
-    'Careful looking and gentle patience help you notice true things. A wonderful discovery does not need hurry; it grows from quiet, steady attention.',
+    'Careful looking and gentle patience help you notice true things. A wonderful discovery does not need hurry; it grows from quiet, steady attention and a mind that keeps asking why.',
   grownUpFact:
-    'Al-Biruni (973–1048 CE) was a Persian scholar who lived and worked in Ghazni around 1000 CE. He famously used a tall mountain and careful angle measurements to estimate the size of the Earth, and his answer was remarkably close to the modern value of about 6,371 km. This gentle bedtime version keeps only the simple, safe idea a young child can see for themselves: from higher up, you can look farther.',
+    'Al-Biruni (973–1048 CE) was a brilliant Persian scholar who lived under the Ghaznavid rulers around 1000 CE. Traveling in the Punjab, near the fort of Nandana, he found a clever way to measure the Earth from a single mountain. First he measured the mountain’s height using two sightings and simple trigonometry. Then, from its summit, he measured the tiny angle by which the far horizon dips below level, and combined the two with geometry to compute the Earth’s radius. His answer, about 6,335 km, is astonishingly close to the modern value of roughly 6,371 km. He also wrote a famous book about India, Kitab al-Hind, and a great astronomy work, Al-Qanun al-Masudi. This retelling keeps the simple, true seed a young child can check: from higher up, you can look farther.',
   pages: [
     {
-      text: 'Long ago, in the town of Ghazni, there lived a scholar named al-Biruni. He loved to measure things and to ask quiet questions. He wondered about the stars, the shadows, and the shape of the land. One warm evening, he walked a broad hill path outside the town. A low stone edge ran beside it. From the first low step, he could see only a little way.',
+      text: 'Long ago, in the lands ruled from Ghazni, there lived a scholar named al-Biruni. He loved to measure things and to ask quiet questions. He wondered about the stars, the shadows, and the shape of the land. Al-Biruni knew many tongues, and he wrote whole books by lamplight. One warm evening he walked a broad hill path near a fort called Nandana. From the first low step, he could see only a little way.',
       cue: 'Crouch down low, like al-Biruni. What in your room is hidden when you are small and near the floor?',
       scene: {
         id: 'the-hill-where-you-see-farther-p1',
-        focus: 'al-Biruni standing on a low hill step outside Ghazni, looking toward a partly hidden far line',
+        focus: 'al-Biruni standing on a low hill step near Nandana fort, looking toward a partly hidden far line',
         composition:
-          'Foreground: a low safe stone step with a sturdy boot beside the edge; midground: an orchard wall blocking much of the view; background: a thin band where land meets sky and a higher resting step above',
+          'Foreground: a low safe stone step with a sturdy boot beside the edge; midground: an orchard wall blocking much of the view; background: a thin band where land meets sky with the pale towers of Nandana fort and a higher step above',
         palette: 'sun-warmed stone, orchard green, rust, and pale mountain blue',
       },
-      alt: 'A robed scholar stands on a low hill step outside a town, where an orchard wall hides most of the distant land.',
+      alt: 'A robed scholar stands on a low hill step near a distant fort, where an orchard wall hides most of the far land.',
     },
     {
-      text: 'From the low step, an orchard wall filled the middle of everything. Al-Biruni saw the wall, three poplar tops, and a thin far line. The wider fields stayed hidden behind the wall. He rested his hand on his walking staff and looked upward. A higher, broader step waited along the safe path. He decided to climb, one careful step at a time.',
+      text: 'From the low step, an orchard wall filled the middle of everything. Al-Biruni saw the wall, three poplar tops, and a thin far line. The wider fields stayed hidden behind the wall. He rested his hand on his walking staff and looked upward. A higher, broader step waited along the safe path. "I wonder," he murmured, "what waits just past that wall?" He decided to climb, one careful step at a time.',
       scene: {
         id: 'the-hill-where-you-see-farther-p2',
         focus: 'al-Biruni noticing the orchard wall block the far fields from the low step',
@@ -51,7 +51,7 @@ export const theHillWhereYouSeeFarther: Story = {
       alt: 'From a higher step a scholar looks over a lower orchard wall and sees a second orchard and a silver stream appear.',
     },
     {
-      text: 'He looked back and forth, comparing the two views in his mind. Low down, the wall had hidden the stream. Higher up, the stream and fields appeared. The land had stayed exactly the same all along. Only his viewpoint had risen, and so his sight reached farther. Al-Biruni smiled at the simple truth. Careful looking, he thought, can teach a patient heart so much.',
+      text: 'He looked back and forth, comparing the two views in his mind. Low down, the wall had hidden the stream. Higher up, the stream and fields appeared. The land had stayed exactly the same all along. Only his viewpoint had risen, so his sight reached farther. Al-Biruni smiled at the simple truth. "If a low hill shows me so much," he thought, "what could a whole mountain show?"',
       scene: {
         id: 'the-hill-where-you-see-farther-p4',
         focus: 'the unchanged orchard wall sitting below a much longer far line',
@@ -62,38 +62,106 @@ export const theHillWhereYouSeeFarther: Story = {
       alt: 'A scholar points across a wide view where the same orchard wall now sits below a long line of distant fields.',
     },
     {
-      text: 'A cool gust brushed his cap, so al-Biruni chose to rest. He sat upon a broad flat stone, well back from the edge. The valley opened gently below him in calm, quiet layers. He could see near fields, a winding stream, a road, and a far blue ridge. "Higher up, you see farther," he whispered again. He did not need to measure it tonight to feel its wonder.',
-      cue: 'Point to something near you, something in the middle, and something far away.',
+      text: 'Now a big idea came to al-Biruni, bright as a lamp. The far line where land meets sky is called the horizon. From a tall mountain, that far line seems to dip a little below straight-ahead. It dips because the Earth is round and curves gently away. If he could measure that tiny dip, he could measure the whole Earth! But first he needed to know how tall his mountain was.',
+      cue: 'Look far across a room or a field. Can you find the line where things farthest away seem to stop? That is your horizon.',
       scene: {
         id: 'the-hill-where-you-see-farther-p5',
-        focus: 'al-Biruni seated safely on a broad stone as the valley opens below',
+        focus: 'al-Biruni gazing at a great mountain and picturing the horizon dipping below level',
         composition:
-          'Foreground: a broad flat sitting stone with the staff resting across the scholar’s lap; midground: near fields, a winding stream, and a quiet road; background: a far blue ridge under a long open land-and-sky line',
-        palette: 'moonrise blue, field green, stone cream, and muted rust',
+          'Foreground: al-Biruni with a small brass sighting ring raised toward the sky; midground: a tall rounded mountain rising above the orchards; background: a faint curved horizon line drawn softly against a deepening sky to hint at the round Earth',
+        palette: 'dusky blue, brass gold, mountain gray, and warm horizon amber',
       },
-      alt: 'A scholar sits safely on a broad stone overlooking near fields, a winding stream, a road, and a far blue ridge.',
+      alt: 'A scholar raises a small brass ring toward a tall mountain while a faint curved horizon hints at the round Earth.',
     },
     {
-      text: 'The evening cooled, and the first stars pricked the darkening sky. Al-Biruni thought about the far line where the land met the sky. From this tall hill it lay much farther away than before. Someday, he knew, careful angles could help him measure the whole round Earth. But not now. Now the sky was soft, and the wide valley grew calm and dim below him.',
+      text: 'The next morning, al-Biruni measured the mountain in a clever way. He stood in one spot on the flat plain and looked up at the peak. He marked how steeply his gaze had to tilt to reach the top. Then he walked a careful, counted distance straight toward the mountain. He looked up and marked the steeper tilt again. From those two angles and his steps, geometry gave the height. He never had to climb it just to measure it.',
       scene: {
         id: 'the-hill-where-you-see-farther-p6',
-        focus: 'al-Biruni gazing at the far horizon line as the first stars appear',
+        focus: 'al-Biruni measuring the mountain height from two spots on the plain using sighting angles',
         composition:
-          'Foreground: the scholar resting on the stone with a gentle, thoughtful face; midground: the dimming valley of fields and stream; background: the far horizon line under a deep sky with the first small stars',
-        palette: 'deep green, silver stream, moon blue, and warm lamplight tones',
+          'Foreground: two small footprints in the dust marking his first and second standing spots; midground: al-Biruni sighting the peak along a graded quadrant, dotted sight-lines rising to the summit; background: the broad mountain and the calm morning plain',
+        palette: 'morning cream, dust tan, slate mountain blue, and soft rose light',
       },
-      alt: 'A scholar gazes toward the distant horizon as the first small stars appear over a dimming quiet valley.',
+      alt: 'A scholar sights a mountain peak from two marked spots on the plain, with dotted lines rising to the summit.',
     },
     {
-      text: 'Al-Biruni walked down the safe path before the hill grew dark. In a sheltered courtyard, he set his staff and cap beside a low bed. From his pillow, he could see only one poplar top and a slice of Moon. That small, near view was quite enough for bedtime. The wide valley would wait above, quiet and patient beneath the gentle stars. His eyes grew heavy. Goodnight.',
+      text: 'With the height known, al-Biruni climbed the mountain at last. Up he went, past goats and gray boulders and thin, cold air. At the very top, the world spread out enormous and hushed. "Higher up, you see farther," he breathed, and here it was truest of all. The horizon lay far, far away, a great ring around him. And that ring, he saw, sat just a little below level. There was the tiny dip he had hoped to find.',
+      cue: 'Spin slowly in place with your arm pointing out. The circle your finger draws is a bit like the ring of the horizon.',
       scene: {
         id: 'the-hill-where-you-see-farther-p7',
-        focus: 'al-Biruni asleep with one poplar top and a crescent Moon visible above the wall',
+        focus: 'al-Biruni on the summit seeing the horizon ring dip slightly below level all around',
         composition:
-          'Foreground: a folded cap and a resting staff beside a soft blanket edge; midground: al-Biruni asleep in a low sheltered bed; background: one poplar top and a crescent Moon above the courtyard wall',
-        palette: 'deep blue, muted green, moon cream, and warm blanket rust',
+          'Foreground: al-Biruni steady near the summit with his quadrant lifted to the far line; midground: a vast ring of hazy blue land curving away in every direction; background: a thin dip between level and horizon marked by a soft guiding line',
+        palette: 'high-altitude blue, pale haze, brass gold, and cool cloud white',
       },
-      alt: 'A scholar sleeps snug in a sheltered courtyard while one poplar top and a crescent Moon rest quietly above the wall.',
+      alt: 'A scholar on a mountaintop lifts a measuring tool toward a vast ring of hazy land that dips slightly below level.',
+    },
+    {
+      text: 'Carefully, al-Biruni measured that little dip with his brass tool. It was a very small angle, smaller than the tip of your finger held far away. Small as it was, it was the key to something huge. He wrote the numbers down with a steady, patient hand. The mountain height told him one thing; the dip told him another. Together, joined by geometry, they could reveal the size of the Earth. He checked his marks twice, then a third time.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p8',
+        focus: 'al-Biruni recording the tiny horizon-dip angle in his notebook on the summit',
+        composition:
+          'Foreground: an open notebook with neat numbers and a small drawn angle; midground: al-Biruni bent close over his brass quadrant, checking the reading; background: the wide bright summit sky and the far hazy ring of horizon',
+        palette: 'parchment cream, ink brown, brass gold, and clear summit blue',
+      },
+      alt: 'A scholar bends over a notebook and a brass tool on a mountaintop, carefully recording a tiny measured angle.',
+    },
+    {
+      text: 'Back at his lamplit table, al-Biruni worked the numbers through. He drew circles and triangles and lines that touched them just so. The mountain, the dip, and the round Earth all fit together neatly. Out of his careful arithmetic came a single wonderful answer. The Earth, he found, was a ball about six thousand miles across from side to side. He had weighed the whole world with two angles and a quiet mind.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p9',
+        focus: 'al-Biruni computing the Earth’s size at his desk from his mountain measurements',
+        composition:
+          'Foreground: a desk with parchment, compass, and a geometric diagram of a circle touched by a line; midground: al-Biruni writing by warm lamplight, quietly pleased; background: shelves of scrolls and a small round window showing night sky',
+        palette: 'lamp gold, ink brown, deep night blue, and warm parchment cream',
+      },
+      alt: 'A scholar writes by lamplight beside a diagram of a circle and a line, working out the size of the round Earth.',
+    },
+    {
+      text: 'How close was his answer? Astonishingly close, it turns out. Long after al-Biruni, people measured the Earth with fine machines and long journeys. Their number and his number were almost the very same. He had come within a whisker of the truth, alone on a mountain. Did you know he did all this without ever leaving the ground for long? Just eyes, brass, geometry, and the patience to look with care.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p10',
+        focus: 'al-Biruni’s old result shown beside a modern globe, nearly matching',
+        composition:
+          'Foreground: a small round globe on a stand beside al-Biruni’s parchment number; midground: al-Biruni gazing fondly at the globe; background: soft warm study light with a suggestion of centuries passing in faded layers',
+        palette: 'globe blue-green, parchment cream, warm gold, and gentle sepia',
+      },
+      alt: 'A scholar looks fondly at a small globe placed beside his old handwritten number, and the two nearly match.',
+    },
+    {
+      text: 'Al-Biruni wrote down his method so others could try it too. He filled great books with stars, tides, gems, and faraway lands. In one famous book he told about the peoples and ideas of India. He believed a true measurer must be fair and honest, always. "Higher up, you see farther," he liked to say, and he meant more than hills. A curious, careful mind can see far across the whole wide world.',
+      cue: 'Ask a grown-up: how big is the Earth around? Wonder together how far you would walk to circle it.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p11',
+        focus: 'al-Biruni writing his books, surrounded by symbols of his many studies',
+        composition:
+          'Foreground: an open book with drawings of stars, a gem, and a small map; midground: al-Biruni writing thoughtfully at a broad table; background: a warm room with instruments, an astrolabe, and a window onto a starry Ghaznavid night',
+        palette: 'lamp amber, ink blue, warm wood brown, and starry indigo',
+      },
+      alt: 'A scholar writes at a table full of instruments and books, with an astrolabe and a starry window behind him.',
+    },
+    {
+      text: 'Long after al-Biruni, sailors and pilots and astronauts all learned the same lesson. The higher you rise, the more of the round Earth you can see. From a ship’s tall mast, a lookout spots land before the deck can. From high in the sky, the far horizon curves plainly into view. From space, the whole blue ball floats round and small. It all began with a scholar, a mountain, and one tiny dip.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p12',
+        focus: 'a rising sequence from mast to sky to space, all showing more of the round Earth',
+        composition:
+          'Foreground: a ship’s lookout high on a mast pointing at faraway land; midground: a soaring view where the horizon curves gently; background: the round blue Earth seen from far above against dark starry space',
+        palette: 'sea blue, sky cyan, earth blue-green, and deep space indigo',
+      },
+      alt: 'A ship lookout, a high sky view, and the round Earth from space all show more land as the viewpoint rises.',
+    },
+    {
+      text: 'That night, al-Biruni set down his brass tools and his parchment. He looked once more at the far line where the land met the sky. It was farther away than it had ever seemed before. Somewhere out past it, the round Earth curved on and on. Tomorrow there would be more to measure and more to wonder. But now the stars were bright, and his patient heart was full. Look up high someday, and see how far you can see.',
+      scene: {
+        id: 'the-hill-where-you-see-farther-p13',
+        focus: 'al-Biruni gazing at the far horizon and stars, content, tools set aside for the night',
+        composition:
+          'Foreground: a resting brass quadrant and a closed notebook on a windowsill; midground: al-Biruni at the window with a calm, thoughtful face; background: the far horizon line beneath a deep sky filled with quiet stars',
+        palette: 'deep night blue, silver starlight, brass gold, and warm lamp glow',
+      },
+      alt: 'A scholar gazes from a window at the far horizon and bright stars, his brass tool and notebook resting nearby.',
     },
   ],
 };

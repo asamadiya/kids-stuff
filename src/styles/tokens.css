@@ -1,55 +1,195 @@
 /*
- * Design tokens for Moonlit Storybook.
+ * Design tokens — "field guide" system.
  *
- * A warm, dusk-leaning palette and a calm, large type scale tuned for a parent
- * reading on a phone in a dim room. Everything downstream (library, reader,
- * cards) composes from these custom properties so the mood stays consistent.
+ * The palette is not invented: it is sampled from the illustrated plates that
+ * accompany the stories and games (warm paper, ink, and a restrained earth
+ * range of terracotta / ochre / teal / olive / slate). Chrome stays quiet so
+ * the illustrations and the prose carry the colour.
+ *
+ * Every ink-on-ground pair below meets WCAG AA for normal text.
+ * Legacy variable names are retained and remapped so older component styles
+ * inherit the new system rather than fighting it.
  */
 
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-400-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-400-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-500-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-500-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-600-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-600-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-400-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-400-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-400-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-400-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-600-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/literata-600-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Night surfaces */
-  --c-night-900: #0d0f18;
-  --c-night-800: #12141f;
-  --c-night-700: #191c2b;
-  --c-surface: #1b1e2e;
-  --c-surface-raised: #232741;
+  /* ------------------------------------------------------------ grounds -- */
+  --paper: #f4f0e6;          /* the page */
+  --paper-raised: #fbf9f4;   /* cards, panels */
+  --paper-sunken: #eae4d5;   /* wells, insets */
+  --paper-edge: #ffffff;
 
-  --c-line: rgba(244, 239, 230, 0.12);
-  --c-line-strong: rgba(244, 239, 230, 0.24);
+  /* --------------------------------------------------------------- ink -- */
+  --ink: #22211b;            /* headings, body */
+  --ink-soft: #4b4739;       /* secondary prose */
+  --ink-faint: #6b6757;      /* labels, captions */
 
-  /* Ink */
-  --c-ink: #f5f0e6;
-  --c-ink-soft: #cdc9dc;
-  --c-ink-faint: #9a97ad;
+  /* ------------------------------------------------------------- rules -- */
+  --rule: #ddd6c4;           /* hairlines */
+  --rule-strong: #b9b09a;    /* emphasis rules, borders */
 
-  /* Warm moonlight accent */
-  --c-moon: #f0c67a;
-  --c-moon-soft: #f7d9a2;
-  --c-moon-ink: #2a1e0b;
-  --c-glow: rgba(240, 198, 122, 0.16);
+  /* ------------------------------------------------------------ accents -- */
+  --terracotta: #9e4b27;
+  --ochre: #8a6416;
+  --teal: #2a5957;
+  --olive: #55632f;
+  --slate: #3c566f;
+  --accent: var(--teal);         /* the single interactive colour */
+  --accent-quiet: #eae7dc;       /* selected/active ground */
 
-  --focus: #a9ccff;
+  /* -------------------------------------------- legacy names, remapped -- */
+  --c-night-900: var(--paper);
+  --c-night-800: var(--paper-sunken);
+  --c-night-700: var(--paper-sunken);
+  --c-surface: var(--paper-raised);
+  --c-surface-raised: var(--paper-raised);
+  --c-line: var(--rule);
+  --c-line-strong: var(--rule-strong);
+  --c-ink: var(--ink);
+  --c-ink-soft: var(--ink-soft);
+  --c-ink-faint: var(--ink-faint);
+  --c-moon: var(--ochre);
+  --c-moon-soft: var(--accent-quiet);
+  --c-moon-ink: var(--ink);
+  --c-glow: var(--accent-quiet);
+  --c-sun: var(--ochre);
+  --c-sun-deep: var(--terracotta);
+  --c-berry: var(--terracotta);
+  --c-berry-deep: var(--terracotta);
+  --c-teal: var(--teal);
+  --c-teal-deep: var(--teal);
+  --c-sky: var(--slate);
+  --c-leaf: var(--olive);
 
-  /* Typefaces: a storybook serif for prose, a clean sans for chrome. */
-  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial,
-    sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino,
-    'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --focus: var(--terracotta);
 
-  /* Fluid type scale (mobile-first, grows gently with the viewport). */
-  --step--1: clamp(0.82rem, 0.78rem + 0.2vw, 0.92rem);
-  --step-0: clamp(1rem, 0.95rem + 0.28vw, 1.14rem);
-  --step-1: clamp(1.22rem, 1.1rem + 0.6vw, 1.5rem);
-  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.05rem);
-  --step-3: clamp(1.95rem, 1.55rem + 1.9vw, 2.9rem);
-  --step-4: clamp(2.5rem, 1.9rem + 3vw, 4rem);
+  /* ---------------------------------------------------------- typefaces -- */
+  /* Literata: a screen-reading book face — warm, sturdy, never childish.
+     Inter: neutral grotesque for labels, controls and figures. */
+  --font-serif: 'Literata', Charter, 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Read-aloud prose: large, with a calm line length. */
-  --reading-size: clamp(1.16rem, 1.04rem + 0.6vw, 1.5rem);
-  --measure: 62ch;
+  /* Type scale — a classical ~1.25 ratio, fluid but restrained. */
+  --step--2: clamp(0.72rem, 0.70rem + 0.10vw, 0.78rem);
+  --step--1: clamp(0.84rem, 0.81rem + 0.14vw, 0.92rem);
+  --step-0:  clamp(1.00rem, 0.97rem + 0.16vw, 1.09rem);
+  --step-1:  clamp(1.20rem, 1.13rem + 0.34vw, 1.42rem);
+  --step-2:  clamp(1.44rem, 1.31rem + 0.62vw, 1.85rem);
+  --step-3:  clamp(1.73rem, 1.49rem + 1.05vw, 2.41rem);
+  --step-4:  clamp(2.07rem, 1.68rem + 1.72vw, 3.13rem);
 
+  /* Read-aloud prose sits large and calm on a book measure. */
+  --reading-size: clamp(1.15rem, 1.06rem + 0.42vw, 1.42rem);
+  --measure: 64ch;
+  --measure-tight: 46ch;
+
+  --leading-tight: 1.18;
+  --leading-body: 1.62;
+
+  /* Letterspaced small labels (eyebrows, captions, plate numbers). */
+  --label-size: var(--step--2);
+  --label-tracking: 0.09em;
+
+  /* ------------------------------------------------------------- space -- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -57,21 +197,25 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-7: 3rem;
-  --space-8: 4rem;
+  --space-8: 4.5rem;
 
-  --radius-sm: 10px;
-  --radius: 18px;
-  --radius-lg: 28px;
+  /* --------------------------------------------------- form & elevation -- */
+  /* Printed matter has edges, not pillows. */
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 4px;
+  --radius-round: 999px;      /* reserved for genuine pips/dots only */
 
-  /* Minimum comfortable touch target. */
-  --touch: 48px;
+  --touch: 44px;
 
-  --shadow-soft: 0 18px 40px -24px rgba(0, 0, 0, 0.8);
-  --shadow-lift: 0 26px 60px -28px rgba(0, 0, 0, 0.85);
+  --shadow-soft: 0 1px 0 rgba(34, 33, 27, 0.04);
+  --shadow-lift: 0 2px 10px -6px rgba(34, 33, 27, 0.28);
 
-  /* Motion values are consumed only under [data-motion="on"] (Task 5). */
-  --turn-duration: 460ms;
-  --turn-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --turn-duration: 320ms;
+  --turn-ease: cubic-bezier(0.2, 0.6, 0.35, 1);
 
   --page-max: 1180px;
 }
+
+/* Numerals in data, tallies and arithmetic must line up. */
+.tabular, .mini-game__tally-count { font-variant-numeric: tabular-nums lining-nums; }

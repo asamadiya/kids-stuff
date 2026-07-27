@@ -12,3 +12,7 @@ test-results/
 # them out of clean clones. Committed here because the parent checkout's local
 # `.git/info/exclude` (which masks all of `.superpowers/`) is not portable.
 .superpowers/sdd/screenshots/
+.uxshoot.mjs
+.fontfetch.sh
+.wsshoot.mjs
+.wsshoot2.mjs
