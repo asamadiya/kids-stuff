@@ -4,9 +4,11 @@ import { StoryLoom } from './StoryLoom';
 import NumberMill from './workshop/NumberMill';
 import Quadrat from './workshop/Quadrat';
 import SortingKey from './workshop/SortingKey';
+import TableOfMeasures from './workshop/TableOfMeasures';
 import { NUMBER_MILL_META } from '../workshop/number-mill';
 import { QUADRAT_META } from '../workshop/quadrat';
 import { SORTINGKEY_META } from '../workshop/sorting-key';
+import { TABLE_OF_MEASURES_META } from '../workshop/table-of-measures';
 import '../styles/workshop.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -36,6 +38,7 @@ const TOOLS: readonly ToolEntry[] = [
   { meta: NUMBER_MILL_META, Component: NumberMill },
   { meta: QUADRAT_META, Component: Quadrat },
   { meta: SORTINGKEY_META, Component: SortingKey },
+  { meta: TABLE_OF_MEASURES_META, Component: TableOfMeasures },
 ];
 
 const LOOM: ToolMeta = {
