@@ -98,8 +98,8 @@ export function LearningCenterWelcome({
                 Practice
               </span>
               <span className="learn-zone__text">
-                46 exercises: place value, multiplication, fractions, letters
-                and patterns, and the vocabulary of feeling.
+                45 exercises: place value, multiplication, fractions, letters
+                and patterns, and what people do next.
               </span>
             </span>
             <span className="learn-zone__arrow" aria-hidden="true">

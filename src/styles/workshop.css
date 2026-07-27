@@ -78,7 +78,9 @@
   border: 1px solid var(--rule); background: var(--paper-raised); cursor: pointer; font: inherit;
   text-align: left; transition: transform 120ms ease, border-color 120ms ease; }
 .tool-card:hover, .tool-card:focus-visible { transform: translateY(-3px); border-color: var(--teal); outline: none; }
-.tool-card__pic { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden;
+/* Both children are absolutely positioned, so without an explicit width the
+   flex item shrink-wraps to nothing and the plate never paints. */
+.tool-card__pic { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; overflow: hidden;
   background: var(--paper-sunken); border: 1px solid var(--rule); }
 .tool-card__pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .tool-card__title { font-family: var(--font-serif); font-size: var(--step-1); }
