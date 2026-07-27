@@ -3,11 +3,13 @@ import type { MouseEvent } from 'react';
 import { Library } from './components/Library';
 import { PlayHub } from './components/PlayHub';
 import { Reader } from './components/Reader';
-import { StoryLoom } from './components/StoryLoom';
+import { WorkshopHub } from './components/WorkshopHub';
 import { useBookProgress } from './hooks/useBookProgress';
 import { STORIES, getStory } from './stories';
 import './styles/tokens.css';
 import './styles/app.css';
+import './styles/workshop.css';
+import './styles/print.css';
 
 /**
  * The whole app is either browsing the library or reading one story at a page.
@@ -180,7 +182,7 @@ function App() {
           announce={announce}
         />
       ) : route.kind === 'make' ? (
-        <StoryLoom onExit={exitToLibrary} />
+        <WorkshopHub onExit={exitToLibrary} />
       ) : route.kind === 'play' ? (
         <PlayHub onExit={exitToLibrary} />
       ) : (
