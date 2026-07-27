@@ -310,7 +310,14 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
  * off the slug and the relaxation runs in a fixed order, so the same mode
  * always draws the same plate.
  */
+/** Laying out 195 stars costs real work, so each arrangement is laid out once. */
+const laid = new Map<Arrangement, Placed[]>();
+
 export function project(mode: Arrangement, stars: readonly Star[] = STARS): Placed[] {
+  if (stars === STARS) {
+    const already = laid.get(mode);
+    if (already) return already;
+  }
   const polar = basePolar(mode, stars);
   const pts: Point[] = stars.map((s) => {
     const p = polar.get(s.slug) ?? { turn: 0, r: 0 };
@@ -321,14 +328,18 @@ export function project(mode: Arrangement, stars: readonly Star[] = STARS): Plac
     };
   });
   spreadCoincident(pts);
-  relax(pts, 7);
-  return stars.map((s, i) => ({
+  // 195 stars on one plate collide badly; relax until no two are nearer than
+  // a fingertip, or the small targets simply cannot be tapped.
+  relax(pts, 120);
+  const out = stars.map((s, i) => ({
     slug: s.slug,
     x: round2(pts[i].x),
     y: round2(pts[i].y),
     size: round2(starSize(s.pages)),
     color: s.color,
   }));
+  if (stars === STARS) laid.set(mode, out);
+  return out;
 }
 
 export function placedIndex(placed: readonly Placed[]): Map<string, Placed> {

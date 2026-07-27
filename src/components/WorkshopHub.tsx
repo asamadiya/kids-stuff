@@ -5,10 +5,14 @@ import NumberMill from './workshop/NumberMill';
 import Quadrat from './workshop/Quadrat';
 import SortingKey from './workshop/SortingKey';
 import TableOfMeasures from './workshop/TableOfMeasures';
+import DividingString from './workshop/DividingString';
+import ConstellationRegister from './workshop/ConstellationRegister';
 import { NUMBER_MILL_META } from '../workshop/number-mill';
 import { QUADRAT_META } from '../workshop/quadrat';
 import { SORTINGKEY_META } from '../workshop/sorting-key';
 import { TABLE_OF_MEASURES_META } from '../workshop/table-of-measures';
+import { DIVIDING_STRING_META } from '../workshop/dividing-string';
+import { CONSTELLATION_REGISTER_META } from '../workshop/constellation-register';
 import '../styles/workshop.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -39,6 +43,8 @@ const TOOLS: readonly ToolEntry[] = [
   { meta: QUADRAT_META, Component: Quadrat },
   { meta: SORTINGKEY_META, Component: SortingKey },
   { meta: TABLE_OF_MEASURES_META, Component: TableOfMeasures },
+  { meta: DIVIDING_STRING_META, Component: DividingString },
+  { meta: CONSTELLATION_REGISTER_META, Component: ConstellationRegister },
 ];
 
 const LOOM: ToolMeta = {
