@@ -697,12 +697,21 @@ button.game-card:focus-visible {
 
 .play-card__pic {
   position: relative;
+  /* Both children are absolutely positioned, so without an explicit width this
+     box collapses to 3x2px and every cover renders invisibly. */
   display: block;
+  width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border: 1px solid var(--rule);
   border-radius: var(--radius-sm);
   background: var(--paper-sunken);
+}
+
+.mini-game__tally {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
 }
 
 .play-card__icon {
