@@ -7,12 +7,14 @@ import SortingKey from './workshop/SortingKey';
 import TableOfMeasures from './workshop/TableOfMeasures';
 import DividingString from './workshop/DividingString';
 import ConstellationRegister from './workshop/ConstellationRegister';
+import OrnamentLathe from './workshop/OrnamentLathe';
 import { NUMBER_MILL_META } from '../workshop/number-mill';
 import { QUADRAT_META } from '../workshop/quadrat';
 import { SORTINGKEY_META } from '../workshop/sorting-key';
 import { TABLE_OF_MEASURES_META } from '../workshop/table-of-measures';
 import { DIVIDING_STRING_META } from '../workshop/dividing-string';
 import { CONSTELLATION_REGISTER_META } from '../workshop/constellation-register';
+import { ORNAMENT_LATHE_META } from '../workshop/ornament-lathe';
 import '../styles/workshop.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -45,6 +47,7 @@ const TOOLS: readonly ToolEntry[] = [
   { meta: TABLE_OF_MEASURES_META, Component: TableOfMeasures },
   { meta: DIVIDING_STRING_META, Component: DividingString },
   { meta: CONSTELLATION_REGISTER_META, Component: ConstellationRegister },
+  { meta: ORNAMENT_LATHE_META, Component: OrnamentLathe },
 ];
 
 const LOOM: ToolMeta = {
