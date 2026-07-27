@@ -11,37 +11,43 @@ export interface EmotionInfo {
   readonly label: string;
   readonly family: EmotionFamily;
   readonly support: string;
+  /**
+   * How big the feeling usually is, 1 (quiet) to 4 (takes the whole room).
+   * Two feelings can share a family and still be different sizes: annoyed is
+   * not angry. Used to lay feelings out on a scale rather than in a list.
+   */
+  readonly intensity: 1 | 2 | 3 | 4;
 }
 
 export const EMOTION_LIST: readonly EmotionInfo[] = [
-  { key: 'happy', label: 'Happy', family: 'joy', support: 'Happy feels bright and light inside.' },
-  { key: 'excited', label: 'Excited', family: 'joy', support: 'Excited is a fizzy, can’t-wait feeling.' },
-  { key: 'proud', label: 'Proud', family: 'joy', support: 'Proud is noticing your own good try.' },
-  { key: 'delighted', label: 'Delighted', family: 'joy', support: 'Delighted is a big sparkly kind of happy.' },
-  { key: 'grateful', label: 'Grateful', family: 'joy', support: 'Grateful is a warm thank-you feeling in your heart.' },
-  { key: 'loved', label: 'Loved', family: 'joy', support: 'Loved is feeling warm and safe with someone who cares.' },
-  { key: 'hopeful', label: 'Hopeful', family: 'joy', support: 'Hopeful is looking forward to something good.' },
-  { key: 'silly', label: 'Silly', family: 'joy', support: 'Silly is playful and giggly and goofy.' },
-  { key: 'confident', label: 'Confident', family: 'joy', support: 'Confident is believing “I can do it.”' },
-  { key: 'calm', label: 'Calm', family: 'calm', support: 'Calm feels quiet and cozy inside.' },
-  { key: 'sad', label: 'Sad', family: 'sad', support: 'Sad is okay — it helps when someone cares.' },
-  { key: 'disappointed', label: 'Disappointed', family: 'sad', support: 'Disappointed is when something you hoped for didn’t happen.' },
-  { key: 'lonely', label: 'Lonely', family: 'sad', support: 'Lonely is wishing someone was with you.' },
-  { key: 'bored', label: 'Bored', family: 'sad', support: 'Bored is when nothing feels fun to do right now.' },
-  { key: 'tired', label: 'Tired', family: 'sad', support: 'Tired is when your body wants to rest.' },
-  { key: 'angry', label: 'Angry', family: 'anger', support: 'Angry tells us something felt unfair.' },
-  { key: 'frustrated', label: 'Frustrated', family: 'anger', support: 'Frustrated is when something is hard and won’t work yet.' },
-  { key: 'annoyed', label: 'Annoyed', family: 'anger', support: 'Annoyed is a little bugged, like an itch.' },
-  { key: 'jealous', label: 'Jealous', family: 'anger', support: 'Jealous is wishing you had what someone else has.' },
-  { key: 'scared', label: 'Scared', family: 'fear', support: 'Scared helps us stay safe and ask for help.' },
-  { key: 'worried', label: 'Worried', family: 'fear', support: 'Worried is when your mind keeps asking “what if?”' },
-  { key: 'nervous', label: 'Nervous', family: 'fear', support: 'Nervous is fluttery, like butterflies in your tummy.' },
-  { key: 'overwhelmed', label: 'Overwhelmed', family: 'fear', support: 'Overwhelmed is when everything feels like too much at once.' },
-  { key: 'shy', label: 'Shy', family: 'social', support: 'Shy is okay — we can warm up slowly.' },
-  { key: 'embarrassed', label: 'Embarrassed', family: 'social', support: 'Embarrassed is that warm-cheeks, oops feeling.' },
-  { key: 'surprised', label: 'Surprised', family: 'surprise', support: 'Surprised is a quick “whoa, I didn’t expect that!”' },
-  { key: 'curious', label: 'Curious', family: 'surprise', support: 'Curious is wanting to know more.' },
-  { key: 'confused', label: 'Confused', family: 'surprise', support: 'Confused is when something doesn’t make sense yet.' },
+  { key: 'happy', label: 'Happy', family: 'joy', support: 'Happy feels bright and light inside.', intensity: 3 },
+  { key: 'excited', label: 'Excited', family: 'joy', support: 'Excited is a fizzy, can’t-wait feeling.', intensity: 4 },
+  { key: 'proud', label: 'Proud', family: 'joy', support: 'Proud is noticing your own good try.', intensity: 3 },
+  { key: 'delighted', label: 'Delighted', family: 'joy', support: 'Delighted is a big sparkly kind of happy.', intensity: 4 },
+  { key: 'grateful', label: 'Grateful', family: 'joy', support: 'Grateful is a warm thank-you feeling in your heart.', intensity: 2 },
+  { key: 'loved', label: 'Loved', family: 'joy', support: 'Loved is feeling warm and safe with someone who cares.', intensity: 3 },
+  { key: 'hopeful', label: 'Hopeful', family: 'joy', support: 'Hopeful is looking forward to something good.', intensity: 2 },
+  { key: 'silly', label: 'Silly', family: 'joy', support: 'Silly is playful and giggly and goofy.', intensity: 3 },
+  { key: 'confident', label: 'Confident', family: 'joy', support: 'Confident is believing “I can do it.”', intensity: 3 },
+  { key: 'calm', label: 'Calm', family: 'calm', support: 'Calm feels quiet and cozy inside.', intensity: 1 },
+  { key: 'sad', label: 'Sad', family: 'sad', support: 'Sad is okay — it helps when someone cares.', intensity: 3 },
+  { key: 'disappointed', label: 'Disappointed', family: 'sad', support: 'Disappointed is when something you hoped for didn’t happen.', intensity: 2 },
+  { key: 'lonely', label: 'Lonely', family: 'sad', support: 'Lonely is wishing someone was with you.', intensity: 3 },
+  { key: 'bored', label: 'Bored', family: 'sad', support: 'Bored is when nothing feels fun to do right now.', intensity: 1 },
+  { key: 'tired', label: 'Tired', family: 'sad', support: 'Tired is when your body wants to rest.', intensity: 2 },
+  { key: 'angry', label: 'Angry', family: 'anger', support: 'Angry tells us something felt unfair.', intensity: 4 },
+  { key: 'frustrated', label: 'Frustrated', family: 'anger', support: 'Frustrated is when something is hard and won’t work yet.', intensity: 3 },
+  { key: 'annoyed', label: 'Annoyed', family: 'anger', support: 'Annoyed is a little bugged, like an itch.', intensity: 2 },
+  { key: 'jealous', label: 'Jealous', family: 'anger', support: 'Jealous is wishing you had what someone else has.', intensity: 3 },
+  { key: 'scared', label: 'Scared', family: 'fear', support: 'Scared helps us stay safe and ask for help.', intensity: 4 },
+  { key: 'worried', label: 'Worried', family: 'fear', support: 'Worried is when your mind keeps asking “what if?”', intensity: 2 },
+  { key: 'nervous', label: 'Nervous', family: 'fear', support: 'Nervous is fluttery, like butterflies in your tummy.', intensity: 2 },
+  { key: 'overwhelmed', label: 'Overwhelmed', family: 'fear', support: 'Overwhelmed is when everything feels like too much at once.', intensity: 4 },
+  { key: 'shy', label: 'Shy', family: 'social', support: 'Shy is okay — we can warm up slowly.', intensity: 2 },
+  { key: 'embarrassed', label: 'Embarrassed', family: 'social', support: 'Embarrassed is that warm-cheeks, oops feeling.', intensity: 3 },
+  { key: 'surprised', label: 'Surprised', family: 'surprise', support: 'Surprised is a quick “whoa, I didn’t expect that!”', intensity: 3 },
+  { key: 'curious', label: 'Curious', family: 'surprise', support: 'Curious is wanting to know more.', intensity: 2 },
+  { key: 'confused', label: 'Confused', family: 'surprise', support: 'Confused is when something doesn’t make sense yet.', intensity: 2 },
 ] as const;
 
 export const EMOTIONS = EMOTION_LIST.map((e) => e.key);
