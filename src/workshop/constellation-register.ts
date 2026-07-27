@@ -182,7 +182,6 @@ interface Polar { turn: number; r: number }
 
 function polarTime(stars: readonly Star[]): Map<string, Polar> {
   const out = new Map<string, Polar>();
-  const span = YEAR_MAX - YEAR_MIN;
   const byBand = new Map<number, Star[]>();
   for (const s of stars) {
     const list = byBand.get(s.eraIndex);
@@ -197,9 +196,11 @@ function polarTime(stars: readonly Star[]): Map<string, Polar> {
       (a, b) => (a.year - b.year) || a.slug.localeCompare(b.slug),
     );
     ordered.forEach((s, k) => {
-      const turn = deep
-        ? k / Math.max(1, ordered.length)
-        : clamp01((s.year - YEAR_MIN) / span);
+      // Each ring carries one era, so the bearing is the account's place in
+      // that era's own order. Mapping it onto the whole 20,000-year span
+      // instead would squeeze a thousand-year band into a thin wedge and pile
+      // every star into one arc of the plate.
+      const turn = k / Math.max(1, ordered.length);
       // Neighbours in a crowded band are staggered across three sub-rings so
       // a run of accounts from the same year cannot stack on one another.
       const stagger = ((k % 3) - 1) * 11;

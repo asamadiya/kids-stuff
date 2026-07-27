@@ -78,7 +78,7 @@ export function ConstellationRegister() {
           {ERA_SHORT.map((band, i) => (
             <g key={band}>
               <circle cx={SKY.cx} cy={SKY.cy} r={ringRadius(i)} fill="none" stroke="#3a382f" strokeWidth="0.8" />
-              <text x={SKY.cx + ringRadius(i) + 4} y={SKY.cy - 4} fontFamily="Inter, sans-serif" fontSize="9" fill="#6f6a5c">
+              <text x={SKY.cx + 6} y={SKY.cy - ringRadius(i) - 5} fontFamily="Inter, sans-serif" fontSize="9" fill="#6f6a5c">
                 {band}
               </text>
             </g>
