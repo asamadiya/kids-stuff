@@ -179,7 +179,10 @@ export function NumberMill() {
           <span key={i} className="bench__row">
             <button type="button" className="bench-part is-set" onClick={() => bumpParam(i)}>
               {BLOCKS.find((s) => s.kind === b.kind)!.label}
-              {BLOCKS.find((s) => s.kind === b.kind)!.settable ? ` ${'•'.repeat(b.param)}` : ''}
+              {/* The count was shown only as dots, so reading a block meant
+                  counting pips, and the control cycles one way — going from 5
+                  back to 4 costs eight taps. The numeral makes it readable. */}
+              {BLOCKS.find((s) => s.kind === b.kind)!.settable ? ` ${b.param}` : ''}
             </button>
             <button type="button" className="bench-btn" onClick={() => dropBlock(i)} aria-label={`Take off ${b.kind}`}>×</button>
           </span>

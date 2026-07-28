@@ -2,9 +2,18 @@
  * Parent notes for the eleven letters / shapes / patterns exercises — the ones
  * PlayHub files under `cat: 'early'`.
  *
- * One record per exercise, keyed by the `id` on that exercise's META. Four
- * fields: what is on the screen, the skill it actually trains, one question a
- * grown-up can ask out loud, and the limitation.
+ * One record per exercise, keyed by the `id` on that exercise's META. Six
+ * fields: what is on the screen, how to actually play it, the skill it trains,
+ * the named capabilities it builds, one question a grown-up can ask out loud,
+ * and the limitation.
+ *
+ * `how` exists because the person who commissioned this site said twice that
+ * he could not tell what the exercises were or how to play them. Every step
+ * names a control that is really on the screen — the word printed on the
+ * button, the card that is tapped — and every step is one a five-year-old can
+ * carry out. Where a step tells the adult to cover something with a hand, that
+ * is not decoration: it is the fix the `honest` field below prescribes, moved
+ * to where it will actually be read.
  *
  * `honest` is the load-bearing field and is never flattering. This shelf is the
  * one most likely to waste a well-ahead five-year-old's time, and nine of the
@@ -23,7 +32,11 @@
 
 export interface ParentNote {
   readonly what: string;
+  /** Three to five imperative steps, in order. Each names a real control. */
+  readonly how: readonly string[];
   readonly practising: string;
+  /** Two to four precise, checkable noun phrases. */
+  readonly skills: readonly string[];
   readonly ask: string;
   readonly honest: string;
 }
@@ -35,10 +48,16 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'One to ten copies of a single picture laid out in one row — three cats, nine bees — and four '
       + 'number buttons underneath. He picks the count.',
+    how: [
+      'Touch each picture in the row and count out loud together.',
+      'Tap the number button that matches the count.',
+      'Read the line that comes back, then press Next.',
+    ],
     practising:
       'One-to-one correspondence: tagging each object exactly once with exactly one number word, and '
       + 'then treating the last word said as the size of the whole set rather than as the name of the '
       + 'last object. At the small end, subitising — seeing three without counting.',
+    skills: ['one-to-one correspondence', 'cardinality', 'subitising small sets'],
     ask: 'Now how many if I take one away? Say it without counting them again.',
     honest:
       'Beneath him. Twelve rounds, counts of one to ten, and a child who counts to ten clears every '
@@ -52,9 +71,20 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'Two rows of the same picture, one above the other, and two buttons: Left and Right. Each button '
       + 'is printed with that side’s own count.',
+    how: [
+      'Count the top row out loud, then the bottom row.',
+      'Cover the counts printed on the two buttons with your thumb.',
+      'Ask him to tap Left or Right.',
+      'Ask how many more that side has, then press Next.',
+    ],
     practising:
       'Comparing two set sizes — in principle by matching the rows one against one, or by counting both '
       + 'and comparing the totals.',
+    skills: [
+      'comparing two set sizes',
+      'one-to-one matching between rows',
+      'finding the difference between two counts',
+    ],
     ask: 'How many more does that side have? The screen never asks, and the answer is on no button.',
     honest:
       'Beneath him twice over. The counts run one to eight and differ by one to three, and, decisively, '
@@ -68,9 +98,20 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'Three numbers in a row — 4, 5, 6 — then a gap, and three number buttons. He picks the one that '
       + 'continues the row.',
+    how: [
+      'Read the three numbers in the row out loud.',
+      'Say what the row does each step — up one, up two, or down one.',
+      'Tap the number that belongs where the question mark is.',
+      'Press Next.',
+    ],
     practising:
       'Continuing a linear sequence by its common difference. Three rules only, over the range zero to '
       + 'ten: up by one, up by two, down by one.',
+    skills: [
+      'extending a linear sequence',
+      'stating a rule as a step size',
+      'counting on and back within ten',
+    ],
     ask: 'Say the rule out loud instead of the number. What is this row doing each time?',
     honest:
       'Mostly beneath him. Eight of the twelve rounds are up-by-one or down-by-one, which is counting '
@@ -86,11 +127,22 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'A row of pictures that repeats — sun, moon, sun, moon — ending in a question mark, and three '
       + 'pictures to choose from. All three choices are items that appear inside the pattern.',
+    how: [
+      'Read the row of pictures out loud, left to right.',
+      'Put a finger on the last picture of the part that repeats.',
+      'Tap the picture that belongs where the question mark is.',
+      'Press Next and read the new row before he chooses again.',
+    ],
     practising:
       'Finding the repeating unit and its length, then continuing it. Five unit shapes: A-B, A-B-C, '
       + 'A-A-B, A-B-B and A-A-B-B. The four-long and the uneven units are the ones that carry the work — '
       + 'he has to decide where the unit ends before he can say what follows, which is the first honest '
       + 'form of period.',
+    skills: [
+      'finding the repeating unit',
+      'reading the length of that unit',
+      'continuing a sequence from its rule',
+    ],
     ask: 'Where does the part that repeats stop? Put your finger on the last one of it.',
     honest:
       'Worth the sitting, but shallow and short. Thirteen rounds is a single session; past that he is '
@@ -104,11 +156,23 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'One outlined figure drawn in the middle of the screen and three names. The prompt asks for the '
       + 'most exact name, and a line beneath it says outright that more than one name can be true.',
+    how: [
+      'Count the straight sides of the figure out loud, then the corners.',
+      'Tap the most exact of the three names.',
+      'Read the feedback out — it names the wider shapes that are also true.',
+      'Tip the tablet onto its corner and ask for the name again.',
+      'Press Next.',
+    ],
     practising:
       'Naming a plane figure from its properties, and the nesting of those names: a square is also a '
       + 'rectangle, also a quadrilateral. The feedback prints the wider true names after every answer, so '
       + 'the hierarchy is stated rather than implied. Trapezoid is used in the exclusive sense — exactly '
       + 'one pair of parallel sides — so trapezoid, rectangle and rhombus stay disjoint.',
+    skills: [
+      'plane-shape vocabulary',
+      'classifying a figure by its sides and corners',
+      'nested shape naming',
+    ],
     ask: 'You said square. Is it also a rectangle? Tell me why it is.',
     honest:
       'The strongest of the eleven, and the only one whose answer is computed from the drawing rather '
@@ -125,11 +189,23 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'A word printed with its first letter missing — a coloured underscore, then "pple" — a button that '
       + 'reads the whole word aloud, and three letters to choose from. He picks the missing one.',
+    how: [
+      'Cover the printed letters with your hand before he looks.',
+      'Press Hear the word and let him listen to it.',
+      'Ask him to say the word again without its first sound.',
+      'Keep the word covered and let him tap the letter that writes that sound.',
+      'Press Next.',
+    ],
     practising:
       'Isolating the first sound of a spoken word and mapping it to the letter that writes it. The wrong '
       + 'answers are built for that job: one letter that really is in the word but not at the front, '
       + 'which is much the commonest mistake, then letters easy to confuse with the right one by shape or '
       + 'by sound.',
+    skills: [
+      'initial-phoneme isolation',
+      'phoneme-to-letter mapping',
+      'letter-shape recognition',
+    ],
     ask: 'Say the word without its first sound. What is left over?',
     honest:
       'For a child who reads at all, this stops being a listening task. The rest of the word is printed, '
@@ -144,9 +220,20 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'A picture and a word in capitals — CAT — and three written words below it. He picks the one that '
       + 'rhymes. Nothing is spoken aloud.',
+    how: [
+      'Say the word on the screen out loud together.',
+      'Read the three choices out loud yourself, one at a time.',
+      'Ask which one ends the same way, then let him tap it.',
+      'Press Next.',
+    ],
     practising:
       'Rime matching: hearing that two words share everything from the vowel onward. Nominally an ear '
       + 'task, which is why the on-screen hint tells him to say each word out loud.',
+    skills: [
+      'rime matching',
+      'listening for word endings',
+      'separating sound from spelling',
+    ],
     ask: 'Give me one more word that rhymes with cat. A made-up word is allowed.',
     honest:
       'In eleven of the twelve rounds the rhyming word ends in the same letters as the prompt — cat and '
@@ -160,9 +247,20 @@ export const NOTES: Record<string, ParentNote> = {
   'opposites': {
     what:
       'A picture and a word in capitals — HOT — and three words to choose from. He picks the opposite.',
+    how: [
+      'Read the word in capitals out loud.',
+      'Ask which of the three choices is even about the same thing — heat, size, direction.',
+      'Let him tap the opposite.',
+      'Press Next.',
+    ],
     practising:
       'Antonym retrieval within one dimension: recognising that hot and cold are the two ends of a single '
       + 'scale rather than two unrelated words.',
+    skills: [
+      'antonym retrieval',
+      'identifying the dimension a word pair sits on',
+      'scale vocabulary',
+    ],
     ask: 'Name something halfway between hot and cold. Now try that with open and shut.',
     honest:
       'Beneath him. Big and small, hot and cold, up and down are vocabulary a bright five-year-old had at '
@@ -177,9 +275,15 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'One flat circle of colour, about the size of a plum, and four colour names written as words. He '
       + 'picks the name.',
+    how: [
+      'Look at the circle in the middle of the screen.',
+      'Tap the colour name that fits it.',
+      'Press Next.',
+    ],
     practising:
       'Attaching the ten basic English colour names to samples. Nothing beyond that: no mixing, no '
       + 'lightness or saturation, no naming a colour against a background that changes it.',
+    skills: ['colour-name vocabulary', 'matching a sample to a written name'],
     ask: 'If you were not allowed to say green, what would you call this one?',
     honest:
       'The most clearly beneath him of the eleven. He has had these ten words for years and fourteen '
@@ -196,8 +300,19 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'A question — "Which one is not a fruit?" — and four pictures as buttons. He taps the one that does '
       + 'not belong. There is no other picture on the stage; the four buttons are the whole board.',
+    how: [
+      'Read the question at the top out loud.',
+      'Name each of the four pictures in turn.',
+      'Tap the one the question rules out.',
+      'Press Next.',
+    ],
     practising:
       'Category membership: holding a class in mind and testing four items against it one at a time.',
+    skills: [
+      'category membership',
+      'testing an item against a stated class',
+      'sorting by a rule',
+    ],
     ask: 'Now split these four a different way. Which two go together, and what is your rule?',
     honest:
       'Beneath him by a wide margin. The outsider is never a near miss — it is a dog among fruit, a car '
@@ -212,9 +327,20 @@ export const NOTES: Record<string, ParentNote> = {
     what:
       'Eight cards face down in a grid, four matching pairs among them. He turns two at a time; a matched '
       + 'pair stays face up, a mismatch stays showing until he taps again.',
+    how: [
+      'Tap any card to turn it over.',
+      'Tap a second card — a matched pair stays up, a mismatch stays showing until you tap again.',
+      'Before he turns a card, ask him to point at where its partner is.',
+      'Press Play again once all four pairs are found.',
+    ],
     practising:
       'Visuospatial working memory: holding a picture together with where it sat, and updating that store '
       + 'as more of the board is turned over.',
+    skills: [
+      'visuospatial working memory',
+      'binding a picture to its position',
+      'deliberate search rather than random flipping',
+    ],
     ask: 'Before you turn it — point to where you think the other one is. Were you right?',
     honest:
       'Four pairs is under what a five-year-old can already hold; decks at this age usually run twelve to '

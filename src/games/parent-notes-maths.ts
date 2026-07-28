@@ -20,6 +20,15 @@ export interface ParentNote {
   readonly practising: string;
   readonly ask: string;
   readonly honest: string;
+  /**
+   * How you actually play it: three to five ordered steps, each naming a
+   * control that exists in the component. Most of these exercises are
+   * multiple choice, so most of these are three steps — the padding a
+   * fourth step would need is not there, and `honest` carries the judgement.
+   */
+  readonly how: readonly string[];
+  /** The mathematics it builds, named so it can be checked. */
+  readonly skills: readonly string[];
 }
 
 export const NOTES: Record<string, ParentNote> = {
@@ -37,6 +46,16 @@ export const NOTES: Record<string, ParentNote> = {
       + 'who can read numerals never has to count a rod — he reads two digits and presses '
       + 'them. It also stops at 99; there are no hundred-flats. Build the Number is the '
       + 'same idea without the giveaway, and it runs to four digits.',
+    how: [
+      'Count the tall blue rods along the top — each rod is worth ten.',
+      'Add the loose yellow cubes to that.',
+      'Tap the total. Cover the "3 tens + 4 ones" line first, or he reads it instead of counting.',
+    ],
+    skills: [
+      'reading a base-ten collection as a two-digit numeral',
+      'unitising ten ones as one ten',
+      'place value to 99',
+    ],
   },
 
   'count-by-tens': {
@@ -53,6 +72,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'round is a copy-and-increment, not arithmetic. Counting back in tens — the harder '
       + 'half, and the one that matters for subtraction — never appears anywhere on the '
       + 'site; you have to ask for it out loud.',
+    how: [
+      'Read the row of numbers out loud with him — 23, 33, 43 — then the question mark.',
+      'Ask him for the next number before he looks at the three buttons.',
+      'Tap it under "What comes next?".',
+      'Now run the same row backwards out loud. The exercise never asks for that.',
+    ],
+    skills: [
+      'adding ten to a two-digit number',
+      'holding the ones digit fixed while the tens digit moves',
+      'counting on in tens across 100',
+    ],
   },
 
   'skip-count': {
@@ -67,6 +97,16 @@ export const NOTES: Record<string, ParentNote> = {
       + 'option list is also sorted, which puts the answer on the second or third button in '
       + 'all twelve rounds and never on the first or last — a child who spots that has a '
       + 'one-in-two guess without counting. Threes and fours live in Multiplication instead.',
+    how: [
+      'Read the run out loud: 2, 4, 6.',
+      'Ask him how much each number goes up by — that is the step.',
+      'Tap the next number under "Counting by 2s — what number comes next?".',
+    ],
+    skills: [
+      'skip counting in twos and fives',
+      'continuing a constant-difference sequence',
+      'the two- and five-times tables recited forwards',
+    ],
   },
 
   'build-the-number': {
@@ -83,6 +123,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'the question the other way (given 3406, name the parts). That reverse direction is '
       + 'the harder and more useful half and it is not here — do it on paper. Fourteen rounds '
       + 'and it stops at thousands.',
+    how: [
+      'Read the towers left to right: thousands, hundreds, tens, ones.',
+      'Ask him to say the whole number out loud before he looks at the four buttons.',
+      'Tap the numeral that matches.',
+      'Then reverse it on paper: write 3406 and ask him to name the parts.',
+    ],
+    skills: [
+      'expanded form to four digits',
+      'zero as a placeholder in an empty place',
+      'reading a four-digit numeral',
+    ],
   },
 
   'add-with-things': {
@@ -97,6 +148,16 @@ export const NOTES: Record<string, ParentNote> = {
       'This is beneath him. A five-year-old who has bonds to ten does not need single-digit '
       + 'sums with the objects still visible, and it will read as busywork. Skip it. Number '
       + 'Bonds, What’s Missing and Two-Digit Addition all ask for a fact rather than a count.',
+    how: [
+      'Count the first group, then carry on counting into the second rather than starting again.',
+      'Ask whether he already knew the total before he counted.',
+      'Tap the total. If he answers instantly every round, close this and open Number Bonds.',
+    ],
+    skills: [
+      'counting on from a group',
+      'single-digit sums within 12',
+      'cardinality of two sets joined',
+    ],
   },
 
   'number-bonds': {
@@ -113,6 +174,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'beats knowing. The ten bonds are probably already his; the four bonds-to-twenty '
       + 'rounds are the only ones with anything in them. Bonds to a hundred in tens — 30 and '
       + 'what makes 100 — is the next rung and is not on the site.',
+    how: [
+      'Read the line above the frame: 6 + ? = 10.',
+      'Ask for the missing number before he starts counting empty cells.',
+      'Tap it under "What goes with 6 to make 10?".',
+      'Say the same fact backwards: ten take away six.',
+    ],
+    skills: [
+      'complements of ten',
+      'complements of twenty',
+      'reading a ten-frame without counting one by one',
+    ],
   },
 
   'two-digit-add': {
@@ -130,6 +202,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'carrying rounds are the first eight, and the remaining fourteen are the old easy '
       + 'set, so the exercise gets easier as it goes and never gets hard again. Sums stop at '
       + '99 and it is still multiple choice. Write four of these out on paper for him.',
+    how: [
+      'Read the column sum on the board: 27 with 15 written under it.',
+      'Cover the hint line underneath — it prints most of the working before he answers.',
+      'Ask for the ones column first, then the tens.',
+      'Tap the total under "What is 27 + 15?".',
+    ],
+    skills: [
+      'column addition within 99',
+      'regrouping ten ones into one ten',
+      'adding by place value rather than by counting on',
+    ],
   },
 
   'take-away': {
@@ -144,6 +227,16 @@ export const NOTES: Record<string, ParentNote> = {
       + 'countable, so the winning move is "count the ones without a cross". One round takes '
       + 'away nothing and one takes away everything. Two-Digit Subtraction and What’s '
       + 'Missing are where the arithmetic is.',
+    how: [
+      'Count the whole row, including the ones struck through in red.',
+      'Ask how many were crossed out.',
+      'Tap what is left. The question names the object: "How many seeds are left?".',
+    ],
+    skills: [
+      'subtraction within ten as take-away',
+      'counting the part of a set that remains',
+      'reading a subtraction sentence off a picture',
+    ],
   },
 
   'two-digit-subtract': {
@@ -159,6 +252,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'no-borrow set, so difficulty drops off a cliff and stays down. The exercise’s own '
       + 'hint and subtitle still say there is no borrowing here, which is now false for those '
       + 'first eight. Four options, so a wrong method can still land on the right button.',
+    how: [
+      'Read the column on the board: 52 with 27 written under it.',
+      'Ask whether the top ones digit is big enough to take the bottom one away from.',
+      'When it is not, say out loud that a ten has to be broken open to pay the ones.',
+      'Tap the answer under "What is 52 − 27?".',
+    ],
+    skills: [
+      'column subtraction within 99',
+      'regrouping across a place boundary',
+      'comparing two digits within the same place',
+    ],
   },
 
   'groups-of': {
@@ -174,6 +278,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'products; the stage also prints "3 x 4" above the picture. This teaches the meaning '
       + 'of multiplication, which he may well already have — once he does, it is a counting '
       + 'drill. Multiplication is the one that makes him use a fact instead of a picture.',
+    how: [
+      'Count the baskets, then count how many are in one basket.',
+      'Ask for the total before he counts every item on the screen.',
+      'Tap it under "3 groups of 4 — how many in all?".',
+      'Cover one basket with your hand and ask the same question again.',
+    ],
+    skills: [
+      'multiplication as equal groups',
+      'telling 3 + 4 apart from 3 × 4',
+      'products within 30',
+    ],
   },
 
   'times-tables': {
@@ -192,6 +307,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'learning, since the rest can be reached by skip-counting on fingers — are absent, '
       + 'and so is the matching division fact (20 / 5 = 4). This is the strongest '
       + 'multiplication exercise here and it still stops short of the hard half.',
+    how: [
+      'Read the fact above the buttons: 4 × 5 = ?.',
+      'Point at the dot grid and say that one row is one group.',
+      'Ask for the answer before he starts counting dots.',
+      'Tap it. "Read this aloud" speaks the question if he cannot read it yet.',
+    ],
+    skills: [
+      'multiplication facts in the 2, 3, 4, 5 and 10 tables',
+      'reading a rectangular array as rows times columns',
+      'recalling a product instead of counting to it',
+    ],
   },
 
   'share-fairly': {
@@ -208,6 +334,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'answer plus or minus one or two, so estimating within one wins without dividing, and '
       + 'totals stop at 24. Nothing is actually shared out on screen — the bowls stay empty '
       + 'and the seeds stay in a row. How Many Groups? is the harder sibling: it has leftovers.',
+    how: [
+      'Read the question: twelve seeds, four bowls.',
+      'Ask him to deal them out in his head — one seed to each bowl, then round again.',
+      'Tap how many land on each bowl. The buttons read "3 each", not "3".',
+      'Ask what each bowl would get if there were one bowl fewer.',
+    ],
+    skills: [
+      'partitive division',
+      'equal sharing with nothing left over',
+      'division as the inverse of equal groups',
+    ],
   },
 
   'how-many-groups': {
@@ -226,6 +363,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'predicting first, which is why the question above is the whole exercise. Totals stop '
       + 'at 20 and no bucket holds more than six. The remainder is only ever counted, never '
       + 'written — "3 remainder 2" does not appear, and neither does the fraction.',
+    how: [
+      'Read the question: how many things there are, and how many go in each jar.',
+      'Before he touches anything, ask how many full jars there will be and what will be left.',
+      'Press the Fill button — it names the container, "Fill a jar" — until it greys out.',
+      'Count the full jars and tap that number. "Tip them out" empties them and starts over.',
+    ],
+    skills: [
+      'quotative division',
+      'remainders as what will not fill another group',
+      'predicting a quotient before carrying it out',
+    ],
   },
 
   'halves-and-wholes': {
@@ -242,6 +390,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'Denominators are only 1, 2, 3, 4, 6 and 8, and nine of the fourteen rounds ask for '
       + 'one half — a child who has learned only "half" will score well and learn little. '
       + 'Fractions as numbers, rather than as shaded pictures, are not on the site.',
+    how: [
+      'Read the question: which shape has one half shaded.',
+      'Take each shape in turn and compare the shaded area with the whole, not the piece count.',
+      'Tap the shape itself — the pictures are the buttons.',
+      'On a shape cut into six with three shaded, ask why that is still a half.',
+    ],
+    skills: [
+      'a fraction as a share of area',
+      'equal shares across differently cut shapes',
+      'rejecting piece count as a rule for naming a fraction',
+    ],
   },
 
   'fraction-pizza': {
@@ -259,6 +418,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'The options are filtered so no two are ever the same amount, which means he will '
       + 'never be shown 2/4 and 1/2 side by side — equivalence is deliberately excluded, and '
       + 'it is the next thing worth teaching. No comparing and no adding of fractions.',
+    how: [
+      'Count the pieces on the plate, including the dashed outlines where pieces are gone.',
+      'Read the question — it asks for what is gone in some rounds and what is left in others.',
+      'Tap the matching label, e.g. "3/4 (three quarters)". "Read this aloud" speaks the question.',
+      'Then ask for the other half of the pair: three quarters gone leaves what?',
+    ],
+    skills: [
+      'naming a proper fraction from a picture',
+      'the part-whole complement',
+      'halves, thirds and quarters',
+    ],
   },
 
   'compare-numbers': {
@@ -275,6 +445,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'middle button in twelve of the fourteen rounds and the third in the other two. A '
       + 'child who notices that stops comparing anything. Two digits only, never three; no '
       + 'less-than or greater-than notation; never more than two numbers to put in order.',
+    how: [
+      'Read both numbers out loud and count the tall block columns under each.',
+      'Ask which of the two has more tens.',
+      'Tap the bigger number, or "They are equal" when the two match.',
+      'Ignore where the button sits: the answer is the middle one in twelve of fourteen rounds.',
+    ],
+    skills: [
+      'comparing two-digit numbers by place value',
+      'spotting a digit reversal such as 26 against 62',
+      'equality as an answer, not only greater or smaller',
+    ],
   },
 
   'number-line-jump': {
@@ -291,6 +472,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'line instead of working it out. Only the label is hidden. The line stops at 20 and '
       + 'never goes below zero, so subtraction can never run out — which is the single most '
       + 'interesting thing a number line can show.',
+    how: [
+      'Find the filled dot on the line and read the number under it.',
+      'Read the question: start at 5, jump 3 hops forward.',
+      'Ask where he lands before he traces the dashed arc with his finger.',
+      'Tap the landing number. The line then marks it — "land 8".',
+    ],
+    skills: [
+      'addition and subtraction as movement along a line',
+      'counting on and counting back within 20',
+      'reading a value off a scaled line',
+    ],
   },
 
   'doubles': {
@@ -306,6 +498,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'does not know. A well-ahead five probably has all ten already. Nothing here doubles '
       + 'a teen or a ten — double 14, double 60 — and halving, the inverse and the harder '
       + 'direction, never appears. Ask for those out loud; they are a minute’s work.',
+    how: [
+      'Read the line above the dots: 6 + 6.',
+      'Ask for the answer before he counts either group of dots.',
+      'Tap it under "Double 6 = ?".',
+      'Follow straight on with the near double: so what is 6 + 7?',
+    ],
+    skills: [
+      'doubles facts to 10 + 10',
+      'near doubles derived from a known double',
+      'two equal groups as the model for doubling',
+    ],
   },
 
   'odd-even': {
@@ -321,6 +524,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'only two buttons. Numbers stop at 20, and the rule that makes parity useful — look '
       + 'at the last digit, so 3407 is odd — is never stated and never tested. One bit of '
       + 'information, illustrated.',
+    how: [
+      'Read the number printed above the objects.',
+      'Ask whether anything is standing alone outside a pair — the dashed box holds the leftover.',
+      'Tap Odd or Even.',
+      'Then ask about a number with no picture behind it: is 154 odd or even?',
+    ],
+    skills: [
+      'parity as splitting a quantity into twos',
+      'a remainder of one as the mark of an odd number',
+      'the even numbers as the two-times table',
+    ],
   },
 
   'money-coins': {
@@ -338,6 +552,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'coin is missing. He never makes change, never pays, and never meets "you have fifty '
       + 'and this costs thirty-eight". This is the most practical exercise in the section and '
       + 'it is still only reading a total off a table. Real coins in a real hand do the rest.',
+    how: [
+      'Name each coin on the table by its size, colour and the words on its face.',
+      'Open the "Coin values" panel underneath if he needs the key — no coin prints a number.',
+      'Add them biggest first: the dimes, then the nickels, then the pennies.',
+      'Tap the total in cents. The buttons read "23¢", not "23".',
+    ],
+    skills: [
+      'identifying US coins without a printed numeral',
+      'adding a mixed set of tens, fives and ones',
+      'counting on from the largest coin down',
+    ],
   },
 
   'ten-more-ten-less': {
@@ -354,6 +579,17 @@ export const NOTES: Record<string, ParentNote> = {
       + 'answers: "Add 1 to the tens digit — the ones digit stays the same." Nothing crosses '
       + '100 and nothing moves by 1 or by 100. He will have it in three rounds and then there '
       + 'is nothing left; the next rung, a hundred more than a three-digit number, is not here.',
+    how: [
+      'Read the number and the arrow beside it — up for ten more, down for ten less.',
+      'Cover the hint line under the board; it states the whole rule before he answers.',
+      'Ask which digit moves and which one stays put.',
+      'Tap the answer under "What is 10 more than 34?".',
+    ],
+    skills: [
+      'adding and subtracting ten mentally',
+      'changing the tens digit while the ones digit holds',
+      'reading the direction of a change from more or less',
+    ],
   },
 
   'whats-missing': {
@@ -372,5 +608,16 @@ export const NOTES: Record<string, ParentNote> = {
       + 'the correct button walks a fixed cycle — first, fourth, third, second, first — which '
       + 'a child working through the deck in order can simply read off. Write the same '
       + 'equations on paper with no options and it becomes genuinely hard.',
+    how: [
+      'Read the equation out loud, saying "something" where the dashed box is.',
+      'Ask whether he has to add or take away to find what belongs in the box.',
+      'Tap the number that fills it, under "Which number fills the blank box?".',
+      'Write the next one on paper with no buttons underneath. That is where the work is.',
+    ],
+    skills: [
+      'solving for an unknown in any position in the sentence',
+      'inverse operations',
+      'addition and subtraction within 20',
+    ],
   },
 };

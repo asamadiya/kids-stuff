@@ -1,4 +1,5 @@
 import { ForTheParent } from './ForTheParent';
+import { HowToPlay } from './HowToPlay';
 import type { ComponentType } from 'react';
 import { toHash } from '../App';
 import { StoryLoom } from './StoryLoom';
@@ -78,7 +79,17 @@ export const WORKSHOP_TOOL_IDS: readonly string[] = [
 export function WorkshopHub({ activeId, onLoomExit }: WorkshopHubProps) {
   const active = TOOLS.find((t) => t.meta.id === activeId) ?? null;
 
-  if (activeId === LOOM.id) return <StoryLoom onExit={onLoomExit} />;
+  // The Loom used to return here bare, which is why it was the one tool on the
+  // site with no explanation attached to it at all.
+  if (activeId === LOOM.id) {
+    return (
+      <>
+        <StoryLoom onExit={onLoomExit} />
+        <HowToPlay id={LOOM.id} />
+        <ForTheParent id={LOOM.id} />
+      </>
+    );
+  }
 
   return (
     <main id="main-content" className="workshop" aria-label="Workshop" tabIndex={-1}>
@@ -87,6 +98,7 @@ export function WorkshopHub({ activeId, onLoomExit }: WorkshopHubProps) {
           <a className="workshop__back" style={NO_UNDERLINE} href={toHash({ kind: 'make' })}>
             <span aria-hidden="true">&larr;</span> All tools
           </a>
+          <HowToPlay id={active.meta.id} />
           <active.Component />
           <ForTheParent id={active.meta.id} />
         </>
