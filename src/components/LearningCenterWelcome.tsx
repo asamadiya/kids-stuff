@@ -1,196 +1,214 @@
-import { useState } from 'react';
-import { CATEGORY_LABEL, CATEGORY_ORDER, SUBJECT_DETAILS } from '../data/meta';
 import { COLLECTION, era } from '../data/collection';
-import type { StoryDomain } from '../types';
+import { getStory } from '../stories';
+import { PLAY_EXERCISE_IDS } from './PlayHub';
+import { WORKSHOP_TOOL_IDS } from './WorkshopHub';
 import { RikkiMascot } from './RikkiMascot';
+import { PLAIN_ROUTES, toHash } from '../App';
+import type { PlainRouteKind } from '../App';
+import '../styles/library.css';
+import '../styles/home.css';
 
-const NOTES = [
-  'The word mathematics comes from an ancient Greek word meaning learning or knowledge.',
-  'Honeybees use a waggle dance to show their hive-mates where flowers are growing.',
-  'A shadow changes size when an object moves closer to or farther from a light.',
-  'The North Star has helped travelers find north for hundreds of years.',
-  'Plants can bend toward light because the cells on their darker side grow longer.',
-] as const;
+/**
+ * The cards were buttons before they were links; the stylesheet therefore never
+ * suppressed the anchor underline that would now strike through every line of
+ * card text. Declared once here rather than in eight places.
+ */
+const NO_UNDERLINE = { textDecoration: 'none' } as const;
 
-export interface LearningCenterWelcomeProps {
-  readonly historicalCount: number;
-  readonly onOpenLibrary: () => void;
-  readonly onPlay?: () => void;
-  readonly onMakeStory?: () => void;
-  readonly onExploreSubject: (domain: StoryDomain) => void;
+/**
+ * The index. Not the collection — the way into it.
+ *
+ * This screen renders no story tiles at all. Every one of the ways in is a real
+ * anchor pointing at its own route, so the browser owns the history: a child
+ * who takes a wrong turning gets out with one Back. The count of what is on the
+ * shelves is stated here as a fact, and is read off the collection itself, so
+ * it cannot drift from what is actually there.
+ */
+
+interface WayIn {
+  readonly kind: PlainRouteKind;
+  readonly numeral: string;
+  readonly kicker: string;
+  readonly label: string;
+  readonly text: string;
+  readonly tone: 'library' | 'play' | 'make';
 }
 
-export function LearningCenterWelcome({
-  historicalCount,
-  onOpenLibrary,
-  onPlay,
-  onMakeStory,
-  onExploreSubject,
-}: LearningCenterWelcomeProps) {
-  const [factIndex, setFactIndex] = useState(0);
+const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'] as const;
+
+function waysIn(): readonly WayIn[] {
+  const ways: readonly Omit<WayIn, 'numeral'>[] = [
+    {
+      kind: 'shelf',
+      kicker: 'Read',
+      label: 'Shelf',
+      text: `All ${COLLECTION.stories} accounts, in two groups: ${COLLECTION.accounts} real, ${COLLECTION.invented} invented.`,
+      tone: 'library',
+    },
+    {
+      kind: 'timeline',
+      kicker: 'Read',
+      label: 'Timeline',
+      text: `The same accounts in order, from ${era(COLLECTION.earliestYear)} to ${era(COLLECTION.latestYear)}.`,
+      tone: 'library',
+    },
+    {
+      kind: 'map',
+      kicker: 'Read',
+      label: 'Map',
+      text: `Where each one happened: ${COLLECTION.places} places on one chart.`,
+      tone: 'library',
+    },
+    {
+      kind: 'topics',
+      kicker: 'Read',
+      label: 'By subject',
+      text: `${COLLECTION.subjects} subjects, from number to fossils. Each account belongs to one.`,
+      tone: 'library',
+    },
+    {
+      kind: 'places',
+      kicker: 'Read',
+      label: 'By place',
+      text: `${COLLECTION.regions} regions of the world, each with its own accounts.`,
+      tone: 'library',
+    },
+    {
+      kind: 'play',
+      kicker: 'Work',
+      label: 'Practice',
+      text: `${PLAY_EXERCISE_IDS.length} exercises: place value, multiplication, fractions, money, letters and patterns.`,
+      tone: 'play',
+    },
+    {
+      kind: 'make',
+      kicker: 'Compose',
+      label: 'Workshop',
+      text: `${WORKSHOP_TOOL_IDS.length} instruments and the Story Loom. You supply the decisions.`,
+      tone: 'make',
+    },
+  ];
+  return ways.map((way, index) => ({ ...way, numeral: NUMERALS[index] ?? String(index + 1) }));
+}
+
+export interface Resume {
+  readonly slug: string;
+  readonly title: string;
+  /** 0-based page index, as stored. */
+  readonly page: number;
+  readonly pageCount: number;
+}
+
+/**
+ * The one story to offer to resume. Bookmarks are held in insertion order, so
+ * the last usable entry is the most recently started story; a bookmark for a
+ * story that no longer exists, or one past its end, is not offered at all.
+ */
+export function pickResume(bookmarks: ReadonlyMap<string, number>): Resume | null {
+  let found: Resume | null = null;
+  for (const [slug, page] of bookmarks) {
+    const story = getStory(slug);
+    if (!story) continue;
+    if (!Number.isInteger(page) || page <= 0 || page >= story.pages.length) continue;
+    found = { slug, title: story.title, page, pageCount: story.pages.length };
+  }
+  return found;
+}
+
+export interface LearningCenterWelcomeProps {
+  readonly bookmarks: ReadonlyMap<string, number>;
+}
+
+export function LearningCenterWelcome({ bookmarks }: LearningCenterWelcomeProps) {
+  const resume = pickResume(bookmarks);
 
   return (
-    <>
+    <main
+      id="main-content"
+      className="library"
+      aria-label="Rikki's Field Guide"
+      tabIndex={-1}
+    >
       <header className="learning-hero">
         <div className="learning-hero__copy">
           <p className="learning-hero__eyebrow">An illustrated field guide</p>
           <h1 className="learning-hero__title">Rikki&rsquo;s Field Guide</h1>
           <p className="learning-hero__lede">
-            {COLLECTION.accounts} illustrated accounts of real people working
-            something out &mdash; from {era(COLLECTION.earliestYear)} to{' '}
-            {era(COLLECTION.latestYear)}, across {COLLECTION.places} places. Plus
-            exercises in number, letter and feeling, and a workshop for composing
-            your own.
+            How people worked things out, what they built, and how the numbers
+            behind it are done.
           </p>
           <dl className="learning-hero__stats">
-            <div><dt>Accounts</dt><dd>{COLLECTION.accounts}</dd></div>
-            <div><dt>Places</dt><dd>{COLLECTION.places}</dd></div>
-            <div><dt>Subjects</dt><dd>{COLLECTION.subjects}</dd></div>
-            <div><dt>Deep time</dt><dd>{COLLECTION.deepTime}</dd></div>
+            <div>
+              <dt>Accounts</dt>
+              <dd>{COLLECTION.accounts}</dd>
+            </div>
+            <div>
+              <dt>Places</dt>
+              <dd>{COLLECTION.places}</dd>
+            </div>
+            <div>
+              <dt>Subjects</dt>
+              <dd>{COLLECTION.subjects}</dd>
+            </div>
+            <div>
+              <dt>Deep time</dt>
+              <dd>{COLLECTION.deepTime}</dd>
+            </div>
           </dl>
-          <button type="button" className="learning-hero__start" onClick={onOpenLibrary}>
-            Open the library
-            <span aria-hidden="true"> &rarr;</span>
-          </button>
         </div>
         <div className="learning-hero__mascot">
           <RikkiMascot />
         </div>
       </header>
 
-      <section className="learning-zones" aria-label="Sections">
-        <button
-          type="button"
-          className="learn-zone learn-zone--library"
-          onClick={onOpenLibrary}
-        >
-          <span className="learn-zone__icon" aria-hidden="true">
-            I
-          </span>
-          <span className="learn-zone__copy">
-            <span className="learn-zone__kicker">Read</span>
-            <span className="learn-zone__title" role="heading" aria-level={2}>
-              Library
-            </span>
-            <span className="learn-zone__text">
-              {historicalCount} accounts, arranged by shelf, timeline, map,
-              subject or place.
-            </span>
-          </span>
-          <span className="learn-zone__arrow" aria-hidden="true">
-            &rarr;
-          </span>
-        </button>
-
-        {onPlay ? (
-          <button
-            type="button"
-            className="learn-zone learn-zone--play"
-            onClick={onPlay}
-            aria-label="Open practice"
-          >
-            <span className="learn-zone__icon" aria-hidden="true">
-              II
-            </span>
-            <span className="learn-zone__copy">
-              <span className="learn-zone__kicker">Work</span>
-              <span className="learn-zone__title" role="heading" aria-level={2}>
-                Practice
-              </span>
-              <span className="learn-zone__text">
-                45 exercises: place value, multiplication, fractions, letters
-                and patterns, and what people do next.
-              </span>
-            </span>
-            <span className="learn-zone__arrow" aria-hidden="true">
-              &rarr;
-            </span>
-          </button>
-        ) : null}
-
-        {onMakeStory ? (
-          <button
-            type="button"
-            className="learn-zone learn-zone--make"
-            onClick={onMakeStory}
-            aria-label="Open the workshop"
-          >
-            <span className="learn-zone__icon" aria-hidden="true">
-              III
-            </span>
-            <span className="learn-zone__copy">
-              <span className="learn-zone__kicker">Compose</span>
-              <span className="learn-zone__title" role="heading" aria-level={2}>
-                Workshop
-              </span>
-              <span className="learn-zone__text">
-                Name three or more things. The Loom composes an adventure that
-                uses every one of them.
-              </span>
-            </span>
-            <span className="learn-zone__arrow" aria-hidden="true">
-              &rarr;
-            </span>
-          </button>
-        ) : null}
-      </section>
-
-      <aside className="fact-card" aria-labelledby="fact-title">
-        <div className="fact-card__badge" aria-hidden="true">
-          &sect;
-        </div>
-        <div className="fact-card__copy">
-          <p id="fact-title" className="fact-card__title">
-            From the notebook
-          </p>
-          <p className="fact-card__fact" aria-live="polite">
-            {NOTES[factIndex]}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="fact-card__next"
-          onClick={() => setFactIndex((current) => (current + 1) % NOTES.length)}
-        >
-          Next note
-        </button>
-      </aside>
-
-      <section className="subject-zone" aria-labelledby="subject-zone-title">
-        <div className="subject-zone__head">
-          <div>
-            <p className="subject-zone__eyebrow">Index</p>
-            <h2 id="subject-zone-title" className="subject-zone__title">
-              By subject
-            </h2>
+      {resume ? (
+        <aside className="fact-card" aria-labelledby="resume-title">
+          <div className="fact-card__badge" aria-hidden="true">
+            &para;
           </div>
-          <p className="subject-zone__lede">
-            Choose a subject to see every account that touches it.
-          </p>
-        </div>
-        <div className="subject-grid">
-          {CATEGORY_ORDER.map((domain) => {
-            const detail = SUBJECT_DETAILS[domain];
-            return (
-              <button
-                key={domain}
-                type="button"
-                className="subject-card"
-                onClick={() => onExploreSubject(domain)}
-                aria-label={`${CATEGORY_LABEL[domain]} — see accounts`}
-                style={({ ['--subject-accent' as string]: detail.color })}
-              >
-                <span className="subject-card__icon" aria-hidden="true">
-                  {detail.icon}
-                </span>
-                <span className="subject-card__label">{CATEGORY_LABEL[domain]}</span>
-                <span className="subject-card__prompt">{detail.prompt}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-    </>
+          <div className="fact-card__copy">
+            <p id="resume-title" className="fact-card__title">
+              Where you stopped
+            </p>
+            <p className="fact-card__fact">
+              {resume.title} &mdash; page {resume.page + 1} of {resume.pageCount}.
+            </p>
+          </div>
+          <a
+            className="fact-card__next"
+            style={NO_UNDERLINE}
+            href={toHash({ kind: 'reader', slug: resume.slug, page: resume.page })}
+          >
+            Carry on reading
+          </a>
+        </aside>
+      ) : null}
+
+      <nav className="learning-zones" aria-label="Ways in">
+        {waysIn().map((way) => (
+          <a
+            key={way.kind}
+            className={`learn-zone learn-zone--${way.tone}`}
+            style={NO_UNDERLINE}
+            href={toHash(PLAIN_ROUTES[way.kind])}
+          >
+            <span className="learn-zone__icon" aria-hidden="true">
+              {way.numeral}
+            </span>
+            <span className="learn-zone__copy">
+              <span className="learn-zone__kicker">{way.kicker}</span>
+              <span className="learn-zone__title" role="heading" aria-level={2}>
+                {way.label}
+              </span>
+              <span className="learn-zone__text">{way.text}</span>
+            </span>
+            <span className="learn-zone__arrow" aria-hidden="true">
+              &rarr;
+            </span>
+          </a>
+        ))}
+      </nav>
+    </main>
   );
 }
 

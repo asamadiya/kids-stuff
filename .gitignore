@@ -16,3 +16,4 @@ test-results/
 .fontfetch.sh
 .wsshoot.mjs
 .wsshoot2.mjs
+artifacts/

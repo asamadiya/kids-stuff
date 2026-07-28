@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   BEFORE_YOU_DECIDE_META, CASES, GLYPHS, QUESTION_KINDS, SHEET,
-  askedFacts, caseAt, casesDecided, chipFor, closingLine, factFor, plateLines, readout,
-  sheetHeight, sheetRows, unaskedFacts, unaskedKinds, unaskedLine,
+  askedFacts, caseAt, casesDecided, chipFor, closingLine, factFor, factText, plateLines, readout,
+  sheetHeight, sheetRows, timelineMarks, unaskedFacts, unaskedKinds, unaskedLine,
 } from '../../sel/before-you-decide';
-import type { Decided, QuestionKind } from '../../sel/before-you-decide';
+import type { Case, Decided, Fact, QuestionKind } from '../../sel/before-you-decide';
 import { drawer } from '../../workshop/drawer';
 import type { Kept } from '../../workshop/drawer';
 import { say } from '../../workshop/say';
@@ -27,13 +27,63 @@ function Mark({ path, size = 30, colour = INK }: { path: string; size?: number; 
   );
 }
 
-function Panel({ id, alt, caption }: { id: string; alt: string; caption: string }) {
+/**
+ * The one picture in the case. There is exactly one of these on screen, because
+ * `Fact` has no field that could name a second plate.
+ */
+function Plate({ id, alt, caption }: { id: string; alt: string; caption: string }) {
   return (
-    <figure className="bench__figure" style={{ margin: 0, maxWidth: '18rem' }}>
+    <figure className="bench__figure" style={{ margin: 0, maxWidth: '22rem' }}>
       <img src={`${BASE}games/sel/${id}.png`} alt={alt}
         style={{ display: 'block', width: '100%', height: 'auto', border: `1px solid ${RULE}`, background: SUNKEN }} />
       <figcaption className="bench__figure-caption">{caption}</figcaption>
     </figure>
+  );
+}
+
+/** A fact, drawn rather than painted: its question mark, its question, its sentence. */
+function FactCard({ subject, fact, prefix }: { subject: Case; fact: Fact; prefix?: string }) {
+  return (
+    <div className="bench__figure" style={{ maxWidth: '18rem', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+      <Mark path={chipFor(fact.kind).path} size={26} colour={TEAL} />
+      <div>
+        <p className="bench__figure-caption" style={{ margin: 0, color: FAINT }}>{prefix ?? fact.question}</p>
+        <p className="bench__figure-caption" style={{ margin: 0, color: INK }}>{factText(subject, fact)}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The clock question is a claim about time, so it is drawn as time: three stops
+ * in order with the picture's stop filled in. Both this strip and the sentence
+ * read aloud come from `Case.timeline`.
+ */
+function Timeline({ subject }: { subject: Case }) {
+  const marks = timelineMarks(subject);
+  const W = 560, H = 96, PAD = 34;
+  const x = (at: number) => PAD + at * (W - PAD * 2);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} role="img"
+      aria-label={`A line of ${marks.length} stops in time order. ${marks.map((m) => m.says).join(' ')}`}
+      style={{ display: 'block', width: '100%', maxWidth: `${W}px`, height: 'auto' }}>
+      <rect x="0" y="0" width={W} height={H} fill={PAPER} />
+      <line x1={x(0)} y1="26" x2={x(1)} y2="26" stroke={RULE} strokeWidth="1" />
+      {marks.map((m) => (
+        <g key={m.says}>
+          <circle cx={x(m.at)} cy="26" r="6" fill={m.isPicture ? OCHRE : 'none'}
+            stroke={m.isPicture ? OCHRE : RULE} strokeWidth="1.2" />
+          <text x={x(m.at)} y="50" textAnchor="middle" fontFamily="Inter, system-ui, sans-serif"
+            fontSize="11" fill={m.isPicture ? INK : FAINT}>
+            {m.says}
+          </text>
+        </g>
+      ))}
+      <text x={x(subject.timeline.length > 0 ? marks[subject.pictureAt].at : 0)} y="74" textAnchor="middle"
+        fontFamily="Inter, system-ui, sans-serif" fontSize="10" letterSpacing="1.2" fill={OCHRE}>
+        THE PICTURE
+      </text>
+    </svg>
   );
 }
 
@@ -64,7 +114,7 @@ export function BeforeYouDecide() {
     const fact = factFor(openCase, kind);
     setAsked([...asked, kind]);
     pluck(step(asked.length * 3 - 4), 0.22);
-    say(`${fact.question} ${fact.fact}`);
+    say(`${fact.question} ${factText(openCase, fact)}`);
   };
 
   const decide = (id: string) => {
@@ -88,6 +138,7 @@ export function BeforeYouDecide() {
 
   const height = sheetHeight(records);
   const standing = readout({ asked: asked.length, decided: chosen !== null, cases: casesDecided(records) });
+  const timeShown = asked.includes('clock') || turned;
 
   return (
     <section className="bench" aria-labelledby="before-you-decide-title">
@@ -102,15 +153,17 @@ export function BeforeYouDecide() {
 
       <div className="bench__stage">
         <div className="bench__row" style={{ alignItems: 'flex-start' }}>
-          <Panel id={openCase.setupPanelId} alt={openCase.setupAlt} caption={openCase.setup} />
-          {seen.map((fact) => (
-            <Panel key={fact.panelId} id={fact.panelId} alt={fact.alt} caption={fact.fact} />
-          ))}
-          {turned && held.map((fact) => (
-            <Panel key={fact.panelId} id={fact.panelId} alt={fact.alt}
-              caption={`${unaskedLine(fact.kind)} ${fact.fact}`} />
-          ))}
+          <Plate id={openCase.setupPanelId} alt={openCase.setupAlt} caption={openCase.setup} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {seen.map((fact) => (
+              <FactCard key={fact.kind} subject={openCase} fact={fact} />
+            ))}
+            {turned && held.map((fact) => (
+              <FactCard key={fact.kind} subject={openCase} fact={fact} prefix={unaskedLine(fact.kind)} />
+            ))}
+          </div>
         </div>
+        {timeShown && <Timeline subject={openCase} />}
         {chosen && <p className="bench__note" style={{ marginTop: 'var(--space-4)' }}>{chosen.outcome}</p>}
         {turned && <p className="bench__note" style={{ marginTop: 'var(--space-3)' }}>{closingLine(openCase)}</p>}
       </div>

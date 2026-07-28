@@ -1,14 +1,23 @@
 import { describe, it, expect } from 'vitest';
 import {
+  ACTION_FIELD,
+  DRAWINGS,
+  GESTURES,
+  PALM,
+  PLACES,
   ROAD_IDS,
   STRIPS,
+  THINGS,
   WHATHAPPENSNEXT_META,
+  actionWordOf,
   allPanels,
+  arrowOf,
   bothWalked,
   coverageLine,
   nextStripId,
   otherRoad,
   panelsOf,
+  placeSays,
   plateFilename,
   plateLines,
   roadKey,
@@ -19,7 +28,7 @@ import {
   totalRoads,
   walkedCount,
 } from '../sel/what-happens-next';
-import type { Strip } from '../sel/what-happens-next';
+import type { ArrowLine, Strip } from '../sel/what-happens-next';
 
 /** Words that would praise, judge, or grade. None may appear in any copy. */
 const MORALISING = /\b(great|well done|good job|good|correct|incorrect|wrong|right way|naughty|kind|kindly|unkind|nice|nicer|better|best|should|shouldn't|proud|shame|selfish|mean|bad|oops|try again|not quite)\b/i;
@@ -30,8 +39,8 @@ const VERDICT_KEYS = ['answer', 'answerid', 'correct', 'right', 'best', 'good', 
 const allCopy = (): string[] =>
   STRIPS.flatMap((s) => [
     s.setupWord,
-    s.place,
-    ...s.roads.flatMap((r) => [r.afterWord, r.laterWord]),
+    placeSays(s.place),
+    ...s.roads.flatMap((r) => [actionWordOf(s, r), r.afterWord, r.laterWord]),
     ...panelsOf(s).map((p) => p.alt),
   ]);
 
@@ -71,15 +80,15 @@ describe('what-happens-next: the strip shape is closed', () => {
     }
   });
 
-  it('gives every strip exactly seven panels: p0, and three per road', () => {
+  it('gives every strip exactly five plates: p0, and two per road, with the action drawn', () => {
     for (const s of STRIPS) {
-      expect(panelsOf(s)).toHaveLength(7);
+      expect(panelsOf(s)).toHaveLength(5);
       for (const r of s.roads) {
         expect(Object.keys(r).sort()).toEqual([
-          'action', 'actionWord', 'after', 'afterWord', 'id', 'later', 'laterWord',
+          'after', 'afterWord', 'gesture', 'id', 'later', 'laterWord', 'thing',
         ]);
       }
-      expect(Object.keys(s).sort()).toEqual(['id', 'place', 'roads', 'setup', 'setupWord']);
+      expect(Object.keys(s).sort()).toEqual(['id', 'other', 'place', 'roads', 'setup', 'setupWord']);
     }
   });
 
@@ -92,7 +101,7 @@ describe('what-happens-next: the strip shape is closed', () => {
 describe('what-happens-next: the drawings', () => {
   it('names every image uniquely and under this exercise', () => {
     const panels = allPanels();
-    expect(panels).toHaveLength(STRIPS.length * 7);
+    expect(panels).toHaveLength(STRIPS.length * 5);
     const ids = panels.map((p) => p.image);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) {
@@ -111,14 +120,173 @@ describe('what-happens-next: the drawings', () => {
   it('draws both roads with the same number of panels, so nothing leaks a key', () => {
     for (const s of STRIPS) {
       const [a, b] = s.roads;
-      expect([a.action, a.after, a.later]).toHaveLength(3);
-      expect([b.action, b.after, b.later]).toHaveLength(3);
+      expect([a.after, a.later]).toHaveLength(2);
+      expect([b.after, b.later]).toHaveLength(2);
       // neither road's description is starved of detail relative to the other
-      const len = (r: Strip['roads'][number]) => r.action.alt.length + r.after.alt.length + r.later.alt.length;
+      const len = (r: Strip['roads'][number]) => r.after.alt.length + r.later.alt.length;
       const ratio = len(a) / len(b);
       expect(ratio).toBeGreaterThan(0.6);
       expect(ratio).toBeLessThan(1.7);
     }
+  });
+});
+
+describe('what-happens-next: the action is drawn, not painted', () => {
+  /**
+   * FAILS IF REVERTED: put an `action` panel or an `actionWord` string back on a
+   * road and this fails. Those two fields are how `last-truck-p1b` came to be
+   * captioned "You hold the truck out to him" over a painting of the other boy
+   * handing it to you, and how `p1a` delivered a verdict with a face.
+   */
+  it('gives a road no field that could hold an action picture or a hand-typed action sentence', () => {
+    const PICTUREISH = /^(action|image|img|panel|plate|picture|photo|art|src)/i;
+    for (const s of STRIPS) {
+      for (const r of s.roads) {
+        for (const key of Object.keys(r)) {
+          expect(PICTUREISH.test(key), `${s.id}/${r.id}.${key}`).toBe(false);
+        }
+        expect('actionWord' in r).toBe(false);
+        expect(GESTURES).toContain(r.gesture);
+        expect(Object.keys(THINGS)).toContain(r.thing);
+      }
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: derive `actionWord` from `road.id` again and this fails.
+   * `road.id` is only 'a' | 'b' and means something different in every strip —
+   * `dinosaur-mia` road a is a lift with no transfer in it at all — so a
+   * generator keyed on it draws a handover wherever a second road exists.
+   */
+  it('derives the action sentence from the gesture and the thing, never from the road id', () => {
+    const said = new Map<string, string>();
+    for (const s of STRIPS) {
+      for (const r of s.roads) {
+        const word = actionWordOf(s, r);
+        expect(word.startsWith('You ')).toBe(true);
+        expect(word.trim().endsWith('.')).toBe(true);
+        if (r.gesture !== 'still') expect(word).toContain(THINGS[r.thing].the);
+        // the same (gesture, thing, them) always makes the same sentence
+        const key = `${r.gesture}|${r.thing}|${s.other.them}`;
+        const before = said.get(key);
+        if (before !== undefined) expect(word).toBe(before);
+        said.set(key, word);
+      }
+    }
+    // the two roads of a strip share an id set, so a sentence keyed on the id
+    // could not tell these apart; keyed on the gesture, it does
+    const dino = stripById('dinosaur-mia') as Strip;
+    expect(roadOf(dino, 'a').gesture).toBe('raise');
+    expect(actionWordOf(dino, roadOf(dino, 'a'))).toBe('You lift the dinosaur up out of reach.');
+    const truck = stripById('last-truck') as Strip;
+    expect(roadOf(truck, 'b').gesture).toBe('give');
+    expect(actionWordOf(truck, roadOf(truck, 'b'))).toBe('You hold the truck out to him.');
+    expect(actionWordOf(dino, roadOf(dino, 'b'))).toBe('You hold the dinosaur out to her.');
+  });
+
+  /**
+   * FAILS IF REVERTED: this is `p1b`'s inversion made impossible. Only `give`
+   * has a second pair of hands, and its arrow ends at those hands, so a handover
+   * cannot be drawn running the other way or drawn at all where none happened.
+   */
+  it('draws a second pair of hands only for a handover, with the arrow always ending at them', () => {
+    for (const g of GESTURES) {
+      const d = DRAWINGS[g];
+      if (g === 'give') {
+        expect(d.theirs).toHaveLength(1);
+        expect(d.arrow).toBe('to-them');
+        const line = arrowOf(d);
+        expect(line).not.toBeNull();
+        expect((line as ArrowLine).x1).toBeLessThan((line as ArrowLine).x2);
+        expect((line as ArrowLine).x2).toBeLessThan(d.theirs[0].x);
+        expect((line as ArrowLine).x1).toBeGreaterThan(d.yours[0].x);
+      } else {
+        expect(d.theirs, g).toHaveLength(0);
+        expect(d.arrow, g).not.toBe('to-them');
+        expect(arrowOf(d), g).not.toBe(undefined);
+      }
+      expect(d.yours.length, g).toBeGreaterThanOrEqual(1);
+      for (const h of [...d.yours, ...d.theirs]) {
+        expect(h.x).toBeGreaterThan(0);
+        expect(h.x).toBeLessThan(ACTION_FIELD.width);
+        expect(h.y).toBeGreaterThan(0);
+        expect(h.y).toBeLessThan(ACTION_FIELD.height);
+      }
+      expect(d.thing.x).toBeGreaterThan(0);
+      expect(d.thing.x).toBeLessThan(ACTION_FIELD.width);
+      expect(d.thing.y).toBeGreaterThan(0);
+      expect(d.thing.y).toBeLessThan(ACTION_FIELD.height);
+    }
+  });
+
+  /**
+   * The golden record. A change to a gesture's drawing has to be made here as
+   * well, which is the point: the renderer cannot be quietly re-tuned.
+   */
+  it('holds the drawn geometry of every gesture as a record that must be re-approved', () => {
+    const shape = Object.fromEntries(
+      GESTURES.map((g) => {
+        const d = DRAWINGS[g];
+        const a = arrowOf(d);
+        return [g, [
+          `thing ${d.thing.x},${d.thing.y}`,
+          `yours ${d.yours.map((h) => `${h.x},${h.y}@${h.turn}`).join(' ')}`,
+          `theirs ${d.theirs.map((h) => `${h.x},${h.y}@${h.turn}`).join(' ')}`,
+          `arrow ${a ? `${a.x1},${a.y1}->${a.x2},${a.y2}` : 'none'}`,
+        ].join(' | ')];
+      }),
+    );
+    expect(shape).toEqual({
+      hold: 'thing 100,88 | yours 74,98@40 126,98@-40 | theirs  | arrow none',
+      give: 'thing 100,82 | yours 46,90@90 | theirs 154,90@-90 | arrow 126,82->128,90',
+      raise: 'thing 100,36 | yours 78,66@15 122,66@-15 | theirs  | arrow 100,80->100,62',
+      point: 'thing 144,92 | yours 50,92@90 | theirs  | arrow 76,92->118,92',
+      still: 'thing 100,124 | yours 76,84@180 124,84@180 | theirs  | arrow none',
+      move: 'thing 84,90 | yours 46,90@90 | theirs  | arrow 110,90->154,90',
+      release: 'thing 100,120 | yours 72,54@180 128,54@180 | theirs  | arrow 100,94->144,64',
+      go: 'thing 70,118 | yours 56,88@165 88,88@195 | theirs  | arrow 70,92->114,62',
+      work: 'thing 100,92 | yours 70,84@55 130,84@-55 | theirs  | arrow none',
+    });
+  });
+
+  it('draws every thing with real strokes and names it for the sentence', () => {
+    for (const [id, thing] of Object.entries(THINGS)) {
+      expect(thing.the.startsWith('the ') || thing.the.startsWith('your '), id).toBe(true);
+      expect(thing.glyph.length, id).toBeGreaterThan(1);
+      for (const d of thing.glyph) expect(d, id).toMatch(/^M/);
+    }
+    expect(PALM).toMatch(/^M/);
+  });
+});
+
+describe('what-happens-next: every plate is in the strip’s place', () => {
+  /**
+   * FAILS IF REVERTED: declare a plate in another setting and the compiler stops
+   * it — `NoInfer` pins each `Panel.at` to the strip's `place`. This is the
+   * runtime half. `last-truck-p3b` is a gravel yard with adults standing about
+   * against a classroom strip; it could not be declared honestly and was
+   * dropped, and its beat moved onto the old p1b plate, which is indoors.
+   */
+  it('has every panel declare the strip’s place, and never uses the outdoor plate', () => {
+    for (const s of STRIPS) {
+      expect(Object.keys(PLACES)).toContain(s.place);
+      for (const p of panelsOf(s)) expect(p.at, `${s.id}/${p.image}`).toBe(s.place);
+      expect(placeSays(s.place).length).toBeGreaterThan(4);
+    }
+    const used = new Set(allPanels().map((p) => p.image));
+    expect(used.has('what-happens-next-last-truck-p3b')).toBe(false);
+    expect(used.has('what-happens-next-last-truck-p1a')).toBe(false);
+    expect(used.has('what-happens-next-last-truck-p1b')).toBe(true);
+  });
+
+  /**
+   * FAILS IF REVERTED: swap-left in Hold the Line changed Leo's shirt colour
+   * between plates and the alt asserted it. A garment colour is a claim one
+   * plate makes about another, and these plates do not hold it.
+   */
+  it('never names the colour of anybody’s clothes in an alt', () => {
+    const COLOUR = /\b(red|blue|green|olive|grey|gray|yellow|orange|purple|pink|brown|black|white|rust|teal|tan|cream|beige|navy|mustard|ochre|terracotta|maroon|khaki)\b/i;
+    for (const p of allPanels()) expect(COLOUR.test(p.alt), p.image).toBe(false);
   });
 });
 

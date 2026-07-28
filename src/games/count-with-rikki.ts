@@ -16,14 +16,14 @@ export interface CountRound {
 export const COUNT_ROUNDS: readonly CountRound[] = [
   { id: 'one-apple', emoji: '🍎', count: 1, name: 'apple' },
   { id: 'two-turtles', emoji: '🐢', count: 2, name: 'turtles' },
-  { id: 'three-stars', emoji: '⭐', count: 3, name: 'stars' },
+  { id: 'three-stars', emoji: '🌱', count: 3, name: 'seedlings' },
   { id: 'four-ducks', emoji: '🦆', count: 4, name: 'ducks' },
   { id: 'five-flowers', emoji: '🌸', count: 5, name: 'flowers' },
   { id: 'six-frogs', emoji: '🐸', count: 6, name: 'frogs' },
   { id: 'seven-strawberries', emoji: '🍓', count: 7, name: 'strawberries' },
-  { id: 'eight-fish', emoji: '🐟', count: 8, name: 'fish' },
+  { id: 'eight-fish', emoji: '🥚', count: 8, name: 'eggs' },
   { id: 'nine-bees', emoji: '🐝', count: 9, name: 'bees' },
-  { id: 'ten-balloons', emoji: '🎈', count: 10, name: 'balloons' },
+  { id: 'ten-balloons', emoji: '🐚', count: 10, name: 'shells' },
   { id: 'three-cats', emoji: '🐱', count: 3, name: 'cats' },
   { id: 'five-suns', emoji: '☀️', count: 5, name: 'suns' },
 ] as const;

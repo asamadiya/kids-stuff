@@ -2,51 +2,70 @@ import { useState } from 'react';
 import {
   FRACTIONPIZZA_META,
   FRACTION_ROUNDS,
+  PLATE,
+  foodOf,
   fractionInfo,
   getFractionOptions,
   getFractionFeedback,
+  plateWedges,
+  roundAnswer,
+  roundHint,
+  roundLabel,
+  roundPrompt,
+  roundSpoken,
   type FractionValue,
-  type PizzaRound,
+  type PlateRound,
 } from '../games/fraction-pizza';
+import { canSpeak, say } from '../workshop/say';
 
-const EYEBROW = 'Math · Fractions';
-const TITLE = FRACTIONPIZZA_META.title;
+const EYEBROW = 'Fractions';
 
-// Inline-SVG pizza cut into `denom` equal wedges; `shaded` wedges get topping.
-function Pizza({ denom, shaded }: { denom: number; shaded: number }): JSX.Element {
-  const cx = 60;
-  const cy = 60;
-  const r = 52;
-  const wedges = Array.from({ length: denom }, (_, i) => {
-    const a0 = (i / denom) * Math.PI * 2 - Math.PI / 2;
-    const a1 = ((i + 1) / denom) * Math.PI * 2 - Math.PI / 2;
-    const x0 = cx + r * Math.cos(a0);
-    const y0 = cy + r * Math.sin(a0);
-    const x1 = cx + r * Math.cos(a1);
-    const y1 = cy + r * Math.sin(a1);
-    const large = a1 - a0 > Math.PI ? 1 : 0;
-    const d = `M ${cx} ${cy} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`;
-    const filled = i < shaded;
-    return (
-      <path
-        key={i}
-        d={d}
-        fill={filled ? '#e8632c' : '#ffe6a8'}
-        stroke="#c9932e"
-        strokeWidth={2}
-      />
-    );
-  });
+/** Sampled from tokens.css: --paper-sunken and --rule-strong. */
+const PLATE_FILL = '#eae4d5';
+const PLATE_EDGE = '#b9b09a';
+
+/**
+ * One whole on a plate, with the pieces that are gone drawn as gone.
+ *
+ * The wedge paths and their absent flags arrive together from `plateWedges`,
+ * so this component cannot draw one set of pieces and mark a different set
+ * missing. The version this replaced had no absent state at all: it filled
+ * wedges with topping and asked how much had been eaten.
+ */
+function Plate({ round }: { round: PlateRound }): JSX.Element {
+  const food = foodOf(round.food);
   return (
     <svg
-      viewBox="0 0 120 120"
-      width={150}
-      height={150}
+      data-testid="fraction-plate"
+      viewBox={`0 0 ${PLATE.size} ${PLATE.size}`}
+      width={158}
+      height={158}
       role="img"
-      aria-label={`Pizza cut into ${denom} equal slices with ${shaded} shaded`}
+      aria-label={roundLabel(round)}
     >
-      <circle cx={cx} cy={cy} r={r + 3} fill="#f2c777" />
-      {wedges}
+      <circle cx={PLATE.cx} cy={PLATE.cy} r={PLATE.plate} fill={PLATE_FILL} stroke={PLATE_EDGE} strokeWidth={1} />
+      {plateWedges(round).map((w) =>
+        w.absent ? (
+          <path
+            key={w.index}
+            data-wedge="absent"
+            d={w.d}
+            fill="none"
+            stroke={PLATE_EDGE}
+            strokeWidth={1}
+            strokeDasharray="3 3"
+          />
+        ) : (
+          <path
+            key={w.index}
+            data-wedge="present"
+            d={w.d}
+            fill={food.fill}
+            stroke={food.rim}
+            strokeWidth={1.5}
+          />
+        ),
+      )}
     </svg>
   );
 }
@@ -56,18 +75,10 @@ export function FractionPizzaGame(): JSX.Element {
   const [chosen, setChosen] = useState<FractionValue | null>(null);
   const [score, setScore] = useState(0);
 
-  const round: PizzaRound = FRACTION_ROUNDS[index % FRACTION_ROUNDS.length];
+  const round = FRACTION_ROUNDS[index % FRACTION_ROUNDS.length];
   const opts = getFractionOptions(index);
-  const answer = round.answer;
+  const answer = roundAnswer(round).value;
   const answered = chosen !== null;
-
-  const question = round.prompt;
-  const hint = 'Count the equal slices, then name one slice as a fraction.';
-  const feedback = answered ? getFractionFeedback(round, chosen) : '';
-
-  function label(o: FractionValue): string {
-    return `${o} (${fractionInfo(o).word})`;
-  }
 
   function choose(o: FractionValue): void {
     if (answered) return;
@@ -86,7 +97,7 @@ export function FractionPizzaGame(): JSX.Element {
         <div>
           <p className="mini-game__eyebrow">{EYEBROW}</p>
           <h3 id="fraction-pizza-title" className="mini-game__title">
-            {TITLE}
+            {FRACTIONPIZZA_META.title}
           </h3>
         </div>
         <div className="mini-game__tally" aria-label={`${score} correct`}>
@@ -96,38 +107,47 @@ export function FractionPizzaGame(): JSX.Element {
       </div>
 
       <div className="mini-game__stage">
-        <span className="mini-game__emoji" aria-hidden="true">
-          🍕
-        </span>
-        <Pizza denom={round.denom} shaded={round.shaded} />
+        <Plate round={round} />
       </div>
 
-      <p className="mini-game__prompt">{question}</p>
+      <p className="mini-game__prompt">{roundPrompt(round)}</p>
+
+      {canSpeak() ? (
+        <p className="mini-game__hint">
+          <button
+            type="button"
+            className="mini-game__next mini-game__say"
+            onClick={() => say(roundSpoken(round))}
+          >
+            Read this aloud
+          </button>
+        </p>
+      ) : null}
 
       <div className="mini-game__options" aria-label="Choose">
         {opts.map((o) => (
           <button
-            key={String(o)}
+            key={o}
             type="button"
             className={`mini-option${chosen === o ? ' is-chosen' : ''}${answered && o === answer ? ' is-correct' : ''}`}
             aria-pressed={chosen === o}
             aria-disabled={answered}
             onClick={() => choose(o)}
           >
-            {label(o)}
+            {o} ({fractionInfo(o).word})
           </button>
         ))}
       </div>
 
       {answered ? (
         <div className="mini-game__feedback">
-          <p role="status">{feedback}</p>
+          <p role="status">{getFractionFeedback(round, chosen)}</p>
           <button type="button" className="mini-game__next" onClick={next}>
             Next <span aria-hidden="true">→</span>
           </button>
         </div>
       ) : (
-        <p className="mini-game__hint">{hint}</p>
+        <p className="mini-game__hint">{roundHint()}</p>
       )}
     </section>
   );

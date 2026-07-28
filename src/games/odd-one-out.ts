@@ -57,7 +57,7 @@ export const ODD_ROUNDS: readonly OddRound[] = [
       { emoji: '🚲', name: 'bike' },
       { emoji: '✈️', name: 'airplane' },
     ],
-    odd: { emoji: '🎂', name: 'cake' },
+    odd: { emoji: '🧀', name: 'cheese' },
     oddGroup: 'yummy treats',
     prompt: 'Which one does not go on a road or in the sky?',
   },

@@ -19,7 +19,7 @@ export const MEMORY_POOLS: readonly (readonly [string, string, string, string])[
   ['🍓', '🥕', '🌽', '🍅'],
   ['🎨', '✏️', '📚', '✂️'],
   ['🐷', '🐑', '🐄', '🐔'],
-  ['🎈', '🎁', '🎂', '🎉'],
+  ['🎈', '🎁', '🧀', '🎉'],
   ['🔵', '🟡', '🔴', '🟢'],
 ] as const;
 

@@ -85,16 +85,15 @@ describe('Reader flow (through the app)', () => {
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
   });
 
-  it('returns to the library from the reader', async () => {
+  it('returns to the collection from the reader', async () => {
     const user = userEvent.setup();
     openApp(2);
-    expect(
-      screen.queryByRole('heading', { name: /rikki.s field guide/i }),
-    ).toBeNull();
+    expect(screen.queryByRole('heading', { name: /the shelf/i })).toBeNull();
     await user.click(screen.getByRole('button', { name: /library/i }));
-    expect(
-      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
-    ).toBeInTheDocument();
+    // Leaving a story lands on the collection, not on the index: the index is
+    // an entrance and holds no stories to come back to.
+    expect(window.location.hash).toBe('#/shelf');
+    expect(screen.getByRole('main', { name: /the collection/i })).toBeInTheDocument();
     expect(screen.queryByText(/Page 2 of 7/i)).toBeNull();
   });
 
@@ -129,12 +128,13 @@ describe('Reader flow (through the app)', () => {
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
   });
 
-  it('sends unknown story slugs back to the library', () => {
+  it('sends unknown story slugs to the shelf, not to the index', () => {
     window.location.hash = '#/read/not-a-real-story/1';
     render(<App />);
-    expect(
-      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
-    ).toBeInTheDocument();
+    // The nearest valid ancestor of a story is the shelf. Falling all the way
+    // back to `#/` would strand a child who followed a stale link.
+    expect(window.location.hash).toBe('#/shelf');
+    expect(screen.getByRole('main', { name: /the collection/i })).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });
 
@@ -210,12 +210,11 @@ describe('Reader keyboard navigation guards', () => {
 });
 
 describe('App hash routing resilience', () => {
-  it('falls back to the library for a malformed percent-encoded hash', () => {
+  it('falls back to the shelf for a malformed percent-encoded hash', () => {
     window.location.hash = '#/read/%E0%A4%A/1';
     expect(() => render(<App />)).not.toThrow();
-    expect(
-      screen.getByRole('heading', { level: 1, name: /rikki.s field guide/i }),
-    ).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/shelf');
+    expect(screen.getByRole('main', { name: /the collection/i })).toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of 7/i)).toBeNull();
   });
 });

@@ -215,6 +215,9 @@ describe('App resumes from bookmarks and records completion', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: 2 }, completed: [] }),
     );
+    // Story tiles live on the shelf now, not on the index: `#/` is an entrance
+    // and renders none of them.
+    window.location.hash = '#/shelf';
     render(<App />);
     await user.click(
       screen.getByRole('button', { name: new RegExp(`read ${story.title}`, 'i') }),
@@ -277,6 +280,12 @@ describe('App resumes from bookmarks and records completion', () => {
 /* -------------------------------------------------------------------------- */
 
 describe('App ignores nonsensical bookmarks when opening a story', () => {
+  /**
+   * The index no longer carries the collection — `#/` renders zero story tiles
+   * by design and the shelf lives at `#/shelf`. Tests that open a story by
+   * clicking a tile must therefore start on the shelf. What they assert about
+   * bookmarks and completion is unchanged.
+   */
   const openFromLibrary = (user: ReturnType<typeof userEvent.setup>) =>
     user.click(
       screen.getByRole('button', { name: new RegExp(`read ${story.title}`, 'i') }),
@@ -288,6 +297,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: PAGE_COUNT }, completed: [] }),
     );
+    window.location.hash = '#/shelf';
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
@@ -303,6 +313,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: 999 }, completed: [] }),
     );
+    window.location.hash = '#/shelf';
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
@@ -317,6 +328,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: 0 }, completed: [] }),
     );
+    window.location.hash = '#/shelf';
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
@@ -330,6 +342,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: 3.5 }, completed: [] }),
     );
+    window.location.hash = '#/shelf';
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
@@ -342,6 +355,7 @@ describe('App ignores nonsensical bookmarks when opening a story', () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({ bookmarks: { [SLUG]: 3 }, completed: [] }),
     );
+    window.location.hash = '#/shelf';
     render(<App />);
     await openFromLibrary(user);
     expect(screen.getByText(/Page 4 of 7/i)).toBeInTheDocument();

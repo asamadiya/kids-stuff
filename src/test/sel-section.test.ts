@@ -13,7 +13,14 @@ const dir = 'src/sel';
 const stripComments = (src: string): string =>
   src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
 
-const modules = readdirSync(dir).filter((f) => f.endsWith('.ts'))
+/**
+ * Support modules carry no exercise. They are listed explicitly so that adding
+ * one is a deliberate act rather than a silent way for an exercise to escape
+ * the guards below.
+ */
+const SUPPORT = new Set(['body-figure.ts', 'the-wide-view.data.ts']);
+
+const modules = readdirSync(dir).filter((f) => f.endsWith('.ts') && !SUPPORT.has(f))
   .map((f) => ({ file: f, text: stripComments(readFileSync(join(dir, f), 'utf8')) }));
 
 const components = readdirSync('src/components/sel').filter((f) => f.endsWith('.tsx'))

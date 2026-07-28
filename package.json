@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prune-dist-masters.mjs",
     "lint": "eslint src",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "verify:build": "node scripts/verify-build.mjs"
+    "verify:build": "node scripts/verify-build.mjs",
+    "verify:body": "vitest run src/test/body-figure.test.ts src/test/body-figure-artifact.test.ts && python3 scripts/render-body-figure.py"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",

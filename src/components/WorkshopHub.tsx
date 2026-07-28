@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import type { ComponentType } from 'react';
+import { toHash } from '../App';
 import { StoryLoom } from './StoryLoom';
 import NumberMill from './workshop/NumberMill';
 import Quadrat from './workshop/Quadrat';
@@ -19,8 +19,15 @@ import '../styles/workshop.css';
 
 const BASE = import.meta.env.BASE_URL;
 
+/** The tool plates were buttons before they were links; workshop.css never
+ *  suppressed the anchor underline that would otherwise cross every plate. */
+const NO_UNDERLINE = { textDecoration: 'none' } as const;
+
 export interface WorkshopHubProps {
-  readonly onExit: () => void;
+  /** Which tool is open, read off the hash. `null` is the bench. */
+  readonly activeId: string | null;
+  /** The Loom leaves through a button of its own, so it is handed a callback. */
+  readonly onLoomExit: () => void;
 }
 
 export interface ToolMeta {
@@ -57,27 +64,35 @@ const LOOM: ToolMeta = {
   note: 'Name three or more things; the Loom composes an adventure that uses every one of them.',
 };
 
-export function WorkshopHub({ onExit }: WorkshopHubProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const active = TOOLS.find((t) => t.meta.id === activeId) ?? null;
-  const back = () => setActiveId(null);
+/**
+ * The bench, in plate order: the Loom first, then the instruments. `App`
+ * validates `#/make/<id>` against this list, so a tool cannot be addressable
+ * without being on the bench, or on the bench without being addressable.
+ */
+export const WORKSHOP_TOOL_IDS: readonly string[] = [
+  LOOM.id,
+  ...TOOLS.map((t) => t.meta.id),
+];
 
-  if (activeId === LOOM.id) return <StoryLoom onExit={back} />;
+export function WorkshopHub({ activeId, onLoomExit }: WorkshopHubProps) {
+  const active = TOOLS.find((t) => t.meta.id === activeId) ?? null;
+
+  if (activeId === LOOM.id) return <StoryLoom onExit={onLoomExit} />;
 
   return (
     <main id="main-content" className="workshop" aria-label="Workshop" tabIndex={-1}>
       {active ? (
         <>
-          <button type="button" className="workshop__back" onClick={back}>
+          <a className="workshop__back" style={NO_UNDERLINE} href={toHash({ kind: 'make' })}>
             <span aria-hidden="true">&larr;</span> All tools
-          </button>
+          </a>
           <active.Component />
         </>
       ) : (
         <>
-          <button type="button" className="workshop__back" onClick={onExit}>
+          <a className="workshop__back" style={NO_UNDERLINE} href={toHash({ kind: 'index' })}>
             <span aria-hidden="true">&larr;</span> Contents
-          </button>
+          </a>
           <header className="workshop__head">
             <div>
               <p className="workshop__eyebrow">Compose</p>
@@ -91,11 +106,11 @@ export function WorkshopHub({ onExit }: WorkshopHubProps) {
 
           <div className="tool-grid">
             {[LOOM, ...TOOLS.map((t) => t.meta)].map((meta) => (
-              <button
+              <a
                 key={meta.id}
-                type="button"
                 className="tool-card"
-                onClick={() => setActiveId(meta.id)}
+                style={NO_UNDERLINE}
+                href={toHash({ kind: 'tool', id: meta.id })}
                 aria-label={`Open ${meta.title}`}
               >
                 <span className="tool-card__pic">
@@ -110,7 +125,7 @@ export function WorkshopHub({ onExit }: WorkshopHubProps) {
                 </span>
                 <span className="tool-card__title">{meta.title}</span>
                 <span className="tool-card__note">{meta.note}</span>
-              </button>
+              </a>
             ))}
           </div>
         </>
