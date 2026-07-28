@@ -121,8 +121,10 @@ describe('the whole practice section is ovo-lacto-vegetarian', () => {
    * or as an object to count on a plate.
    */
   const foodGlyphs = /🍖|🍗|🥩|🥓|🍤|🍣|🍱|🐟(?=[^']*(?:eat|meal|plate|dish|food))/;
+  // parent-notes-*.ts is prose for the adult about the exercises; it names the
+  // candy register in order to say it was removed.
   const files = readdirSync('src/games')
-    .filter((f) => f.endsWith('.ts'))
+    .filter((f) => f.endsWith('.ts') && !f.startsWith('parent-notes'))
     .map((f) => ({ file: f, text: readFileSync(join('src/games', f), 'utf8') }));
 
   it('serves no meat or fish', () => {

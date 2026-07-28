@@ -1,3 +1,4 @@
+import { ForTheParent } from './ForTheParent';
 import type { ComponentType } from 'react';
 import { toHash } from '../App';
 import { StoryLoom } from './StoryLoom';
@@ -87,6 +88,7 @@ export function WorkshopHub({ activeId, onLoomExit }: WorkshopHubProps) {
             <span aria-hidden="true">&larr;</span> All tools
           </a>
           <active.Component />
+          <ForTheParent id={active.meta.id} />
         </>
       ) : (
         <>

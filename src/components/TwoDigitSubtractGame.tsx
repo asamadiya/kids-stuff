@@ -20,7 +20,7 @@ export function TwoDigitSubtractGame() {
   const answered = chosen !== null;
 
   const question = `What is ${round.top} − ${round.bottom}?`;
-  const hint = 'Subtract the ones, then subtract the tens. No borrowing here!';
+  const hint = 'Subtract the ones, then subtract the tens. When the top digit is smaller, take a ten from the column on its left.';
   const feedback = answered ? getSubtractFeedback(round, chosen) : '';
 
   function choose(o: number) {

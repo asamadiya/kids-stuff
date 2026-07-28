@@ -29,10 +29,23 @@ describe('two-digit-add logic module', () => {
     }
   });
 
-  it('every round is no-regroup: each column sum < 10', () => {
-    for (const r of TWO_DIGIT_ADD_ROUNDS) {
-      expect((r.a % 10) + (r.b % 10)).toBeLessThan(10);
-      expect(Math.floor(r.a / 10) + Math.floor(r.b / 10)).toBeLessThan(10);
+  it('includes rounds that regroup, which is the step that makes carrying mean something', () => {
+    // The module used to throw at build time on any round whose ones column
+    // reached ten, capping the hardest sum on the site at 45+33. Without a
+    // carry the exercise is two independent single-digit sums side by side.
+    const carrying = TWO_DIGIT_ADD_ROUNDS.filter((r) => r.carries);
+    expect(carrying.length).toBeGreaterThanOrEqual(6);
+    for (const r of carrying) expect((r.a % 10) + (r.b % 10)).toBeGreaterThanOrEqual(10);
+    // and the answer is still the true sum, carry included
+    for (const r of TWO_DIGIT_ADD_ROUNDS) expect(r.answer).toBe(r.a + r.b);
+  });
+
+  it('offers the forgot-to-carry answer whenever a round regroups', () => {
+    // 27 + 15 -> 32 is the misconception the round exists to surface, so it
+    // must be on the board rather than left to chance.
+    for (const r of TWO_DIGIT_ADD_ROUNDS.filter((x) => x.carries)) {
+      const noCarry = Math.floor(r.a / 10) * 10 + Math.floor(r.b / 10) * 10 + ((r.a % 10) + (r.b % 10)) % 10;
+      expect(r.options, `${r.a}+${r.b}`).toContain(noCarry);
     }
   });
 
