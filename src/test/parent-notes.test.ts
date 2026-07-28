@@ -38,4 +38,41 @@ describe('every exercise explains itself to the adult', () => {
   it('returns nothing for an unknown id rather than throwing', () => {
     expect(parentNote('no-such-exercise')).toBeUndefined();
   });
+
+  it('tells you how to play, in ordered steps, for every single item', () => {
+    // The complaint that produced this was that the workshop instruments could
+    // not be started: The Quadrat renders 36 controls against 82 words. An item
+    // with no steps is an item nobody can begin.
+    const stepless = Object.entries(PARENT_NOTES)
+      .filter(([, n]) => (n.how?.length ?? 0) < 3)
+      .map(([id]) => id);
+    expect(stepless).toEqual([]);
+  });
+
+  it('writes steps a person can actually carry out', () => {
+    const vague = /\b(explore|experiment|discover|play around|interact|engage|try things)\b/i;
+    for (const [id, n] of Object.entries(PARENT_NOTES)) {
+      for (const step of n.how ?? []) {
+        expect(step, `${id}: "${step}"`).not.toMatch(vague);
+        // A step is one instruction, not a paragraph.
+        expect(step.length, `${id}: "${step}"`).toBeLessThan(150);
+        expect(step.trim().length).toBeGreaterThan(8);
+      }
+    }
+  });
+
+  it('names the skills precisely, never in the language of a brochure', () => {
+    const empty = /\b(critical thinking|creativity|confidence|social skills|life skills|growth mindset|21st century)\b/i;
+    for (const [id, n] of Object.entries(PARENT_NOTES)) {
+      expect((n.skills?.length ?? 0), id).toBeGreaterThanOrEqual(2);
+      for (const skill of n.skills ?? []) expect(skill, id).not.toMatch(empty);
+    }
+  });
+
+  it('covers the Story Loom, which had no note at all', () => {
+    // WorkshopHub returned the Loom early, before the note was ever reached.
+    const loom = PARENT_NOTES['story-loom'];
+    expect(loom).toBeDefined();
+    expect(loom.how?.length ?? 0).toBeGreaterThanOrEqual(3);
+  });
 });

@@ -64,7 +64,11 @@ export function DividingString() {
   const [phrase, setPhrase] = useState<readonly string[]>([]);
   const [playhead, setPlayhead] = useState(-1);
   const [dragging, setDragging] = useState(false);
-  const [sound, setSound] = useState(false);
+  // Starts ON. The instrument's entire claim — that pitch is the reciprocal of
+  // length — is something you HEAR, and it was hidden behind a toggle sitting
+  // fourth in the actions row. A first-timer dragged the bridge, heard nothing
+  // and concluded the thing was broken.
+  const [sound, setSound] = useState(true);
   const [kept, setKept] = useState<readonly KeptString[]>(() => shelf.list());
   const [canSound] = useState(() => audioAvailable());
   const svgRef = useRef<SVGSVGElement>(null);

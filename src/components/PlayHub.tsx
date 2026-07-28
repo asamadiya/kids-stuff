@@ -1,4 +1,5 @@
 import { ForTheParent } from './ForTheParent';
+import { HowToPlay } from './HowToPlay';
 import type { ComponentType } from 'react';
 import { toHash } from '../App';
 import { RikkiMascot } from './RikkiMascot';
@@ -207,6 +208,7 @@ export function PlayHub({ activeId }: PlayHubProps) {
           <a className="mini-game__back" style={NO_UNDERLINE} href={toHash({ kind: 'play' })}>
             <span aria-hidden="true">&larr;</span> All exercises
           </a>
+          <HowToPlay id={active.meta.id} />
           <active.Component />
           <ForTheParent id={active.meta.id} />
         </section>
