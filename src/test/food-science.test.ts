@@ -17,6 +17,9 @@ import {
   NUTRIENT_KEYS,
   PROTEIN_GROUPS,
   airCellPath,
+  axisMax,
+  axisNote,
+  barFraction,
   blockCheck,
   blockLine,
   contribution,
@@ -137,6 +140,23 @@ describe('the food table', () => {
     }
   });
 
+  it('fits the exercise registry PlayHub keeps, so wiring it cannot fail to compile', () => {
+    // Declared here rather than imported: PlayHub's GameMeta is private to that
+    // module, so this is the contract restated where it can be checked.
+    interface GameMeta {
+      readonly id: string;
+      readonly title: string;
+      readonly icon: string;
+      readonly color: string;
+      readonly tagline: string;
+    }
+    const card: GameMeta = FOOD_SCIENCE_META;
+    expect(card.id).toBe('food-science');
+    expect(card.color).toBe('leaf');
+    expect(card.tagline.length).toBeGreaterThan(20);
+    expect(card.tagline).not.toMatch(/!/);
+  });
+
   it('says what each nutrient does in the body rather than what to eat', () => {
     for (const key of NUTRIENT_KEYS) {
       expect(NUTRIENTS[key].does.length, key).toBeGreaterThan(40);
@@ -235,6 +255,25 @@ describe('complementary protein is computed, not asserted', () => {
     expect(wrong.slice(0, 5)).toEqual([]);
   });
 
+  it('fits the sentence on the plate, and agrees its verb, on every triple', () => {
+    // The first version repeated one clause per gap and ran past the edge of
+    // the plate, where the drawing chopped it mid-word. Two lines of the plate
+    // hold about 216 characters.
+    const long: string[] = [];
+    const disagrees: string[] = [];
+    for (const a of FOODS) {
+      for (const b of FOODS) {
+        for (const c of [FOODS[0], FOODS[8], FOODS[9]]) {
+          const line = blockLine(plateOf(a.id, b.id, c.id));
+          if (line.length > 200) long.push(`${a.id}+${b.id}+${c.id} (${line.length})`);
+          if (/\band \w[\w ]* brings\b/.test(line)) disagrees.push(line);
+        }
+      }
+    }
+    expect(long.slice(0, 4)).toEqual([]);
+    expect(disagrees.slice(0, 2)).toEqual([]);
+  });
+
   it('says "all nine" if and only if the intersection is empty, over every pair on the table', () => {
     const disagreements: string[] = [];
     for (const a of FOODS) {
@@ -311,6 +350,33 @@ describe('the readout is summed from the table', () => {
     const plate = plateOf('roti', 'dal', 'curd');
     const first = plateLines(plate)[0];
     for (const s of servingsOn(plate)) expect(first).toContain(s.food.singular);
+  });
+
+  it('measures every bar against a fixed ruler, so two servings draw twice one', () => {
+    // The first version stretched the axis to the plate, which pegged every bar
+    // full the moment the plate held more than one serving and made two plates
+    // incomparable. The ruler is now the four biggest single servings on the
+    // shelf, and it does not move.
+    for (const key of NUTRIENT_KEYS) {
+      const one = barFraction(plateOf('rajma', 'spinach', 'orange'), key);
+      const two = barFraction(serve(serve(serve(plateOf('rajma', 'spinach', 'orange'), 'rajma'), 'spinach'), 'orange'), key);
+      if (one > 0) expect(two, key).toBeGreaterThan(one);
+      expect(one, key).toBeLessThan(1);
+      expect(axisMax(key), key).toBeGreaterThan(0);
+      expect(axisNote(key), key).toContain(String(axisMax(key)));
+    }
+  });
+
+  it('names a food in prose without reading like a machine', () => {
+    // `singular` names a serving, which is right for counting and wrong for a
+    // sentence: "bowl of rajma covers the lysine".
+    expect(foodById('rajma')!.name).toBe('rajma');
+    expect(foodById('rajma')!.singular).toBe('bowl of rajma');
+    for (const f of FOODS) {
+      expect(f.name.length, f.id).toBeGreaterThan(2);
+      expect(f.name, f.id).not.toMatch(/^(bowl|glass|pot|piece|handful|half|spoon|head|ear) of/);
+    }
+    expect(blockLine(plateOf('rajma', 'rice'))).not.toContain('bowl of');
   });
 
   it('gives one line per nutrient, with the amount and the mechanism', () => {

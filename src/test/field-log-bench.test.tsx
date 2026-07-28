@@ -70,6 +70,26 @@ describe('the field log bench', () => {
     expect(stage.getAttribute('aria-label')).toContain('ant, 5 across 2 entries');
   });
 
+  it('agrees its counts with its words, and does not print a date range of one day', async () => {
+    // "1 days out", "12 in 1" and "28 July 2026 to 28 July 2026" all shipped
+    // in the first draft of this plate.
+    const user = setup();
+    const { container } = render(<FieldLog />);
+    await logAFind('ant', 12);
+    const plate = container.querySelector('svg')!.textContent ?? '';
+    expect(plate).not.toMatch(/\b1 days\b/);
+    expect(plate).not.toMatch(/\b1 entries\b/);
+    expect(plate).toContain('1 day out');
+    expect(plate).toContain('12 in 1 entry');
+    expect(plate).not.toMatch(/(\d+ \w+ \d{4}) to \1/);
+
+    await user.click(screen.getByRole('button', { name: 'snail' }));
+    await user.click(screen.getByRole('button', { name: 'Keep this find' }));
+    const two = container.querySelector('svg')!.textContent ?? '';
+    expect(two).toContain('2 kinds');
+    expect(two).not.toMatch(/\b1 entries\b/);
+  });
+
   it('says what was kept, because he does not read fluently', async () => {
     const { say } = await import('../workshop/say');
     render(<FieldLog />);

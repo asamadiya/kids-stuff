@@ -51,6 +51,9 @@ const SERIF = 'Literata, Georgia, serif';
 const NUM = { fontVariantNumeric: 'tabular-nums' } as const;
 const VIEW = { w: 960, h: 640 };
 
+/** Count and word agreeing. Both forms are written out; nothing appends an s. */
+const many = (n: number, one: string, more: string): string => `${n} ${n === 1 ? one : more}`;
+
 /* ------------------------------------------------------------ drawing parts */
 
 function strokeGlyph(paths: readonly string[], x: number, y: number, size: number, color: string, weight = 1.4): ReactElement {
@@ -161,10 +164,10 @@ function findPlate(records: readonly FieldRecord[], draft: FindDraft, today: str
             </text>
             {gateMarks(Math.min(40, row.total), 220, y - 14, 18, PALETTE.olive, 1.6)}
             <text x={880} y={y} textAnchor="end" fontFamily={SANS} fontSize={14} fill={PALETTE.ink} style={NUM}>
-              {`${row.total} in ${row.times}`}
+              {`${row.total} in ${many(row.times, 'entry', 'entries')}`}
             </text>
-            <text x={640} y={y} textAnchor="end" fontFamily={SANS} fontSize={12} fill={PALETTE.faint} style={NUM}>
-              {`${formatDate(row.first)} to ${formatDate(row.last)}`}
+            <text x={660} y={y} textAnchor="end" fontFamily={SANS} fontSize={12} fill={PALETTE.faint} style={NUM}>
+              {row.first === row.last ? formatDate(row.first) : `${formatDate(row.first)} to ${formatDate(row.last)}`}
             </text>
           </g>
         );
@@ -175,7 +178,7 @@ function findPlate(records: readonly FieldRecord[], draft: FindDraft, today: str
         </text>
       ) : null}
       <text x={40} y={608} fontFamily={SANS} fontSize={12} fill={PALETTE.faint} style={NUM}>
-        {`counts written in fives · ${visitDates(records).length} days out so far`}
+        {`counts written in fives · ${many(visitDates(records).length, 'day out', 'days out')} so far`}
       </text>
     </g>
   );
@@ -268,7 +271,10 @@ function shadowPlate(record: FieldRecord): ReactElement {
   const longest = Math.max(1, ...readings.map((r) => r.shadowMm), record.stickMm);
   const groundY = 330;
   const baseX = 200;
-  const scale = 300 / longest;
+  // One scale for the stick and the shadow, so the angle on the paper is the
+  // angle in the arithmetic. It is only ever reduced to keep both in frame.
+  const noonMm = read.noon ? read.noon.shadowMm : record.stickMm;
+  const scale = Math.min(190 / Math.max(1, record.stickMm), 640 / Math.max(1, noonMm));
   const stickH = record.stickMm * scale;
   const shadowW = read.noon ? read.noon.shadowMm * scale : 0;
 
@@ -315,8 +321,8 @@ function shadowPlate(record: FieldRecord): ReactElement {
           <text x={baseX + 26} y={groundY - 14} fontFamily={SANS} fontSize={13} fill={PALETTE.ochre} style={NUM}>
             {`${read.noonAltitude}°`}
           </text>
-          <text x={baseX + shadowW + 20} y={groundY - 6} fontFamily={SANS} fontSize={12} fill={PALETTE.faint}>
-            shadow points {read.points}
+          <text x={900} y={groundY - 12} textAnchor="end" fontFamily={SANS} fontSize={12} fill={PALETTE.faint}>
+            at noon the shadow points {read.points}
           </text>
         </>
       ) : null}
@@ -324,6 +330,13 @@ function shadowPlate(record: FieldRecord): ReactElement {
       <line x1={40} y1={382} x2={920} y2={382} stroke={PALETTE.rule} strokeWidth={1} />
       {label('SHADOW THROUGH THE DAY', 40, 406)}
       <line x1={gx0} y1={gy1} x2={gx1} y2={gy1} stroke={PALETTE.rule} strokeWidth={1} />
+      <line x1={gx0} y1={gy0} x2={gx0} y2={gy1} stroke={PALETTE.rule} strokeWidth={1} />
+      <text x={gx0 - 12} y={gy0 + 6} textAnchor="end" fontFamily={SANS} fontSize={11} fill={PALETTE.faint} style={NUM}>
+        {`${longest} mm`}
+      </text>
+      <text x={gx0 - 12} y={gy1} textAnchor="end" fontFamily={SANS} fontSize={11} fill={PALETTE.faint} style={NUM}>
+        0
+      </text>
       {readings.length > 1 ? (
         <polyline
           points={readings.map((r) => `${px(r.minutes)},${py(r.shadowMm)}`).join(' ')}
@@ -447,7 +460,6 @@ export function FieldLog(): ReactElement {
     await exportPlate(svg, { title: printTitle, lines: [formatDate(today), printLine] }, `field-log-${phase}-${today}`);
   };
 
-  const many = (n: number, one: string, more: string): string => `${n} ${n === 1 ? one : more}`;
   const headReadout =
     phase === 'find'
       ? many(visitDates(records).length, 'day out', 'days out')

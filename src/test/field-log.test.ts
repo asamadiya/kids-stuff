@@ -57,6 +57,21 @@ describe('the field log', () => {
     expect(PHASES.map((p) => p.key)).toEqual(['find', 'watch', 'shadow']);
   });
 
+  it('fits the tool registry WorkshopHub keeps, so wiring it cannot fail to compile', () => {
+    // WorkshopHub's ToolMeta is private to that module; this restates it where
+    // it can be checked.
+    interface ToolMeta {
+      readonly id: string;
+      readonly title: string;
+      readonly eyebrow: string;
+      readonly note: string;
+    }
+    const card: ToolMeta = FIELD_LOG_META;
+    expect(card.id).toBe('field-log');
+    expect(card.note.length).toBeGreaterThan(20);
+    expect(card.note).not.toMatch(/!/);
+  });
+
   it('offers a closed list of places and of things a creature can be doing', () => {
     expect(HABITAT_KEYS).toHaveLength(6);
     for (const k of HABITAT_KEYS) {

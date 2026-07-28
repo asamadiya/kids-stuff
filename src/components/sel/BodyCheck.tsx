@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { PAINT_ORDER, VIEW, regionPath } from '../../sel/body-figure';
 import { drawer } from '../../workshop/drawer';
 import { say } from '../../workshop/say';
 import { pluck, step } from '../../workshop/tone';
@@ -6,10 +7,6 @@ import { exportPlate, printPlate } from '../../workshop/plate';
 import {
   BODYCHECK_META,
   CHECKS,
-  FIGURE_BOX,
-  FIGURE_PLATE,
-  FIGURE_PLATE_ALT,
-  FIGURE_STROKES,
   PALETTE,
   REGIONS,
   WAIT_LENGTHS,
@@ -41,42 +38,23 @@ const rack = drawer<BodyCheckRecord>('body-check');
 type Phase = 'before' | 'checks' | 'remedy' | 'after' | 'done';
 type Remedy = 'breath' | 'wait' | null;
 
-const IMG: CSSProperties = {
-  display: 'block',
-  width: '100%',
-  height: 'auto',
-  border: `1px solid ${PALETTE.rule}`,
-  background: PALETTE.raised,
-};
 
-function markStyle(on: boolean): CSSProperties {
-  return {
-    display: 'block',
-    width: '1.35rem',
-    height: '1.35rem',
-    boxSizing: 'border-box',
-    borderRadius: '50%',
-    border: `1.5px solid ${on ? PALETTE.ink : PALETTE.rule}`,
-    background: on ? PALETTE.terracotta : 'rgba(251, 249, 244, 0.55)',
-  };
-}
 
-function spotStyle(x: number, y: number): CSSProperties {
-  return {
-    position: 'absolute',
-    left: `${x}%`,
-    top: `${y}%`,
-    transform: 'translate(-50%, -50%)',
-    padding: 0,
-    margin: 0,
-    border: 'none',
-    background: 'none',
-    lineHeight: 0,
-    cursor: 'pointer',
-  };
-}
 
 /** The painted figure with the ink marks laid over it. */
+/**
+ * The figure, drawn by the code.
+ *
+ * This replaced a painted plate with six hand-typed points on top of it. On
+ * that plate `hands` sat entirely off the child outside the printed border,
+ * `throat` landed on the face and `legs` landed on the cast shadow, because
+ * the coordinates were written from the prompt sent to an image model and the
+ * model composed a different picture.
+ *
+ * A mark is a region, never a point: tapping fills the whole region, and the
+ * shape that fills is the same vertex array the hit test and the geometry
+ * tests use. There is nothing left for a person to keep in sync.
+ */
 function FigurePlate(props: {
   readonly marks: readonly RegionId[];
   readonly onTap: ((id: RegionId) => void) | null;
@@ -85,31 +63,48 @@ function FigurePlate(props: {
   const { marks, onTap, caption } = props;
   return (
     <div className="bench__figure">
-      <div style={{ position: 'relative', width: '100%', maxWidth: '19rem' }}>
-        <img src={`${import.meta.env.BASE_URL}games/sel/${FIGURE_PLATE}.png`} alt={FIGURE_PLATE_ALT} style={IMG} />
-        {REGIONS.flatMap((r) => {
-          const on = marks.includes(r.id);
-          const spots = r.mirror ? [r.spot, { x: 100 - r.spot.x, y: r.spot.y }] : [r.spot];
-          return spots.map((s, i) =>
-            onTap ? (
-              <button
-                key={`${r.id}-${i}`}
-                type="button"
-                style={spotStyle(s.x, s.y)}
-                aria-pressed={on}
-                aria-label={i === 0 ? `${r.place}. ${r.signal}.` : `${r.place}, other side. ${r.signal}.`}
-                onClick={() => onTap(r.id)}
-              >
-                <span style={markStyle(on)} />
-              </button>
-            ) : (
-              <span key={`${r.id}-${i}`} aria-hidden="true" style={{ ...spotStyle(s.x, s.y), display: 'block' }}>
-                <span style={markStyle(on)} />
-              </span>
-            ),
+      <svg
+        viewBox={`0 0 ${VIEW.width} ${VIEW.height}`}
+        width="100%"
+        style={{ display: 'block', maxWidth: '17rem', margin: '0 auto', background: 'var(--paper-raised)', border: '1px solid var(--rule)' }}
+        role={onTap ? 'group' : 'img'}
+        aria-label={onTap ? undefined : 'A figure of a child with the marked places filled.'}
+      >
+        {PAINT_ORDER.map((id) => {
+          const region = regionById(id);
+          const on = marks.includes(id);
+          const shape = (
+            <path
+              d={regionPath(id)}
+              fill={on ? 'var(--terracotta)' : 'var(--paper-sunken)'}
+              fillOpacity={on ? 0.55 : 1}
+              stroke="var(--ink)"
+              strokeWidth={1.2}
+              strokeLinejoin="round"
+            />
+          );
+          if (!onTap) return <g key={id} aria-hidden="true">{shape}</g>;
+          return (
+            <g
+              key={id}
+              role="button"
+              tabIndex={0}
+              aria-pressed={on}
+              aria-label={`${region.place}. ${region.signal}.`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => onTap(id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onTap(id);
+                }
+              }}
+            >
+              {shape}
+            </g>
           );
         })}
-      </div>
+      </svg>
       <p className="bench__figure-caption">{caption}</p>
     </div>
   );
@@ -138,7 +133,7 @@ function Glyph(props: { readonly paths: readonly string[]; readonly size?: numbe
   );
 }
 
-/** The ink figure used on the saved plate, so no <img> ever enters the export. */
+/** The saved plate draws the same polygons, so sheet and screen cannot disagree. */
 function InkFigure(props: {
   readonly x: number;
   readonly y: number;
@@ -146,30 +141,19 @@ function InkFigure(props: {
   readonly marks: readonly RegionId[];
 }) {
   const { x, y, scale, marks } = props;
-  const w = FIGURE_BOX.width * scale;
-  const h = FIGURE_BOX.height * scale;
   return (
-    <g>
-      <g transform={`translate(${x} ${y}) scale(${scale})`} fill="none" stroke={PALETTE.ink} strokeWidth={1.5 / scale} strokeLinecap="round">
-        {FIGURE_STROKES.map((d) => (
-          <path key={d} d={d} />
-        ))}
-      </g>
-      {marks.flatMap((id) => {
-        const r = regionById(id);
-        const spots = r.mirror ? [r.spot, { x: 100 - r.spot.x, y: r.spot.y }] : [r.spot];
-        return spots.map((s, i) => (
-          <circle
-            key={`${id}-${i}`}
-            cx={x + (s.x / 100) * w}
-            cy={y + (s.y / 100) * h}
-            r={7}
-            fill={PALETTE.terracotta}
-            stroke={PALETTE.ink}
-            strokeWidth={1}
-          />
-        ));
-      })}
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      {PAINT_ORDER.map((id) => (
+        <path
+          key={id}
+          d={regionPath(id)}
+          fill={marks.includes(id) ? PALETTE.terracotta : 'none'}
+          fillOpacity={marks.includes(id) ? 0.55 : 1}
+          stroke={PALETTE.ink}
+          strokeWidth={1.4 / scale}
+          strokeLinejoin="round"
+        />
+      ))}
     </g>
   );
 }

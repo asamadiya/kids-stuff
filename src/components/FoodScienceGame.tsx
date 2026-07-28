@@ -69,6 +69,22 @@ const frame = (w: number, h: number): ReactElement => (
 
 const round1 = (v: number): string => String(Math.round(v * 10) / 10);
 
+/** Break a sentence on word boundaries; SVG text does not wrap on its own. */
+function wrap(text: string, perLine: number): string[] {
+  const lines: string[] = [];
+  let line = '';
+  for (const word of text.split(' ')) {
+    if (line && `${line} ${word}`.length > perLine) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = line ? `${line} ${word}` : word;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
 /* ------------------------------------------------------------- the plate bench */
 
 const PLATE_VIEW = { w: 960, h: 640 };
@@ -125,7 +141,7 @@ function platePlate(plate: Plate): ReactElement {
         const x1 = 828;
         const width = (x1 - x0) * barFraction(plate, key);
         const top = topSources(plate, key, 2)
-          .map((s) => `${s.food.singular} ${round1(contribution(s, key))}`)
+          .map((s) => `${s.food.name} ${round1(contribution(s, key))}`)
           .join(' · ');
         return (
           <g key={key}>
@@ -148,11 +164,13 @@ function platePlate(plate: Plate): ReactElement {
 
       <line x1={40} y1={520} x2={920} y2={520} stroke={RULE} strokeWidth={1} />
       {label('BUILDING BLOCKS', 40, 548)}
-      <text x={40} y={578} fontFamily={SANS} fontSize={14} fill={check.complete ? TEAL : INK}>
-        {blockLine(plate).slice(0, 118)}
-      </text>
-      <text x={40} y={602} fontFamily={SANS} fontSize={12} fill={FAINT} style={NUM}>
-        {axisNote(plate, 'protein')}
+      {wrap(blockLine(plate), 108).slice(0, 2).map((line, i) => (
+        <text key={line} x={40} y={574 + i * 20} fontFamily={SANS} fontSize={14} fill={check.complete ? TEAL : INK}>
+          {line}
+        </text>
+      ))}
+      <text x={40} y={620} fontFamily={SANS} fontSize={12} fill={FAINT} style={NUM}>
+        {axisNote('protein')}
       </text>
     </g>
   );

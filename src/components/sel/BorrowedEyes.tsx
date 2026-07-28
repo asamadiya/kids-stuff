@@ -89,55 +89,74 @@ function ChipGlyph({ id, tint }: { id: ChipId; tint: string }) {
 
 /* ------------------------------------------------------------------- plan -- */
 
-const PLAN_W = 360, PLAN_H = 300;
+const PLAN_W = 360, ROOM_H = 236, KEY_TOP = 268, KEY_STEP = 15;
 
 /**
- * The room from above, with the standing eye's cone drawn over it and every
- * figure that eye cannot see left hollow. Nothing here is asserted: the cone,
- * the positions and the hollow marks are all read off the same plan the spoken
- * sentence is generated from.
+ * The room from above. Figures carry a number rather than their name, and the
+ * key sits under the plan, so nothing overlaps and nothing has to be shortened.
+ * People are drawn round and things square. Everything on it — the cone, the
+ * positions, the hollow marks on what this position cannot see — is read off
+ * the same plan the spoken sentence is generated from.
  */
 function RoomPlan({ moment, view }: { moment: Moment; view: View }) {
   const eye = eyeFor(moment.plan, view.id);
-  const spots = spotsIn(moment.plan, PLAN_W, PLAN_H);
-  const cone = coneIn(moment.plan, eye, PLAN_W, PLAN_H);
+  const spots = spotsIn(moment.plan, PLAN_W - 16, ROOM_H - 16);
+  const cone = coneIn(moment.plan, eye, PLAN_W - 16, ROOM_H - 16);
   const covered = new Set(hiddenFrom(moment.plan, eye).map((s) => s.figure.id));
+  const height = KEY_TOP + spots.length * KEY_STEP + 10;
+  const clip = `plan-${moment.id}-${view.id}`;
   return (
-    <svg viewBox={`0 0 ${PLAN_W} ${PLAN_H}`} role="img"
-      aria-label={`${moment.where}, seen from above. ${seesIn(moment, view)}`}
+    <svg viewBox={`0 0 ${PLAN_W} ${height}`} role="img"
+      aria-label={`${moment.where}, drawn from above. ${seesIn(moment, view)}`}
       style={{ display: 'block', width: '100%', maxWidth: `${PLAN_W}px`, height: 'auto' }}>
-      <rect x="0" y="0" width={PLAN_W} height={PLAN_H} fill={PAPER} />
-      <clipPath id={`plan-${moment.id}`}>
-        <rect x="0" y="0" width={PLAN_W} height={PLAN_H} />
+      <rect x="0" y="0" width={PLAN_W} height={height} fill={PAPER} />
+      <rect x="4" y="4" width={PLAN_W - 8} height={ROOM_H - 8} fill={RAISED} stroke={RULE} strokeWidth="1" />
+      <clipPath id={clip}>
+        <rect x="4" y="4" width={PLAN_W - 8} height={ROOM_H - 8} />
       </clipPath>
-      <g clipPath={`url(#plan-${moment.id})`}>
+      <g clipPath={`url(#${clip})`} transform="translate(8 8)">
         <path
           d={`M${cone.x} ${cone.y} L${cone.left[0]} ${cone.left[1]} L${cone.right[0]} ${cone.right[1]} Z`}
           fill={SUNKEN}
-          stroke={RULE}
-          strokeWidth="1"
+          stroke="none"
         />
+        {spots.map((s, i) => {
+          const self = s.figure.id === eye.self;
+          const hidden = covered.has(s.figure.id);
+          const thing = s.figure.kind === 'thing';
+          const fill = self ? OCHRE : thing ? 'none' : hidden ? PAPER : RAISED;
+          const line = self ? OCHRE : hidden ? FAINT : INK;
+          return (
+            <g key={s.figure.id}>
+              {thing ? (
+                <rect x={s.x - s.r} y={s.y - s.r} width={s.r * 2} height={s.r * 2}
+                  fill={fill} stroke={line} strokeWidth="1.2"
+                  strokeDasharray={hidden ? '3 3' : undefined} />
+              ) : (
+                <circle cx={s.x} cy={s.y} r={s.r} fill={fill} stroke={line} strokeWidth="1.2"
+                  strokeDasharray={hidden ? '3 3' : undefined} />
+              )}
+              <text x={s.x} y={s.y + 4} textAnchor="middle" fontFamily="Inter, sans-serif"
+                fontSize="11" fill={self ? PAPER : line}>
+                {i + 1}
+              </text>
+            </g>
+          );
+        })}
       </g>
-      {spots.map((s) => {
+      <text x="8" y={ROOM_H + 12} fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="1.2" fill={FAINT}>
+        {`${moment.plan.across} BY ${moment.plan.deep} CENTIMETRES, FROM ABOVE`}
+      </text>
+      {spots.map((s, i) => {
         const self = s.figure.id === eye.self;
         const hidden = covered.has(s.figure.id);
         return (
-          <g key={s.figure.id}>
-            <circle cx={s.x} cy={s.y} r={s.r}
-              fill={self ? OCHRE : hidden ? PAPER : RAISED}
-              stroke={self ? OCHRE : hidden ? RULE : INK}
-              strokeWidth="1.2"
-              strokeDasharray={hidden ? '3 3' : undefined} />
-            <text x={s.x} y={s.y - s.r - 4} textAnchor="middle" fontFamily="Inter, sans-serif"
-              fontSize="9" fill={hidden ? FAINT : INK}>
-              {s.figure.label}
-            </text>
-          </g>
+          <text key={s.figure.id} x="8" y={KEY_TOP + i * KEY_STEP}
+            fontFamily="Inter, sans-serif" fontSize="11" fill={hidden ? FAINT : INK}>
+            {`${i + 1}  ${s.figure.label}${self ? ' — you are here' : hidden ? ' — you cannot see it from here' : ''}`}
+          </text>
         );
       })}
-      <text x="8" y={PLAN_H - 8} fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="1.2" fill={FAINT}>
-        {`${moment.plan.across} BY ${moment.plan.deep} CENTIMETRES, FROM ABOVE`}
-      </text>
     </svg>
   );
 }

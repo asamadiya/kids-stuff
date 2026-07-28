@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   ACTION_FIELD,
+  ARROW_FLOOR,
   DRAWINGS,
   GESTURES,
   PALM,
@@ -238,15 +239,42 @@ describe('what-happens-next: the action is drawn, not painted', () => {
     );
     expect(shape).toEqual({
       hold: 'thing 100,88 | yours 74,98@40 126,98@-40 | theirs  | arrow none',
-      give: 'thing 100,82 | yours 46,90@90 | theirs 154,90@-90 | arrow 126,82->128,90',
-      raise: 'thing 100,36 | yours 78,66@15 122,66@-15 | theirs  | arrow 100,80->100,62',
-      point: 'thing 144,92 | yours 50,92@90 | theirs  | arrow 76,92->118,92',
+      give: 'thing 88,78 | yours 36,92@90 | theirs 166,92@-90 | arrow 108,78->146,92',
+      raise: 'thing 100,36 | yours 78,66@15 122,66@-15 | theirs  | arrow 100,82->100,56',
+      point: 'thing 144,92 | yours 50,92@90 | theirs  | arrow 70,92->124,92',
       still: 'thing 100,124 | yours 76,84@180 124,84@180 | theirs  | arrow none',
-      move: 'thing 84,90 | yours 46,90@90 | theirs  | arrow 110,90->154,90',
-      release: 'thing 100,120 | yours 72,54@180 128,54@180 | theirs  | arrow 100,94->144,64',
-      go: 'thing 70,118 | yours 56,88@165 88,88@195 | theirs  | arrow 70,92->114,62',
+      move: 'thing 84,90 | yours 46,90@90 | theirs  | arrow 104,90->148,90',
+      release: 'thing 100,120 | yours 72,54@180 128,54@180 | theirs  | arrow 100,100->144,70',
+      go: 'thing 70,118 | yours 56,88@165 88,88@195 | theirs  | arrow 70,98->114,68',
       work: 'thing 100,92 | yours 70,84@55 130,84@-55 | theirs  | arrow none',
     });
+  });
+
+  /**
+   * FAILS IF REVERTED: the handover arrow was first drawn between a thing and a
+   * hand only 54 apart with 26 of clearance at each end, which left a two-unit
+   * stub that rendered as a tick, not an arrow. It was invisible to every
+   * assertion and obvious the moment the panel was looked at. This is that look,
+   * made mechanical.
+   */
+  it('gives every arrow enough length to read as an arrow', () => {
+    for (const g of GESTURES) {
+      const a = arrowOf(DRAWINGS[g]);
+      if (!a) {
+        expect(DRAWINGS[g].arrow, g).toBeNull();
+        continue;
+      }
+      const length = Math.hypot(a.x2 - a.x1, a.y2 - a.y1);
+      expect(length, `${g}: ${Math.round(length)}`).toBeGreaterThanOrEqual(ARROW_FLOOR - 4);
+      for (const v of [a.x1, a.x2]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(ACTION_FIELD.width);
+      }
+      for (const v of [a.y1, a.y2]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(ACTION_FIELD.height);
+      }
+    }
   });
 
   it('draws every thing with real strokes and names it for the sentence', () => {

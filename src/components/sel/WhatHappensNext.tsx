@@ -78,10 +78,10 @@ function Action({ strip, road }: { strip: Strip; road: Road }) {
           <path d={headOf(arrow)} />
         </g>
       )}
-      <text x="10" y={height - 10} fontFamily="Inter, sans-serif" fontSize="10" letterSpacing="1.2" fill={FAINT}>
+      <text x="10" y="16" fontFamily="Inter, sans-serif" fontSize="10" letterSpacing="1.2" fill={FAINT}>
         {road.gesture.toUpperCase()}
       </text>
-      <text x={width - 10} y={height - 10} textAnchor="end" fontFamily="Inter, sans-serif"
+      <text x={width - 10} y="16" textAnchor="end" fontFamily="Inter, sans-serif"
         fontSize="10" letterSpacing="1.2" fill={FAINT}>
         {strip.other.name.toUpperCase()}
       </text>

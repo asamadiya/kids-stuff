@@ -151,6 +151,13 @@ export const PROTEIN_GROUPS: readonly FoodGroup[] = ['pulse', 'grain', 'dairy', 
  */
 export interface Food extends Noun {
   readonly id: string;
+  /**
+   * What the food is called in a sentence. `singular` and `plural` name a
+   * SERVING of it ("bowl of rajma"), which is right for counting and wrong for
+   * prose: "bowl of rajma covers the lysine" reads like a machine. Both forms
+   * are still written out; nothing derives one from the other.
+   */
+  readonly name: string;
   readonly group: FoodGroup;
   /** The serving the numbers below are measured on. */
   readonly serving: string;
@@ -166,6 +173,7 @@ export interface Food extends Noun {
 
 const food = (
   id: string,
+  name: string,
   singular: string,
   plural: string,
   glyph: string,
@@ -175,7 +183,7 @@ const food = (
   per: Record<NutrientKey, number>,
   limiting: readonly AminoKey[] | null,
   fact: string,
-): Food => ({ id, singular, plural, glyph, unicode, group, serving, per, limiting, fact });
+): Food => ({ id, name, singular, plural, glyph, unicode, group, serving, per, limiting, fact });
 
 const nut = (
   protein: number, fibre: number, fat: number, calcium: number, iron: number, vitaminC: number,
@@ -187,64 +195,64 @@ const nut = (
  * not so anyone can hit a target.
  */
 export const FOODS: readonly Food[] = [
-  food('egg', 'egg', 'eggs', '🥚', 'EGG', 'egg', 'one, 50 g',
+  food('egg', 'egg', 'egg', 'eggs', '🥚', 'EGG', 'egg', 'one, 50 g',
     nut(6.3, 0, 5, 25, 0.9, 0), [],
     'Carries all nine essential building blocks, which is why it is the yardstick other protein foods are measured against.'),
-  food('milk', 'glass of milk', 'glasses of milk', '🥛', 'GLASS OF MILK', 'dairy', 'one cup, 240 ml',
+  food('milk', 'milk', 'glass of milk', 'glasses of milk', '🥛', 'GLASS OF MILK', 'dairy', 'one cup, 240 ml',
     nut(8, 0, 8, 300, 0, 0), [],
     'About seven-eighths water. The rest is protein, fat, sugar (lactose) and minerals.'),
-  food('curd', 'pot of curd', 'pots of curd', '🫙', 'JAR', 'dairy', 'one cup, 245 g',
+  food('curd', 'curd', 'pot of curd', 'pots of curd', '🫙', 'JAR', 'dairy', 'one cup, 245 g',
     nut(9, 0, 8, 300, 0.1, 1), [],
     'Milk that has been set by acid. The bacteria that make the acid are still alive in it.'),
-  food('cheese', 'piece of cheese', 'pieces of cheese', '🧀', 'CHEESE WEDGE', 'dairy', '30 g of paneer or hard cheese',
+  food('cheese', 'cheese', 'piece of cheese', 'pieces of cheese', '🧀', 'CHEESE WEDGE', 'dairy', '30 g of paneer or hard cheese',
     nut(7, 0, 9, 200, 0.1, 0), [],
     'Curd with most of the whey pressed out, so everything left is concentrated about tenfold.'),
-  food('rajma', 'bowl of rajma', 'bowls of rajma', '🫘', 'BEANS', 'pulse', 'one cup cooked, 175 g',
+  food('rajma', 'rajma', 'bowl of rajma', 'bowls of rajma', '🫘', 'BEANS', 'pulse', 'one cup cooked, 175 g',
     nut(15, 13, 0.5, 60, 4, 2), ['methionine'],
     'Kidney beans. The skin holds most of the fibre, so they are cooked with the skin on.'),
-  food('dal', 'bowl of dal', 'bowls of dal', '🥣', 'BOWL WITH SPOON', 'pulse', 'one cup cooked, 200 g',
+  food('dal', 'dal', 'bowl of dal', 'bowls of dal', '🥣', 'BOWL WITH SPOON', 'pulse', 'one cup cooked, 200 g',
     nut(18, 16, 0.8, 38, 6.6, 3), ['methionine'],
     'Lentils. They carry more iron for their weight than almost anything else on this table.'),
-  food('rice', 'bowl of rice', 'bowls of rice', '🍚', 'COOKED RICE', 'grain', 'one cup cooked, 160 g',
+  food('rice', 'rice', 'bowl of rice', 'bowls of rice', '🍚', 'COOKED RICE', 'grain', 'one cup cooked, 160 g',
     nut(4, 0.6, 0.4, 16, 0.2, 0), ['lysine'],
     'White rice has had the bran polished off, and the bran is where the fibre was.'),
-  food('roti', 'roti', 'rotis', '🫓', 'FLATBREAD', 'grain', 'one, 40 g of whole wheat',
+  food('roti', 'roti', 'roti', 'rotis', '🫓', 'FLATBREAD', 'grain', 'one, 40 g of whole wheat',
     nut(4, 3, 1, 10, 1.2, 0), ['lysine'],
     'Whole wheat keeps its bran, so one roti carries about five times the fibre of a cup of white rice.'),
-  food('maize', 'ear of maize', 'ears of maize', '🌽', 'EAR OF MAIZE', 'grain', 'one ear, 90 g',
+  food('maize', 'maize', 'ear of maize', 'ears of maize', '🌽', 'EAR OF MAIZE', 'grain', 'one ear, 90 g',
     nut(3, 2, 1.5, 2, 0.5, 7), ['lysine', 'tryptophan'],
     'Short of two blocks rather than one, which is why maize has been eaten with beans for four thousand years in Mexico.'),
-  food('peanuts', 'handful of peanuts', 'handfuls of peanuts', '🥜', 'PEANUTS', 'nut', '30 g',
+  food('peanuts', 'peanuts', 'handful of peanuts', 'handfuls of peanuts', '🥜', 'PEANUTS', 'nut', '30 g',
     nut(7.5, 2.5, 14, 26, 1.3, 0), ['methionine'],
     'Not a nut at all. Peanuts are a pulse that ripens underground, and they run short of the same block beans do.'),
-  food('avocado', 'half an avocado', 'halves of avocado', '🥑', 'AVOCADO', 'fat', 'half, 100 g',
+  food('avocado', 'avocado', 'half an avocado', 'halves of avocado', '🥑', 'AVOCADO', 'fat', 'half, 100 g',
     nut(2, 7, 15, 12, 0.6, 10), null,
     'One of the few fruits built mostly of fat instead of sugar.'),
-  food('oliveoil', 'spoon of olive oil', 'spoons of olive oil', '🫒', 'OLIVE', 'fat', 'one tablespoon, 14 g',
+  food('oliveoil', 'olive oil', 'spoon of olive oil', 'spoons of olive oil', '🫒', 'OLIVE', 'fat', 'one tablespoon, 14 g',
     nut(0, 0, 14, 0, 0.1, 0), null,
     'Pressed straight out of the fruit, so it is fat and almost nothing else.'),
-  food('ghee', 'spoon of ghee', 'spoons of ghee', '🧈', 'BUTTER', 'fat', 'one teaspoon, 5 g',
+  food('ghee', 'ghee', 'spoon of ghee', 'spoons of ghee', '🧈', 'BUTTER', 'fat', 'one teaspoon, 5 g',
     nut(0, 0, 5, 1, 0, 0), null,
     'Butter boiled until the water steams off and the milk solids are strained out, which is why it keeps without a fridge.'),
-  food('spinach', 'bowl of spinach', 'bowls of spinach', '🥬', 'LEAFY GREEN', 'vegetable', 'one cup cooked, 180 g',
+  food('spinach', 'spinach', 'bowl of spinach', 'bowls of spinach', '🥬', 'LEAFY GREEN', 'vegetable', 'one cup cooked, 180 g',
     nut(5, 4, 0.5, 245, 6.4, 18), null,
     'Full of iron and calcium, though the oxalic acid in the leaf locks some of both away from the gut.'),
-  food('broccoli', 'head of broccoli', 'heads of broccoli', '🥦', 'BROCCOLI', 'vegetable', 'one cup cooked, 155 g',
+  food('broccoli', 'broccoli', 'head of broccoli', 'heads of broccoli', '🥦', 'BROCCOLI', 'vegetable', 'one cup cooked, 155 g',
     nut(4, 5, 0.6, 62, 1, 100), null,
     'A cup carries more vitamin C than an orange does.'),
-  food('carrot', 'carrot', 'carrots', '🥕', 'CARROT', 'vegetable', 'one, 60 g',
+  food('carrot', 'carrot', 'carrot', 'carrots', '🥕', 'CARROT', 'vegetable', 'one, 60 g',
     nut(0.6, 1.7, 0.1, 20, 0.2, 4), null,
     'The orange is beta-carotene, which the body cuts in half to make vitamin A. It only crosses into the body with fat.'),
-  food('potato', 'potato', 'potatoes', '🥔', 'POTATO', 'vegetable', 'one medium, 170 g, skin on',
+  food('potato', 'potato', 'potato', 'potatoes', '🥔', 'POTATO', 'vegetable', 'one medium, 170 g, skin on',
     nut(4.3, 4, 0.2, 26, 1.9, 20), null,
     'Most of the fibre is in the skin. Peel it and about half the fibre goes in the bin.'),
-  food('apple', 'apple', 'apples', '🍎', 'RED APPLE', 'fruit', 'one medium, 180 g',
+  food('apple', 'apple', 'apple', 'apples', '🍎', 'RED APPLE', 'fruit', 'one medium, 180 g',
     nut(0.5, 4.4, 0.3, 11, 0.2, 8), null,
     'The fibre is pectin, the same stuff that makes jam set.'),
-  food('orange', 'orange', 'oranges', '🍊', 'TANGERINE', 'fruit', 'one medium, 130 g',
+  food('orange', 'orange', 'orange', 'oranges', '🍊', 'TANGERINE', 'fruit', 'one medium, 130 g',
     nut(1.2, 3, 0.2, 52, 0.1, 70), null,
     'Sailors worked out four hundred years ago that citrus stopped scurvy, two centuries before anyone knew vitamin C existed.'),
-  food('lemon', 'lemon', 'lemons', '🍋', 'LEMON', 'fruit', 'the juice of one, 45 ml',
+  food('lemon', 'lemon', 'lemon', 'lemons', '🍋', 'LEMON', 'fruit', 'the juice of one, 45 ml',
     nut(0.1, 0.1, 0, 3, 0, 19), null,
     'Sour because of citric acid, which is strong enough to set a pan of milk into curd.'),
 ];
@@ -421,6 +429,8 @@ export function pairingsFor(plate: Plate): readonly Pairing[] {
 const amount = (value: number, key: NutrientKey): string =>
   `${Number.isInteger(value) ? value : value.toFixed(1)} ${NUTRIENTS[key].unit}`;
 
+const sentenceCase = (text: string): string => (text ? text[0].toUpperCase() + text.slice(1) : text);
+
 /** A list read out in words, without appending letters to anything. */
 export function listWords(items: readonly string[]): string {
   if (items.length === 0) return '';
@@ -432,7 +442,7 @@ export function listWords(items: readonly string[]): string {
 export function nutrientLines(plate: Plate): readonly string[] {
   const totals = plateTotals(plate);
   return NUTRIENT_KEYS.map((key) => {
-    const sources = topSources(plate, key).map((s) => `${s.food.singular}, ${amount(contribution(s, key), key)}`);
+    const sources = topSources(plate, key).map((s) => `${s.food.name}, ${amount(contribution(s, key), key)}`);
     const from = sources.length ? ` From ${listWords(sources)}.` : '';
     return `${NUTRIENTS[key].name}, about ${amount(totals[key], key)}. ${NUTRIENTS[key].does}${from}`;
   });
@@ -445,10 +455,21 @@ export function blockLine(plate: Plate): string {
     return 'No pulse, grain, egg, nut or dairy here, so there is nothing on the plate carrying the nine building blocks protein is made of.';
   }
   if (check.complete) {
-    const covers = check.covered.map(
-      (gap) => `${listWords(gap.filledBy.map((f) => f.singular))} covers the ${AMINOS[gap.amino].name} that the rest is short of`,
+    // Gaps filled by the same foods are said once. Left ungrouped the sentence
+    // repeats itself three times and runs off the edge of the plate, which is
+    // what the first version did.
+    const groups = new Map<string, { readonly by: readonly string[]; aminos: AminoKey[] }>();
+    for (const gap of check.covered) {
+      const by = gap.filledBy.slice(0, 2).map((f) => f.name);
+      const key = by.join('|');
+      const held = groups.get(key);
+      if (held) held.aminos.push(gap.amino);
+      else groups.set(key, { by, aminos: [gap.amino] });
+    }
+    const covers = [...groups.values()].map(
+      (g, i) => `${i === 0 ? sentenceCase(listWords(g.by)) : listWords(g.by)} ${g.by.length === 1 ? 'brings' : 'bring'} the ${listWords(g.aminos.map((a) => AMINOS[a].name))}`,
     );
-    const how = covers.length ? ` ${listWords(covers)}.` : '';
+    const how = covers.length ? ` ${covers.join('; ')}.` : '';
     return `All nine building blocks are here.${how}`;
   }
   const short = listWords(check.missing.map((a) => AMINOS[a].name));
@@ -456,7 +477,7 @@ export function blockLine(plate: Plate): string {
     check.missing
       .flatMap((a) => fillersFor(a).slice(0, 2))
       .filter((f, i, all) => all.findIndex((o) => o.id === f.id) === i)
-      .map((f) => f.singular),
+      .map((f) => f.name),
   );
   return `Everything protein-carrying on this plate is short of the same block: ${short}. ${fillers} would bring it.`;
 }
@@ -479,7 +500,7 @@ export function plateSummary(plate: Plate): string {
   const totals = plateTotals(plate);
   const size = plateSize(plate);
   if (size === 0) return 'Nothing on the plate yet.';
-  const parts = NUTRIENT_KEYS.map((k) => `${NUTRIENTS[k].name.toLowerCase()} ${amount(totals[k], k)}`);
+  const parts = NUTRIENT_KEYS.map((k) => `${NUTRIENTS[k].name} ${amount(totals[k], k)}`);
   return `${size === 1 ? '1 serving' : `${size} servings`}: ${parts.join(', ')}.`;
 }
 
@@ -827,16 +848,28 @@ export function maxPerServing(key: NutrientKey): number {
   return FOODS.reduce((m, f) => Math.max(m, f.per[key]), 0);
 }
 
-export function axisMax(plate: Plate, key: NutrientKey): number {
-  return Math.max(maxPerServing(key), plateTotals(plate)[key]);
+/** How many of the biggest servings the ruler is long. */
+export const AXIS_SERVINGS = 4;
+
+/**
+ * The ruler is fixed: the four biggest single servings of that nutrient on the
+ * shelf, added together. Fixed matters — an axis that stretched to fit the
+ * plate would peg every bar full the moment the plate held more than one
+ * serving, which is what the first version of this did, and it would make two
+ * plates incomparable. Taken from the table rather than from a recommended
+ * amount, because a recommended amount would turn the instrument into a scold.
+ */
+export function axisMax(key: NutrientKey): number {
+  const top = FOODS.map((f) => f.per[key]).sort((a, b) => b - a).slice(0, AXIS_SERVINGS);
+  return Math.round(top.reduce((n, v) => n + v, 0) * 10) / 10;
 }
 
 /** The bar's length as a fraction of the row, 0 to 1. */
 export function barFraction(plate: Plate, key: NutrientKey): number {
-  const axis = axisMax(plate, key);
+  const axis = axisMax(key);
   return axis <= 0 ? 0 : Math.min(1, plateTotals(plate)[key] / axis);
 }
 
-export function axisNote(plate: Plate, key: NutrientKey): string {
-  return `bar measured against ${Math.round(axisMax(plate, key) * 10) / 10} ${NUTRIENTS[key].unit}, the largest single serving on the shelf`;
+export function axisNote(key: NutrientKey): string {
+  return `each bar is measured against ${axisMax(key)} ${NUTRIENTS[key].unit}: the ${AXIS_SERVINGS} biggest single servings on the shelf, added up`;
 }
