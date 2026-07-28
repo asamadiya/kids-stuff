@@ -29,18 +29,18 @@ export function sumOf(round: AddRound): number {
 export const ADD_ROUNDS: readonly AddRound[] = [
   { left: 3, right: 2, emoji: '🍎', name: 'apples' },
   { left: 4, right: 3, emoji: '🍌', name: 'bananas' },
-  { left: 2, right: 2, emoji: '⭐', name: 'stars' },
+  { left: 2, right: 2, emoji: '🌱', name: 'seedlings' },
   { left: 5, right: 4, emoji: '🍓', name: 'strawberries' },
   { left: 1, right: 6, emoji: '🐝', name: 'bees' },
   { left: 6, right: 6, emoji: '🔵', name: 'blue dots' },
   { left: 3, right: 4, emoji: '🍊', name: 'oranges' },
-  { left: 2, right: 5, emoji: '🐟', name: 'fish' },
-  { left: 4, right: 4, emoji: '🎈', name: 'balloons' },
+  { left: 2, right: 5, emoji: '🥚', name: 'eggs' },
+  { left: 4, right: 4, emoji: '🐚', name: 'shells' },
   { left: 7, right: 2, emoji: '🌻', name: 'sunflowers' },
-  { left: 5, right: 3, emoji: '🍪', name: 'cookies' },
+  { left: 5, right: 3, emoji: '🌰', name: 'chestnuts' },
   { left: 6, right: 4, emoji: '🚗', name: 'cars' },
   { left: 3, right: 6, emoji: '🐢', name: 'turtles' },
-  { left: 8, right: 4, emoji: '🥓', name: 'bacon strips' },
+  { left: 8, right: 4, emoji: '🧀', name: 'cheese slices' },
 ];
 
 /** Stable number of options every round. */

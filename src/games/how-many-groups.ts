@@ -29,7 +29,7 @@ export interface GroupRound {
 // total / per is always exact (no remainder) for every round.
 export const GROUP_ROUNDS: readonly GroupRound[] = [
   { item: '🧦', total: 12, per: 2, groupWord: 'pair', groupWordPlural: 'pairs', prompt: '12 socks. Put 2 in each pair. How many pairs?' },
-  { item: '🍪', total: 6, per: 3, groupWord: 'plate', groupWordPlural: 'plates', prompt: '6 cookies. Put 3 on each plate. How many plates?' },
+  { item: '🌰', total: 6, per: 3, groupWord: 'plate', groupWordPlural: 'plates', prompt: '6 chestnuts. Put 3 on each plate. How many plates?' },
   { item: '🍎', total: 10, per: 5, groupWord: 'bag', groupWordPlural: 'bags', prompt: '10 apples. Put 5 in each bag. How many bags?' },
   { item: '🦋', total: 8, per: 4, groupWord: 'jar', groupWordPlural: 'jars', prompt: '8 butterflies. Put 4 in each jar. How many jars?' },
   { item: '🍓', total: 9, per: 3, groupWord: 'bowl', groupWordPlural: 'bowls', prompt: '9 strawberries. Put 3 in each bowl. How many bowls?' },
@@ -40,7 +40,7 @@ export const GROUP_ROUNDS: readonly GroupRound[] = [
   { item: '🔴', total: 16, per: 4, groupWord: 'box', groupWordPlural: 'boxes', prompt: '16 balls. Put 4 in each box. How many boxes?' },
   { item: '🍇', total: 14, per: 7, groupWord: 'basket', groupWordPlural: 'baskets', prompt: '14 grapes. Put 7 in each basket. How many baskets?' },
   { item: '🧮', total: 18, per: 6, groupWord: 'shelf', groupWordPlural: 'shelves', prompt: '18 blocks. Put 6 on each shelf. How many shelves?' },
-  { item: '🍩', total: 20, per: 5, groupWord: 'plate', groupWordPlural: 'plates', prompt: '20 donuts. Put 5 on each plate. How many plates?' },
+  { item: '🐚', total: 20, per: 5, groupWord: 'plate', groupWordPlural: 'plates', prompt: '20 shells. Put 5 on each plate. How many plates?' },
   { item: '🐟', total: 10, per: 2, groupWord: 'tank', groupWordPlural: 'tanks', prompt: '10 fish. Put 2 in each tank. How many tanks?' },
 ];
 

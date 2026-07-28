@@ -31,7 +31,7 @@ export function questionOf(round: GroupsRound): string {
 /** 14 rounds, every product <= 30. */
 export const GROUPS_ROUNDS: readonly GroupsRound[] = [
   { groups: 3, per: 4, emoji: '🍎', unit: 'basket' },
-  { groups: 2, per: 5, emoji: '🍪', unit: 'plate' },
+  { groups: 2, per: 5, emoji: '🌰', unit: 'plate' },
   { groups: 4, per: 3, emoji: '🟦', unit: 'box' },
   { groups: 5, per: 2, emoji: '🧦', unit: 'pair' },
   { groups: 3, per: 6, emoji: '🥚', unit: 'carton' },
@@ -40,7 +40,7 @@ export const GROUPS_ROUNDS: readonly GroupsRound[] = [
   { groups: 4, per: 5, emoji: '⭐', unit: 'row' },
   { groups: 5, per: 5, emoji: '🌟', unit: 'jar' },
   { groups: 3, per: 7, emoji: '🍇', unit: 'bunch' },
-  { groups: 7, per: 3, emoji: '🍭', unit: 'bag' },
+  { groups: 7, per: 3, emoji: '🥄', unit: 'bag' },
   { groups: 2, per: 9, emoji: '🍉', unit: 'crate' },
   { groups: 6, per: 5, emoji: '🌼', unit: 'vase' },
   { groups: 4, per: 6, emoji: '🥞', unit: 'tray' },

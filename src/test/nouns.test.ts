@@ -111,3 +111,42 @@ describe('no string surgery anywhere', () => {
     expect(hits).toEqual([]);
   });
 });
+
+describe('the whole practice section is ovo-lacto-vegetarian', () => {
+  /**
+   * The family are ovo-lacto-vegetarian: eggs and dairy yes, meat and fish
+   * never. This guards food, not animals — a chicken in "which one is not a
+   * bird?" and a fish in "which one is not something we wear?" are zoology and
+   * stay. What may not appear is meat or fish presented as something to eat,
+   * or as an object to count on a plate.
+   */
+  const foodGlyphs = /🍖|🍗|🥩|🥓|🍤|🍣|🍱|🐟(?=[^']*(?:eat|meal|plate|dish|food))/;
+  const files = readdirSync('src/games')
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => ({ file: f, text: readFileSync(join('src/games', f), 'utf8') }));
+
+  it('serves no meat or fish', () => {
+    const hits = files.filter((f) => foodGlyphs.test(f.text)).map((f) => f.file);
+    expect(hits).toEqual([]);
+  });
+
+  it('counts no candy, in glyph or in word', () => {
+    // Both halves matter: swapping the glyph while the prompt still reads
+    // "6 cookies" produces exactly the picture-versus-text mismatch this whole
+    // pass exists to remove. Comments are stripped so prose describing the ban
+    // does not trip it.
+    const strip = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    const candyGlyph = /🍪|🍬|🧁|🍩|🍭|🍰|🎂|🍫/;
+    const candyWord = /\b(cookies?|donuts?|doughnuts?|candies|candy|cupcakes?|lollipops?|pizzas?|sweets)\b/i;
+    // Identifier positions are excluded: `id: 'fraction-pizza'` is a routing
+    // slug and a storage key, not something a child reads.
+    const childFacing = (src: string): string =>
+      strip(src).replace(/\bid:\s*'[^']*'/g, '');
+    const hits = files
+      .map((f) => ({ ...f, text: childFacing(f.text) }))
+      .filter((f) => candyGlyph.test(f.text) || candyWord.test(f.text))
+      .map((f) => f.file);
+    expect(hits).toEqual([]);
+  });
+});
