@@ -793,3 +793,59 @@ button.game-card:focus-visible {
 /* The colophon is a mark, not an exhibit: small, quiet, out of the way. */
 .play-hub__rikki { width: 96px; align-self: flex-start; }
 .play-hub__rikki .rikki__caption { font-size: var(--label-size); }
+
+/* ------------------------------------------------------- for the parent
+   A note to the adult sitting next to him, folded away under the exercise.
+   Quiet by default: it must not compete with the thing the child is doing,
+   and it must not read as an instruction to the child. */
+.parent-note {
+  margin: var(--space-4) auto 0;
+  max-width: 44rem;
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-2);
+}
+
+.parent-note__summary {
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+
+.parent-note__body { padding: var(--space-2) 0 0; }
+
+.parent-note__what {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-serif);
+  font-size: var(--step-0);
+  line-height: var(--leading-normal);
+  color: var(--ink);
+}
+
+.parent-note__fields { margin: 0; display: grid; gap: var(--space-2); }
+.parent-note__fields > div { display: grid; grid-template-columns: 7rem 1fr; gap: var(--space-2); }
+
+.parent-note__fields dt {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* --ink-faint fails AA against paper; a label the parent has to read is
+     not decoration. */
+  color: var(--ink-soft);
+}
+
+.parent-note__fields dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  line-height: var(--leading-normal);
+  color: var(--ink-soft);
+}
+
+@media (max-width: 34rem) {
+  .parent-note__fields > div { grid-template-columns: 1fr; gap: 0.15rem; }
+}

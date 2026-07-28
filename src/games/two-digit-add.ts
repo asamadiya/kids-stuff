@@ -37,25 +37,26 @@ interface RawRound {
   readonly distractors: readonly number[];
 }
 
-// Column check: every round keeps ones-col and tens-col sums < 10 (no regroup).
+// Rounds run from no-carry to carrying; only the hundreds boundary is refused.
 const RAW_ROUNDS: readonly RawRound[] = [
-  // Regrouping rounds. The ones column passes ten and the ten moves across.
-  { a: 27, b: 15, distractors: [42, 31] },
-  { a: 48, b: 36, distractors: [74, 83] },
-  { a: 19, b: 26, distractors: [44, 36] },
-  { a: 35, b: 47, distractors: [72, 91] },
-  { a: 56, b: 28, distractors: [74, 85] },
-  { a: 17, b: 38, distractors: [45, 56] },
-  { a: 29, b: 43, distractors: [62, 71] },
-  { a: 64, b: 27, distractors: [81, 92] },
+  // Easy and carrying rounds interleaved: all the hard ones first made
+  // difficulty fall off a cliff and never return.
   { a: 23, b: 14, distractors: [36, 47] },
+  { a: 27, b: 15, distractors: [42, 31] },
   { a: 31, b: 42, distractors: [72, 74] },
+  { a: 48, b: 36, distractors: [74, 83] },
   { a: 12, b: 15, distractors: [26, 37] },
+  { a: 19, b: 26, distractors: [44, 36] },
   { a: 45, b: 33, distractors: [77, 88] },
+  { a: 35, b: 47, distractors: [72, 91] },
   { a: 21, b: 26, distractors: [46, 48] },
+  { a: 56, b: 28, distractors: [74, 85] },
   { a: 52, b: 34, distractors: [85, 96] },
+  { a: 17, b: 38, distractors: [45, 56] },
   { a: 13, b: 21, distractors: [33, 35] },
+  { a: 29, b: 43, distractors: [62, 71] },
   { a: 40, b: 27, distractors: [66, 68] },
+  { a: 64, b: 27, distractors: [81, 92] },
   { a: 34, b: 25, distractors: [58, 60] },
   { a: 11, b: 18, distractors: [28, 30] },
   { a: 62, b: 25, distractors: [86, 88] },
@@ -66,7 +67,7 @@ const RAW_ROUNDS: readonly RawRound[] = [
 
 const clampOption = (n: number): number => (n < 0 ? 0 : n);
 
-// Build a round: verify no-regroup, compute the true sum, and assemble
+// Build a round: flag whether it carries, compute the true sum, and assemble
 // a deterministic, sorted option list that always contains the answer.
 function buildRound(raw: RawRound, index: number): TwoDigitAddRound {
   const onesA = raw.a % 10;
@@ -119,9 +120,17 @@ export function getAddHint(round: TwoDigitAddRound): string {
 
 /** Warm feedback for ANY choice — affirming, never negative. */
 export function getAddFeedback(round: TwoDigitAddRound, selected: number): string {
-  const onesSum = (round.a % 10) + (round.b % 10);
-  const tensSum = Math.floor(round.a / 10) + Math.floor(round.b / 10);
-  const why = `Ones ${round.a % 10}+${round.b % 10}=${onesSum}, tens ${Math.floor(round.a / 10)}+${Math.floor(round.b / 10)}=${tensSum}, so ${tensSum}${onesSum} = ${round.answer}.`;
+  const onesA = round.a % 10;
+  const onesB = round.b % 10;
+  const tensA = Math.floor(round.a / 10);
+  const tensB = Math.floor(round.b / 10);
+  const onesSum = onesA + onesB;
+  // The old line glued the two column results together as digits, which is only
+  // ever right when nothing carries: 27+15 printed "so 312 = 42".
+  const why = round.carries
+    ? `Ones ${onesA}+${onesB}=${onesSum}, which is more than ten — write the ${onesSum % 10} and carry the ten. `
+      + `Tens ${tensA}+${tensB}+1=${tensA + tensB + 1}. So ${round.answer}.`
+    : `Ones ${onesA}+${onesB}=${onesSum}, tens ${tensA}+${tensB}=${tensA + tensB}. So ${round.answer}.`;
   if (selected === round.answer) {
     return `Correct. ${round.a} + ${round.b} = ${round.answer}. ${why}`;
   }

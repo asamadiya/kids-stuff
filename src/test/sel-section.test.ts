@@ -18,11 +18,12 @@ const stripComments = (src: string): string =>
  * one is a deliberate act rather than a silent way for an exercise to escape
  * the guards below.
  */
-const SUPPORT = new Set(['body-figure.ts', 'the-wide-view.data.ts']);
+const SUPPORT = new Set(['body-figure.ts', 'the-wide-view.data.ts', 'parent-notes.ts']);
 
 const modules = readdirSync(dir).filter((f) => f.endsWith('.ts') && !SUPPORT.has(f))
   .map((f) => ({ file: f, text: stripComments(readFileSync(join(dir, f), 'utf8')) }));
 
+/** Notes written FOR the adult, about the exercises. Not exercise content. */
 const components = readdirSync('src/components/sel').filter((f) => f.endsWith('.tsx'))
   .map((f) => ({ file: f, text: stripComments(readFileSync(join('src/components/sel', f), 'utf8')) }));
 

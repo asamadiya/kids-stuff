@@ -13,7 +13,7 @@ export const TWO_DIGIT_SUBTRACT_META = {
   title: 'Two-Digit Subtraction',
   icon: '➖',
   color: 'grape',
-  tagline: 'Subtracting column by column, without regrouping.',
+  tagline: 'Column subtraction, including taking a ten apart.',
 } as const;
 
 export interface SubtractRound {
@@ -34,23 +34,23 @@ function round(top: number, bottom: number): SubtractRound {
 
 // >= 12 varied rounds. Every column: top digit >= bottom digit (no borrow).
 export const SUBTRACT_ROUNDS: readonly SubtractRound[] = [
-  // Borrowing rounds: the ones digit on top is smaller, so a ten comes apart.
-  round(52, 27),
-  round(63, 38),
-  round(41, 19),
-  round(74, 46),
-  round(80, 35),
-  round(65, 28),
-  round(93, 57),
-  round(32, 14),
+  // Interleaved, so difficulty does not fall off a cliff after round eight.
   round(47, 12), // 4>=1, 7>=2
+  round(52, 27),
   round(58, 23), // 5>=2, 8>=3
+  round(63, 38),
   round(69, 34), // 6>=3, 9>=4
+  round(41, 19),
   round(85, 41), // 8>=4, 5>=1
+  round(74, 46),
   round(76, 25), // 7>=2, 6>=5
+  round(80, 35),
   round(99, 45), // 9>=4, 9>=5
+  round(65, 28),
   round(64, 30), // 6>=3, 4>=0
+  round(93, 57),
   round(38, 15), // 3>=1, 8>=5
+  round(32, 14),
   round(97, 52), // 9>=5, 7>=2
   round(55, 24), // 5>=2, 5>=4
   round(88, 33), // 8>=3, 8>=3
@@ -106,8 +106,15 @@ export function getSubtractFeedback(round: SubtractRound, selected: number): str
   const onesB = bottom % 10;
   const ones = onesT - onesB;
   const tens = tensT - tensB;
+  // Column-wise arithmetic printed a negative ones digit the moment a round
+  // borrowed: 52-27 read "2 - 7 = -5 ones". The borrow has to be narrated.
+  const why = round.borrows
+    ? `${onesT} is smaller than ${onesB}, so take a ten from the ${tensT}: `
+      + `${onesT + 10} − ${onesB} = ${onesT + 10 - onesB}. `
+      + `Then ${tensT - 1} − ${tensB} = ${tensT - 1 - tensB} tens. So ${answer}.`
+    : `${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens. So ${answer}.`;
   if (selected === answer) {
-    return `Correct. ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens, so ${top} − ${bottom} = ${answer}.`;
+    return `Correct. ${top} − ${bottom} = ${answer}. ${why}`;
   }
-  return `Not quite. Take away each column: ${onesT} − ${onesB} = ${ones} ones and ${tensT} − ${tensB} = ${tens} tens. Put them together: ${top} − ${bottom} = ${answer}.`;
+  return `Not quite. The answer is ${answer}. ${why}`;
 }

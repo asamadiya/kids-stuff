@@ -1,3 +1,4 @@
+import { ForTheParent } from './ForTheParent';
 import type { ComponentType } from 'react';
 import { toHash } from '../App';
 import { RikkiMascot } from './RikkiMascot';
@@ -207,6 +208,7 @@ export function PlayHub({ activeId }: PlayHubProps) {
             <span aria-hidden="true">&larr;</span> All exercises
           </a>
           <active.Component />
+          <ForTheParent id={active.meta.id} />
         </section>
       ) : (
         <div className="play-cats">
