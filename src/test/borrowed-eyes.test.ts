@@ -276,6 +276,12 @@ describe('borrowed eyes — the plan is the authority', () => {
 
   it('sets every figure inside the plan, with a width, a height and a kind', () => {
     for (const m of MOMENTS) {
+      // A floor on figure count is safe HERE, and would not be in The Wide
+      // View. There the roster had to match a painting nobody controlled, and
+      // a quota on observed content is what produced an invented shoe. This
+      // plan IS the drawing — the app renders these figures — so the floor
+      // constrains what an author writes, and there is no second artifact for
+      // it to contradict.
       expect(m.plan.figures.length).toBeGreaterThanOrEqual(4);
       expect(new Set(m.plan.figures.map((f) => f.id)).size).toBe(m.plan.figures.length);
       for (const f of m.plan.figures) {

@@ -553,7 +553,7 @@ export const STRIPS: readonly Strip[] = [
         },
         later: {
           image: `${IMG}-promised-mia-p3b`,
-          alt: 'The empty front step through the open door, no shoes on the mat, the street beyond it quiet.',
+          alt: 'Seen from inside past your own hands: the front door standing open onto an empty path, no shoes on the mat, and your sister waiting on the boards just inside it.',
           at: 'front-room',
         },
         afterWord: 'You stayed and threaded beads. Mia tipped the tin over after two minutes and went to find Dad.',

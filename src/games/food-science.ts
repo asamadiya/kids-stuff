@@ -27,14 +27,22 @@
  */
 import { counted, type Noun } from './nouns';
 
+/**
+ * The exercise registry calls this a `tagline` and the workshop registry calls
+ * it a `note`. Both are supplied so either can list this bench, and both are
+ * the same constant so they cannot drift apart.
+ */
+const FOOD_SCIENCE_NOTE =
+  'Take an egg apart, set milk into curd, and build a plate that reads back what it supplies.';
+
 export const FOOD_SCIENCE_META = {
   id: 'food-science',
   title: 'What Food Is Made Of',
   icon: '',
   color: 'leaf',
   eyebrow: 'Food science',
-  tagline: 'Take an egg apart, set milk into curd, and build a plate that reads back what it supplies.',
-  note: 'Take an egg apart, set milk into curd, and build a plate that reads back what it supplies.',
+  tagline: FOOD_SCIENCE_NOTE,
+  note: FOOD_SCIENCE_NOTE,
 } as const;
 
 /* --------------------------------------------------------------- nutrients */
@@ -212,7 +220,7 @@ export const FOODS: readonly Food[] = [
     'Kidney beans. The skin holds most of the fibre, so they are cooked with the skin on.'),
   food('dal', 'dal', 'bowl of dal', 'bowls of dal', '🥣', 'BOWL WITH SPOON', 'pulse', 'one cup cooked, 200 g',
     nut(18, 16, 0.8, 38, 6.6, 3), ['methionine'],
-    'Lentils. They carry more iron for their weight than almost anything else on this table.'),
+    'Lentils. One bowl carries more iron than any other single serving on this table.'),
   food('rice', 'rice', 'bowl of rice', 'bowls of rice', '🍚', 'COOKED RICE', 'grain', 'one cup cooked, 160 g',
     nut(4, 0.6, 0.4, 16, 0.2, 0), ['lysine'],
     'White rice has had the bran polished off, and the bran is where the fibre was.'),
@@ -251,7 +259,7 @@ export const FOODS: readonly Food[] = [
     'The fibre is pectin, the same stuff that makes jam set.'),
   food('orange', 'orange', 'orange', 'oranges', '🍊', 'TANGERINE', 'fruit', 'one medium, 130 g',
     nut(1.2, 3, 0.2, 52, 0.1, 70), null,
-    'Sailors worked out four hundred years ago that citrus stopped scurvy, two centuries before anyone knew vitamin C existed.'),
+    'Sailors worked out four hundred years ago that citrus stopped scurvy, three centuries before anyone knew vitamin C existed.'),
   food('lemon', 'lemon', 'lemon', 'lemons', '🍋', 'LEMON', 'fruit', 'the juice of one, 45 ml',
     nut(0.1, 0.1, 0, 3, 0, 19), null,
     'Sour because of citric acid, which is strong enough to set a pan of milk into curd.'),
@@ -672,7 +680,7 @@ export const EGG_PARTS: readonly EggPart[] = [
   {
     id: 'yolk',
     label: 'Yolk',
-    what: 'The chick’s food store: fat, vitamins A and D, and the yellow pigment it is named for. About a third of it is fat.',
+    what: 'The chick’s food store: fat, vitamins A and D, and the yellow pigment it is named for. About a quarter of it is fat, and about half is water.',
     color: '#8a6416',
     side: 'left',
     hit: (p) => Math.hypot(p.x - EGG.cx, p.y - EGG.cy) <= EGG.yolkR,

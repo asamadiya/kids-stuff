@@ -155,6 +155,24 @@ describe('the food table', () => {
     expect(card.color).toBe('leaf');
     expect(card.tagline.length).toBeGreaterThan(20);
     expect(card.tagline).not.toMatch(/!/);
+    // The workshop registry reads `note` and the exercise registry reads
+    // `tagline`; they are one constant, so neither can go stale.
+    expect(FOOD_SCIENCE_META.note).toBe(FOOD_SCIENCE_META.tagline);
+  });
+
+  it('states only claims the table itself can be checked against', () => {
+    // Two facts on the shelf are quantitative claims about the shelf. If the
+    // numbers move and the sentence does not, this fails.
+    const mostIron = FOODS.slice().sort((a, b) => b.per.iron - a.per.iron)[0];
+    expect(mostIron.id, 'the dal fact claims the most iron per serving').toBe('dal');
+    expect(foodById('dal')!.fact).toContain('more iron than any other single serving');
+
+    const rotiPerRice = foodById('roti')!.per.fibre / foodById('rice')!.per.fibre;
+    expect(Math.round(rotiPerRice), 'the roti fact claims about five times').toBe(5);
+    expect(foodById('roti')!.fact).toContain('five times the fibre');
+
+    expect(foodById('broccoli')!.per.vitaminC).toBeGreaterThan(foodById('orange')!.per.vitaminC);
+    expect(foodById('broccoli')!.fact).toContain('more vitamin C than an orange');
   });
 
   it('says what each nutrient does in the body rather than what to eat', () => {

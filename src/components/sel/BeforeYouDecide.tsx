@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   BEFORE_YOU_DECIDE_META, CASES, GLYPHS, QUESTION_KINDS, SHEET,
-  askedFacts, caseAt, casesDecided, chipFor, closingLine, factFor, factText, plateLines, readout,
-  sheetHeight, sheetRows, timelineMarks, unaskedFacts, unaskedKinds, unaskedLine,
+  askedFacts, caseAt, casesDecided, chipFor, closingLine, clockLine, factFor, factText, plateLines,
+  readout, sheetHeight, sheetRows, timelineMarks, unaskedFacts, unaskedKinds, unaskedLine,
 } from '../../sel/before-you-decide';
 import type { Case, Decided, Fact, QuestionKind } from '../../sel/before-you-decide';
 import { drawer } from '../../workshop/drawer';
@@ -44,45 +44,52 @@ function Plate({ id, alt, caption }: { id: string; alt: string; caption: string 
 /** A fact, drawn rather than painted: its question mark, its question, its sentence. */
 function FactCard({ subject, fact, prefix }: { subject: Case; fact: Fact; prefix?: string }) {
   return (
-    <div className="bench__figure" style={{ maxWidth: '18rem', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+    <div className="bench__figure" style={{ maxWidth: '20rem', display: 'flex', gap: '0.6rem', alignItems: 'flex-start', textAlign: 'left' }}>
       <Mark path={chipFor(fact.kind).path} size={26} colour={TEAL} />
       <div>
-        <p className="bench__figure-caption" style={{ margin: 0, color: FAINT }}>{prefix ?? fact.question}</p>
-        <p className="bench__figure-caption" style={{ margin: 0, color: INK }}>{factText(subject, fact)}</p>
+        <p className="bench__figure-caption" style={{ margin: 0, textAlign: 'left', color: FAINT }}>{prefix ?? fact.question}</p>
+        <p className="bench__figure-caption" style={{ margin: 0, textAlign: 'left', color: INK }}>{factText(subject, fact)}</p>
       </div>
     </div>
   );
 }
 
 /**
- * The clock question is a claim about time, so it is drawn as time: three stops
- * in order with the picture's stop filled in. Both this strip and the sentence
- * read aloud come from `Case.timeline`.
+ * The clock question is a claim about time, so it is drawn as time rather than
+ * said as a sentence: three stops in order, down the page so a stop can be as
+ * long as it needs to be, with the picture's stop filled in. This strip and the
+ * sentence read aloud both come from `Case.timeline`, and this replaces the
+ * clock fact's card rather than sitting beside it.
  */
 function Timeline({ subject }: { subject: Case }) {
   const marks = timelineMarks(subject);
-  const W = 560, H = 96, PAD = 34;
-  const x = (at: number) => PAD + at * (W - PAD * 2);
+  const W = 330, TOP = 30, STEP = 34, H = TOP + (marks.length - 1) * STEP + 34;
+  const y = (at: number) => TOP + at * (marks.length - 1) * STEP;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} role="img"
-      aria-label={`A line of ${marks.length} stops in time order. ${marks.map((m) => m.says).join(' ')}`}
+      aria-label={`${factFor(subject, 'clock').question} ${clockLine(subject)}`}
       style={{ display: 'block', width: '100%', maxWidth: `${W}px`, height: 'auto' }}>
       <rect x="0" y="0" width={W} height={H} fill={PAPER} />
-      <line x1={x(0)} y1="26" x2={x(1)} y2="26" stroke={RULE} strokeWidth="1" />
+      <text x="0" y="12" fontFamily="Inter, system-ui, sans-serif" fontSize="12" fill={FAINT}>
+        {factFor(subject, 'clock').question}
+      </text>
+      <line x1="9" y1={y(0)} x2="9" y2={y(1)} stroke={RULE} strokeWidth="1" />
       {marks.map((m) => (
         <g key={m.says}>
-          <circle cx={x(m.at)} cy="26" r="6" fill={m.isPicture ? OCHRE : 'none'}
+          <circle cx="9" cy={y(m.at)} r="5.5" fill={m.isPicture ? OCHRE : PAPER}
             stroke={m.isPicture ? OCHRE : RULE} strokeWidth="1.2" />
-          <text x={x(m.at)} y="50" textAnchor="middle" fontFamily="Inter, system-ui, sans-serif"
-            fontSize="11" fill={m.isPicture ? INK : FAINT}>
+          <text x="26" y={y(m.at) + 4} fontFamily="Inter, system-ui, sans-serif" fontSize="12"
+            fill={m.isPicture ? INK : FAINT}>
             {m.says}
           </text>
+          {m.isPicture && (
+            <text x="26" y={y(m.at) + 20} fontFamily="Inter, system-ui, sans-serif" fontSize="10"
+              letterSpacing="1.2" fill={OCHRE}>
+              THIS IS THE PICTURE
+            </text>
+          )}
         </g>
       ))}
-      <text x={x(subject.timeline.length > 0 ? marks[subject.pictureAt].at : 0)} y="74" textAnchor="middle"
-        fontFamily="Inter, system-ui, sans-serif" fontSize="10" letterSpacing="1.2" fill={OCHRE}>
-        THE PICTURE
-      </text>
     </svg>
   );
 }
@@ -138,7 +145,6 @@ export function BeforeYouDecide() {
 
   const height = sheetHeight(records);
   const standing = readout({ asked: asked.length, decided: chosen !== null, cases: casesDecided(records) });
-  const timeShown = asked.includes('clock') || turned;
 
   return (
     <section className="bench" aria-labelledby="before-you-decide-title">
@@ -155,15 +161,14 @@ export function BeforeYouDecide() {
         <div className="bench__row" style={{ alignItems: 'flex-start' }}>
           <Plate id={openCase.setupPanelId} alt={openCase.setupAlt} caption={openCase.setup} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {seen.map((fact) => (
-              <FactCard key={fact.kind} subject={openCase} fact={fact} />
-            ))}
-            {turned && held.map((fact) => (
-              <FactCard key={fact.kind} subject={openCase} fact={fact} prefix={unaskedLine(fact.kind)} />
-            ))}
+            {seen.map((fact) => (fact.kind === 'clock'
+              ? <Timeline key={fact.kind} subject={openCase} />
+              : <FactCard key={fact.kind} subject={openCase} fact={fact} />))}
+            {turned && held.map((fact) => (fact.kind === 'clock'
+              ? <Timeline key={fact.kind} subject={openCase} />
+              : <FactCard key={fact.kind} subject={openCase} fact={fact} prefix={unaskedLine(fact.kind)} />))}
           </div>
         </div>
-        {timeShown && <Timeline subject={openCase} />}
         {chosen && <p className="bench__note" style={{ marginTop: 'var(--space-4)' }}>{chosen.outcome}</p>}
         {turned && <p className="bench__note" style={{ marginTop: 'var(--space-3)' }}>{closingLine(openCase)}</p>}
       </div>

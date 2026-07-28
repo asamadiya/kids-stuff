@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "verify:build": "node scripts/verify-build.mjs",
-    "verify:body": "vitest run src/test/body-figure.test.ts src/test/body-figure-artifact.test.ts && python3 scripts/render-body-figure.py"
+    "verify:body": "vitest run src/test/body-figure.test.ts src/test/body-figure-artifact.test.ts && python3 scripts/render-body-figure.py",
+    "verify:wide-view": "vitest run src/test/the-wide-view.test.ts && node scripts/derive-wide-view.mjs --sheet"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",
