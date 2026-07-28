@@ -74,7 +74,7 @@ export function getSubtractOptions(i: number): number[] {
   const rest = [...set].filter((v) => v !== a);
   return placeOptions({
     gameId: 'two-digit-subtract', roundIndex: i % SUBTRACT_ROUNDS.length, answer: a,
-    distractors: rest, count: SUBTRACT_OPTION_COUNT,
+    distractors: [...rest, a - 10, a + 10, a - 1, a + 1, a - 2, a + 2].filter((v) => v >= 0 && v !== a), count: SUBTRACT_OPTION_COUNT,
   });
 }
 

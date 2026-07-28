@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FieldLog from '../components/workshop/FieldLog';
-import { clockLabel, isoDate, shortestShadow, type ShadowReading } from '../workshop/field-log';
+import { clockLabel, shortestShadow, type ShadowReading } from '../workshop/field-log';
 
 vi.mock('../workshop/say', () => ({
   say: vi.fn(),
@@ -11,7 +11,10 @@ vi.mock('../workshop/say', () => ({
 }));
 vi.mock('../workshop/tone', () => ({ pluck: vi.fn(), step: () => 440 }));
 
-const today = isoDate(new Date());
+// Pinned, not taken from the clock: the latitude derived from a fixed sun
+// altitude changes sign with the season, so `new Date()` makes this assertion
+// pass for part of the year and fail for the rest.
+const today = '2026-07-28';
 
 // The shadow bench is driven with roughly ninety clicks. userEvent's default
 // inter-event delay makes that the slowest test in the suite and, under load,

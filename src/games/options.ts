@@ -64,19 +64,53 @@ export interface PlaceOptions<T> {
  * id alone, so no property of the answer can influence where it lands.
  */
 export function placeOptions<T>({ gameId, roundIndex, answer, distractors, count }: PlaceOptions<T>): T[] {
-  const rest: T[] = [];
-  for (const d of distractors) {
-    if (rest.length >= count - 1) break;
-    if (d !== answer && !rest.includes(d)) rest.push(d);
+  /**
+   * Which distractors are taken decides the answer's RANK among the values, and
+   * rank is a second, independent leak: with the slot moving freely, money's
+   * answer was still the third-smallest of four in 14 of 14 rounds, so "take
+   * the third biggest" won without arithmetic. Shuffling cannot fix that — the
+   * chosen set has to straddle the answer unevenly.
+   *
+   * So each round is given a target rank from its own seed, and the set is
+   * filled with that many candidates below the answer and the remainder above,
+   * falling back to whatever exists when one side runs short.
+   */
+  const wanted = count - 1;
+  const usable = distractors.filter((d, i) => d !== answer && distractors.indexOf(d) === i);
+  const numeric = typeof answer === 'number' && usable.every((d) => typeof d === 'number');
+
+  let rest: T[];
+  if (numeric) {
+    const below = usable.filter((d) => (d as number) < (answer as number));
+    const above = usable.filter((d) => (d as number) > (answer as number));
+    const targetRank = hash(`${gameId}#rank#${roundIndex}`) % count;
+    const takeBelow = Math.min(targetRank, below.length, wanted);
+    const takeAbove = Math.min(wanted - takeBelow, above.length);
+    rest = [...below.slice(0, takeBelow), ...above.slice(0, takeAbove)];
+    // Top up from either side if one ran out, so the option count never drops.
+    for (const d of usable) {
+      if (rest.length >= wanted) break;
+      if (!rest.includes(d)) rest.push(d);
+    }
+  } else {
+    rest = usable.slice(0, wanted);
   }
 
   const size = rest.length + 1;
   const h = hash(gameId);
-  // Strides coprime to `size` cycle through every slot before repeating.
+  /**
+   * A pure stride is balanced but *cyclic*: it produced 0,1,2,3,0,1,2,3 for a
+   * four-option game, which a child playing the deck in order can read off
+   * without doing any arithmetic — the fixed-slot bug wearing a different hat.
+   * So the stride sets the base and a per-round hash rotates within the cycle,
+   * keeping the distribution balanced while removing the readable period.
+   */
   const strides: number[] = [];
   for (let s = 1; s < Math.max(2, size); s += 1) if (gcd(s, size) === 1) strides.push(s);
   const stride = strides.length ? strides[h % strides.length] : 1;
-  const slot = (((h % size) + roundIndex * stride) % size + size) % size;
+  const block = Math.floor(roundIndex / size);
+  const jitter = hash(`${gameId}#block${block}`) % size;
+  const slot = (((h % size) + roundIndex * stride + jitter) % size + size) % size;
 
   // The distractors are then shuffled among the remaining positions, so their
   // order is not a stable tell either.

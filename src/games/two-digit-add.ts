@@ -68,7 +68,8 @@ function buildRound(raw: RawRound, index: number): TwoDigitAddRound {
   uniq.delete(answer);
   const options = placeOptions({
     gameId: 'two-digit-add', roundIndex: index, answer,
-    distractors: Array.from(uniq), count: 3,
+    distractors: [...Array.from(uniq), answer - 10, answer + 10, answer - 1, answer + 1,
+                  answer - 2, answer + 2].filter((v) => v > 0 && v !== answer), count: 3,
   });
   return { a: raw.a, b: raw.b, answer, options };
 }
