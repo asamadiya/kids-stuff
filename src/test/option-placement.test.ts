@@ -108,3 +108,28 @@ describe('no dead options', () => {
     }
   });
 });
+
+describe('the answer is not findable by its value', () => {
+  /**
+   * Placement was only half the leak. Even with the slot moving, money's answer
+   * was the 3rd-smallest of four in 14 of 14 rounds and how-many-groups' rank
+   * was pinned too — so "pick the third biggest" won the game without any
+   * arithmetic. Rank is a property of which distractors were chosen, not of
+   * where they were placed, so no amount of shuffling fixes it: the distractor
+   * sets themselves have to straddle the answer unevenly.
+   */
+  const rankOfAnswer = (g: Registered, i: number): number => {
+    const sorted = [...g.options(i)].sort((a, b) => a - b);
+    return sorted.indexOf(g.answer(i));
+  };
+
+  it.each(GAMES.map((g) => [g.id, g] as const))('%s does not pin the answer to one rank', (_id, g) => {
+    const ranks = Array.from({ length: g.rounds }, (_, i) => rankOfAnswer(g, i));
+    const counts = new Map<number, number>();
+    for (const r of ranks) counts.set(r, (counts.get(r) ?? 0) + 1);
+    const worst = Math.max(...counts.values());
+    // A child should not be able to win by always taking the nth-smallest.
+    expect({ game: g.id, worst, ranks }).toMatchObject({ game: g.id });
+    expect(worst).toBeLessThan(g.rounds);
+  });
+});

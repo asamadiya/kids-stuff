@@ -86,7 +86,8 @@ export function getGroupsOptions(index: number): number[] {
   const [, ...rest] = opts;
   return placeOptions({
     gameId: 'groups-of', roundIndex: index % GROUPS_ROUNDS.length, answer,
-    distractors: rest, count: OPTION_COUNT,
+    distractors: [...rest, answer - 1, answer + 1, answer - 2, answer + 2, answer - round.per, answer + round.per]
+      .filter((v) => v > 0 && v !== answer), count: OPTION_COUNT,
   });
 }
 

@@ -203,7 +203,8 @@ export function getMoneyOptions(index: number): number[] {
   const rest = Array.from(opts).filter((v) => v !== answer);
   return placeOptions({
     gameId: 'money-coins', roundIndex: index % MONEY_ROUNDS.length, answer,
-    distractors: rest, count: MONEY_OPTION_COUNT,
+    distractors: [...rest, answer - 5, answer + 5, answer - 1, answer + 1, answer - 10, answer + 10]
+      .filter((v) => v > 0 && v <= 99 && v !== answer), count: MONEY_OPTION_COUNT,
   });
 }
 

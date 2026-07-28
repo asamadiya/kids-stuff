@@ -293,7 +293,10 @@ function shadowPlate(record: FieldRecord): ReactElement {
       {label('A STICK AND ITS SHADOW', 40, 54)}
       <text x={40} y={92} fontFamily={SERIF} fontSize={20} fill={PALETTE.ink} style={NUM}>
         {read.noon
-          ? `Sun ${read.noonAltitude} degrees up at ${clockLabel(read.noon.minutes)} · about ${Math.round(read.latitude)} degrees north`
+          // The hemisphere is read off the sign, not assumed. A shadow that
+          // points south puts you north of the sun; hard-coding "north" would
+          // print "about -12 degrees north" for a southern reading.
+          ? `Sun ${read.noonAltitude} degrees up at ${clockLabel(read.noon.minutes)} · about ${Math.abs(Math.round(read.latitude))} degrees ${read.latitude < 0 ? 'south' : 'north'}`
           : 'Measure the shadow every hour and the shortest one is local noon.'}
       </text>
       <line x1={40} y1={110} x2={920} y2={110} stroke={PALETTE.rule} strokeWidth={1} />
