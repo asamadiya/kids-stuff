@@ -73,7 +73,13 @@ function CropCard({
           alt=""
           width={f.imgW}
           height={f.imgH}
-          style={{ position: 'absolute', left: f.offsetX, top: f.offsetY, maxWidth: 'none' }}
+          style={{
+            position: 'absolute', left: f.offsetX, top: f.offsetY,
+            // The plate is scaled to exactly these pixels; the global
+            // `img { max-width: 100% }` in app.css would otherwise shrink it
+            // back inside the frame and the crop would show the whole room.
+            width: f.imgW, height: f.imgH, maxWidth: 'none',
+          }}
         />
       </span>
       <span

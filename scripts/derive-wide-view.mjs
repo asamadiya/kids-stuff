@@ -52,7 +52,7 @@
  *     node scripts/derive-wide-view.mjs            # census -> data file
  *     npx vitest run src/test/the-wide-view.test.ts  # writes artifacts/wide-view.json
  *     node scripts/derive-wide-view.mjs --sheet    # cuts every crop, renders the sheet
- *     <open artifacts/wide-view-contact.png and LOOK AT IT>
+ *     <open artifacts/wide-view-<room>.png and LOOK AT THEM>
  *     node scripts/derive-wide-view.mjs --approve  # freezes what you just saw
  *
  * The sheet is not a debug view. Its cards are the product surface: the app
@@ -622,12 +622,12 @@ ${cards}
 <h1>The Wide View — every person, cut out of the plate</h1>
 <p class="lede">Every card below is what the child is shown. If a card is a bookshelf, a
 patch of carpet or half a chair, that box is wrong — fix the census in
-scripts/derive-wide-view.mjs and regenerate. digest ${esc(art.digest ?? '')}</p>
+scripts/derive-wide-view.mjs and regenerate.</p>
 ${sections}
 `;
 }
 
-async function sheet() {
+function sheet() {
   const art = readArtifact();
   mkdirSync('artifacts', { recursive: true });
   writeFileSync(SHEET_HTML, sheetHtml(art));
@@ -644,10 +644,28 @@ async function sheet() {
  * Freeze the result of having looked. The digest covers every crop rectangle
  * and every generated sentence, so any change to a box, a pose, or the sentence
  * template makes the approval stale and the suite red with "look again".
+ *
+ * It refuses if the artifact is older than the census: approving a sheet that
+ * was cut from last week's boxes would freeze a look that never happened.
  */
 function approve() {
-  const digest = sha(readFileSync(ARTIFACT));
+  const art = readArtifact();
   const src = readFileSync(DATA_FILE, 'utf8');
+  const stale = [];
+  for (const room of art.rooms) {
+    for (const person of room.people) {
+      const box = person.box.map((v) => v.toFixed(3)).join(', ');
+      if (!src.includes(`id: '${person.id}', box: [${box}]`)) stale.push(`${room.id}/${person.id}`);
+    }
+    if (!src.includes(`plateSha: '${room.plateSha}'`)) stale.push(`${room.id}: plate`);
+  }
+  if (stale.length) {
+    console.error('The sheet was cut from boxes that are no longer in the data file:');
+    console.error(`  ${stale.slice(0, 8).join(', ')}${stale.length > 8 ? ` and ${stale.length - 8} more` : ''}`);
+    console.error('Run the tests and re-render the sheet, then look at it again.');
+    process.exit(1);
+  }
+  const digest = sha(readFileSync(ARTIFACT));
   if (!/looked: '[0-9a-f]*'/.test(src)) {
     console.error(`${DATA_FILE} has no SEAL.looked field. Regenerate it first.`);
     process.exit(1);
@@ -657,7 +675,7 @@ function approve() {
 }
 
 const arg = process.argv[2] ?? '';
-if (arg === '--sheet') await sheet();
+if (arg === '--sheet') sheet();
 else if (arg === '--approve') approve();
 else if (arg === '' || arg === '--derive') emit();
 else {

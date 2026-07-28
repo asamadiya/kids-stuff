@@ -235,7 +235,7 @@ export const CASES: readonly Case[] = [
     id: 'snack',
     title: 'The missing snack',
     setupPanelId: plate(`${P}-snack-setup`),
-    setupAlt: 'Your open school bag on the peg rail, the inside pocket empty, other bags hanging along the wall.',
+    setupAlt: 'Your own hands holding your school bag open at the peg rail, with other bags hanging along the rail behind it and boots under the bench.',
     setup: 'Your snack is not in your bag. Your bag is open.',
     timeline: [
       { says: 'At home your snack went into the bag.' },
@@ -292,7 +292,7 @@ export const CASES: readonly Case[] = [
     id: 'mia',
     title: 'Mia by your things',
     setupPanelId: plate(`${P}-mia-setup`),
-    setupAlt: 'Mia in her yellow romper sitting on the rug crying, next to your open box of small cars with one car on the floor.',
+    setupAlt: 'Seen from the doorway: Mia sitting on the rug crying with one arm out, beside your open box of small cars, with a car on the floor near her.',
     setup: 'Mia is crying. She is sitting beside your box of cars, and one car is on the floor.',
     timeline: [
       { says: 'Mia was standing by the low table.' },
@@ -349,7 +349,7 @@ export const CASES: readonly Case[] = [
     id: 'hello',
     title: 'The friend at the gate',
     setupPanelId: plate(`${P}-hello-setup`),
-    setupAlt: 'Seen from your own place at the school gate: a friend walking past close by, his face turned ahead, other families behind him.',
+    setupAlt: 'At the school gate, seen from behind two boys standing close together, one with a satchel and one with a bag over his shoulder, and families and children in the yard through the open gate.',
     setup: 'Your friend walked past you at the gate. He did not say hello.',
     timeline: [
       { says: 'He was away all last week.' },
@@ -406,7 +406,7 @@ export const CASES: readonly Case[] = [
     id: 'broken',
     title: 'The broken thing at the play date',
     setupPanelId: plate(`${P}-broken-setup`),
-    setupAlt: 'A painted wooden aeroplane lying in two pieces on a bedroom floor, another boy standing over it looking at you.',
+    setupAlt: 'Seen from the doorway with your own hand on the door: a wooden aeroplane lying in two pieces on a bedroom floor, another boy standing beyond it looking at you, and a girl at the edge of the frame.',
     setup: 'A wooden aeroplane is on the floor in two pieces. The other boy is looking at you.',
     timeline: [
       { says: 'The aeroplane came off the loose shelf.' },

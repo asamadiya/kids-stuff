@@ -327,6 +327,6 @@ export function roomById(id: string): Room | undefined {
  */
 export function keptLine(kept: readonly string[]): string {
   const n = kept.length;
-  if (n === 0) return 'You have not marked anybody yet.';
+  if (n === 0) return 'You have not kept anybody yet.';
   return `You kept ${n} ${n === 1 ? 'person' : 'people'}.`;
 }

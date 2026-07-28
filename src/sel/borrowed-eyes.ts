@@ -480,16 +480,16 @@ export const MOMENTS: readonly Moment[] = [
       across: 200,
       deep: 320,
       figures: [
-        { id: 'rail', x: 100, y: 258, across: 8, top: 96, kind: 'thing', label: 'the rail' },
-        { id: 'ladder', x: 100, y: 120, across: 3, top: 240, kind: 'thing', label: 'the ladder' },
+        { id: 'rail', x: 100, y: 246, across: 9, top: 96, kind: 'thing', label: 'the rail' },
+        { id: 'ladder', x: 96, y: 118, across: 7, top: 240, kind: 'thing', label: 'the ladder' },
         { id: 'trees', x: 30, y: 20, across: 40, top: 400, kind: 'thing', label: 'the trees' },
         { id: 'leo', x: 100, y: 285, across: 17, top: 118, kind: 'child', label: 'a boy at the foot of the ladder' },
-        { id: 'sam', x: 100, y: 215, across: 17, top: 112, kind: 'child', label: 'Sam' },
+        { id: 'sam', x: 128, y: 228, across: 17, top: 112, kind: 'child', label: 'Sam' },
         { id: 'small', x: 104, y: 120, across: 12, top: 200, kind: 'small one', label: 'a smaller boy up the steps' },
       ],
       eyes: [
         { viewId: 'yours', self: 'leo', x: 100, y: 285, height: 112, stance: 'standing', facing: -90, halfAngle: 58 },
-        { viewId: 'sam', self: 'sam', x: 100, y: 215, height: 106, stance: 'standing', facing: -90, halfAngle: 58 },
+        { viewId: 'sam', self: 'sam', x: 128, y: 228, height: 106, stance: 'standing', facing: -105, halfAngle: 58 },
       ],
     },
     views: [

@@ -70,6 +70,26 @@ describe('the field log bench', () => {
     expect(stage.getAttribute('aria-label')).toContain('ant, 5 across 2 entries');
   });
 
+  it('agrees its counts with its words, and does not print a date range of one day', async () => {
+    // "1 days out", "12 in 1" and "28 July 2026 to 28 July 2026" all shipped
+    // in the first draft of this plate.
+    const user = setup();
+    const { container } = render(<FieldLog />);
+    await logAFind('ant', 12);
+    const plate = container.querySelector('svg')!.textContent ?? '';
+    expect(plate).not.toMatch(/\b1 days\b/);
+    expect(plate).not.toMatch(/\b1 entries\b/);
+    expect(plate).toContain('1 day out');
+    expect(plate).toContain('12 in 1 entry');
+    expect(plate).not.toMatch(/(\d+ \w+ \d{4}) to \1/);
+
+    await user.click(screen.getByRole('button', { name: 'snail' }));
+    await user.click(screen.getByRole('button', { name: 'Keep this find' }));
+    const two = container.querySelector('svg')!.textContent ?? '';
+    expect(two).toContain('2 kinds');
+    expect(two).not.toMatch(/\b1 entries\b/);
+  });
+
   it('says what was kept, because he does not read fluently', async () => {
     const { say } = await import('../workshop/say');
     render(<FieldLog />);
@@ -127,7 +147,11 @@ describe('the stick, the shadow and where on the Earth he is', () => {
     }
   };
 
-  it('marks local noon on the shortest shadow, not on the middle reading or on the clock', async () => {
+  it('marks local noon on the shortest shadow, reads the sun off it, and keeps the day', async () => {
+    // One entry of the readings, three claims about it, because driving the
+    // stepper is the most expensive thing in this file and doing it three times
+    // made the test flaky under load rather than more informative.
+    const user = setup();
     const { container } = render(<FieldLog />);
     await enter();
 
@@ -139,31 +163,24 @@ describe('the stick, the shadow and where on the Earth he is', () => {
     expect(readings[Math.floor(readings.length / 2)]).not.toEqual(noon);
     expect(noon.minutes).not.toBe(12 * 60);
 
+    // (1) the marker on the plate sits on the shortest reading
     const svg = container.querySelector('svg')!;
     const circles = [...svg.querySelectorAll('circle')];
     expect(circles).toHaveLength(readings.length);
     const marked = circles.findIndex((c) => c.getAttribute('r') === '5');
     expect(marked).toBe(readings.findIndex((r) => r.minutes === noon.minutes));
-
     const noonText = [...svg.querySelectorAll('text')].filter((t) => t.textContent === 'local noon');
     expect(noonText).toHaveLength(1);
     expect(noonText[0].getAttribute('x')).toBe(circles[marked].getAttribute('cx'));
-  }, 20000);
 
-  it('reads back the sun\'s height and a latitude taken from it', async () => {
-    render(<FieldLog />);
-    await enter();
+    // (2) the words carry the angle and the latitude taken from it
     const words = screen.getByRole('img').getAttribute('aria-label') ?? '';
     expect(words).toContain('Shortest shadow 400 mm at 1:00 pm');
     // atan(1000 / 400) = 68.2 degrees, worked out on a calculator, not here.
     expect(words).toMatch(/the sun was 68\.2 degrees up/);
     expect(words).toMatch(/degrees north/);
-  });
 
-  it('keeps the whole day of readings in the drawer', async () => {
-    const user = setup();
-    render(<FieldLog />);
-    await enter();
+    // (3) the whole day goes into the drawer
     await user.click(screen.getByRole('button', { name: 'Keep this day of readings' }));
     const kept = JSON.parse(window.localStorage.getItem('ks.workshop.field-log.v1') ?? '[]');
     expect(kept).toHaveLength(1);

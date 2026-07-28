@@ -259,6 +259,18 @@ describe('the remedy is run, not chosen', () => {
   });
 });
 
+describe('the readout names, it does not tally', () => {
+  it('carries no denominator, so marking is not a set to complete', () => {
+    for (const times of [0, 1, 5]) {
+      for (const places of [0, 1, 3, REGIONS.length]) {
+        const line = coverageLine({ times, places, total: REGIONS.length });
+        expect(line).not.toMatch(/\bof the \d+\b/);
+        expect(line).not.toMatch(new RegExp(`\\b${REGIONS.length}\\b`));
+      }
+    }
+  });
+});
+
 describe('the record he keeps', () => {
   it('measures coverage of himself, never a ratio of right to wrong', () => {
     const records = [
@@ -266,9 +278,9 @@ describe('the record he keeps', () => {
       record({ before: ['hands'], after: [] }),
     ];
     expect(coverage(records)).toEqual({ times: 2, places: 3, total: 6 });
-    expect(coverageLine(coverage(records))).toBe('You have opened this 2 times. 3 of the 6 places marked.');
-    expect(coverageLine(coverage([]))).toBe('You have not opened this yet. 0 of the 6 places marked.');
-    expect(coverageLine(coverage([records[1]]))).toBe('You have opened this once. 1 of the 6 places marked.');
+    expect(coverageLine(coverage(records))).toBe('You have opened this 2 times. You have named three places.');
+    expect(coverageLine(coverage([]))).toBe('You have not opened this yet');
+    expect(coverageLine(coverage([records[1]]))).toBe('You have opened this once. You have named one place.');
   });
 
   it('writes the whole plate out in order, reading then remedy then comparison', () => {

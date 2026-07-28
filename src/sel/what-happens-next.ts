@@ -189,9 +189,9 @@ export const DRAWINGS: Readonly<Record<Gesture, Drawing>> = {
   },
   // The only gesture with a second pair of hands, and the arrow runs to them.
   give: {
-    thing: { x: 100, y: 82 },
-    yours: [{ x: 46, y: 90, turn: 90 }],
-    theirs: [{ x: 154, y: 90, turn: -90 }],
+    thing: { x: 88, y: 78 },
+    yours: [{ x: 36, y: 92, turn: 90 }],
+    theirs: [{ x: 166, y: 92, turn: -90 }],
     arrow: 'to-them',
   },
   raise: {
@@ -553,7 +553,7 @@ export const STRIPS: readonly Strip[] = [
         },
         later: {
           image: `${IMG}-promised-mia-p3b`,
-          alt: 'The empty front step through the open door, no shoes on the mat, the street beyond it quiet.',
+          alt: 'Seen from inside past your own hands: the front door standing open onto an empty path, no shoes on the mat, and your sister waiting on the boards just inside it.',
           at: 'front-room',
         },
         afterWord: 'You stayed and threaded beads. Mia tipped the tin over after two minutes and went to find Dad.',
@@ -588,7 +588,7 @@ export interface ArrowLine {
   readonly y2: number;
 }
 
-const CLEAR = 26;
+const CLEAR = 20;
 
 /**
  * Where the arrow runs, derived from the drawing. `to-them` ends at the other
@@ -609,7 +609,7 @@ export const arrowOf = (d: Drawing): ArrowLine | null => {
       return { x1: from.x + CLEAR, y1: from.y, x2: thing.x - CLEAR, y2: thing.y };
     }
     case 'up':
-      return { x1: thing.x, y1: thing.y + CLEAR + 18, x2: thing.x, y2: thing.y + CLEAR };
+      return { x1: thing.x, y1: thing.y + CLEAR + 26, x2: thing.x, y2: thing.y + CLEAR };
     case 'along':
       return { x1: thing.x + CLEAR, y1: thing.y, x2: thing.x + CLEAR + 44, y2: thing.y };
     case 'away':
@@ -618,6 +618,9 @@ export const arrowOf = (d: Drawing): ArrowLine | null => {
       return null;
   }
 };
+
+/** No arrow may be too short to read as an arrow. Asserted in the tests. */
+export const ARROW_FLOOR = 30;
 
 /**
  * The short label under the action panel. Derived from (gesture, thing) and the

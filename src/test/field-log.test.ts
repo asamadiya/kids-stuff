@@ -57,6 +57,21 @@ describe('the field log', () => {
     expect(PHASES.map((p) => p.key)).toEqual(['find', 'watch', 'shadow']);
   });
 
+  it('fits the tool registry WorkshopHub keeps, so wiring it cannot fail to compile', () => {
+    // WorkshopHub's ToolMeta is private to that module; this restates it where
+    // it can be checked.
+    interface ToolMeta {
+      readonly id: string;
+      readonly title: string;
+      readonly eyebrow: string;
+      readonly note: string;
+    }
+    const card: ToolMeta = FIELD_LOG_META;
+    expect(card.id).toBe('field-log');
+    expect(card.note.length).toBeGreaterThan(20);
+    expect(card.note).not.toMatch(/!/);
+  });
+
   it('offers a closed list of places and of things a creature can be doing', () => {
     expect(HABITAT_KEYS).toHaveLength(6);
     for (const k of HABITAT_KEYS) {
@@ -343,6 +358,24 @@ describe('the stick measures the sun, and the sun gives the latitude', () => {
     expect(words).toContain('pointed north');
     expect(shadowSummary(kept(composeShadow({ date: '2026-06-21', stickMm: 900, readings: [] }))))
       .toMatch(/no readings yet/);
+  });
+
+  it('says south when the stick says south, rather than "about -22 degrees north"', () => {
+    // A nearly overhead sun on the December solstice can only be seen from the
+    // southern hemisphere, so the latitude comes out negative and the words
+    // have to follow the sign.
+    const record = kept(composeShadow({
+      date: '2026-12-21', stickMm: 1000, readings: [{ minutes: 720, shadowMm: 20 }],
+    }));
+    const read = shadowReadout(record);
+    expect(read.latitude).toBeLessThan(0);
+    expect(read.latitude).toBeGreaterThan(-23.5);
+    // The formula always returns the branch where the sun is to the south, so
+    // the direction and the sign never contradict each other.
+    expect(read.points).toBe('north');
+    const words = shadowSummary(record);
+    expect(words).toContain('degrees south');
+    expect(words).not.toMatch(/-\d+ degrees/);
   });
 
   it('writes the clock the way a clock is written', () => {

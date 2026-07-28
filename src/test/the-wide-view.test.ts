@@ -232,13 +232,21 @@ describe('nothing about this exercise may demand that a room be crowded', () => 
   const quota = new RegExp(`(?:\\b(?:people|figures)\\.length\\b|\\bTOTAL_(?:PEOPLE|FIGURES)\\b)[^;\\n]*${min}`); // no-roster-floor
 
   const sources = (): { file: string; text: string }[] => {
+    // Comments quote the old assertions in order to explain them, so the guard
+    // reads code only — otherwise it fires on the paragraph describing it.
+    const code = (s: string): string =>
+      s.replace(/\/\*[\s\S]*?\*\//g, ' ')
+        .split('\n')
+        .filter((l) => !l.includes(TAG))
+        .map((l) => l.replace(/(^|[^:])\/\/.*$/, '$1'))
+        .join('\n');
     const out: { file: string; text: string }[] = [];
     for (const [dir, match] of [['src/test', /\.tsx?$/], ['src/sel', /\.ts$/], ['src/components/sel', /\.tsx$/]] as const) {
       for (const file of readdirSync(dir).filter((f) => match.test(f))) {
         const text = readFileSync(join(dir, file), 'utf8');
         // Only files that are about this exercise.
         if (!/the-wide-view|TOTAL_PEOPLE/.test(text)) continue;
-        out.push({ file: join(dir, file), text: text.split('\n').filter((l) => !l.includes(TAG)).join('\n') });
+        out.push({ file: join(dir, file), text: code(text) });
       }
     }
     return out;
@@ -454,7 +462,7 @@ describe('the one interpretive line, and its refusal', () => {
 
 describe('the readout counts what he kept and never what he missed', () => {
   it('states the number he kept with nothing to compare it against', () => {
-    expect(keptLine([])).toMatch(/not marked anybody/i);
+    expect(keptLine([])).toMatch(/not kept anybody/i);
     expect(keptLine(['a'])).toBe('You kept 1 person.');
     expect(keptLine(['a', 'b'])).toBe('You kept 2 people.');
   });
@@ -532,6 +540,23 @@ describe('the interface cuts people out instead of pointing at coordinates', () 
     expect(screen.getByText(CLOSING_LINE)).toBeInTheDocument();
     // A generated line for every person, in both accounts together.
     for (const p of room.people) expect(screen.getAllByText(sentenceFor(p)).length).toBeGreaterThan(0);
+  });
+
+  it('positions the plate so the card shows the box and not the whole room', () => {
+    const { container } = render(createElement(TheWideView));
+    fireEvent.click(screen.getByRole('button', { name: 'I have looked' }));
+    const room = ROOMS[0];
+    const p = room.people[0];
+    const card = screen.getByRole('button', { name: sentenceFor(p) });
+    const img = card.querySelector('img') as HTMLImageElement;
+    const f = cropFrame(p, room, 132, 168);
+    expect(img.style.left).toBe(`${f.offsetX}px`);
+    expect(img.style.top).toBe(`${f.offsetY}px`);
+    expect(img.style.width).toBe(`${f.imgW}px`);
+    // Without this the global `img { max-width: 100% }` shrinks the plate back
+    // inside the frame and every card becomes the same whole room.
+    expect(img.style.maxWidth).toBe('none');
+    expect(container.querySelectorAll('img')).toHaveLength(room.people.length);
   });
 
   it('has no coverage counter and nothing that files a child as needing something', () => {

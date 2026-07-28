@@ -429,7 +429,12 @@ export function coverage(records: readonly BodyCheckRecord[]): Coverage {
 export function coverageLine(c: Coverage): string {
   const times = c.times === 1 ? 'once' : `${c.times} times`;
   const opened = c.times === 0 ? 'You have not opened this yet' : `You have opened this ${times}`;
-  return `${opened}. ${c.places} of the ${c.total} places marked.`;
+  // No denominator. "2 of the 6 places marked" turns noticing where something
+  // sits in your body into a collection to complete, and there is no reason a
+  // child should mark all six.
+  if (c.places === 0) return opened;
+  const part = c.places === 1 ? 'one place' : `${countWord(c.places)} places`;
+  return `${opened}. You have named ${part}.`;
 }
 
 /* --------------------------------------------------------------------- date */

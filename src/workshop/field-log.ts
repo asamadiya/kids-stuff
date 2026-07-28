@@ -496,7 +496,7 @@ export function shadowSummary(record: FieldRecord): string {
     `Stick ${record.stickMm} mm. Shortest shadow ${read.noon.shadowMm} mm at ${clockLabel(read.noon.minutes)}, ` +
     `so that was local noon and the sun was ${read.noonAltitude} degrees up. ` +
     `On ${formatDate(record.date)} the sun stands over ${read.declination} degrees, ` +
-    `so the stick puts you at about ${Math.round(read.latitude)} degrees north. ` +
+    `so the stick puts you at about ${Math.abs(Math.round(read.latitude))} degrees ${read.latitude < 0 ? 'south' : 'north'}. ` +
     `At noon the shadow pointed ${read.points}.${contrast}`
   );
 }
