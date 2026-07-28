@@ -1,11 +1,18 @@
 import { useMemo, useRef, useState } from 'react';
 import {
+  ACTION_FIELD,
+  PALM,
   STRIPS,
+  THINGS,
   WHATHAPPENSNEXT_META,
+  actionWordOf,
+  arrowOf,
   bothWalked,
   coverageLine,
+  drawingOf,
   nextStripId,
   otherRoad,
+  placeSays,
   plateFilename,
   plateLines,
   roadKey,
@@ -39,6 +46,61 @@ const TEAL = '#2a5957';
 
 const src = (p: Panel): string => `${import.meta.env.BASE_URL}games/sel/${p.image}.png`;
 
+/**
+ * The action, drawn. Hands, the thing, and an arrow whose direction comes from
+ * the same record that places the other person's hands — so "out to him" cannot
+ * be printed over a drawing of him handing it to you.
+ */
+function Action({ strip, road }: { strip: Strip; road: Road }) {
+  const d = drawingOf(road);
+  const arrow = arrowOf(d);
+  const thing = THINGS[road.thing];
+  const { width, height } = ACTION_FIELD;
+  const hand = (h: { x: number; y: number; turn: number }, i: number, colour: string) => (
+    <g key={`${colour}-${i}`} transform={`translate(${h.x} ${h.y}) rotate(${h.turn})`}>
+      <path d={PALM} fill="none" stroke={colour} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  );
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} aria-hidden="true"
+      focusable="false" style={{ display: 'block', border: `1px solid ${RULE}`, background: PAPER }}>
+      <g transform={`translate(${d.thing.x - 24} ${d.thing.y - 24})`}>
+        {thing.glyph.map((p) => (
+          <path key={p} d={p} fill="none" stroke={INK} strokeWidth="1.6"
+            strokeLinecap="round" strokeLinejoin="round" />
+        ))}
+      </g>
+      {d.yours.map((h, i) => hand(h, i, INK))}
+      {d.theirs.map((h, i) => hand(h, i, FAINT))}
+      {arrow && (
+        <g stroke={TEAL} strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+          <line x1={arrow.x1} y1={arrow.y1} x2={arrow.x2} y2={arrow.y2} />
+          <path d={headOf(arrow)} />
+        </g>
+      )}
+      <text x="10" y={height - 10} fontFamily="Inter, sans-serif" fontSize="10" letterSpacing="1.2" fill={FAINT}>
+        {road.gesture.toUpperCase()}
+      </text>
+      <text x={width - 10} y={height - 10} textAnchor="end" fontFamily="Inter, sans-serif"
+        fontSize="10" letterSpacing="1.2" fill={FAINT}>
+        {strip.other.name.toUpperCase()}
+      </text>
+    </svg>
+  );
+}
+
+/** A short arrow head at the far end, turned along the line. */
+function headOf(a: { x1: number; y1: number; x2: number; y2: number }): string {
+  const angle = Math.atan2(a.y2 - a.y1, a.x2 - a.x1);
+  const wing = (turn: number) => [
+    a.x2 - Math.cos(angle + turn) * 8,
+    a.y2 - Math.sin(angle + turn) * 8,
+  ];
+  const [lx, ly] = wing(0.45);
+  const [rx, ry] = wing(-0.45);
+  return `M${lx.toFixed(1)} ${ly.toFixed(1)} L${a.x2} ${a.y2} L${rx.toFixed(1)} ${ry.toFixed(1)}`;
+}
+
 export function WhatHappensNext() {
   const [stripId, setStripId] = useState<string>(STRIPS[0].id);
   const [chosen, setChosen] = useState<RoadId | null>(null);
@@ -61,7 +123,7 @@ export function WhatHappensNext() {
       setWalked((w) => [...w, key]);
     }
     pluck(step(-5));
-    say(road.afterWord);
+    say(`${actionWordOf(strip, road)} ${road.afterWord}`);
   };
 
   const extend = () => {
@@ -82,21 +144,22 @@ export function WhatHappensNext() {
   const keepPlate = () => {
     const svg = svgRef.current;
     if (!svg) return;
-    void exportPlate(svg, { title: `Two roads: ${strip.place}`, lines }, plateFilename(strip)).then((ok) => {
+    void exportPlate(svg, { title: `Two roads: ${placeSays(strip.place)}`, lines }, plateFilename(strip)).then((ok) => {
       if (!ok) return;
-      const made = plateRack.add({ strip: strip.id, title: strip.place });
+      const made = plateRack.add({ strip: strip.id, title: placeSays(strip.place) });
       setKept((k) => [...k, made]);
     });
   };
 
   /**
    * The two roads sit side by side so the fork reads as one choice rather than
-   * two sequential steps, and each is captioned with what the hands actually do
-   * — a caption of "what your hands did" on both is no help in choosing.
+   * two sequential steps. Each is a drawing of what the hands do, and its label
+   * is generated from the same (gesture, thing) the drawing is generated from.
    */
   const roadChoice = (road: Road) => {
     const isChosen = chosen === road.id;
     const faded = chosen !== null && !isChosen;
+    const word = actionWordOf(strip, road);
     return (
       <div
         className="bench__figure"
@@ -107,18 +170,12 @@ export function WhatHappensNext() {
           type="button"
           className={`bench-part${isChosen ? ' is-set' : ''}`}
           aria-pressed={isChosen}
-          aria-label={`${road.actionWord} ${road.action.alt}`}
+          aria-label={word}
           onClick={() => walk(road.id)}
         >
-          <img
-            src={src(road.action)}
-            alt={road.action.alt}
-            width={200}
-            height={156}
-            style={{ display: 'block', border: `1px solid ${RULE}` }}
-          />
+          <Action strip={strip} road={road} />
         </button>
-        <p className="bench__figure-caption">{road.actionWord}</p>
+        <p className="bench__figure-caption">{word}</p>
         {faded && <p className="bench__figure-caption">the road not taken</p>}
       </div>
     );
@@ -198,7 +255,7 @@ export function WhatHappensNext() {
         >
           <rect x="0" y="0" width={W} height={H} fill={PAPER} />
           <text x="24" y="30" fontFamily="Inter, sans-serif" fontSize="12" letterSpacing="1.6" fill={FAINT}>
-            TWO ROADS — {strip.place.toUpperCase()}
+            TWO ROADS — {placeSays(strip.place).toUpperCase()}
           </text>
           <line x1="24" y1="42" x2={W - 24} y2="42" stroke={RULE} strokeWidth="1" />
 
@@ -282,7 +339,7 @@ export function WhatHappensNext() {
             type="button"
             className={`bench-part${s.id === strip.id ? ' is-set' : ''}`}
             aria-pressed={s.id === strip.id}
-            aria-label={`Go to the strip at ${s.place}. ${s.setup.alt}`}
+            aria-label={`Go to the strip at ${placeSays(s.place)}. ${s.setup.alt}`}
             onClick={() => goToStrip(s.id)}
           >
             <img
@@ -340,7 +397,7 @@ export function WhatHappensNext() {
       </div>
 
       <div className="plate-print">
-        <p className="plate-print__title">Two roads: {strip.place}</p>
+        <p className="plate-print__title">Two roads: {placeSays(strip.place)}</p>
         {lines.map((line) => (
           <p key={line} className="plate-print__line">{line}</p>
         ))}

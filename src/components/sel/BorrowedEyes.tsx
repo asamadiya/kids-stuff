@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   BORROWED_EYES_META, CHIPS, MOMENTS,
-  bothSentences, chipAt, chipById, chipClause, chipWord, coverageLine, earlierChip,
-  momentComplete, nextNotch, notchAngle, plateChips, plateLines, readingFor, sentenceFor,
-  slotKey, wrapWords,
+  bothSentences, chipAt, chipById, chipClause, chipWord, coneIn, coverageLine, earlierChip,
+  eyeFor, eyeLineIn, hiddenFrom, momentComplete, nextNotch, notchAngle, plateChips, plateLines,
+  readingFor, seesIn, sentenceFor, slotKey, spotsIn, wrapWords,
 } from '../../sel/borrowed-eyes';
 import type { ChipId, Moment, Other, Placed, PlateChip, View } from '../../sel/borrowed-eyes';
 import { drawer } from '../../workshop/drawer';
@@ -87,6 +87,61 @@ function ChipGlyph({ id, tint }: { id: ChipId; tint: string }) {
   }
 }
 
+/* ------------------------------------------------------------------- plan -- */
+
+const PLAN_W = 360, PLAN_H = 300;
+
+/**
+ * The room from above, with the standing eye's cone drawn over it and every
+ * figure that eye cannot see left hollow. Nothing here is asserted: the cone,
+ * the positions and the hollow marks are all read off the same plan the spoken
+ * sentence is generated from.
+ */
+function RoomPlan({ moment, view }: { moment: Moment; view: View }) {
+  const eye = eyeFor(moment.plan, view.id);
+  const spots = spotsIn(moment.plan, PLAN_W, PLAN_H);
+  const cone = coneIn(moment.plan, eye, PLAN_W, PLAN_H);
+  const covered = new Set(hiddenFrom(moment.plan, eye).map((s) => s.figure.id));
+  return (
+    <svg viewBox={`0 0 ${PLAN_W} ${PLAN_H}`} role="img"
+      aria-label={`${moment.where}, seen from above. ${seesIn(moment, view)}`}
+      style={{ display: 'block', width: '100%', maxWidth: `${PLAN_W}px`, height: 'auto' }}>
+      <rect x="0" y="0" width={PLAN_W} height={PLAN_H} fill={PAPER} />
+      <clipPath id={`plan-${moment.id}`}>
+        <rect x="0" y="0" width={PLAN_W} height={PLAN_H} />
+      </clipPath>
+      <g clipPath={`url(#plan-${moment.id})`}>
+        <path
+          d={`M${cone.x} ${cone.y} L${cone.left[0]} ${cone.left[1]} L${cone.right[0]} ${cone.right[1]} Z`}
+          fill={SUNKEN}
+          stroke={RULE}
+          strokeWidth="1"
+        />
+      </g>
+      {spots.map((s) => {
+        const self = s.figure.id === eye.self;
+        const hidden = covered.has(s.figure.id);
+        return (
+          <g key={s.figure.id}>
+            <circle cx={s.x} cy={s.y} r={s.r}
+              fill={self ? OCHRE : hidden ? PAPER : RAISED}
+              stroke={self ? OCHRE : hidden ? RULE : INK}
+              strokeWidth="1.2"
+              strokeDasharray={hidden ? '3 3' : undefined} />
+            <text x={s.x} y={s.y - s.r - 4} textAnchor="middle" fontFamily="Inter, sans-serif"
+              fontSize="9" fill={hidden ? FAINT : INK}>
+              {s.figure.label}
+            </text>
+          </g>
+        );
+      })}
+      <text x="8" y={PLAN_H - 8} fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="1.2" fill={FAINT}>
+        {`${moment.plan.across} BY ${moment.plan.deep} CENTIMETRES, FROM ABOVE`}
+      </text>
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------- the exhibit -- */
 
 export function BorrowedEyes() {
@@ -110,13 +165,13 @@ export function BorrowedEyes() {
   const goTo = (index: number, next = 0) => {
     setMomentIndex(index);
     setNotch(next);
-    say(MOMENTS[index].views[next].sees);
+    say(seesIn(MOMENTS[index], MOMENTS[index].views[next]));
   };
 
   const turn = (to: number) => {
     setNotch(to);
     pluck(step(to === 0 ? -5 : 2), 0.3);
-    say(views[to].sees);
+    say(seesIn(moment, views[to]));
   };
 
   const place = (id: ChipId) => {
@@ -161,24 +216,22 @@ export function BorrowedEyes() {
       </div>
 
       <div className="bench__stage">
-        <div
-          style={{
-            position: 'relative', width: '100%', aspectRatio: '640 / 498',
-            border: `1px solid ${RULE}`, background: SUNKEN, overflow: 'hidden',
-          }}
-        >
-          {views.map((v, i) => (
+        <div className="bench__row" style={{ alignItems: 'flex-start' }}>
+          <figure className="bench__figure" style={{ margin: 0, flex: '1 1 20rem' }}>
             <img
-              key={v.id}
-              src={`${import.meta.env.BASE_URL}games/sel/${v.imageId}.png`}
-              alt={v.alt}
-              aria-hidden={i !== notch}
+              src={`${import.meta.env.BASE_URL}games/sel/${moment.imageId}.png`}
+              alt={moment.alt}
               style={{
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                objectFit: 'cover', opacity: i === notch ? 1 : 0, transition: 'opacity 520ms ease',
+                display: 'block', width: '100%', height: 'auto',
+                border: `1px solid ${RULE}`, background: SUNKEN,
               }}
             />
-          ))}
+            <figcaption className="bench__figure-caption">{moment.where}</figcaption>
+          </figure>
+          <figure className="bench__figure" style={{ margin: 0, flex: '1 1 20rem' }}>
+            <RoomPlan moment={moment} view={view} />
+            <figcaption className="bench__figure-caption">{seesIn(moment, view)}</figcaption>
+          </figure>
         </div>
 
         <div className="bench__row" style={{ marginTop: 'var(--space-4)', gap: 'var(--space-4)' }}>
@@ -211,7 +264,7 @@ export function BorrowedEyes() {
               onClick={() => turn(i)}
             >
               {v.whose}
-              <span className="bench__figure-caption" style={{ display: 'block' }}>{v.eyeLine}</span>
+              <span className="bench__figure-caption" style={{ display: 'block' }}>{eyeLineIn(moment, v)}</span>
             </button>
           ))}
         </div>

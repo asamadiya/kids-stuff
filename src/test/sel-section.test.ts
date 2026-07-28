@@ -18,7 +18,7 @@ const stripComments = (src: string): string =>
  * one is a deliberate act rather than a silent way for an exercise to escape
  * the guards below.
  */
-const SUPPORT = new Set(['body-figure.ts']);
+const SUPPORT = new Set(['body-figure.ts', 'the-wide-view.data.ts']);
 
 const modules = readdirSync(dir).filter((f) => f.endsWith('.ts') && !SUPPORT.has(f))
   .map((f) => ({ file: f, text: stripComments(readFileSync(join(dir, f), 'utf8')) }));

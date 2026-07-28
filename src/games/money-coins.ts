@@ -1,7 +1,20 @@
 import { placeOptions } from './options';
-// Coin Counter — pure typed logic module (no React).
-// Practical money math: count dimes (10c), nickels (5c), pennies (1c).
-// Totals kept <= 50c. Deterministic options always include the correct answer.
+
+/**
+ * Coin Counter — how much money is on the table.
+ *
+ * The first version asked `10c + 10c + 10c + 10c + 1c + 1c = how many cents?`
+ * and drew every coin at the same size with its value stamped on the face, in a
+ * row marked `aria-hidden`. The question contained its own answer, the coins
+ * were decoration, and the one thing worth learning — that a dime is ten and a
+ * nickel is five, and that you tell them apart by looking — never came up.
+ *
+ * So the prompt no longer names any value. The coins carry the legends real US
+ * coins carry (which are words, not numerals: a dime says ONE DIME) at their
+ * real relative diameters, and each rendered coin exposes `data-kind`, so the
+ * total on the table can be recomputed from the picture — which is what
+ * `src/test/money-coins.test.ts` does.
+ */
 
 export const MONEY_COINS_META = {
   id: 'money-coins',
@@ -12,6 +25,9 @@ export const MONEY_COINS_META = {
 } as const;
 
 export type CoinKind = 'dime' | 'nickel' | 'penny';
+
+/** Display order: biggest value first, which is also how you count a handful. */
+export const COIN_KINDS: readonly CoinKind[] = ['dime', 'nickel', 'penny'];
 
 export const COIN_VALUE: Record<CoinKind, number> = {
   dime: 10,
@@ -32,6 +48,62 @@ export const COIN_PLURAL: Record<CoinKind, string> = {
   penny: 'Pennies',
 };
 
+/**
+ * What is actually written on the coin. No US circulating coin prints its value
+ * as a numeral — the dime says ONE DIME, the nickel FIVE CENTS, the cent ONE
+ * CENT — so a face with "10c" on it was never a picture of a dime.
+ */
+export const COIN_LEGEND: Record<CoinKind, string> = {
+  dime: 'ONE DIME',
+  nickel: 'FIVE CENTS',
+  penny: 'ONE CENT',
+};
+
+/** Diameter in millimetres, US Mint specification. A dime is the smallest of the three. */
+export const COIN_MM: Record<CoinKind, number> = {
+  dime: 17.91,
+  nickel: 21.21,
+  penny: 19.05,
+};
+
+/** Edge finish — the other way to tell a dime from a penny without looking. */
+export const COIN_EDGE: Record<CoinKind, string> = {
+  dime: 'reeded',
+  nickel: 'smooth',
+  penny: 'smooth',
+};
+
+/**
+ * Ink sampled from `src/styles/tokens.css`. Cupronickel coins in sunken paper,
+ * the cent in terracotta; the test checks these still match the tokens.
+ */
+export const MONEY_PALETTE = {
+  silver: '#eae4d5', // --paper-sunken
+  silverLine: '#4b4739', // --ink-soft
+  copper: '#9e4b27', // --terracotta
+  copperLine: '#22211b', // --ink
+  copperInk: '#f4f0e6', // --paper
+} as const;
+
+export interface CoinFace {
+  readonly fill: string;
+  readonly line: string;
+  readonly ink: string;
+}
+
+/** Dimes and nickels are the same alloy and the same colour; size and legend tell them apart. */
+export const COIN_FACE: Record<CoinKind, CoinFace> = {
+  dime: { fill: MONEY_PALETTE.silver, line: MONEY_PALETTE.silverLine, ink: MONEY_PALETTE.silverLine },
+  nickel: { fill: MONEY_PALETTE.silver, line: MONEY_PALETTE.silverLine, ink: MONEY_PALETTE.silverLine },
+  penny: { fill: MONEY_PALETTE.copper, line: MONEY_PALETTE.copperLine, ink: MONEY_PALETTE.copperInk },
+};
+
+/** Pixels per millimetre. One scale for every coin, so the sizes stay in proportion. */
+export const COIN_PX_PER_MM = 3.2;
+
+/** The question. It names no coin and no number: the coins on the table are the question. */
+export const MONEY_PROMPT = 'How much is this?';
+
 export interface CoinCount {
   kind: CoinKind;
   count: number;
@@ -42,24 +114,32 @@ export interface MoneyRound {
   coins: CoinCount[];
 }
 
+/** The coins on the table, one entry per coin, in the order they are laid out. */
+export function coinsOf(round: MoneyRound): CoinKind[] {
+  const out: CoinKind[] = [];
+  for (const c of round.coins) {
+    for (let i = 0; i < c.count; i += 1) out.push(c.kind);
+  }
+  return out;
+}
+
+/**
+ * Add up a handful of coins. The component lays out `coinsOf(round)` and the
+ * test reads the kinds back off the rendered coins and calls this, so the total
+ * being scored is the total that is on the screen.
+ */
+export function totalOf(kinds: readonly CoinKind[]): number {
+  return kinds.reduce((sum, kind) => sum + COIN_VALUE[kind], 0);
+}
+
 /** Sum a round's coins to its total in cents. */
 export function roundTotal(round: MoneyRound): number {
-  return round.coins.reduce((sum, c) => sum + COIN_VALUE[c.kind] * c.count, 0);
+  return totalOf(coinsOf(round));
 }
 
-/** Build the "10c + 5c + 1c" style expression string for the prompt. */
-export function roundExpression(round: MoneyRound): string {
-  const parts: string[] = [];
-  for (const c of round.coins) {
-    const cents = COIN_VALUE[c.kind];
-    for (let i = 0; i < c.count; i += 1) parts.push(`${cents}c`);
-  }
-  return parts.join(' + ');
-}
-
-/** Total number of coins in a round (for aria / summaries). */
+/** Total number of coins in a round. */
 export function roundCoinCount(round: MoneyRound): number {
-  return round.coins.reduce((sum, c) => sum + c.count, 0);
+  return coinsOf(round).length;
 }
 
 const d = (count: number): CoinCount => ({ kind: 'dime', count });
@@ -93,8 +173,8 @@ export const MONEY_OPTION_COUNT = 4;
 
 /**
  * Deterministic option builder. Always includes the correct total, pads with
- * plausible near-miss distractors, and returns exactly MONEY_OPTION_COUNT
- * sorted ascending. Totals are all <= 50c so options stay in range.
+ * plausible near-miss distractors, and returns exactly MONEY_OPTION_COUNT.
+ * Totals are all <= 50c so options stay in range.
  */
 export function getMoneyOptions(index: number): number[] {
   const round = MONEY_ROUNDS[index % MONEY_ROUNDS.length];
@@ -127,28 +207,26 @@ export function getMoneyOptions(index: number): number[] {
   });
 }
 
-/** Format a cents value as a friendly label, e.g. 16 -> "16c". */
+/** Format a cents value with the cent sign, e.g. 16 -> "16¢". */
 export function centsLabel(cents: number): string {
-  return `${cents}c`;
+  return `${cents}¢`;
 }
 
-/** A short breakdown like "1 dime + 1 nickel + 1 penny" for feedback. */
+/** The sum written out: "1 dime (10¢) + 1 nickel (5¢) + 1 penny (1¢)". */
 export function roundBreakdown(round: MoneyRound): string {
-  const parts = round.coins.map((c) => {
-    const name = COIN_LABEL[c.kind].toLowerCase();
-    const plural = c.count === 1 ? name : COIN_PLURAL[c.kind].toLowerCase();
-    return `${c.count} ${plural}`;
-  });
-  return parts.join(' + ');
+  return round.coins
+    .map((c) => {
+      const name = c.count === 1 ? COIN_LABEL[c.kind] : COIN_PLURAL[c.kind];
+      return `${c.count} ${name.toLowerCase()} (${centsLabel(COIN_VALUE[c.kind])})`;
+    })
+    .join(' + ');
 }
 
-/** Warm feedback for ANY choice — never says wrong/no/fail. */
+/** States the sum. Does not grade the child, and does not withhold the working. */
 export function getMoneyFeedback(index: number, selected: number): string {
   const round = MONEY_ROUNDS[index % MONEY_ROUNDS.length];
   const answer = roundTotal(round);
-  const breakdown = roundBreakdown(round);
-  if (selected === answer) {
-    return `Correct. ${breakdown} adds up to ${answer}c.`;
-  }
-  return `Not quite. Count them up: ${breakdown} makes ${answer}c. Dimes are 10, nickels 5, pennies 1 — add them all!`;
+  const sum = `${roundBreakdown(round)} = ${centsLabel(answer)}`;
+  if (selected === answer) return `Correct. ${sum}.`;
+  return `That is ${centsLabel(selected)}. On the table: ${sum}.`;
 }

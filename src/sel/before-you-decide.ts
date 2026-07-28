@@ -10,6 +10,28 @@
  *
  * Two of the five cases cannot be settled even after all three facts. That is
  * the point of them, not a gap in the writing.
+ *
+ * ONE CASE, ONE PICTURE.
+ *
+ * This module used to give every fact its own plate and caption them as the
+ * same place — "The same carpet a few minutes earlier". They were not. The
+ * tower case shipped three painted rooms: a blue/green/ochre checkerboard
+ * carpet with untreated pale-wood blocks (setup), a grey-taupe flat-weave with
+ * a coat rack, a glass garden door and blocks painted teal/terracotta/cream
+ * (clock), and a mottled blue/brown carpet with a bookshelf (hand). Nothing in
+ * the code connected the three files, so nothing could keep the claim true,
+ * and a five-year-old comparing them learns that the words overrule the
+ * picture.
+ *
+ * So `Fact` has no field that can hold a plate. The only plate id in the module
+ * is `Case.setupPanelId`, it is a branded `PlateId` that only `plate()` makes,
+ * and a test requires it to equal `<module>-<case>-setup`. "The same carpet" is
+ * now true because there is exactly one carpet and the compiler will not let a
+ * fact name a second one.
+ *
+ * The clock fact is a claim about TIME, which no second painting can carry, so
+ * it is not a painting: the case owns a three-stop timeline and both the drawn
+ * strip and the spoken sentence are derived from that one array.
  */
 
 export const BEFORE_YOU_DECIDE_META = {
@@ -37,16 +59,47 @@ export interface Chip {
   readonly path: string;
 }
 
-export interface FactPanel {
-  readonly kind: QuestionKind;
-  /** games/sel/<panelId>.png */
-  readonly panelId: string;
-  readonly alt: string;
-  /** The question in this case's own terms, read aloud before the fact. */
-  readonly question: string;
-  /** Stated flat, in the second person. No inference. */
-  readonly fact: string;
-  readonly effect: FactEffect;
+/**
+ * A plate id. Branded so that the only way to make one is `plate()`, and the
+ * only field in this module typed as one is `Case.setupPanelId`. A fact cannot
+ * name a picture because no fact has a field this type could go in.
+ */
+export type PlateId = string & { readonly __plate: unique symbol };
+
+const plate = (id: string): PlateId => id as PlateId;
+
+/**
+ * A fact bought with a question.
+ *
+ * Deliberately has no plate, no alt and no image: a fact is a sentence about
+ * the ONE picture the case already shows. The `clock` arm carries no sentence
+ * at all — its text is derived from `Case.timeline`, which is also what the
+ * timeline strip is drawn from, so the words and the drawing are one array.
+ */
+export type Fact =
+  | {
+    readonly kind: 'eye';
+    /** The question in this case's own terms, read aloud before the fact. */
+    readonly question: string;
+    /** Stated flat, in the second person. No inference. */
+    readonly fact: string;
+    readonly effect: FactEffect;
+  }
+  | {
+    readonly kind: 'hand';
+    readonly question: string;
+    readonly fact: string;
+    readonly effect: FactEffect;
+  }
+  | {
+    readonly kind: 'clock';
+    readonly question: string;
+    readonly effect: FactEffect;
+  };
+
+/** One stop on a case's timeline. Second person, past tense, no inference. */
+export interface Stop {
+  readonly says: string;
 }
 
 export interface Choice {
@@ -61,12 +114,17 @@ export interface Choice {
 export interface Case {
   readonly id: string;
   readonly title: string;
-  readonly setupPanelId: string;
+  /** The only picture in the case. Everything else is said or drawn over it. */
+  readonly setupPanelId: PlateId;
   readonly setupAlt: string;
   /** Only what can be seen. */
   readonly setup: string;
   /** Exactly one fact per question kind. */
-  readonly facts: readonly FactPanel[];
+  readonly facts: readonly Fact[];
+  /** Three stops in time order, earliest first. The clock fact reads these out. */
+  readonly timeline: readonly [Stop, Stop, Stop];
+  /** Which stop the picture is standing at. The strip marks this one. */
+  readonly pictureAt: 0 | 1 | 2;
   readonly choices: readonly Choice[];
   /** Whether the three facts together say what happened. */
   readonly settles: boolean;
@@ -119,30 +177,29 @@ export const CASES: readonly Case[] = [
   {
     id: 'tower',
     title: 'The tower down',
-    setupPanelId: `${P}-tower-setup`,
+    setupPanelId: plate(`${P}-tower-setup`),
     setupAlt: 'Your block tower lying knocked over on the classroom carpet, with a boy standing beside it holding one block.',
     setup: 'Your tower is down. A boy is standing next to it, holding one of your blocks.',
+    timeline: [
+      { says: 'You were over at the sink.' },
+      { says: 'The tower came down.' },
+      { says: 'He came in from the yard.' },
+    ],
+    pictureAt: 2,
     facts: [
       {
         kind: 'eye',
-        panelId: `${P}-tower-eye`,
-        alt: 'A girl at the low table with her head bent over an open picture book, not looking towards the carpet.',
         question: 'Did anyone see the tower go down?',
         fact: 'The girl at the table was reading. She says she did not look up.',
         effect: 'unresolved',
       },
       {
         kind: 'clock',
-        panelId: `${P}-tower-clock`,
-        alt: 'The same carpet a few minutes earlier: the tower already scattered, the doorway to the yard empty.',
         question: 'When did the tower come down?',
-        fact: 'The tower came down while you were at the sink. He came in from the yard after that.',
         effect: 'reverses',
       },
       {
         kind: 'hand',
-        panelId: `${P}-tower-hand`,
-        alt: "Close view of the boy's hands lifting a single wooden block up from the floor towards the pile.",
         question: 'What did his hands do?',
         fact: 'He picked that block up off the floor. He was setting it back on the pile.',
         effect: 'supports',
@@ -177,30 +234,29 @@ export const CASES: readonly Case[] = [
   {
     id: 'snack',
     title: 'The missing snack',
-    setupPanelId: `${P}-snack-setup`,
+    setupPanelId: plate(`${P}-snack-setup`),
     setupAlt: 'Your open school bag on the peg rail, the inside pocket empty, other bags hanging along the wall.',
     setup: 'Your snack is not in your bag. Your bag is open.',
+    timeline: [
+      { says: 'At home your snack went into the bag.' },
+      { says: 'You do not remember shutting it.' },
+      { says: 'You got here and the bag was open.' },
+    ],
+    pictureAt: 2,
     facts: [
       {
         kind: 'eye',
-        panelId: `${P}-snack-eye`,
-        alt: 'Two children at the peg rail with their backs turned, each reaching into a bag of their own.',
         question: 'Did anyone see your bag?',
         fact: 'Two children were at the pegs before you. Neither of them was facing your bag.',
         effect: 'unresolved',
       },
       {
         kind: 'clock',
-        panelId: `${P}-snack-clock`,
-        alt: 'Morning at home: the same bag lying open on the hall floor beside a lunch box on the counter.',
         question: 'When was your bag last shut?',
-        fact: 'Your bag was open when you got here. You do not remember shutting it at home.',
         effect: 'unresolved',
       },
       {
         kind: 'hand',
-        panelId: `${P}-snack-hand`,
-        alt: 'A scatter of pale cracker crumbs on the floorboards under the shelf, beside a folded paper napkin.',
         question: 'What did the hands leave behind?',
         fact: 'There are crumbs under the shelf. They are not from your snack.',
         effect: 'reverses',
@@ -235,30 +291,29 @@ export const CASES: readonly Case[] = [
   {
     id: 'mia',
     title: 'Mia by your things',
-    setupPanelId: `${P}-mia-setup`,
+    setupPanelId: plate(`${P}-mia-setup`),
     setupAlt: 'Mia in her yellow romper sitting on the rug crying, next to your open box of small cars with one car on the floor.',
     setup: 'Mia is crying. She is sitting beside your box of cars, and one car is on the floor.',
+    timeline: [
+      { says: 'Mia was standing by the low table.' },
+      { says: 'She caught her knee and started crying.' },
+      { says: 'She sat down beside your box of cars.' },
+    ],
+    pictureAt: 2,
     facts: [
       {
         kind: 'eye',
-        panelId: `${P}-mia-eye`,
-        alt: 'Dad standing at the kitchen sink with his head turned towards the doorway, hands still in the water.',
         question: 'Did anyone see her?',
         fact: 'Dad was at the sink. He heard a bump and then crying. He did not see it.',
         effect: 'unresolved',
       },
       {
         kind: 'clock',
-        panelId: `${P}-mia-clock`,
-        alt: 'A moment earlier: Mia standing by the low table crying, your box of cars still closed across the rug.',
         question: 'When did she start crying?',
-        fact: 'She started crying by the table, before she got to your box.',
         effect: 'reverses',
       },
       {
         kind: 'hand',
-        panelId: `${P}-mia-hand`,
-        alt: "Close view of Mia's empty open hands in her lap and a red mark on her bare knee.",
         question: 'What did her hands do?',
         fact: 'Her hands are empty. There is a red mark on her knee.',
         effect: 'supports',
@@ -293,30 +348,29 @@ export const CASES: readonly Case[] = [
   {
     id: 'hello',
     title: 'The friend at the gate',
-    setupPanelId: `${P}-hello-setup`,
+    setupPanelId: plate(`${P}-hello-setup`),
     setupAlt: 'Seen from your own place at the school gate: a friend walking past close by, his face turned ahead, other families behind him.',
     setup: 'Your friend walked past you at the gate. He did not say hello.',
+    timeline: [
+      { says: 'He was away all last week.' },
+      { says: 'This morning he came in late.' },
+      { says: 'He walked past you at the gate.' },
+    ],
+    pictureAt: 2,
     facts: [
       {
         kind: 'eye',
-        panelId: `${P}-hello-eye`,
-        alt: "His mother striding ahead with her phone at her ear, holding his hand and pulling him along at her pace.",
         question: 'Did he look your way?',
         fact: 'His mum was walking fast and holding his hand. His head was turned to keep up with her.',
         effect: 'reverses',
       },
       {
         kind: 'clock',
-        panelId: `${P}-hello-clock`,
-        alt: 'The gate almost empty, the last children going in, a clock face on the school wall above them.',
         question: 'When did he arrive?',
-        fact: 'He came in late. It was his first morning back after being away.',
         effect: 'unresolved',
       },
       {
         kind: 'hand',
-        panelId: `${P}-hello-hand`,
-        alt: 'The friend carrying a large cardboard box with both arms, his chin resting on the top edge of it.',
         question: 'What were his hands doing?',
         fact: 'Both his arms were around a big box. His chin was on top of it.',
         effect: 'reverses',
@@ -351,30 +405,29 @@ export const CASES: readonly Case[] = [
   {
     id: 'broken',
     title: 'The broken thing at the play date',
-    setupPanelId: `${P}-broken-setup`,
+    setupPanelId: plate(`${P}-broken-setup`),
     setupAlt: 'A painted wooden aeroplane lying in two pieces on a bedroom floor, another boy standing over it looking at you.',
     setup: 'A wooden aeroplane is on the floor in two pieces. The other boy is looking at you.',
+    timeline: [
+      { says: 'The aeroplane came off the loose shelf.' },
+      { says: 'The two pieces were on the floor.' },
+      { says: 'You came up the stairs.' },
+    ],
+    pictureAt: 2,
     facts: [
       {
         kind: 'eye',
-        panelId: `${P}-broken-eye`,
-        alt: 'His older sister in the doorway pointing up at a shelf that tilts down at one end, its bracket pulled from the wall.',
         question: 'Did anyone see it fall?',
         fact: 'His big sister says the shelf is loose. Things have slid off it before.',
         effect: 'reverses',
       },
       {
         kind: 'clock',
-        panelId: `${P}-broken-clock`,
-        alt: 'The stairs seen from below, the bedroom doorway at the top, the two pieces already on the floor inside.',
         question: 'When did it break?',
-        fact: 'The two pieces were on the floor before you came up the stairs.',
         effect: 'reverses',
       },
       {
         kind: 'hand',
-        panelId: `${P}-broken-hand`,
-        alt: 'The other boy standing straight with both hands hidden behind his back, the broken pieces near his feet.',
         question: 'What are his hands doing?',
         fact: 'His hands are behind his back. You cannot see them.',
         effect: 'unresolved',
@@ -420,22 +473,54 @@ export const caseAt = (index: number): Case => CASES[((index % CASES.length) + C
 
 export const caseById = (id: string): Case | undefined => CASES.find((c) => c.id === id);
 
-export const factFor = (subject: Case, kind: QuestionKind): FactPanel => {
+export const factFor = (subject: Case, kind: QuestionKind): Fact => {
   const fact = subject.facts.find((f) => f.kind === kind);
   if (!fact) throw new Error(`${subject.id} has no ${kind} fact`);
   return fact;
 };
 
+/* ------------------------------------------------------------ the timeline -- */
+
+/**
+ * What the clock question buys, read aloud. Derived from `Case.timeline`, which
+ * is the same array `timelineMarks` draws, so the sentence and the strip cannot
+ * come apart. There is no stored clock sentence to disagree with.
+ */
+export const clockLine = (subject: Case): string =>
+  subject.timeline
+    .map((stop, i) => (i === subject.pictureAt ? `${stop.says} That is what the picture shows.` : stop.says))
+    .join(' ');
+
+/** The sentence a fact says. Only the clock arm is derived; the rest are stated. */
+export const factText = (subject: Case, fact: Fact): string =>
+  fact.kind === 'clock' ? clockLine(subject) : fact.fact;
+
+export interface Mark {
+  readonly says: string;
+  /** Along the strip, 0 at the left end and 1 at the right. */
+  readonly at: number;
+  /** True for the stop the picture is standing at. */
+  readonly isPicture: boolean;
+}
+
+/** Geometry for the drawn timeline. Pure, so the strip is tested, not eyeballed. */
+export const timelineMarks = (subject: Case): readonly Mark[] =>
+  subject.timeline.map((stop, i) => ({
+    says: stop.says,
+    at: i / (subject.timeline.length - 1),
+    isPicture: i === subject.pictureAt,
+  }));
+
 /** The facts already paid for, in the order the questions were spent. */
-export const askedFacts = (subject: Case, asked: readonly QuestionKind[]): readonly FactPanel[] =>
+export const askedFacts = (subject: Case, asked: readonly QuestionKind[]): readonly Fact[] =>
   asked.map((kind) => factFor(subject, kind));
 
 /** The questions still on the rack, always in rack order. */
 export const unaskedKinds = (asked: readonly QuestionKind[]): readonly QuestionKind[] =>
   QUESTION_KINDS.filter((kind) => !asked.includes(kind));
 
-/** The panels turned face-up after a decision. Shown as still available, never as a rebuke. */
-export const unaskedFacts = (subject: Case, asked: readonly QuestionKind[]): readonly FactPanel[] =>
+/** The facts turned face-up after a decision. Shown as still available, never as a rebuke. */
+export const unaskedFacts = (subject: Case, asked: readonly QuestionKind[]): readonly Fact[] =>
   unaskedKinds(asked).map((kind) => factFor(subject, kind));
 
 const NOT_ASKED: Readonly<Record<QuestionKind, string>> = {

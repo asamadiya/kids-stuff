@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   BEFORE_YOU_DECIDE_META, CASES, CHIPS, GLYPHS, QUESTION_KINDS, SHEET,
-  askedFacts, caseAt, caseById, casesDecided, chipFor, closingLine, factFor,
-  plateLines, readout, sheetHeight, sheetRows, totalAsked, unaskedFacts, unaskedKinds, unaskedLine,
+  askedFacts, caseAt, caseById, casesDecided, chipFor, closingLine, clockLine, factFor, factText,
+  plateLines, readout, sheetHeight, sheetRows, timelineMarks, totalAsked, unaskedFacts,
+  unaskedKinds, unaskedLine,
 } from '../sel/before-you-decide';
 import type { Decided, QuestionKind } from '../sel/before-you-decide';
 
@@ -83,7 +85,8 @@ describe('ambiguity is the material', () => {
 
   it('never reveals a culprit as a separate hidden truth', () => {
     const allowed = new Set([
-      'id', 'title', 'setupPanelId', 'setupAlt', 'setup', 'facts', 'choices', 'settles', 'closing',
+      'id', 'title', 'setupPanelId', 'setupAlt', 'setup', 'facts', 'timeline', 'pictureAt',
+      'choices', 'settles', 'closing',
     ]);
     for (const c of CASES) for (const key of Object.keys(c)) expect(allowed.has(key)).toBe(true);
   });
@@ -209,21 +212,98 @@ describe('the plate and the record sheet', () => {
   });
 });
 
-describe('the pictures', () => {
-  it('asks for a distinct panel per moment, all under this exercise', () => {
-    const ids = CASES.flatMap((c) => [c.setupPanelId, ...c.facts.map((f) => f.panelId)]);
-    expect(ids).toHaveLength(CASES.length * 4);
-    expect(new Set(ids).size).toBe(ids.length);
-    for (const id of ids) expect(id).toMatch(/^before-you-decide-[a-z-]+$/);
+describe('one case, one picture', () => {
+  /**
+   * FAILS IF REVERTED: put `panelId` (or any other plate-shaped field) back on a
+   * fact and this fails. Restoring the three per-fact plates is what let the
+   * tower case ship three different painted rooms captioned "the same carpet".
+   */
+  it('gives a fact no field that could name a second picture, so "the same carpet" cannot be a lie', () => {
+    const PLATEISH = /panel|image|img|plate|picture|png|photo|art|alt|src|file/i;
+    const FACT_KEYS: Readonly<Record<QuestionKind, readonly string[]>> = {
+      eye: ['effect', 'fact', 'kind', 'question'],
+      clock: ['effect', 'kind', 'question'],
+      hand: ['effect', 'fact', 'kind', 'question'],
+    };
+    for (const c of CASES) {
+      for (const f of c.facts) {
+        expect(Object.keys(f).sort()).toEqual([...FACT_KEYS[f.kind]]);
+        for (const key of Object.keys(f)) expect(key).not.toMatch(PLATEISH);
+      }
+    }
   });
 
-  it('describes every picture for a listener', () => {
+  /**
+   * FAILS IF REVERTED: point a case at a plate that is not its own and this
+   * fails, so `setupPanelId` cannot drift away from the case it belongs to.
+   */
+  it('derives the one plate id from the case id, so it cannot point somewhere else', () => {
+    const ids = CASES.map((c) => c.setupPanelId as string);
+    expect(ids).toHaveLength(CASES.length);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const c of CASES) {
+      expect(c.setupPanelId as string).toBe(`${BEFORE_YOU_DECIDE_META.id}-${c.id}-setup`);
+    }
+  });
+
+  it('counts exactly one plate in the whole module', () => {
+    const source = readFileSync('src/sel/before-you-decide.ts', 'utf8');
+    const slugs = [...source.matchAll(/`\$\{P\}-([a-z0-9-]+)`/g)].map((m) => m[1]);
+    expect(slugs.sort()).toEqual(CASES.map((c) => `${c.id}-setup`).sort());
+  });
+
+  it('describes the one picture for a listener, and asks every question as a question', () => {
     for (const c of CASES) {
       expect(c.setupAlt.length).toBeGreaterThan(40);
       for (const f of c.facts) {
-        expect(f.alt.length).toBeGreaterThan(40);
         expect(f.question).toMatch(/\?$/);
-        expect(f.fact.length).toBeGreaterThan(20);
+        expect(factText(c, f).length).toBeGreaterThan(20);
+      }
+    }
+  });
+});
+
+describe('the clock fact is time, not a second painting', () => {
+  /**
+   * FAILS IF REVERTED: give the clock fact its own `fact` string again and the
+   * spoken sentence stops being derived from the drawn strip, which is how a
+   * timeline and its caption come apart.
+   */
+  it('reads the clock fact straight off the timeline the strip is drawn from', () => {
+    for (const c of CASES) {
+      const clock = factFor(c, 'clock');
+      expect(clock.kind).toBe('clock');
+      expect('fact' in clock).toBe(false);
+      const spoken = factText(c, clock);
+      for (const stop of c.timeline) expect(spoken).toContain(stop.says);
+      expect(spoken).toBe(clockLine(c));
+      // the stops are read out in time order, earliest first
+      const positions = c.timeline.map((s) => spoken.indexOf(s.says));
+      expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    }
+  });
+
+  it('marks the picture on exactly one stop, and puts the stops in even steps along the strip', () => {
+    for (const c of CASES) {
+      const marks = timelineMarks(c);
+      expect(marks).toHaveLength(3);
+      expect(marks.filter((m) => m.isPicture)).toHaveLength(1);
+      expect(marks[c.pictureAt].isPicture).toBe(true);
+      expect(marks.map((m) => m.at)).toEqual([0, 0.5, 1]);
+      expect(marks.map((m) => m.says)).toEqual(c.timeline.map((s) => s.says));
+      // the marker sits where the sentence says the picture is
+      expect(clockLine(c)).toContain(`${c.timeline[c.pictureAt].says} That is what the picture shows.`);
+    }
+  });
+
+  it('states every stop flatly, in the past, naming no feeling', () => {
+    const FEELING = /\b(happy|sad|angry|cross|scared|worried|upset|excited|jealous|lonely|feel|feels|felt)\b/i;
+    for (const c of CASES) {
+      for (const stop of c.timeline) {
+        expect(stop.says.trim().endsWith('.')).toBe(true);
+        expect(stop.says).not.toMatch(/[!?]/);
+        expect(stop.says).not.toMatch(FEELING);
+        expect(stop.says.length).toBeGreaterThan(12);
       }
     }
   });

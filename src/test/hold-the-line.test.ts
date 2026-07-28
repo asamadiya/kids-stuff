@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOT_LABELS,
   allPicks, chipById, chipsFor, coverage, forceOf, heldLabel, isComplete, lineOf,
-  maxStrength, nextKindOf, outcomeOf, panelFor, plateLines, plateTitle, readout,
+  maxStrength, nextKindOf, outcomeOf, panelFor, panelsOf, plateLines, plateTitle, readout,
   scenarioById, strengthOf, strongestPick, wordsFor, wrapText,
 } from '../sel/hold-the-line';
 import type { ChipId, Pick, Scenario, SlotKind } from '../sel/hold-the-line';
@@ -57,7 +57,7 @@ describe('the shape of the exercise', () => {
 
   it('carries no field that could hold a right answer', () => {
     const allowed = new Set([
-      'id', 'where', 'setup', 'names', 'asks', 'nexts', 'lines', 'weights',
+      'id', 'where', 'awayTo', 'setup', 'names', 'asks', 'nexts', 'lines', 'weights',
       'yieldsAt', 'stops', 'goesOn', 'left',
     ]);
     for (const s of SCENARIOS) {
@@ -68,6 +68,74 @@ describe('the shape of the exercise', () => {
     }
     for (const c of CHIPS) {
       expect(Object.keys(c).sort()).toEqual(['force', 'glyph', 'id', 'next', 'slot', 'words']);
+    }
+  });
+});
+
+describe('where the panel is', () => {
+  /**
+   * FAILS IF REVERTED: drop `at` from a panel and the compiler stops it; make
+   * `left` a `here` panel and this fails. Exactly one plate per place is allowed
+   * to be somewhere else, and it is the one he walked to.
+   */
+  it('marks exactly one plate per place as somewhere else, and it is the one he left for', () => {
+    for (const s of SCENARIOS) {
+      expect(panelsOf(s).map((p) => p.at)).toEqual(['here', 'here', 'here', 'away']);
+      expect(s.left.at).toBe('away');
+      expect(panelsOf(s).filter((p) => p.at === 'away')).toHaveLength(1);
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: this is the swap-left defect as a check. The away place
+   * is named once, in `awayTo.label`; put the name back into the panel copy by
+   * hand and let the two drift and this fails, and a `here` panel that quietly
+   * relocates fails it too.
+   */
+  it('names the away place in the away plate and nowhere else', () => {
+    for (const s of SCENARIOS) {
+      expect(s.left.says.toLowerCase()).toContain(s.awayTo.label.toLowerCase());
+      expect(s.left.alt.toLowerCase()).toContain(s.awayTo.label.toLowerCase());
+      expect(s.awayTo.goingLine.toLowerCase()).toContain(s.awayTo.label.toLowerCase());
+      for (const p of panelsOf(s).filter((q) => q.at === 'here')) {
+        expect(`${p.alt} ${p.says}`.toLowerCase(), `${s.id}/${p.panel}`)
+          .not.toContain(s.awayTo.label.toLowerCase());
+      }
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: `Scenario.lines` excludes `x-elsewhere` at the type
+   * level, so the second copy of the doorway sentence cannot be written. This
+   * is the runtime half of that ban.
+   */
+  it('reads the doorway chip straight off the away place, with no override anywhere', () => {
+    for (const s of SCENARIOS) {
+      expect(wordsFor(s, 'x-elsewhere')).toBe(s.awayTo.goingLine);
+      expect(Object.keys(s.lines ?? {})).not.toContain('x-elsewhere');
+      expect(new Set(SCENARIOS.map((x) => x.awayTo.id)).size).toBe(SCENARIOS.length);
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: swap-left's alt used to put Leo in an olive shirt he was
+   * not wearing in swap-setup. A garment colour is a claim one plate makes about
+   * another, and nothing in a set of independently painted plates keeps it, so
+   * no alt is allowed to make one.
+   */
+  it('never names the colour of anybody’s clothes, because no plate can hold that across to the next', () => {
+    const GARMENT = /\b(shirt|top|jumper|sweater|romper|dress|trousers|shorts|coat|jacket|skirt|hoodie)\b/i;
+    const COLOUR = /\b(red|blue|green|olive|grey|gray|yellow|orange|purple|pink|brown|black|white|rust|teal|tan|cream|beige|navy|mustard|ochre|terracotta|maroon|khaki)\b/i;
+    for (const s of SCENARIOS) {
+      for (const p of panelsOf(s)) {
+        const words = p.alt.split(/\s+/);
+        for (let i = 0; i < words.length; i += 1) {
+          if (!GARMENT.test(words[i])) continue;
+          const near = words.slice(Math.max(0, i - 3), i + 4).join(' ');
+          expect(COLOUR.test(near), `${s.id}/${p.panel}: "${near}"`).toBe(false);
+        }
+        expect(COLOUR.test(p.alt), `${s.id}/${p.panel}`).toBe(false);
+      }
     }
   });
 });

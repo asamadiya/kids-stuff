@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   BORROWED_EYES_META, CHIPS, CHIP_IDS, MOMENTS,
-  allSlots, bothSentences, chipAt, chipById, chipClause, chipWord, coverageLine, coveredCount,
-  earlierChip, momentById, momentComplete, nextNotch, notchAngle, plateChips, plateLines,
-  readingFor, sentenceFor, slotKey, wrapWords,
+  allSlots, bothSentences, chipAt, chipById, chipClause, chipWord, coneIn, coverageLine,
+  coveredCount, earlierChip, eyeFor, eyeLineIn, hiddenFrom, listOf, momentById, momentComplete,
+  nextNotch, notchAngle, plateChips, plateLines, readingFor, seesIn, sentenceFor, sightFrom,
+  slotKey, spotsIn, turnBetween, visibleFrom, wrapWords,
 } from '../sel/borrowed-eyes';
-import type { ChipId, Placed } from '../sel/borrowed-eyes';
+import type { ChipId, Eye, Figure, Placed } from '../sel/borrowed-eyes';
 
 /** Every string carried by the content, so prose can be checked in bulk. */
 function strings(value: unknown): string[] {
@@ -44,30 +45,36 @@ describe('borrowed eyes — the plate', () => {
     expect(new Set(MOMENTS.map((m) => m.id)).size).toBe(MOMENTS.length);
   });
 
-  it('gives every position a picture, a description and an eye height', () => {
+  it('gives the moment ONE picture, which is what makes "the same second" true', () => {
+    // The two views used to carry an imageId each, and the two paintings were
+    // of different rooms — different rug, furniture, game and child count —
+    // while the copy claimed they were one second seen twice. The field now
+    // lives on the moment, so a second unrelated painting is unrepresentable
+    // and the claim is enforced by the compiler rather than by a person.
     const ids: string[] = [];
     for (const m of MOMENTS) {
-      for (const v of m.views) {
-        expect(v.imageId).toMatch(/^borrowed-eyes-[a-z0-9-]+$/);
-        ids.push(v.imageId);
-        for (const field of [v.whose, v.from, v.said, v.sees, v.eyeLine, v.alt]) {
-          expect(field.trim().length).toBeGreaterThan(0);
-        }
-        // the alt text describes the picture, not the exercise
-        expect(v.alt.length).toBeGreaterThan(40);
-      }
+      expect(m.imageId).toMatch(/^borrowed-eyes-[a-z0-9-]+$/);
+      ids.push(m.imageId);
+      expect('imageId' in (m.views[0] as object)).toBe(false);
     }
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('draws the two positions as different pictures of the same second', () => {
+  it('gives every position its own words and its own eye height', () => {
     for (const m of MOMENTS) {
-      const said = m.views.map((v) => v.said);
-      expect(new Set(said).size).toBe(said.length);
-      const sees = m.views.map((v) => v.sees);
-      expect(new Set(sees).size).toBe(sees.length);
-      const eyes = m.views.map((v) => v.eyeLine);
-      expect(new Set(eyes).size).toBe(eyes.length);
+      for (const v of m.views) {
+        for (const field of [v.whose, v.from, v.said]) {
+          expect(field.trim().length).toBeGreaterThan(0);
+        }
+      }
+      // What differs between the views is where you stood and what the room
+      // let you see from there — not which painting you were shown. What is
+      // visible from each position is computed from the moment's plan, so it
+      // cannot contradict the picture.
+      for (const key of ['whose', 'from', 'said'] as const) {
+        const values = m.views.map((v) => v[key]);
+        expect(new Set(values).size).toBe(values.length);
+      }
     }
   });
 });
@@ -152,7 +159,7 @@ describe('borrowed eyes — the two readings', () => {
     const m = momentById('tower');
     expect(bothSentences(m)).toEqual([
       'From where you stood, her hand came down on the roof.',
-      'From where Mia stood, she was putting a piece on.',
+      'From where Mia knelt, she was putting a piece on.',
     ]);
   });
 
@@ -220,6 +227,219 @@ describe('borrowed eyes — a second run', () => {
     for (const id of CHIP_IDS) expect(chipById(id).id).toBe(id);
     expect(() => chipById('nope' as ChipId)).toThrow();
     expect(() => momentById('nope')).toThrow();
+  });
+});
+
+describe('borrowed eyes — the plan is the authority', () => {
+  /**
+   * FAILS IF REVERTED: put `imageId` back on a view and this fails. Two plates
+   * per moment is how "the same second, drawn twice" became two rooms with
+   * different rugs, furniture, games and child counts.
+   */
+  it('gives a view no field that could hold a second painting', () => {
+    for (const m of MOMENTS) {
+      for (const v of m.views) {
+        expect(Object.keys(v).sort()).toEqual(['from', 'id', 'said', 'whose']);
+        for (const key of Object.keys(v)) {
+          expect(key, `${m.id}/${v.id}.${key}`)
+            .not.toMatch(/image|img|panel|plate|picture|png|alt|src|photo/i);
+        }
+      }
+      expect(Object.keys(m)).toContain('imageId');
+      expect(m.alt.length).toBeGreaterThan(60);
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: write "four children" into an alt or a `said` again and
+   * this fails. The old `circle` prose claimed four in both views over five
+   * drawn children. A count may only be spoken by a sentence that counted it.
+   */
+  it('writes no count anywhere in the prose, so a count can only be one the plan made', () => {
+    const NUMBER = /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|both|\d+)\b/i;
+    // Scoped to the strings that make a claim about what is in the room. A
+    // title is not one of those: "The one outside the circle" names a person.
+    for (const m of MOMENTS) {
+      expect(NUMBER.test(m.alt), `${m.id}.alt`).toBe(false);
+      for (const v of m.views) {
+        expect(NUMBER.test(v.said), `${m.id}/${v.id}.said`).toBe(false);
+        expect(NUMBER.test(v.whose), `${m.id}/${v.id}.whose`).toBe(false);
+        expect(NUMBER.test(v.from), `${m.id}/${v.id}.from`).toBe(false);
+      }
+      for (const f of m.plan.figures) expect(NUMBER.test(f.label), `${m.id}/${f.id}`).toBe(false);
+    }
+    // and the generated sentence does carry a count, measured off the plan
+    const circle = momentById('circle');
+    expect(eyeLineIn(circle, circle.views[0]))
+      .toContain(`of the ${circle.plan.figures.length - 1} things`);
+  });
+
+  it('sets every figure inside the plan, with a width, a height and a kind', () => {
+    for (const m of MOMENTS) {
+      expect(m.plan.figures.length).toBeGreaterThanOrEqual(4);
+      expect(new Set(m.plan.figures.map((f) => f.id)).size).toBe(m.plan.figures.length);
+      for (const f of m.plan.figures) {
+        expect(f.x, `${m.id}/${f.id}`).toBeGreaterThanOrEqual(0);
+        expect(f.x, `${m.id}/${f.id}`).toBeLessThanOrEqual(m.plan.across);
+        expect(f.y, `${m.id}/${f.id}`).toBeGreaterThanOrEqual(0);
+        expect(f.y, `${m.id}/${f.id}`).toBeLessThanOrEqual(m.plan.deep);
+        expect(f.across, `${m.id}/${f.id}`).toBeGreaterThan(0);
+        expect(f.top, `${m.id}/${f.id}`).toBeGreaterThan(0);
+        expect(['child', 'grown-up', 'small one', 'thing']).toContain(f.kind);
+        expect(f.label).not.toContain(',');
+      }
+    }
+  });
+
+  it('stands each eye on the figure it belongs to, one eye per view', () => {
+    for (const m of MOMENTS) {
+      expect(m.plan.eyes.map((e) => e.viewId)).toEqual(m.views.map((v) => v.id));
+      for (const e of m.plan.eyes) {
+        const self = m.plan.figures.find((f) => f.id === e.self) as Figure;
+        expect(self, `${m.id}/${e.viewId}`).toBeDefined();
+        expect(e.x).toBe(self.x);
+        expect(e.y).toBe(self.y);
+        expect(e.height).toBeGreaterThan(40);
+        expect(e.height).toBeLessThanOrEqual(self.top);
+        expect(e.halfAngle).toBeGreaterThan(20);
+        expect(e.halfAngle).toBeLessThan(120);
+        expect(eyeFor(m.plan, e.viewId)).toBe(e);
+      }
+      // the two positions are genuinely different heights, which is the parallax
+      const [a, b] = m.plan.eyes;
+      expect(Math.abs(a.height - b.height), m.id).toBeGreaterThanOrEqual(6);
+    }
+  });
+
+  it('never reports that anyone can see themselves', () => {
+    for (const m of MOMENTS) {
+      for (const e of m.plan.eyes) {
+        const seen = sightFrom(m.plan, e).map((s) => s.figure.id);
+        expect(seen).not.toContain(e.self);
+        expect(seen).toHaveLength(m.plan.figures.length - 1);
+      }
+    }
+  });
+
+  /**
+   * FAILS IF REVERTED: drop the height term from the occlusion test — go back to
+   * "anything on the line hides anything behind it" — and this fails, because a
+   * standing eye would stop seeing over a seated one. Parallax IS the module,
+   * and this is the claim the two paintings were supposed to be making.
+   */
+  it('lets a standing position and a sitting one disagree about the same thing', () => {
+    const circle = momentById('circle');
+    const nell = eyeFor(circle.plan, 'nell');
+    const yours = eyeFor(circle.plan, 'yours');
+    const game = (e: Eye) => sightFrom(circle.plan, e).find((s) => s.figure.id === 'game');
+    // Nell stands back behind a ring of seated backs, so the game on the floor
+    // is covered; Leo sits inside the ring with nothing between him and it.
+    expect(game(nell)?.inFront).toBe(true);
+    expect(game(nell)?.behind?.id).toBe('kid-b');
+    expect(game(yours)?.inFront).toBe(true);
+    expect(game(yours)?.behind).toBeNull();
+    // the same standing eye still sees every seated child over every other
+    expect(sightFrom(circle.plan, nell).filter((s) => s.figure.kind === 'child' && s.behind))
+      .toHaveLength(0);
+    // and it runs the other way too: the low eye is the covered one here
+    const story = momentById('story');
+    expect(sightFrom(story.plan, eyeFor(story.plan, 'yours'))
+      .find((s) => s.figure.id === 'mia')?.behind?.id).toBe('dad');
+    expect(sightFrom(story.plan, eyeFor(story.plan, 'dad'))
+      .find((s) => s.figure.id === 'mia')?.behind).toBeNull();
+  });
+
+  it('clears the view when the eye rises above what stands in the way', () => {
+    const circle = momentById('circle');
+    const nell = eyeFor(circle.plan, 'nell');
+    const gameFrom = (e: Eye) => sightFrom(circle.plan, e).find((s) => s.figure.id === 'game');
+    expect(gameFrom(nell)?.behind).not.toBeNull();
+    expect(gameFrom({ ...nell, height: 400 })?.behind).toBeNull();
+    expect(gameFrom({ ...nell, height: 20 })?.behind).not.toBeNull();
+  });
+
+  it('turns the cone with the face, so what is not in front stops being in front', () => {
+    const tower = momentById('tower');
+    const mia = eyeFor(tower.plan, 'mia');
+    const inFront = (e: Eye) => sightFrom(tower.plan, e).filter((s) => s.inFront).map((s) => s.figure.id);
+    expect(inFront(mia)).toContain('tower');
+    expect(inFront({ ...mia, facing: mia.facing + 180 })).not.toContain('tower');
+    expect(turnBetween(170, -170)).toBe(20);
+    expect(turnBetween(-170, 170)).toBe(-20);
+    expect(turnBetween(10, 10)).toBe(0);
+  });
+
+  /**
+   * FAILS IF REVERTED: hand-type a `sees` string onto a view again and it can
+   * say anything. Generated, it can only name figures the plan holds, and it
+   * cannot tell the viewer they can see themselves.
+   */
+  it('generates the seeing sentence out of the plan, naming only figures in it', () => {
+    for (const m of MOMENTS) {
+      for (const v of m.views) {
+        const line = seesIn(m, v);
+        const said = line.toLowerCase();
+        const eye = eyeFor(m.plan, v.id);
+        expect(line.startsWith('From here you can see ')).toBe(true);
+        expect(line.trim().endsWith('.')).toBe(true);
+        for (const s of visibleFrom(m.plan, eye)) expect(said).toContain(s.figure.label.toLowerCase());
+        for (const s of hiddenFrom(m.plan, eye)) {
+          expect(said).toContain(s.figure.label.toLowerCase());
+          expect(said).toContain(`behind ${s.behind?.label.toLowerCase()}`);
+        }
+        const self = m.plan.figures.find((f) => f.id === eye.self) as Figure;
+        expect(said, `${m.id}/${v.id}`).not.toContain(self.label.toLowerCase());
+      }
+    }
+    // every moment has at least one position where something stands in the way
+    const covering = MOMENTS.filter(
+      (m) => m.plan.eyes.some((e) => hiddenFrom(m.plan, e).length > 0),
+    );
+    expect(covering.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('reads the eye height off the eye, and counts what stands taller every time', () => {
+    for (const m of MOMENTS) {
+      for (const v of m.views) {
+        const eye = eyeFor(m.plan, v.id);
+        const line = eyeLineIn(m, v);
+        expect(line).toContain(`${eye.height} centimetres above the floor`);
+        const taller = m.plan.figures.filter((f) => f.id !== eye.self && f.top > eye.height).length;
+        expect(line).toContain(`${taller} of the ${m.plan.figures.length - 1} things`);
+        expect(line.toLowerCase()).toContain(eye.stance);
+      }
+    }
+  });
+
+  it('joins a list without losing a part or gaining a comma', () => {
+    expect(listOf([])).toBe('nothing');
+    expect(listOf(['the game'])).toBe('the game');
+    expect(listOf(['a', 'b'])).toBe('a and b');
+    expect(listOf(['a', 'b', 'c'])).toBe('a, b and c');
+  });
+
+  it('scales the plan onto a drawing box with one scale for both axes', () => {
+    const m = momentById('circle');
+    const spots = spotsIn(m.plan, 360, 300);
+    expect(spots).toHaveLength(m.plan.figures.length);
+    for (const s of spots) {
+      expect(s.x).toBeGreaterThanOrEqual(0);
+      expect(s.x).toBeLessThanOrEqual(360);
+      expect(s.y).toBeGreaterThanOrEqual(0);
+      expect(s.y).toBeLessThanOrEqual(300);
+      expect(s.r).toBeGreaterThan(0);
+    }
+    // one scale, so the plan stays a map: distances keep their ratio
+    const k = Math.min(360 / m.plan.across, 300 / m.plan.deep);
+    const drawn = Math.hypot(spots[0].x - spots[1].x, spots[0].y - spots[1].y);
+    const real = Math.hypot(
+      m.plan.figures[0].x - m.plan.figures[1].x,
+      m.plan.figures[0].y - m.plan.figures[1].y,
+    );
+    expect(drawn).toBeCloseTo(real * k, 6);
+    const cone = coneIn(m.plan, eyeFor(m.plan, 'nell'), 360, 300);
+    expect(cone.left).not.toEqual(cone.right);
+    expect(cone.x).toBeCloseTo(eyeFor(m.plan, 'nell').x * k, 6);
   });
 });
 

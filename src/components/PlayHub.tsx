@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import type { ComponentType } from 'react';
+import { toHash } from '../App';
 import { RikkiMascot } from './RikkiMascot';
 import CountWithRikkiGame from './CountWithRikkiGame';
 import PatternParadeGame from './PatternParadeGame';
@@ -95,7 +95,14 @@ import '../styles/play.css';
 
 const BASE = import.meta.env.BASE_URL;
 
-export interface PlayHubProps { readonly onExit: () => void; }
+/** The cards were buttons before they were links; play.css never suppressed the
+ *  anchor underline that would otherwise strike through every card title. */
+const NO_UNDERLINE = { textDecoration: 'none' } as const;
+
+export interface PlayHubProps {
+  /** Which exercise is open, read off the hash. `null` is the gallery. */
+  readonly activeId: string | null;
+}
 interface GameMeta { readonly id: string; readonly title: string; readonly icon: string; readonly color: string; readonly tagline: string; }
 interface GameEntry { readonly meta: GameMeta; readonly Component: ComponentType; readonly cat: string; }
 
@@ -157,22 +164,33 @@ const GAMES: readonly GameEntry[] = [
   { meta: TEN_MORE_TEN_LESS_META, Component: TenMoreTenLessGame, cat: 'math' },
   { meta: WHATS_MISSING_META, Component: WhatsMissingGame, cat: 'math' },
 ];
+/**
+ * The exercise ids, in gallery order, read off the same array that renders the
+ * cards. `App` validates `#/play/<id>` against this list, so an exercise cannot
+ * be addressable without being on the bench, or on the bench without being
+ * addressable.
+ */
+export const PLAY_EXERCISE_IDS: readonly string[] = GAMES.map((g) => g.meta.id);
+
+/**
+ * Number first: it is the work he is actually here for, and it used to sit
+ * below two other sections.
+ */
 const CATEGORIES: readonly { key: string; title: string; blurb: string }[] = [
-  { key: 'feelings', title: "People & What Happens Next", blurb: "Watch what people do, decide what you do, and see what follows. Nothing here is marked." },
   { key: 'math', title: "Number & Quantity", blurb: "Place value, addition and subtraction, multiplication, division, fractions, money and the number line." },
   { key: 'early', title: "Letters, Shapes & Patterns", blurb: "Sounds and letters, plane shapes, colour, sequence and recall." },
+  { key: 'feelings', title: "People & What Happens Next", blurb: "Watch what people do, decide what you do, and see what follows. Nothing here is marked." },
 ];
 
-export function PlayHub({ onExit }: PlayHubProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
+export function PlayHub({ activeId }: PlayHubProps) {
   const active = GAMES.find((g) => g.meta.id === activeId) ?? null;
   return (
     <main id="main-content" className="play-hub" aria-label="Practice" tabIndex={-1}>
       <header className="play-hub__hero">
         <div className="play-hub__copy">
-          <button type="button" className="play-hub__back" onClick={onExit}>
+          <a className="play-hub__back" style={NO_UNDERLINE} href={toHash({ kind: 'index' })}>
             <span aria-hidden="true">&larr;</span> Contents
-          </button>
+          </a>
           <p className="play-hub__eyebrow">Exercises</p>
           <h1 className="play-hub__title">Practice</h1>
           <p className="play-hub__lede">
@@ -185,9 +203,9 @@ export function PlayHub({ onExit }: PlayHubProps) {
 
       {active ? (
         <section aria-label={active.meta.title}>
-          <button type="button" className="mini-game__back" onClick={() => setActiveId(null)}>
+          <a className="mini-game__back" style={NO_UNDERLINE} href={toHash({ kind: 'play' })}>
             <span aria-hidden="true">&larr;</span> All exercises
-          </button>
+          </a>
           <active.Component />
         </section>
       ) : (
@@ -203,15 +221,16 @@ export function PlayHub({ onExit }: PlayHubProps) {
                 </div>
                 <div className="play-grid">
                   {games.map(({ meta }) => (
-                    <button key={meta.id} type="button" className={`play-card play-card--${meta.color}`}
-                      onClick={() => setActiveId(meta.id)} aria-label={`Play ${meta.title}`}>
+                    <a key={meta.id} className={`play-card play-card--${meta.color}`}
+                      style={NO_UNDERLINE}
+                      href={toHash({ kind: 'exercise', id: meta.id })} aria-label={`Play ${meta.title}`}>
                       <span className="play-card__pic">
                         <span className="play-card__icon" aria-hidden="true">{meta.icon}</span>
                         <img src={`${BASE}games/covers/${meta.id}.png`} alt="" loading="lazy"
                           onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
                       </span>
                       <span className="play-card__title">{meta.title}</span>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </section>
