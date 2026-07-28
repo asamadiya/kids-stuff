@@ -48,6 +48,12 @@ export interface PlaceOptions<T> {
   readonly answer: T;
   /** Candidates in order of teaching value; the first `count - 1` usable ones are taken. */
   readonly distractors: readonly T[];
+  /**
+   * Distractors that must always appear. Use only for the misconception an
+   * exercise exists to surface — the forgot-to-carry sum, say — where leaving
+   * it to the straddle logic would sometimes drop it.
+   */
+  readonly required?: readonly T[];
   /** Total options to show, including the answer. */
   readonly count: number;
 }
@@ -63,7 +69,7 @@ export interface PlaceOptions<T> {
  * is not at fourteen rounds. Both the stride and the offset come from the game
  * id alone, so no property of the answer can influence where it lands.
  */
-export function placeOptions<T>({ gameId, roundIndex, answer, distractors, count }: PlaceOptions<T>): T[] {
+export function placeOptions<T>({ gameId, roundIndex, answer, distractors, required = [], count }: PlaceOptions<T>): T[] {
   /**
    * Which distractors are taken decides the answer's RANK among the values, and
    * rank is a second, independent leak: with the slot moving freely, money's
@@ -76,7 +82,10 @@ export function placeOptions<T>({ gameId, roundIndex, answer, distractors, count
    * falling back to whatever exists when one side runs short.
    */
   const wanted = count - 1;
-  const usable = distractors.filter((d, i) => d !== answer && distractors.indexOf(d) === i);
+  const must = required.filter((d, i) => d !== answer && required.indexOf(d) === i).slice(0, wanted);
+  const usable = distractors.filter(
+    (d, i) => d !== answer && distractors.indexOf(d) === i && !must.includes(d),
+  );
   const numeric = typeof answer === 'number' && usable.every((d) => typeof d === 'number');
 
   let rest: T[];
@@ -86,14 +95,15 @@ export function placeOptions<T>({ gameId, roundIndex, answer, distractors, count
     const targetRank = hash(`${gameId}#rank#${roundIndex}`) % count;
     const takeBelow = Math.min(targetRank, below.length, wanted);
     const takeAbove = Math.min(wanted - takeBelow, above.length);
-    rest = [...below.slice(0, takeBelow), ...above.slice(0, takeAbove)];
+    rest = [...must, ...below.slice(0, Math.max(0, takeBelow - must.length)), ...above.slice(0, takeAbove)]
+      .slice(0, wanted);
     // Top up from either side if one ran out, so the option count never drops.
     for (const d of usable) {
       if (rest.length >= wanted) break;
       if (!rest.includes(d)) rest.push(d);
     }
   } else {
-    rest = usable.slice(0, wanted);
+    rest = [...must, ...usable].slice(0, wanted);
   }
 
   const size = rest.length + 1;

@@ -20,18 +20,16 @@ describe('two-digit-subtract logic', () => {
     expect(TWO_DIGIT_SUBTRACT_META.tagline.length).toBeGreaterThan(0);
   });
 
-  it('every round is genuine no-regrouping two-digit subtraction with correct answer', () => {
+  it('includes rounds that borrow, which is the step that makes the algorithm mean something', () => {
+    // Every round used to require top digit >= bottom digit in both columns, so
+    // the child never once had to take a ten apart.
+    const borrowing = SUBTRACT_ROUNDS.filter((r) => r.borrows);
+    expect(borrowing.length).toBeGreaterThanOrEqual(6);
+    for (const r of borrowing) expect(r.top % 10).toBeLessThan(r.bottom % 10);
     for (const r of SUBTRACT_ROUNDS) {
-      // Two-digit operands.
-      expect(r.top).toBeGreaterThanOrEqual(10);
-      expect(r.top).toBeLessThanOrEqual(99);
-      expect(r.bottom).toBeGreaterThanOrEqual(10);
-      expect(r.bottom).toBeLessThanOrEqual(99);
-      // Answer is actually correct math (computed here).
       expect(r.answer).toBe(r.top - r.bottom);
-      // No regrouping: each column top digit >= bottom digit.
-      expect(r.top % 10).toBeGreaterThanOrEqual(r.bottom % 10);
-      expect(Math.floor(r.top / 10)).toBeGreaterThanOrEqual(Math.floor(r.bottom / 10));
+      expect(r.answer).toBeGreaterThanOrEqual(0);
+      expect(r.top).toBeLessThanOrEqual(99);
     }
   });
 

@@ -1,6 +1,12 @@
 import { placeOptions } from './options';
 // Two-Digit Adding — pure typed logic module (no React).
-// Two-digit addition WITHOUT regrouping: every column sum stays < 10,
+// Two-digit addition, INCLUDING regrouping. The first version refused to
+// carry — `buildRound` threw at build time if a column summed to ten or more —
+// which capped the hardest sum on the site at 45+33 for a child whose stated
+// need is multi-digit arithmetic. Carrying is the step that makes column
+// addition mean anything; without it the exercise is two independent
+// single-digit sums printed side by side.
+//
 // so tens add to tens and ones add to ones with no carrying.
 
 export const TWO_DIGIT_ADD_META = {
@@ -12,6 +18,8 @@ export const TWO_DIGIT_ADD_META = {
 } as const;
 
 export interface TwoDigitAddRound {
+  /** True when the ones column passes ten, so a ten has to move across. */
+  carries: boolean;
   /** First addend, e.g. 23. */
   readonly a: number;
   /** Second addend, e.g. 14. */
@@ -31,6 +39,15 @@ interface RawRound {
 
 // Column check: every round keeps ones-col and tens-col sums < 10 (no regroup).
 const RAW_ROUNDS: readonly RawRound[] = [
+  // Regrouping rounds. The ones column passes ten and the ten moves across.
+  { a: 27, b: 15, distractors: [42, 31] },
+  { a: 48, b: 36, distractors: [74, 83] },
+  { a: 19, b: 26, distractors: [44, 36] },
+  { a: 35, b: 47, distractors: [72, 91] },
+  { a: 56, b: 28, distractors: [74, 85] },
+  { a: 17, b: 38, distractors: [45, 56] },
+  { a: 29, b: 43, distractors: [62, 71] },
+  { a: 64, b: 27, distractors: [81, 92] },
   { a: 23, b: 14, distractors: [36, 47] },
   { a: 31, b: 42, distractors: [72, 74] },
   { a: 12, b: 15, distractors: [26, 37] },
@@ -56,9 +73,10 @@ function buildRound(raw: RawRound, index: number): TwoDigitAddRound {
   const onesB = raw.b % 10;
   const tensA = Math.floor(raw.a / 10);
   const tensB = Math.floor(raw.b / 10);
-  // Guard the no-regroup invariant at construction time.
-  if (onesA + onesB >= 10 || tensA + tensB >= 10) {
-    throw new Error(`Round ${raw.a}+${raw.b} regroups; not allowed.`);
+  const carries = onesA + onesB >= 10;
+  // Only the hundreds boundary is refused: the display is two digits wide.
+  if (raw.a + raw.b > 99) {
+    throw new Error(`Round ${raw.a}+${raw.b} passes 99; the column display is two digits.`);
   }
   const answer = raw.a + raw.b;
   const uniq = new Set<number>([answer]);
@@ -68,10 +86,14 @@ function buildRound(raw: RawRound, index: number): TwoDigitAddRound {
   uniq.delete(answer);
   const options = placeOptions({
     gameId: 'two-digit-add', roundIndex: index, answer,
+    // The no-carry answer (27+15 -> 32) is the misconception this exercise
+    // exists to surface, so it is always offered when the round regroups.
+    required: carries ? [tensA * 10 + tensB * 10 + ((onesA + onesB) % 10)] : [],
     distractors: [...Array.from(uniq), answer - 10, answer + 10, answer - 1, answer + 1,
-                  answer - 2, answer + 2].filter((v) => v > 0 && v !== answer), count: 3,
+                  answer - 2, answer + 2].filter((v) => v > 0 && v !== answer),
+    count: 4,
   });
-  return { a: raw.a, b: raw.b, answer, options };
+  return { a: raw.a, b: raw.b, answer, carries, options };
 }
 
 export const TWO_DIGIT_ADD_ROUNDS: readonly TwoDigitAddRound[] =

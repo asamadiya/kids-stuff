@@ -1,6 +1,11 @@
 import { placeOptions } from './options';
 // Two-Digit Take Away — pure typed logic module (no React).
-// Two-digit subtraction WITHOUT regrouping: for every round, each column's
+// Two-digit subtraction, INCLUDING borrowing. Every round used to require the
+// top digit to be at least the bottom digit in both columns, which meant the
+// child never once had to take a ten apart — the step that makes column
+// subtraction mean anything.
+//
+// Original note follows: two-digit subtraction WITHOUT regrouping: for every round, each column's
 // top digit >= bottom digit, so tens and ones can be subtracted independently.
 
 export const TWO_DIGIT_SUBTRACT_META = {
@@ -18,18 +23,26 @@ export interface SubtractRound {
   bottom: number;
   /** The correct difference (top - bottom). */
   answer: number;
+  /** True when the ones digit on top is smaller, so a ten must be broken. */
+  borrows: boolean;
 }
 
-/**
- * Build a round from two-digit top and bottom, asserting no-regrouping in dev.
- * Both the tens column and the ones column must have top digit >= bottom digit.
- */
+/** `borrows` is true when the ones column needs a ten taken apart. */
 function round(top: number, bottom: number): SubtractRound {
-  return { top, bottom, answer: top - bottom };
+  return { top, bottom, answer: top - bottom, borrows: top % 10 < bottom % 10 };
 }
 
 // >= 12 varied rounds. Every column: top digit >= bottom digit (no borrow).
 export const SUBTRACT_ROUNDS: readonly SubtractRound[] = [
+  // Borrowing rounds: the ones digit on top is smaller, so a ten comes apart.
+  round(52, 27),
+  round(63, 38),
+  round(41, 19),
+  round(74, 46),
+  round(80, 35),
+  round(65, 28),
+  round(93, 57),
+  round(32, 14),
   round(47, 12), // 4>=1, 7>=2
   round(58, 23), // 5>=2, 8>=3
   round(69, 34), // 6>=3, 9>=4
@@ -74,6 +87,9 @@ export function getSubtractOptions(i: number): number[] {
   const rest = [...set].filter((v) => v !== a);
   return placeOptions({
     gameId: 'two-digit-subtract', roundIndex: i % SUBTRACT_ROUNDS.length, answer: a,
+    required: r.borrows
+      ? [Math.floor(r.top / 10 - r.bottom / 10) * 10 + Math.abs((r.top % 10) - (r.bottom % 10))]
+      : [],
     distractors: [...rest, a - 10, a + 10, a - 1, a + 1, a - 2, a + 2].filter((v) => v >= 0 && v !== a), count: SUBTRACT_OPTION_COUNT,
   });
 }
