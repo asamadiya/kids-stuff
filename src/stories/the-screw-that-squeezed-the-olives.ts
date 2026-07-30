@@ -1,156 +1,177 @@
 import type { Story } from '../types';
 
+/**
+ * Rewritten from the ground up. The first version had three faults, all of
+ * which a parent hit within a page or two:
+ *
+ * 1. The title promised a screw and nine of twelve pages described a lever —
+ *    a Greek beam press, with the screw appended as a coda. Someone opening
+ *    "The Screw That Squeezed the Olives" got a windlass.
+ * 2. It averaged 72 words a page, 870 in all, in sentences like "Pushing far
+ *    out at the rope end took only a light, steady effort." Page 11 dated Hero
+ *    of Alexandria as "about sixty years after a very old calendar's start",
+ *    which is not a fact a five-year-old can hold, or anyone.
+ * 3. Eight of the twelve pictures did not show their page. Page 6 read "a
+ *    shining drop gathered at the wooden spout" over a night scene of a
+ *    sleeping child under a moon.
+ *
+ * So: the screw is the subject from page one, the machine is drawn on every
+ * page it is named on, and the text runs about 35 words a page in short
+ * sentences. The two figures are fixed — a girl and her grandfather — and
+ * described identically in every art prompt, because the cast wandering
+ * between panels was half of why the pictures read as unrelated.
+ */
 export const theScrewThatSqueezedTheOlives: Story = {
   slug: 'the-screw-that-squeezed-the-olives',
   title: 'The Screw That Squeezed the Olives',
-  subtitle: 'Long ago in Attica, Greek farm families pressed olives under a great turning beam.',
+  subtitle: 'A Roman farm, a giant wooden screw, and the oil hiding inside a hard little fruit.',
   domain: 'simple-machines',
   collection: 'historical',
-  repeatedPhrase: 'Round goes the windlass',
-  readAloudMinutes: 9,
+  repeatedPhrase: 'Round and down',
+  readAloudMinutes: 5,
   learningTakeaway:
-    'A lever press works like a long, strong arm. Turning the windlass winds the rope, which pulls the heavy beam down. Each slow turn presses the olive baskets a little harder, so more oil trickles out. Later, the Romans learned to press even harder by turning a screw.',
+    'A screw is a ramp wrapped around a pole. Turning it a long way round moves it a short way down, and that trade turns a small push into a very big squeeze. Roman farms used a giant wooden screw to press oil out of crushed olives.',
   heartTakeaway:
-    'Thankfulness grows when we notice how many careful hands, and how much patient turning, bring food and light to our table.',
+    'Some things only come out slowly. The press does not hurry, and the oil comes anyway.',
   grownUpFact:
-    'This is a warm picture of real Greek farm craft, not a single inventor’s tale. Around 300 BCE in Attica, families crushed olives, packed the paste into woven baskets, and squeezed them under a long wooden lever, or beam, press. A rope wound on a hand-turned windlass hauled the beam down to press harder. The oil floated above the watery lees and was ladled off. Ripe olives hold roughly a fifth of their weight in oil. Olive oil fed lamps, dressed food, soothed skin, and was traded across the sea in clay jars called amphorae. The screw press came later, in Roman times, described by Hero of Alexandria around 60 CE. The myth of Athena giving Athens the first olive tree is an ancient tale, not history.',
+    'Olives are too bitter to eat off the branch, but about a fifth of a ripe olive’s weight is oil. Ancient presses worked in three steps that have barely changed: crush the fruit, pack the paste into flat loosely-woven baskets, stack them, and squeeze. Greek farms pulled a long wooden beam down onto the stack. Roman farms increasingly used a screw — either to haul that beam down or, as here, pressing straight down on the stack itself. Hero of Alexandria described screw presses in his Mechanica in the first century CE, and Pliny the Elder wrote about press improvements in his Natural History around 77 CE. The oil separates and floats above the watery part, so it is drawn off the top. It burned in lamps, dressed food, and was rubbed on skin, and it travelled by sea in tall clay jars called amphorae.',
   pages: [
     {
-      text: 'Long ago, in a quiet Attica farmyard, a Greek family gathered at their olive press. All autumn they had picked the little fruits from silver-leaved trees. Ripe olives are too bitter to eat straight from the branch. But hidden inside each one waits a small treasure of oil. To free it, the family would press the olives, gently and slow. A clean clay jar waited below the wooden spout for the first golden drop.',
-      cue: 'Squeeze your fist tight, then open it. What might come out if you squeezed a soft olive?',
+      text: 'The olives are picked. They fill the baskets to the top.\n\nBite one and you would spit it out. Olives are bitter.\n\nBut there is oil hiding inside. Every single one.',
+      cue: 'Squeeze your hand shut, hard. Now open it. What could come out of a squeezed olive?',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p1-autumn-harvest',
-        focus: 'a Greek family beside baskets of ripe olives at a long wooden beam press',
+        id: 'the-screw-that-squeezed-the-olives-p1-baskets',
+        focus: 'baskets heaped with dark olives on the floor of a stone press room',
         composition:
-          'Foreground: baskets of dark ripe olives and an empty clay jar under the spout; midground: a Greek aunt and child at the press; background: silver olive trees on a terraced hill in golden autumn light',
-        palette: 'olive green, warm wood, clay red, and late-afternoon gold',
+          'Foreground: two wide baskets heaped with dark purple-black olives; midground: a girl of six kneeling with a handful, her grandfather beside her; background: the stone doorway of the press room with olive trees outside',
+        palette: 'olive green, deep purple-black, warm stone, and afternoon gold',
       },
-      alt: 'A Greek family stands by baskets of ripe olives beside a long wooden beam press with an empty clay jar below the spout.',
+      alt: 'A girl kneels beside baskets heaped with dark olives in a stone press room, her grandfather standing next to her.',
     },
     {
-      text: 'First the olives had to be crushed into a soft, glistening paste. The aunt tipped them into a round stone basin worn smooth by years. A heavy stone wheel rolled over them, round and round. Crushing broke the fruit so the oil could seep out later. The child scooped the fragrant paste into flat baskets of woven rushes. Then the baskets were stacked in a tall, neat pile beneath the great wooden beam.',
+      text: 'First the olives must be crushed.\n\nA big round stone rolls over them. Round and round it goes.\n\nNow the olives are a wet grey paste. It smells green.',
       scene: {
         id: 'the-screw-that-squeezed-the-olives-p2-crushing',
-        focus: 'a stone wheel crushing olives into paste while a child fills woven baskets',
+        focus: 'a large round crushing stone rolling through olives in a stone basin',
         composition:
-          'Foreground: a round stone wheel turning in a worn basin full of olive paste; midground: the child packing paste into flat woven baskets; background: the long beam press waiting in the shaded farmyard',
-        palette: 'dusty ochre, olive, honey brown, and pale stone gray',
+          'Foreground: a tall round stone wheel set on its edge in a circular stone basin, olives crushing to grey-green paste beneath it; midground: the girl pushing the wooden handle, her grandfather steadying it; background: the press room wall',
+        palette: 'grey stone, olive green, wet paste, and warm shadow',
       },
-      alt: 'A heavy stone wheel crushes olives into paste in a stone basin as a child packs the paste into flat woven baskets.',
+      alt: 'A tall round stone rolls through olives in a stone basin, crushing them to paste, while a girl pushes the handle.',
     },
     {
-      text: 'Now for the clever part, the part the child loved best. One end of the long beam was hooked under a strong stone wall. The other end reached far out over the stacked baskets. Near that far end hung a thick rope, wound around a wooden drum. That turning drum had a special name, the windlass. Pulling the rope would haul the whole beam down, like a giant, patient arm.',
+      text: 'The paste goes into flat baskets. One scoop, then another.\n\nThe baskets are stacked up in a tower.\n\nThe tower is soft and heavy and full of oil.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p3-meet-the-beam',
-        focus: 'the long lever beam hooked at the wall, reaching over baskets, with a rope on the windlass drum',
+        id: 'the-screw-that-squeezed-the-olives-p3-stack',
+        focus: 'flat woven baskets of olive paste stacked into a short tower',
         composition:
-          'Foreground: a thick rope coiled on a wooden windlass drum; midground: the long beam reaching over the basket stack; background: the stone wall anchoring the beam’s near end',
-        palette: 'walnut brown, rope tan, olive, and cool shadowed gray',
+          'Foreground: a stack of six flat round woven baskets, olive paste showing at the edges; midground: the girl setting one more basket on top, the grandfather holding the stack steady; background: the press frame rising behind them',
+        palette: 'straw, olive paste grey-green, wood brown, and stone',
       },
-      alt: 'A long wooden beam is hooked under a stone wall at one end and reaches over stacked olive baskets, with a rope on a windlass drum.',
+      alt: 'A girl sets a flat basket of olive paste on top of a stack of them, beside a wooden press frame.',
     },
     {
-      text: 'The child placed small hands beside the aunt’s on the windlass handle. Together they pushed, and the wooden drum began to turn. “Round goes the windlass,” the aunt said, and the rope wound tight. Slowly, slowly, the great beam leaned down toward the top basket. The child felt the handle grow firm and strong under their palms. A lever like this is one of the oldest simple machines people ever made.',
-      cue: 'Trace a slow circle in the air with your hand. Can you make it round and steady?',
+      text: 'Above the tower stands the screw.\n\nIt is made of wood. It is taller than Grandfather.\n\nA long bar goes through the top, for pushing.',
+      cue: 'Hold up one finger. Now wind it round and round, going down. That is a screw.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p4-first-turn',
-        focus: 'a Greek aunt and child safely turning the windlass drum to wind the press rope',
+        id: 'the-screw-that-squeezed-the-olives-p4-screw',
+        focus: 'a giant wooden screw standing in its frame above the basket stack',
         composition:
-          'Foreground: rope winding onto a turning wooden drum; midground: paired hands on the windlass handle; background: the long beam beginning to lean over the stacked baskets',
-        palette: 'dusty ochre, olive, honey brown, and pale blue',
+          'Foreground: the stack of paste baskets; midground: a huge wooden screw with deep spiral threads running down into a heavy timber frame, a long wooden bar through the head of it; background: the girl looking up at it, small beside the frame',
+        palette: 'honey wood, deep shadow in the threads, straw, and stone',
       },
-      alt: 'A child and adult slowly turn a wooden windlass drum, winding a rope that pulls a heavy press beam down onto olive baskets.',
+      alt: 'A giant wooden screw with deep spiral threads stands in a timber frame above a stack of baskets, a long bar through its top.',
     },
     {
-      text: 'Here is the secret the beam was quietly teaching them. Pushing far out at the rope end took only a light, steady effort. Yet that gentle push became a mighty squeeze upon the baskets below. A long lever trades a small push for a big, strong lift. That is why one child and one aunt could press so many olives. The longer the beam, the harder it could press without tired arms.',
+      text: 'Look at the screw closely.\n\nThe line winds round it like a path up a hill.\n\nA screw is a ramp, wrapped around a pole. That is all it is.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p5-lever-secret',
-        focus: 'the long beam pressing down hard on baskets while light hands turn the far windlass',
+        id: 'the-screw-that-squeezed-the-olives-p5-thread',
+        focus: 'a close view of the spiral thread winding down the wooden screw',
         composition:
-          'Foreground: the beam bearing down firmly on the basket stack; midground: the pile squeezing tighter; background: the small figures turning the distant windlass with ease',
-        palette: 'honey brown, deep olive, terracotta, and soft amber',
+          'Foreground: a close view of the wooden screw filling the frame, one continuous spiral thread winding down it, the girl tracing the thread with one finger; background: soft blur of the press room',
+        palette: 'honey wood, deep carved shadow, and warm light',
       },
-      alt: 'A long beam presses hard on stacked baskets while a child and aunt turn the far windlass with a light, easy push.',
+      alt: 'A close view of the spiral thread winding down a wooden screw, a child tracing it with one finger.',
     },
     {
-      text: 'Then a shining drop gathered at the wooden spout. It grew round, trembled, and fell into the jar. Plip. Another drop followed, then another, then a thin golden thread. Each one glowed bright as a little bead of evening sun. This was the treasure that had hidden inside every olive. The child watched it pool in the jar, clear and green-gold and new.',
+      text: 'They lean on the bar and push.\n\nThe screw turns. Round and down. Round and down.\n\nIt goes a long way round to go a little way down.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p6-first-drops',
-        focus: 'the first golden drops falling from the press spout into a clay jar',
+        id: 'the-screw-that-squeezed-the-olives-p6-turning',
+        focus: 'the girl and her grandfather pushing the long bar to turn the screw',
         composition:
-          'Foreground: a glowing oil drop at the jar rim; midground: the pressed woven baskets under the beam; background: a delighted child and a smiling aunt watching closely',
-        palette: 'golden oil, dark olive, terracotta, and warm cream',
+          'Foreground: the long wooden bar sweeping toward the viewer; midground: the girl and her grandfather leaning into it with both hands, walking it round; background: the screw turning down into its frame above the baskets',
+        palette: 'warm wood, dust in the light, and stone grey',
       },
-      alt: 'Golden drops fall from a wooden olive beam press into a clay jar while a Greek child watches with delight.',
+      alt: 'A girl and her grandfather lean on a long wooden bar with both hands, walking it round to turn the screw.',
     },
     {
-      text: 'The child hurried and turned too fast. The windlass bumped, and the jar wobbled near the spout. The aunt caught it and set it safely in the middle. “The olives have waited all season,” she said gently. “We can give them one quiet moment.” The child let those hurried shoulders soften and slow. Patient hands, the aunt always said, make the very best oil.',
+      text: 'The screw presses down on the tower of baskets.\n\nThe tower squashes. It gets shorter and shorter.\n\nAnd the oil comes out.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p7-wobbly-jar',
-        focus: 'an aunt steadying the clay oil jar after the windlass moves too quickly',
+        id: 'the-screw-that-squeezed-the-olives-p7-pressing',
+        focus: 'the basket stack squashed flat under the screw, oil running from its edges',
         composition:
-          'Foreground: the clay jar centered beneath the spout; midground: the aunt calming the child; background: the still wooden beam press holding its squeeze',
-        palette: 'muted amber, clay, sage green, and lengthening violet shadow',
+          'Foreground: oil running out from between the squashed baskets into a shallow stone channel; midground: the flattened stack pressed under the foot of the screw; background: the girl watching closely, her hands on her knees',
+        palette: 'green-gold oil, wet stone, straw, and shadow',
       },
-      alt: 'An adult steadies a clay jar while a child pauses beside the windlass of an olive press.',
+      alt: 'Oil runs from between squashed baskets into a stone channel under the foot of a wooden screw.',
     },
     {
-      text: 'They began again, slow and even. “Round goes the windlass,” the child whispered this time. The drum turned; the rope wound; the beam pressed the baskets deeper. A thin golden ribbon slipped steadily into the waiting jar. The child noticed something wonderful floating at the very top. The clear oil rose above a thin, watery layer left in the fruit. So they would gently ladle the good oil off from above.',
-      cue: 'Oil floats on water. Wonder together: have you seen oil sit on top of water at home?',
+      text: 'The oil runs down the stone channel. It goes into a big clay jar.\n\nThere is water in there too, from the fruit.\n\nBut oil floats. It sits on top, all by itself.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p8-oil-floats',
-        focus: 'a ribbon of oil floating above a thin watery layer in the centered clay jar',
+        id: 'the-screw-that-squeezed-the-olives-p8-floating',
+        focus: 'a clay jar with green-gold oil floating in a clear layer above darker water',
         composition:
-          'Foreground: golden oil floating over a paler watery layer in the jar; midground: the beam press and the turning pair; background: woven baskets in soft evening light',
-        palette: 'liquid gold, walnut brown, moss green, and dusky rose',
+          'Foreground: a wide clay jar seen from above the rim, a bright green-gold layer of oil floating clearly above a darker watery layer; midground: the girl leaning over the rim to look in; background: the stone channel running back to the press',
+        palette: 'green-gold, dark water, terracotta, and stone',
       },
-      alt: 'A ribbon of oil flows into a jar and floats above a thin watery layer as a Greek child and aunt turn the press windlass.',
+      alt: 'A girl leans over a clay jar where a bright layer of oil floats above a darker watery layer.',
     },
     {
-      text: 'When the jar was full enough, the aunt lifted it with both careful hands. “This is why we press,” she said, and the child leaned in to listen. This oil would burn bright in their little clay lamp all winter. It would shine on warm bread and soften rough, chapped skin. Some jars would even sail across the sea to faraway towns. One patient beam had made light and food from a tree.',
+      text: 'Why use a screw? Why not just push down hard?\n\nBecause hands are not strong enough. Not nearly.\n\nThe screw turns a small push into a huge squeeze.',
+      cue: 'Push down on the table as hard as you can. Now imagine squeezing a hundred times harder.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p9-what-oil-does',
-        focus: 'a Greek aunt showing a full jar of oil beside a clay lamp, bread, and a shipping jar',
+        id: 'the-screw-that-squeezed-the-olives-p9-why',
+        focus: 'the girl pushing the bar with both hands while the great screw bears down',
         composition:
-          'Foreground: a glowing jar of oil in the aunt’s hands; midground: a small lit clay lamp and fresh bread; background: a tall sealed amphora ready for a sea journey',
-        palette: 'soft gold, olive leaf, brown wood, and warm lamplight',
+          'Foreground: the girl pushing the long bar with two hands, her whole weight in it; midground: the screw pressing down hard on the flattened stack, oil running fast; background: the heavy timber frame taking the strain',
+        palette: 'warm wood, green-gold oil, and dusty light',
       },
-      alt: 'A Greek aunt holds a full jar of fresh oil beside a lit clay lamp, bread, and a tall sealed jar ready to travel.',
+      alt: 'A girl pushes the long bar with her whole weight while the screw presses down and oil runs fast.',
     },
     {
-      text: 'That night the child asked, “Could a press ever squeeze even harder?” The aunt smiled at the good, curious question. “Someday, clever people will find new ways,” she said softly. And they truly did, in the years long after this quiet farm. Builders learned to turn a great wooden screw straight down onto the baskets. A screw is a ramp wrapped round and round a pole, pressing as it turns.',
-      cue: 'Wonder together: how could turning a screw round and round push something straight down?',
+      text: 'The jar is full. Grandfather carries it with both arms.\n\nThis oil will burn in their lamp all winter.\n\nIt will go on bread. It will go on dry hands.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p10-the-screw-idea',
-        focus: 'a later Roman-style screw press turning straight down onto olive baskets',
+        id: 'the-screw-that-squeezed-the-olives-p10-uses',
+        focus: 'a lit clay lamp, bread, and the full jar of oil on a wooden table',
         composition:
-          'Foreground: a great wooden screw threading down onto a basket stack; midground: a curious child imagining it; background: the old beam press faded softly behind, like a memory',
-        palette: 'twilight violet, warm lamp-gold, aged wood, and dusky olive',
+          'Foreground: a small clay oil lamp with a live flame, a torn loaf of bread beside it; midground: the full jar of green-gold oil, the grandfather setting it down; background: the girl watching, evening light through a doorway',
+        palette: 'lamp flame gold, bread crust, terracotta, and dusk blue',
       },
-      alt: 'A large wooden screw press turns straight down onto stacked olive baskets, imagined beside the older beam press.',
+      alt: 'A lit clay lamp and bread sit on a table beside a full jar of oil, a girl watching in the evening light.',
     },
     {
-      text: 'A clever builder named Hero, from the city of Alexandria, wrote about that screw press. He described it long ago, about sixty years after a very old calendar’s start. So the family’s beam and the later screw are cousins in one long story. Each one, in its turn, helped people press more oil with gentler effort. The child felt proud to stand at the very start of that story. Round and round, hands kept the oil flowing through the ages.',
+      text: 'Some jars do not stay home. They are tall and sealed with clay.\n\nThey go down to the boats.\n\nThe oil sails away across the sea.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p11-hero-of-alexandria',
-        focus: 'a scholar in Alexandria writing about presses beside a scroll and lamp',
+        id: 'the-screw-that-squeezed-the-olives-p11-amphorae',
+        focus: 'tall sealed clay amphorae being carried aboard a boat at a stone quay',
         composition:
-          'Foreground: an open scroll with simple press drawings and a burning oil lamp; midground: the scholar Hero writing by lamplight; background: a great library and a harbor of sailing ships',
-        palette: 'ink brown, papyrus cream, lamp amber, and deep harbor blue',
+          'Foreground: three tall pointed clay amphorae sealed at the neck, resting on a stone quay; midground: a man carrying one up a plank onto a wooden boat; background: a calm sea and a low headland in morning light',
+        palette: 'terracotta, sea blue-green, pale stone, and morning gold',
       },
-      alt: 'A scholar in Alexandria writes about olive presses by lamplight, with a scroll of press drawings and a harbor behind him.',
+      alt: 'Tall sealed clay jars stand on a stone quay while a man carries one up a plank onto a boat.',
     },
     {
-      text: 'People say that long before, a goddess gave Athens its first olive tree. That is an old tale, not a true story, but a lovely one to share. What is truly true is simpler, and just as full of wonder. From a bitter little fruit, patient turning coaxes bright golden oil. Look for that same oil today, in a bottle upon your table. Every drop began with a tree, a squeeze, and someone’s careful hands. Round goes the windlass, still, in the long, shining story of oil.',
-      cue: 'Look for olive oil at home. Can you find where it rests, ready to shine on your food?',
+      text: 'That was a long time ago.\n\nBut look in your kitchen. There is a bottle of olive oil.\n\nSame hard little fruit. Same squeeze. Round and down.',
       scene: {
-        id: 'the-screw-that-squeezed-the-olives-p12-oil-today',
-        focus: 'a modern bottle of olive oil on a table linking back to the ancient grove',
+        id: 'the-screw-that-squeezed-the-olives-p12-today',
+        focus: 'a modern bottle of olive oil on a kitchen counter',
         composition:
-          'Foreground: a clear bottle of golden olive oil on a kitchen table; midground: a child noticing it with bright eyes; background: a soft dreamlike olive grove and the old press, glowing faintly',
-        palette: 'warm gold, kitchen cream, olive green, and gentle twilight blue',
+          'Foreground: a plain glass bottle of green-gold olive oil on a wooden kitchen counter, a few olives beside it; midground: a child’s hand reaching toward it; background: a bright modern kitchen window',
+        palette: 'green-gold, clear glass, pale wood, and daylight',
       },
-      alt: 'A bottle of golden olive oil rests on a table while a child looks at it, with an ancient olive grove glowing softly behind.',
+      alt: 'A glass bottle of green-gold olive oil stands on a kitchen counter, a child reaching toward it.',
     },
   ],
 };
+
+export default theScrewThatSqueezedTheOlives;
