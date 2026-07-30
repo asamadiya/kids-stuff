@@ -119,7 +119,7 @@ export const STORY_META: Record<string, StoryMeta> = {
   'the-rope-stretchers-of-the-nile': { year: -1300, yearLabel: 'c. 1300 BCE', lat: 26.0, lng: 32.0, place: 'Nile, Egypt', region: 'Africa', era: 'Prehistory (before 1000 BCE)' },
   'the-round-earth-in-the-old-book': { year: 600, yearLabel: 'c. 600 CE', lat: 23.18, lng: 75.78, place: 'Ujjain, India', region: 'South Asia', era: 'Medieval (500–1400 CE)' },
   'the-round-felt-house': { year: 1500, yearLabel: 'traditional (yurt)', lat: 47.9, lng: 106.9, place: 'Mongolia', region: 'East Asia', era: 'Early modern (1400–1700 CE)' },
-  'the-screw-that-squeezed-the-olives': { year: -300, yearLabel: 'c. 300 BCE', lat: 37.98, lng: 23.73, place: 'Attica, Greece', region: 'Mediterranean', era: 'Ancient (1000 BCE–1 CE)' },
+  'the-screw-that-squeezed-the-olives': { year: 70, yearLabel: 'c. 70 CE', lat: 40.75, lng: 14.49, place: 'Campania, Roman Italy', region: 'Mediterranean', era: 'Classical (1–500 CE)' },
   'the-shadow-that-measured-a-giant': { year: -585, yearLabel: 'c. 585 BCE', lat: 37.53, lng: 27.28, place: 'Miletus', region: 'Mediterranean', era: 'Ancient (1000 BCE–1 CE)' },
   'the-shell-that-covered-the-moon': { year: -270, yearLabel: 'c. 270 BCE', lat: 37.75, lng: 26.85, place: 'Samos, Greece', region: 'Mediterranean', era: 'Ancient (1000 BCE–1 CE)' },
   'the-shell-that-meant-zero': { year: -36, yearLabel: 'c. 36 BCE', lat: 17.22, lng: -89.62, place: 'Maya lowlands', region: 'Mesoamerica', era: 'Ancient (1000 BCE–1 CE)' },

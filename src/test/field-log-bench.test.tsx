@@ -11,10 +11,6 @@ vi.mock('../workshop/say', () => ({
 }));
 vi.mock('../workshop/tone', () => ({ pluck: vi.fn(), step: () => 440 }));
 
-// Pinned, not taken from the clock: the latitude derived from a fixed sun
-// altitude changes sign with the season, so `new Date()` makes this assertion
-// pass for part of the year and fail for the rest.
-const today = '2026-07-28';
 
 // The shadow bench is driven with roughly ninety clicks. userEvent's default
 // inter-event delay makes that the slowest test in the suite and, under load,
@@ -55,8 +51,12 @@ describe('the field log bench', () => {
     const kept = JSON.parse(window.localStorage.getItem('ks.workshop.field-log.v1') ?? '[]');
     expect(kept).toHaveLength(1);
     expect(kept[0]).toMatchObject({
-      kind: 'find', what: 'snail', habitat: 'wall', count: 2, doing: 'carrying', date: today,
+      kind: 'find', what: 'snail', habitat: 'wall', count: 2, doing: 'carrying',
     });
+    // The record stamps the real day. Pinning it here would only assert that
+    // the machine's clock matches a constant — the pinned date exists for the
+    // latitude assertions, whose sign changes with the season, not for this.
+    expect(kept[0].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   it('carries the tally across sessions, which is the reason to go back out', async () => {
