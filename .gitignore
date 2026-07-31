@@ -17,3 +17,4 @@ test-results/
 .wsshoot.mjs
 .wsshoot2.mjs
 artifacts/
+.figure-render/

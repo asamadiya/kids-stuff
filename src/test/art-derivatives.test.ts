@@ -24,9 +24,16 @@ const required = (): Need[] => {
     const text = readFileSync(join(STORIES, f), 'utf8');
     const slug = /slug:\s*'([a-z0-9-]+)'/.exec(text)?.[1];
     if (!slug) continue;
-    const pages = text.match(/\btext:\s*'/g)?.length ?? 0;
     out.push({ slug, name: 'cover' });
-    for (let i = 0; i < pages; i += 1) out.push({ slug, name: `page-${i + 1}` });
+    // A page carrying a `figureId` renders a hand-authored diagram instead of
+    // a painting, so it has no art file and must not be demanded here. Split
+    // on the page boundary rather than counting `text:` matches, so the two
+    // are never mismatched: an over-count fails the suite for a file that
+    // should not exist, an under-count lets a real 404 through.
+    const chunks = text.split(/\btext:\s*'/).slice(1);
+    chunks.forEach((chunk, i) => {
+      if (!/\bfigureId:\s*'/.test(chunk)) out.push({ slug, name: `page-${i + 1}` });
+    });
   }
   return out;
 };

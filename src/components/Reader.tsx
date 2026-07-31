@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { StoryImage } from './StoryImage';
+import { StoryFigure } from './StoryFigure';
 import { ReaderControls } from './ReaderControls';
 import { StoryComplete } from './StoryComplete';
 import type { Story } from '../types';
@@ -205,11 +206,15 @@ export function Reader({
             aria-labelledby="reader-story-title"
           >
             <figure className="reader__figure">
-              <StoryImage
-                story={story}
-                page={current}
-                alt={story.pages[current].alt}
-              />
+              {story.pages[current].figureId ? (
+                <StoryFigure figureId={story.pages[current].figureId as string} />
+              ) : (
+                <StoryImage
+                  story={story}
+                  page={current}
+                  alt={story.pages[current].alt}
+                />
+              )}
             </figure>
 
             <div className="reader__panel">

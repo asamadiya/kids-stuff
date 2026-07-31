@@ -44,7 +44,14 @@ QUALITY = 82
 
 
 def required() -> list[tuple[str, str]]:
-    """(slug, name) for every image the stories reference."""
+    """(slug, name) for every image the stories reference.
+
+    A page carrying a `figureId` renders a hand-authored diagram instead of a
+    painting, so it has no master and must not be encoded — otherwise a stale
+    derivative from an earlier draft survives every rebuild and ships as a page
+    nothing points at. Split on the page boundary so this list and the one in
+    src/test/art-derivatives.test.ts cannot disagree.
+    """
     out: list[tuple[str, str]] = []
     for f in sorted((ROOT / "src" / "stories").glob("*.ts")):
         text = f.read_text()
@@ -52,9 +59,10 @@ def required() -> list[tuple[str, str]]:
         if not slug_m:
             continue
         slug = slug_m.group(1)
-        pages = len(re.findall(r"\btext:\s*'", text))
         out.append((slug, "cover"))
-        out.extend((slug, f"page-{i + 1}") for i in range(pages))
+        for i, chunk in enumerate(re.split(r"\btext:\s*'", text)[1:]):
+            if not re.search(r"\bfigureId:\s*'", chunk):
+                out.append((slug, f"page-{i + 1}"))
     return out
 
 
