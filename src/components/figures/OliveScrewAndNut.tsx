@@ -127,13 +127,17 @@ export function OliveScrewAndNut() {
         ))}
       </g>
 
-      {/* the plate, and where it is headed */}
-      <rect x="124" y={SHAFT_BOTTOM} width="124" height="18" rx="4" fill={INK.woodDark} stroke={INK.line} strokeWidth="2" />
+      {/* The foot, and the lid it bears on. These are two pieces, not one: a
+          plate rigid with the screw would grind the mats round as it came
+          down instead of pressing them, and page 11's figure already drew
+          them separate. */}
+      <rect x={CX - 26} y={SHAFT_BOTTOM} width="52" height="10" rx="2" fill={INK.woodShade} stroke={INK.line} strokeWidth="2" />
+      <rect x="124" y={SHAFT_BOTTOM + 13} width="124" height="18" rx="4" fill={INK.woodDark} stroke={INK.line} strokeWidth="2" />
       <path
-        d={`M${CX},394 L${CX},428 M${CX - 8},418 L${CX},429 L${CX + 8},418`}
+        d={`M${CX},406 L${CX},438 M${CX - 8},428 L${CX},439 L${CX + 8},428`}
         fill="none" stroke={INK.mark} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
       />
-      <text className="story-figure__lead" x={CX} y="458" fill={INK.mark} textAnchor="middle">
+      <text className="story-figure__lead" x={CX} y="462" fill={INK.mark} textAnchor="middle">
         …and it walks down.
       </text>
 

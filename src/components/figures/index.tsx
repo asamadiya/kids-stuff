@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react';
+import { OliveTheStone } from './OliveTheStone';
 import { OliveScrewAndNut } from './OliveScrewAndNut';
+import { OliveTheLongBar } from './OliveTheLongBar';
 import { OliveTheSqueeze } from './OliveTheSqueeze';
 
 /**
@@ -19,9 +21,19 @@ export interface StoryFigureSpec {
 
 const specs: readonly StoryFigureSpec[] = [
   {
+    id: 'olive-the-stone',
+    caption: 'Nobody lifts the stone. It is round, so it rolls; the post keeps it rolling over the same olives; and its own weight does the crushing.',
+    render: () => <OliveTheStone />,
+  },
+  {
     id: 'olive-screw-and-nut',
     caption: 'Cut the beam open and you can see it: the ridge is sitting in a groove that fits it exactly, and that groove runs round and down.',
     render: () => <OliveScrewAndNut />,
+  },
+  {
+    id: 'olive-the-long-bar',
+    caption: 'Both arrows turn the screw the same amount. The fat one is what her hands could not manage; the thin one is what she did instead.',
+    render: () => <OliveTheLongBar />,
   },
   {
     id: 'olive-the-squeeze',

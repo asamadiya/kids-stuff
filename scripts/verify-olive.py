@@ -21,11 +21,12 @@ ART = Path('public/art/the-screw-that-squeezed-the-olives')
 OUT = Path('artifacts')
 SRC = Path('src/stories/the-screw-that-squeezed-the-olives.ts')
 
-# All eight painted pages are cut from ONE 3x3 sheet, so the press, the room
+# All nine painted pages are cut from ONE 3x3 sheet, so the press, the room
 # and the two figures cannot drift between them. Pages 6 and 8 are absent here
-# on purpose: they carry hand-authored diagrams (the threaded beam, and the oil
-# leaving through the weave), which `scripts/verify-figures.mjs` checks instead.
-PAINTED = [1, 2, 3, 4, 5, 7, 9, 10]
+# on purpose: 3, 7, 9 and 11 carry hand-authored diagrams (the mill from above,
+# the threaded beam, the two pushes on the bar, the oil leaving through the
+# weave), which `scripts/verify-figures.mjs` checks instead.
+PAINTED = [1, 2, 4, 5, 6, 8, 10, 12, 13]
 
 
 def hashes() -> dict:
