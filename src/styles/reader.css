@@ -356,3 +356,54 @@
   font-size: var(--step-1);
   line-height: var(--leading-body);
 }
+
+/*
+ * Diagram pages.
+ *
+ * Two pages of the olive story explain a mechanism that is hidden by
+ * definition — a hole cut through a beam, liquid moving inside a stack — so
+ * they carry a hand-authored figure where the painting would go. The box keeps
+ * the painting's 4:3 so the spread does not jump size on a page turn; the
+ * drawing letterboxes inside it against the same paper.
+ *
+ * Below 34rem the figure pans horizontally rather than shrinking its labels
+ * into illegibility. The reader turns pages with buttons and arrow keys, never
+ * a horizontal swipe, so the scroll cannot steal a gesture.
+ */
+.reader__figure .story-figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.story-figure__svg {
+  display: block;
+  width: 100%;
+  min-width: 34rem;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: #f7f1e4;
+}
+
+.story-figure__svg text {
+  font-family: var(--font-sans);
+}
+
+.story-figure__lead {
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.story-figure__note {
+  font-size: 19px;
+}
+
+.story-figure__caption {
+  margin: 0;
+  color: var(--ink-faint);
+  font-family: var(--font-serif);
+  font-size: var(--step--1);
+  line-height: 1.5;
+}

@@ -47,6 +47,16 @@ export interface StoryPage {
   readonly cue?: string;
   /** Illustration composition metadata for later scene implementers. */
   readonly scene: StoryScene;
+  /**
+   * Renders a hand-authored diagram in place of the page's painting.
+   *
+   * Some pages explain a mechanism that is, by definition, hidden: a hole cut
+   * through a beam, liquid moving inside a stack. A painting cannot show a
+   * cutaway, and the image model cannot be made to draw a correct one. Those
+   * pages get a figure instead, keyed into the registry in
+   * `src/components/figures`. A page with a figure needs no art file.
+   */
+  readonly figureId?: string;
   /** Non-empty accessible description of the illustrated scene. */
   readonly alt: string;
 }

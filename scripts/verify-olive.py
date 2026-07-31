@@ -21,14 +21,17 @@ ART = Path('public/art/the-screw-that-squeezed-the-olives')
 OUT = Path('artifacts')
 SRC = Path('src/stories/the-screw-that-squeezed-the-olives.ts')
 
-# Pages 3-6 are cut from one sheet; 1, 2, 7 and 8 are rendered individually.
-PAGES = 8
+# All eight painted pages are cut from ONE 3x3 sheet, so the press, the room
+# and the two figures cannot drift between them. Pages 6 and 8 are absent here
+# on purpose: they carry hand-authored diagrams (the threaded beam, and the oil
+# leaving through the weave), which `scripts/verify-figures.mjs` checks instead.
+PAINTED = [1, 2, 3, 4, 5, 7, 9, 10]
 
 
 def hashes() -> dict:
     return {
         f'page-{i}': hashlib.sha256((ART / f'page-{i}.png').read_bytes()).hexdigest()
-        for i in range(1, PAGES + 1)
+        for i in PAINTED
     }
 
 
@@ -41,7 +44,7 @@ def main() -> int:
 
     text = SRC.read_text(encoding='utf-8')
     pages = [t.replace('\\n\\n', ' ') for t in re.findall(r"text: '((?:[^'\\]|\\.)*)'", text)]
-    ims = [Image.open(ART / f'page-{i}.png').convert('RGB') for i in range(1, PAGES + 1)]
+    ims = [Image.open(ART / f'page-{i}.png').convert('RGB') for i in PAINTED]
     w = 430
     h = round(ims[0].height * w / ims[0].width)
     cols, cap = 3, 112
@@ -50,9 +53,9 @@ def main() -> int:
     for i, im in enumerate(ims):
         x, y = (i % cols) * w, (i // cols) * (h + cap)
         sheet.paste(im.resize((w, h), Image.LANCZOS), (x, y))
-        dr.text((x + 6, y + h + 4), f'PAGE {i + 1}', fill=(150, 40, 40))
+        dr.text((x + 6, y + h + 4), f'PAGE {PAINTED[i]}', fill=(150, 40, 40))
         line, row = '', 0
-        for word in pages[i].split():
+        for word in pages[PAINTED[i] - 1].split():
             if len(line) + len(word) + 1 > 60:
                 dr.text((x + 6, y + h + 18 + row * 14), line, fill=(20, 20, 20))
                 line, row = word, row + 1
