@@ -31,8 +31,10 @@ const OUT = 'artifacts';
 const WORK = '.figure-render';
 
 const FIGURES = [
-  ['olive-screw-and-nut', 'OliveScrewAndNut', 'page 6'],
-  ['olive-the-squeeze', 'OliveTheSqueeze', 'page 8'],
+  ['olive-the-stone', 'OliveTheStone', 'page 3'],
+  ['olive-screw-and-nut', 'OliveScrewAndNut', 'page 7'],
+  ['olive-the-long-bar', 'OliveTheLongBar', 'page 9'],
+  ['olive-the-squeeze', 'OliveTheSqueeze', 'page 11'],
 ];
 
 mkdirSync(OUT, { recursive: true });

@@ -18,3 +18,4 @@ test-results/
 .wsshoot2.mjs
 artifacts/
 .figure-render/
+__pycache__/

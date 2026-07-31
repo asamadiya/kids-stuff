@@ -33,11 +33,13 @@ SLUG = 'the-screw-that-squeezed-the-olives'
 GEN = Path.home() / 'my_stuff/kids-stuff/generated' / SLUG
 SHEET = GEN / '_book-sheet.png'
 
-# Row-major over the 3x3 grid: eight painted pages, then the cover. Pages 6 and
-# 8 are not here — they carry hand-authored diagrams (the threaded beam, and the
-# oil leaving through the weave), because a painting cannot show a cutaway.
-CELL_TARGET = ['page-1', 'page-2', 'page-3', 'page-4', 'page-5',
-               'page-7', 'page-9', 'page-10', 'cover']
+# Row-major over the 3x3 grid: the nine painted pages. Pages 3, 7, 9 and 11 are
+# not here — they carry hand-authored diagrams (the mill from above, the
+# threaded beam, the two pushes on the bar, the oil leaving through the weave),
+# because a painting can show none of those. The cover is copied from one of
+# these cells afterwards, so it cannot be a different machine.
+CELL_TARGET = ['page-1', 'page-2', 'page-4', 'page-5', 'page-6',
+               'page-8', 'page-10', 'page-12', 'page-13']
 
 LOOK = (
     "A nine-panel storyboard sheet for a children's picture book, a 3x3 grid of nine equal "
@@ -67,6 +69,15 @@ PRESS = (
     "floor with a shallow channel running to a clay jar sunk into the floor. "
 )
 
+MILL = (
+    "THE CRUSHING MILL, in the panel that shows it: a wide round stone basin at floor level; a "
+    "stout wooden POST standing upright in the very CENTRE of that basin; a horizontal wooden ARM "
+    "joined to the post and reaching outward from it; and on the far end of that arm, a great round "
+    "stone wheel standing UP ON ITS EDGE, resting in the basin on the olives. The post, the arm and "
+    "the wheel are all clearly visible and clearly joined to one another. The wheel rolls round the "
+    "basin on its edge like a wheel, it does not lie flat and it does not float. "
+)
+
 CAST = (
     "THIS BOOK CONTAINS EXACTLY TWO CHARACTERS IN TOTAL AND NO OTHERS ANYWHERE. Every single panel "
     "contains AT MOST ONE CHILD and AT MOST ONE ADULT. There is never a second child in a panel: no "
@@ -84,34 +95,43 @@ PANELS = (
     "not look alike; vary the camera distance. "
     "1: the girl kneels beside two wide baskets heaped with hard green olives on the floor, the "
     "grandfather setting down a third basket. "
-    "2: ONE GIRL ONLY and her grandfather, no other child: a great round millstone standing on its "
-    "edge in a circular stone basin, the two of them leaning on its wooden handle, crushing olives "
-    "to grey paste. "
+    "2: THE CRUSHING MILL, and the only panel that shows it. THE GRANDFATHER IS ALONE AT THE MILL "
+    "and is the only person touching it: he leans forward on the far end of the wooden arm, walking "
+    "it round, and the stone wheel rolls on its edge over the olives in the basin. THE GIRL STANDS "
+    "APART on the far side of the basin with her hands at her sides, just watching it go round. "
+    "There are EXACTLY TWO PEOPLE in this panel, one old man and one girl, and nobody else. The "
+    "upright post at the centre of the basin, and the arm joining that post to the wheel, must both "
+    "be plainly visible. "
     "3: the girl lifting one flat woven mat of grey-green paste onto the top of the stack under "
     "the press; the mats are OPEN LOOSE BASKETWORK with visible gaps in the weave; the pressing "
     "plate hangs clearly ABOVE the stack with a wide open gap between them, nothing touching. THE "
-    "STACK IS TALL HERE — five thick mats, as high as the girl's knee. "
-    "4: MEDIUM — the girl ALONE at the bar, bent forward, heels lifted, shoving it hard with both "
-    "hands; the screw has not moved and the plate is STILL HELD HIGH ABOVE the stack with the gap "
-    "of panel 3 unchanged; THE GRANDFATHER IS NOT HELPING — he stands well back with his arms "
-    "folded and both hands away from the bar, only watching. "
+    "STACK IS TALL HERE — five thick mats, as high as the girl\'s knee. "
+    "4: the girl trying to squash the paste with her bare hands, and failing. BOTH HER PALMS ARE "
+    "FLAT ON THE TOP MAT OF GREY-GREEN PASTE at the top of the stack, which is at about her waist "
+    "height. She is bent forward over it with her arms straight, her shoulders directly above her "
+    "hands, pressing her whole body weight straight DOWNWARD into the paste, with one bare foot "
+    "slipping backwards on the stone floor. The wooden pressing plate hangs in the air ABOVE her "
+    "hands and she is not touching it. SHE IS NOT TOUCHING THE BAR either. The stack is not squashed "
+    "at all. THE GRANDFATHER IS NOT HELPING — he stands well back with his arms folded, watching. "
     "5: CLOSE-UP at the screw — the girl kneels on the stone floor right beside the screw with "
     "her index finger PRESSED ON the spiral thread, following it; the grandfather kneels beside "
-    "her with both hands on his own knees, not touching the screw; the bar is still in place above. "
-    "6: the girl ALONE, gripping the far end of the bar mid-stride, walking it round; the bar has "
+    "her with both hands on his own knees, not touching the screw. "
+    "6: THE GRANDFATHER IS TEACHING HER WHERE TO HOLD. Both of them stand at the bar. His two hands "
+    "are placed over her two hands on the bar, and he is sliding her hands OUTWARD along it, away "
+    "from the screw, towards the very FAR END of the bar. Both of them are looking at her hands. "
+    "7: the girl ALONE, gripping the far end of the bar mid-stride, walking it round; the bar has "
     "swung to a different angle; LESS OF THE SCREW NOW SHOWS ABOVE THE BEAM than in the other "
     "panels because it has wound down through it; the plate has come DOWN and is pressing hard onto "
     "the stack. THIS IS THE ONE PANEL WHERE THE STACK IS SHORT: the mats are crushed to HALF THE "
     "HEIGHT of the tall stack in panel 3, squashed into thin flat discs, spread wider than before, "
     "with grey-green paste bulging out at their rims and no gap left under the plate. "
-    "7: CLOSE and LOW — green-gold oil seeping from the seam between two flattened mats near the "
+    "8: CLOSE and LOW — green-gold oil seeping from the seam between two flattened mats near the "
     "floor, one fat drop falling into the stone channel, the girl crouched watching it. "
-    "8: night, a small clay lamp burning with a yellow flame on a low table, the girl sitting "
-    "looking down at her own open hands, the grandfather across from her. "
-    "9: the girl standing small at the foot of the whole press, looking up at the screw."
+    "9: night, a small clay lamp burning with a yellow flame on a low table, the girl sitting "
+    "looking down at her own open hands, the grandfather across from her."
 )
 
-SCENE = LOOK + PRESS + CAST + PANELS
+SCENE = LOOK + PRESS + MILL + CAST + PANELS
 
 
 def generate() -> bool:
