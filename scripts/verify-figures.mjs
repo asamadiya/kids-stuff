@@ -130,6 +130,33 @@ const report = await page.evaluate(() => {
   return out;
 });
 
+// Legibility on a phone. The figures pan horizontally below 34rem rather than
+// scaling their labels away, which I described as an acceptable trade without
+// ever measuring it. This measures it: what size does a label actually render
+// at, in CSS pixels, on a 360px-wide screen?
+await page.setViewport({ width: 360, height: 780, deviceScaleFactor: 2 });
+await page.goto(`file://${process.cwd()}/${WORK}/figures.html`, { waitUntil: 'networkidle0' });
+await page.addStyleTag({ content: '.wrap { width: 360px; padding: 8px; }' });
+const narrow = await page.evaluate(() => {
+  const out = [];
+  for (const svg of document.querySelectorAll('svg')) {
+    const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+    const notes = [...svg.querySelectorAll('.story-figure__note')];
+    const px = notes.map((t) => Math.round(parseFloat(getComputedStyle(t).fontSize) * scale * 10) / 10);
+    out.push({ id: svg.getAttribute('aria-label').slice(0, 26),
+               rendered: svg.getBoundingClientRect().width > 0 ? Math.round(svg.getBoundingClientRect().width) : 0,
+               smallestLabelPx: Math.min(...px) });
+  }
+  return out;
+});
+for (const n of narrow) {
+  const verdict = n.smallestLabelPx >= 12 ? 'legible' : 'TOO SMALL';
+  console.log(`  360px viewport: ${n.id}… label ${n.smallestLabelPx}px  ${verdict}`);
+}
+await page.setViewport({ width: 1048, height: 1400, deviceScaleFactor: 2 });
+await page.goto(`file://${process.cwd()}/${WORK}/figures.html`, { waitUntil: 'networkidle0' });
+await page.setViewport({ width: 1048, height: await page.evaluate(() => document.body.scrollHeight), deviceScaleFactor: 2 });
+
 const shot = `${OUT}/story-figures.png`;
 await page.screenshot({ path: shot, fullPage: true });
 await browser.close();
