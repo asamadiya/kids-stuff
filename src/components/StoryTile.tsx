@@ -42,7 +42,7 @@ export function StoryTile({
       style={accent ? ({ ['--accent' as string]: accent }) : undefined}
     >
       <span className="tile__cover">
-        <StoryImage story={story} page="cover" alt={story.pages[0].alt} />
+        <StoryImage story={story} page="cover" alt={story.coverAlt ?? story.pages[0].alt} />
         {completed ? (
           <span className="tile__check" aria-hidden="true">
             &#10003;

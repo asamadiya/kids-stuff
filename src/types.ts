@@ -80,5 +80,14 @@ export interface Story {
   readonly heartTakeaway: string;
   /** A true, supportable note for the grown-up reader. */
   readonly grownUpFact: string;
+  /**
+   * Describes the cover image, when it is not the first page's picture.
+   *
+   * Tiles used to pass `pages[0].alt` for the cover unconditionally, which was
+   * only ever approximately true — and became plainly false for a story whose
+   * cover is cut from a later page. A screen reader was told about baskets of
+   * olives while the tile showed a press.
+   */
+  readonly coverAlt?: string;
   readonly pages: readonly StoryPage[];
 }
