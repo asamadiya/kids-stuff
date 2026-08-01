@@ -77,3 +77,22 @@ describe('story figures', () => {
     expect(container.innerHTML).toBe('');
   });
 });
+
+describe('cover alt text', () => {
+  it('describes the cover, not page one, when they are different pictures', () => {
+    // The olive story's cover is cut from page 4. Passing pages[0].alt told a
+    // screen reader about baskets of olives over a picture of a press.
+    const olives = STORIES.find((s) => s.slug === 'the-screw-that-squeezed-the-olives')!;
+    expect(olives.coverAlt).toBeTruthy();
+    expect(olives.coverAlt).not.toBe(olives.pages[0].alt);
+    expect(olives.coverAlt).toMatch(/press|screw/);
+  });
+
+  it('still falls back to page one everywhere else', () => {
+    const withoutOwnCoverAlt = STORIES.filter((s) => !s.coverAlt);
+    // The fallback is what every other story relies on; if this ever empties,
+    // the `??` in StoryTile/StoryCard has become dead code.
+    expect(withoutOwnCoverAlt.length).toBeGreaterThan(100);
+    for (const s of withoutOwnCoverAlt) expect(s.pages[0].alt).toBeTruthy();
+  });
+});

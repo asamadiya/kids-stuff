@@ -33,7 +33,7 @@ export function StoryCard({
     >
       <button type="button" className="story-card__open" onClick={() => onOpen(story.slug)} aria-label={readLabel}>
         <span className="story-card__cover">
-          <StoryImage story={story} page="cover" alt={story.pages[0].alt} />
+          <StoryImage story={story} page="cover" alt={story.coverAlt ?? story.pages[0].alt} />
           {featured ? <span className="story-card__ribbon">Tonight&rsquo;s pick</span> : null}
           {completed ? (
             <span className="story-card__check" aria-hidden="true">
