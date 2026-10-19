@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -59,10 +60,10 @@ LOOKS = {
 }
 
 ZONES = {
-    'top': 'The TOP THIRD of the picture is calm, open, uncluttered background (sky, plain wall or soft ground colour) with nothing important in it, kept clear for words.',
-    'bottom': 'The BOTTOM THIRD of the picture is calm, open, uncluttered ground or floor with nothing important in it, kept clear for words.',
-    'left': 'The LEFT THIRD of the picture is a calm, plain, uncluttered area with nothing important in it, kept clear for words.',
-    'right': 'The RIGHT THIRD of the picture is a calm, plain, uncluttered area with nothing important in it, kept clear for words.',
+    'top': 'The TOP QUARTER of the picture is calm, open, uncluttered background (sky, plain wall or soft ground colour) with nothing important in it, kept clear for words.',
+    'bottom': 'The BOTTOM QUARTER of the picture is calm, open, uncluttered ground or floor with nothing important in it, kept clear for words.',
+    'left': 'The LEFT QUARTER of the picture is a calm, plain, uncluttered area with nothing important in it, kept clear for words.',
+    'right': 'The RIGHT QUARTER of the picture is a calm, plain, uncluttered area with nothing important in it, kept clear for words.',
     'none': '',
 }
 
@@ -115,7 +116,12 @@ def main() -> int:
         book = load(slug)
         slug = book['slug']
         first = book['pages'][0]
-        cover = {**first, 'zone': 'none', 'art': f"A cover picture for the book '{book['title']}': " + first['art']}
+        # A cover fills a card edge to edge, so drop the page's reserved-zone
+        # sentences ("The top third ... is a plain cream wall") — kept, they paint
+        # a blank band across the top of every shelf card.
+        art = ' '.join(s for s in re.split(r'(?<=[.!?])\s+', first['art'])
+                       if not re.search(r'\b(third|half|quarter)\b.*\b(picture|frame|image)\b|kept clear|empty and calm|calm and empty', s, re.I))
+        cover = {**first, 'zone': 'none', 'art': f"A cover picture for the book '{book['title']}', filling the whole frame: " + art}
         p, ref = page_prompt(book, cover)
         jobs.append({'out': f'{a.art_root}/{slug}/cover.png', 'prompt': p, **({'ref': ref} if ref else {})})
         for i, page in enumerate(book['pages'], 1):

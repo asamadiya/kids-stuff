@@ -1,20 +1,14 @@
 import { StrictMode } from 'react';
 import {
-  render,
-  screen,
   cleanup,
   act,
   renderHook,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getStory } from '../stories';
 import { useBookProgress, PROGRESS_STORAGE_KEY } from '../hooks/useBookProgress';
 
 const SLUG = 'the-tallest-sunflower';
 const OTHER_SLUG = 'pips-pattern-parade';
-const story = getStory(SLUG)!;
-const PAGE_COUNT = story.pages.length; // 7 story pages; index 7 == completion
 
 const resetUrl = () => {
   window.location.hash = '';
@@ -201,11 +195,6 @@ describe('useBookProgress storage diagnostics', () => {
 /* App integration — resume, completion, and completed styling                 */
 /* -------------------------------------------------------------------------- */
 
-const cardFor = (title: string): HTMLElement =>
-  // A story tile is itself the button; its data-completed reflects progress.
-  screen.getByRole('button', {
-    name: new RegExp(`^Read ${title}( again)?$`, 'i'),
-  });
 
 
 

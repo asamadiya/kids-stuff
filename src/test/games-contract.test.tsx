@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
-import { MATHS_GAMES } from '../maths/registry';
-import { SCIENCE_GAMES } from '../science/registry';
+import { INCOMPLETE as MATHS_INCOMPLETE, MATHS_GAMES } from '../maths/registry';
+import { INCOMPLETE as SCIENCE_INCOMPLETE, SCIENCE_GAMES } from '../science/registry';
 import { REQUIRED_NOTE_FIELDS } from '../notes/types';
 import type { AnyGame, Level } from '../play/types';
 
@@ -21,6 +21,10 @@ describe('the game registry', () => {
   it('has the catalogue the advisor asked for', () => {
     expect(MATHS_GAMES.length).toBeGreaterThanOrEqual(16);
     expect(SCIENCE_GAMES.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('has no game file that exports no game', () => {
+    expect([...MATHS_INCOMPLETE, ...SCIENCE_INCOMPLETE]).toEqual([]);
   });
 
   it('uses each id once', () => {

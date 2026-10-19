@@ -1,5 +1,5 @@
-import { StrictMode, type ComponentProps } from 'react';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { type ComponentProps } from 'react';
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Reader } from '../components/Reader';

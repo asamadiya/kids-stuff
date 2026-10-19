@@ -570,9 +570,6 @@ export function BodyCheck() {
 
         {phase === 'done' && (
           <>
-            <button type="button" className="bench-btn" onClick={() => say(lines.join(' '))}>
-              Read this out
-            </button>
             <button
               type="button"
               className="bench-btn"

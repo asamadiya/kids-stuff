@@ -100,7 +100,8 @@
   --radius-sm: 14px;
   --pill: 999px;
   --tap: 64px;
-  --tap-sm: 48px;
+  /* advisor floor for anything a child can tap: 56 CSS px. */
+  --tap-sm: 56px;
   --line: 3px;
   --shadow: 0 2px 0 rgba(36, 23, 15, 0.12), 0 10px 24px -14px rgba(36, 23, 15, 0.45);
   --shadow-press: 0 1px 0 rgba(36, 23, 15, 0.12);

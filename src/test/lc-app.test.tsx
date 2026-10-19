@@ -64,7 +64,9 @@ describe('every screen of the Learning Center', () => {
     const btn = screen.getAllByRole('button', { name: /for grown-ups/i })[0];
     act(() => btn.click());
     expect(screen.getByText(MATHS_GAMES[0].note.honest)).toBeTruthy();
-    act(() => screen.getByRole('button', { name: /close/i }).click());
+    const dialog = document.querySelector('dialog[open]') as HTMLElement;
+    act(() => (dialog.querySelector('.grownups__close') as HTMLButtonElement).click());
+    expect(document.querySelector('dialog[open]')).toBeNull();
   });
 
   it('home offers exactly the four ways in', () => {

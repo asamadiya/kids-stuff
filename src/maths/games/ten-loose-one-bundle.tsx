@@ -1,0 +1,536 @@
+import type { ComponentType, CSSProperties } from 'react';
+import type { BoardProps, Level, SolveGame } from '../../play/types';
+import { Piece, Tray } from '../../play/parts';
+
+/**
+ * Ten Loose, One Bundle — place value and unitising.
+ *
+ * Concept (advisor, maths 4): ten ones are ONE ten. The misconception it
+ * attacks is "a group counts only as one object" and "the 1 in 14 means one".
+ * The mat has a column per place, laid out left to right in the order the
+ * numeral is written (flats | bundles | loose), so the picture and the digits
+ * line up once the hint or worked answer colours them.
+ *
+ * Three kinds of round, mixed at every level:
+ *  - build:  an empty mat and a number. He builds it with a bundle for every
+ *            ten (and at level 3 a flat for every hundred).
+ *  - tie:    the mat starts with too many loose sticks (or bundles). He swaps
+ *            ten of them for one bigger piece; the amount must not change.
+ *  - untie:  "and back again". The mat starts with the usual pieces; he must
+ *            show the same number with fewer bundles (or flats) — 34 as 2
+ *            bundles and 14 loose — which is the regrouping subtraction needs.
+ *
+ * Levels: 1 is 11-19, 2 is 20-99, 3 is up to 999 with flats of a hundred
+ * (ten bundles tied flat).
+ *
+ * Control: tap-to-add/remove only. Tapping a tray piece puts one on the mat;
+ * tapping a mat piece takes it off. Swapping is exactly that: ten taps off,
+ * one tap on. No running total is shown until after Check.
+ */
+
+type Place = 'hundreds' | 'tens' | 'ones';
+
+/** What is on the mat, by place. */
+export interface Mat {
+  readonly hundreds: number;
+  readonly tens: number;
+  readonly ones: number;
+}
+
+export interface Round {
+  readonly kind: 'build' | 'tie' | 'untie';
+  /** The number the finished mat must make. */
+  readonly target: number;
+  /** The mat as the round opens: empty for build, a pile for tie and untie. */
+  readonly start: Mat;
+  /** Untie rounds only: the flats and bundles the answer must use. */
+  readonly want?: { readonly hundreds: number; readonly tens: number };
+  /** Level 3: flats of a hundred are on the tray and the mat. */
+  readonly flats: boolean;
+}
+
+/** The mat he has made. */
+export type Answer = Mat;
+
+const PLACES: readonly Place[] = ['hundreds', 'tens', 'ones'];
+const UNIT: Record<Place, number> = { hundreds: 100, tens: 10, ones: 1 };
+
+const mat = (hundreds: number, tens: number, ones: number): Mat => ({ hundreds, tens, ones });
+const EMPTY = mat(0, 0, 0);
+export const value = (m: Mat) => m.hundreds * 100 + m.tens * 10 + m.ones;
+/** The usual way to write n: no place holds ten or more. */
+export const canonical = (n: number): Mat => mat(Math.floor(n / 100), Math.floor(n / 10) % 10, n % 10);
+
+const build = (n: number, flats = false): Round => ({ kind: 'build', target: n, start: EMPTY, flats });
+const tie = (start: Mat, flats = false): Round => ({ kind: 'tie', target: value(start), start, flats });
+const untie = (n: number, hundreds: number, tens: number, flats = false): Round => ({
+  kind: 'untie',
+  target: n,
+  start: canonical(n),
+  want: { hundreds, tens },
+  flats,
+});
+
+/**
+ * Deterministic variety without Math.random: a table per level walked by
+ * index. Every level mixes the three kinds; level 2 sets 34 beside 43 and
+ * 70 (no loose), level 3 sets 306 (no bundles), 304 as 2 flats, 9 bundles and
+ * 14 loose (untying across the empty tens place, the regrouping 304 - 6
+ * needs) and 204 (a swap that cascades: ten loose make a tenth bundle, which
+ * makes a flat). Indexes 0-4 at level 3 hold only two plain builds.
+ */
+const TABLE: Record<Level, readonly Round[]> = {
+  1: [
+    build(14), tie(mat(0, 0, 13)), build(17), untie(15, 0, 0),
+    tie(mat(0, 0, 18)), build(11), tie(mat(0, 0, 16)), build(19),
+  ],
+  2: [
+    build(43), tie(mat(0, 3, 16)), build(70), untie(34, 0, 2),
+    build(58), tie(mat(0, 5, 12)), untie(81, 0, 7), build(96),
+  ],
+  3: [
+    build(243, true), tie(mat(1, 12, 5), true), untie(152, 0, 15, true), build(306, true),
+    untie(304, 2, 9, true), tie(mat(1, 9, 14), true), untie(318, 2, 11, true), build(815, true),
+  ],
+};
+
+export function generate(level: Level, index: number): Round {
+  const t = TABLE[level];
+  // A fresh object per call: the shell resets the answer when the round's
+  // identity changes, so two calls must never hand back the same reference.
+  return { ...t[index % t.length] };
+}
+
+/** The mat the round asks for. */
+export function solution(round: Round): Mat {
+  if (round.kind !== 'untie' || !round.want) return canonical(round.target);
+  const { hundreds, tens } = round.want;
+  return mat(hundreds, tens, round.target - hundreds * 100 - tens * 10);
+}
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+function list(parts: readonly string[]): string {
+  if (parts.length <= 1) return parts.join('');
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+/** The mat in the board's own words: "1 bundle and 14 loose sticks". */
+function sticks(m: Mat): string {
+  const p: string[] = [];
+  if (m.hundreds) p.push(plural(m.hundreds, 'flat', 'flats'));
+  if (m.tens) p.push(plural(m.tens, 'bundle', 'bundles'));
+  if (m.ones) p.push(plural(m.ones, 'loose stick', 'loose sticks'));
+  return list(p);
+}
+
+/** The values the pieces stand for, added: "100 + 140 + 3". Zero places dropped. */
+function worth(m: Mat): string {
+  const p = PLACES.filter((k) => m[k] > 0).map((k) => String(m[k] * UNIT[k]));
+  return p.length ? p.join(' + ') : '0';
+}
+
+/** "1 flat makes", "1 bundle and 3 loose make". */
+const makes = (m: Mat) => (m.hundreds + m.tens + m.ones === 1 ? 'makes' : 'make');
+
+const same = (a: Mat, b: Mat) => a.hundreds === b.hundreds && a.tens === b.tens && a.ones === b.ones;
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** What an untie round asks for: "2 bundles", "no flats and 15 bundles". */
+function askFor(round: Round): string {
+  const w = solution(round);
+  const tens = w.tens ? plural(w.tens, 'bundle', 'bundles') : 'no bundles';
+  if (!round.flats) return tens;
+  return `${w.hundreds ? plural(w.hundreds, 'flat', 'flats') : 'no flats'} and ${tens}`;
+}
+
+/** Tie rounds: the swaps that turn the starting pile into the usual mat. */
+function tyings(start: Mat): string[] {
+  const k1 = Math.floor(start.ones / 10);
+  const k2 = Math.floor((start.tens + k1) / 10);
+  const out: string[] = [];
+  if (k1) out.push(`${k1 * 10} loose sticks tied into ${plural(k1, 'bundle', 'bundles')}`);
+  if (k2) out.push(`${k2 * 10} bundles tied into ${plural(k2, 'flat', 'flats')}`);
+  return out;
+}
+
+/** Untie rounds: what was untied to reach the asked-for mat. */
+function untyings(round: Round): string[] {
+  const c = canonical(round.target);
+  const w = solution(round);
+  const flats = c.hundreds - w.hundreds;
+  const bundles = c.tens + flats * 10 - w.tens;
+  const out: string[] = [];
+  if (flats) out.push(`${plural(flats, 'flat', 'flats')} untied into ${flats * 10} bundles`);
+  if (bundles) out.push(`${plural(bundles, 'bundle', 'bundles')} untied into ${bundles * 10} loose sticks`);
+  return out;
+}
+
+function prompt(round: Round): string {
+  const n = round.target;
+  if (round.kind === 'build') {
+    return round.flats ? `Make ${n}. Flats for hundreds, bundles for tens.` : `Make ${n}. A bundle for every ten.`;
+  }
+  if (round.kind === 'tie') {
+    return round.flats ? 'Swap every ten for the next bigger piece.' : 'Swap every ten loose sticks for one bundle.';
+  }
+  return `Show ${n} with ${askFor(round)}.`;
+}
+
+function check(round: Round, answer: Answer) {
+  const want = solution(round);
+  if (same(answer, want)) return { ok: true };
+  const v = value(answer);
+  const n = round.target;
+  if (v === 0) {
+    return { ok: false, hint: round.kind === 'build' ? 'The mat is empty, so it shows 0.' : `The mat is empty now. It began with ${n}.` };
+  }
+  const shown = cap(sticks(answer));
+  if (v !== n) {
+    return {
+      ok: false,
+      hint: round.kind === 'tie' ? `The mat began with ${n}. ${shown} ${makes(answer)} ${v}.` : `${shown} ${makes(answer)} ${v}, not ${n}.`,
+    };
+  }
+  if (round.kind === 'untie') {
+    return { ok: false, hint: `${shown} ${makes(answer)} ${n}. The task asks for ${askFor(round)}.` };
+  }
+  // The amount is right and the round wants the usual mat, so some place
+  // still holds ten or more: that is the bundle (or flat) still untied.
+  return {
+    ok: false,
+    hint: answer.ones >= 10
+      ? `That makes ${n}. ${answer.ones === 10 ? 'Those' : 'Ten of the'} ${answer.ones} loose sticks can be one bundle.`
+      : `That makes ${n}. ${answer.tens === 10 ? 'Those' : 'Ten of the'} ${answer.tens} bundles can be one flat.`,
+  };
+}
+
+
+function explain(round: Round): string {
+  const n = round.target;
+  const c = canonical(n);
+  if (round.kind === 'build') {
+    // Name the tens digit: "the 1 in 14 means one ten" is the misconception.
+    const s = String(n);
+    const d = String(c.tens);
+    const which = s.indexOf(d) === s.lastIndexOf(d) ? d : s.length === 3 ? `middle ${d}` : `first ${d}`;
+    const sum = worth(c).includes('+') ? `: ${worth(c)}` : '';
+    const tens = c.tens ? plural(c.tens, 'ten', 'tens') : 'no tens';
+    return `${n} is ${sticks(c)}${sum}. The ${which} in ${n} means ${tens}.`;
+  }
+  if (round.kind === 'tie') {
+    return `${cap(tyings(round.start).join('; '))}. ${n} is ${worth(c)}: nothing added, nothing lost.`;
+  }
+  const w = solution(round);
+  return `${n} is ${sticks(c)}, or ${sticks(w)}: ${worth(c)} = ${worth(w)}.`;
+}
+
+/* ------------------------------------------------------------- pictures -- */
+
+/** One loose stick, drawn in the piece's text colour on its place colour. */
+function StickArt() {
+  return (
+    <svg viewBox="0 0 44 44" aria-hidden="true">
+      <rect x="18" y="3" width="8" height="38" rx="4" fill="currentColor" />
+    </svg>
+  );
+}
+
+const BUNDLE_SVG: CSSProperties = { width: 60, height: 44 };
+
+/** Ten sticks tied with a band: count them, and it is still ten. */
+function BundleArt() {
+  return (
+    <svg viewBox="0 0 60 44" style={BUNDLE_SVG} aria-hidden="true">
+      {Array.from({ length: 10 }, (_, i) => (
+        <rect key={i} x={1 + i * 6} y="3" width="4" height="38" rx="2" fill="currentColor" />
+      ))}
+      <rect x="0.75" y="18" width="58.5" height="8" rx="2" fill="#f2a900" stroke="#24170f" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+const FLAT_SVG: CSSProperties = { width: 96, height: 44 };
+
+/** Ten bundles laid side by side and tied flat: a hundred sticks. */
+function FlatArt() {
+  return (
+    <svg viewBox="0 0 96 44" style={FLAT_SVG} aria-hidden="true">
+      {Array.from({ length: 10 }, (_, i) => (
+        <g key={i}>
+          <rect x={3 + i * 9.1} y="3" width="7.6" height="38" rx="1.5" fill="currentColor" />
+          <rect x={3 + i * 9.1} y="19.5" width="7.6" height="5" fill="#f2a900" />
+        </g>
+      ))}
+      <rect x="1" y="8" width="94" height="4" rx="2" fill="#24170f" />
+      <rect x="1" y="32" width="94" height="4" rx="2" fill="#24170f" />
+    </svg>
+  );
+}
+
+const COLUMN: Record<Place, { readonly name: string; readonly one: string; readonly art: ComponentType }> = {
+  hundreds: { name: 'Flats', one: 'flat', art: FlatArt },
+  tens: { name: 'Bundles', one: 'bundle', art: BundleArt },
+  ones: { name: 'Loose sticks', one: 'loose stick', art: StickArt },
+};
+
+/** At this many in one place the tray piece greys out: room for 243 as 24 bundles. */
+const MAX_PER_PLACE = 30;
+
+/* --------------------------------------------------------------- styles -- */
+
+const MAT: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 'var(--s3)',
+  alignItems: 'stretch',
+};
+/** Loose sticks pile up highest, so their column gets the most room. */
+const GROW: Record<Place, CSSProperties> = {
+  hundreds: { flex: '1 1 200px' },
+  tens: { flex: '1 1 220px' },
+  ones: { flex: '1.6 1 300px' },
+};
+const COL: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--s2)',
+  padding: 'var(--s3)',
+  minHeight: 180,
+  background: 'var(--raised)',
+  border: '2px solid var(--rule-strong)',
+  borderRadius: 'var(--radius-sm)',
+};
+const COL_HEAD: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'baseline',
+  gap: 'var(--s2)',
+  fontWeight: 700,
+  fontSize: 'var(--t-sm)',
+  paddingBottom: 'var(--s2)',
+  borderBottom: '4px solid currentColor',
+};
+const COL_BODY: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 'var(--s2)',
+  alignContent: 'flex-start',
+  flex: 1,
+};
+/** The ring the hint draws round ten pieces that could be one bigger piece. */
+const RING: CSSProperties = {
+  display: 'inline-flex',
+  flexWrap: 'wrap',
+  gap: 'var(--s2)',
+  padding: 'var(--s2)',
+  border: '4px dashed #f2a900',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--gold-tint)',
+};
+const RING_TAG: CSSProperties = {
+  flexBasis: '100%',
+  fontFamily: 'var(--font-read)',
+  fontSize: 'var(--t-xs)',
+  fontWeight: 700,
+  color: 'var(--ink)',
+};
+const COUNT: CSSProperties = {
+  textAlign: 'center',
+  fontSize: 'var(--t-xl)',
+  fontWeight: 700,
+  lineHeight: 1.1,
+};
+const COUNT_SUB: CSSProperties = {
+  display: 'block',
+  fontFamily: 'var(--font-read)',
+  fontSize: 'var(--t-sm)',
+  fontWeight: 400,
+  color: 'var(--ink-soft)',
+};
+const TOTAL: CSSProperties = {
+  textAlign: 'center',
+  fontSize: 'var(--t-xl)',
+  fontWeight: 700,
+};
+
+/* ---------------------------------------------------------------- board -- */
+
+const HUE: Record<Place, string> = { hundreds: 'var(--hundreds)', tens: 'var(--tens)', ones: 'var(--ones)' };
+
+/** Pieces in fives, so a column of 14 reads as five, five and four. */
+function fives(n: number, draw: (i: number) => JSX.Element) {
+  const groups: JSX.Element[] = [];
+  for (let start = 0; start < n; start += 5) {
+    groups.push(
+      <span key={start} style={{ display: 'inline-flex', flexWrap: 'wrap', gap: 'var(--s1)', marginRight: 'var(--s2)' }}>
+        {Array.from({ length: Math.min(5, n - start) }, (_, j) => draw(start + j))}
+      </span>,
+    );
+  }
+  return groups;
+}
+
+/** The number, each digit in the colour of the place it stands for. */
+function Numeral({ n, label }: { readonly n: number; readonly label: string }) {
+  const s = String(n);
+  // Place by position from the right; a fourth digit (an over-full mat) is ink.
+  const hue = (i: number) => {
+    const k = ['ones', 'tens', 'hundreds'][s.length - 1 - i] as Place | undefined;
+    return k ? HUE[k] : 'var(--ink)';
+  };
+  return (
+    <p style={TOTAL} aria-label={`${label} ${n}`}>
+      <span style={{ fontFamily: 'var(--font-read)', fontSize: 'var(--t-md)', fontWeight: 400, marginRight: 'var(--s2)' }}>{label}</span>
+      {s.split('').map((d, i) => (
+        <span key={i} style={{ color: hue(i) }}>{d}</span>
+      ))}
+    </p>
+  );
+}
+
+/**
+ * Which pieces the hint rings, and what the ring says. Usual-mat rounds ring
+ * ten of a place that holds ten or more; untie rounds ring the one bigger piece
+ * that has to come apart.
+ */
+function ringFor(round: Round, m: Mat): { readonly place: Place; readonly size: number; readonly tag: string } | null {
+  if (round.kind === 'untie') {
+    const w = solution(round);
+    if (m.hundreds > w.hundreds) return { place: 'hundreds', size: 1, tag: '1 flat = 10 bundles' };
+    if (m.hundreds < w.hundreds && m.tens >= 10) return { place: 'tens', size: 10, tag: '10 bundles = 1 flat' };
+    if (m.tens > w.tens) return { place: 'tens', size: 1, tag: '1 bundle = 10 loose' };
+    if (m.tens < w.tens && m.ones >= 10) return { place: 'ones', size: 10, tag: '10 loose = 1 bundle' };
+    return null;
+  }
+  if (m.ones >= 10) return { place: 'ones', size: 10, tag: '10 loose = 1 bundle' };
+  // Levels 1-2 have no flats on the tray, so ten bundles there are simply too many.
+  if (round.flats && m.tens >= 10) return { place: 'tens', size: 10, tag: '10 bundles = 1 flat' };
+  return null;
+}
+
+function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
+  const worked = stage === 'worked';
+  const locked = stage === 'solved' || worked;
+  const shown = worked ? solution(round) : answer;
+  const facts = stage !== 'answering';
+  const ring = stage === 'hint' ? ringFor(round, shown) : null;
+  const places = round.flats ? PLACES : PLACES.slice(1);
+
+  const put = (k: Place, d: number) => setAnswer({ ...answer, [k]: Math.max(0, answer[k] + d) });
+
+  const column = (k: Place) => {
+    const { name, one, art: Art } = COLUMN[k];
+    const n = shown[k];
+    const many = name.toLowerCase();
+    const piece = (i: number) => (
+      <Piece
+        key={i}
+        tone={worked ? 'worked' : 'placed'}
+        hue={k}
+        wide={k === 'hundreds'}
+        onTap={locked ? undefined : () => put(k, -1)}
+        ariaLabel={locked ? `A ${one}` : `Take off a ${one}`}
+      >
+        <Art />
+      </Piece>
+    );
+    const ringed = ring && ring.place === k ? Math.min(ring.size, n) : 0;
+    return (
+      <section key={k} style={{ ...COL, ...GROW[k] }} aria-label={`${name}: ${n}`}>
+        <h3 style={{ ...COL_HEAD, color: HUE[k] }}>
+          <span>{name}</span>
+          <span style={{ fontFamily: 'var(--font-read)', fontWeight: 400, color: 'var(--ink-soft)' }}>
+            {k === 'ones' ? 'one stick' : k === 'tens' ? '10 sticks' : '100 sticks'}
+          </span>
+        </h3>
+        <div style={COL_BODY}>
+          {ringed ? (
+            <span style={RING}>
+              <span style={RING_TAG}>{ring?.tag}</span>
+              {fives(ringed, piece)}
+            </span>
+          ) : null}
+          {fives(n - ringed, (i) => piece(ringed + i))}
+          {n === 0 && !facts ? <span className="board-caption">none yet</span> : null}
+        </div>
+        {facts ? (
+          <p style={{ ...COUNT, color: HUE[k] }}>
+            {n}
+            <span style={COUNT_SUB}>
+              {n === 1 ? one : many} = {n * UNIT[k]}
+            </span>
+          </p>
+        ) : null}
+      </section>
+    );
+  };
+
+  const steps = worked ? (round.kind === 'tie' ? tyings(round.start) : round.kind === 'untie' ? untyings(round) : []) : [];
+
+  return (
+    <div className="board board--bundles">
+      <div style={MAT} role="group" aria-label="The mat">
+        {places.map(column)}
+      </div>
+
+      {facts ? <Numeral n={value(shown)} label={worked ? 'The mat shows' : 'The mat makes'} /> : null}
+      {worked ? (
+        <p className="board-caption">
+          {steps.length ? `${cap(steps.join('; '))}. ` : ''}
+          {cap(sticks(shown))} {makes(shown)} {worth(shown).includes('+') ? `${worth(shown)} = ` : ''}{round.target}.
+        </p>
+      ) : null}
+
+      <Tray label="Tap to put on the mat">
+        {places.map((k) => {
+          const { one, art: Art } = COLUMN[k];
+          const full = answer[k] >= MAX_PER_PLACE;
+          return (
+            <Piece
+              key={k}
+              tone={locked || full ? 'ghost' : 'source'}
+              hue={k}
+              wide={k === 'hundreds'}
+              onTap={locked || full ? undefined : () => put(k, 1)}
+              ariaLabel={`Put a ${one} on the mat`}
+            >
+              <Art />
+            </Piece>
+          );
+        })}
+      </Tray>
+      <p className="board-caption">
+        A bundle is 10 loose sticks tied together.{round.flats ? ' A flat is 10 bundles tied together.' : ''}
+      </p>
+    </div>
+  );
+}
+
+export const tenLooseOneBundle: SolveGame<Round, Answer> = {
+  kind: 'solve',
+  id: 'ten-loose-one-bundle',
+  title: 'Ten Loose, One Bundle',
+  hook: 'Tie ten sticks into one bundle.',
+  group: 'numbers',
+  levels: ['Teens', 'Up to 99', 'Hundreds too'],
+  generate,
+  prompt,
+  emptyAnswer: (round) => round.start,
+  Board,
+  check,
+  explain,
+  cover: 'art/games/ten-loose-one-bundle.png',
+  note: {
+    what: 'A place-value mat with columns for loose sticks, bundles of ten and (at level 3) flats of a hundred. He taps tray pieces onto the mat and taps mat pieces to take them off, to build a number, tie ten loose into a bundle, or untie one.',
+    expect: 'Two first builds of 14 are likely: fourteen loose sticks (right amount, no bundle; the hint rings ten of them), or one bundle and thirteen loose, counting the bundle as one stick (the hint says that makes 23). Untie rounds such as "Show 34 with 2 bundles" tend to break next: he takes a bundle off and does not put its ten loose sticks back.',
+    practising: 'Unitising: ten ones are counted as one ten, and ten tens as one hundred, without the amount changing. Also that the digit in each place counts bundles, so the 1 in 14 means one ten.',
+    ask: 'When the hint rings ten loose sticks, before he taps anything: "If I tie these ten together, do we have more sticks, fewer, or the same?"',
+    next: 'Use ice-cream sticks or straws and rubber bands at the kitchen table. Count out 23, tie the tens, then untie one bundle and ask him to count all the sticks again.',
+    honest: 'Building 243 on this mat does not mean he can add 38 + 25 or subtract with regrouping. Check that separately with real bundles, and listen for whether he counts a bundle as one or as ten.',
+    easier: 'Stay on level 1 and let him count every stick in a bundle aloud before he ties a new one.',
+    harder: 'On level 2, before he taps anything, ask for the number 10 more and 10 less than the target, and which column changes.',
+  },
+};
+
+export default tenLooseOneBundle;

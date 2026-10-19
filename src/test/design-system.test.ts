@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { MATHS_GAMES } from '../maths/registry';
+import { SCIENCE_GAMES } from '../science/registry';
 
 /**
  * The parent's standing rules for how this looks and talks, as assertions.
@@ -76,7 +78,27 @@ describe('the child is addressed as a capable person', () => {
   });
 
   it('awards no stars, trophies or streaks', () => {
-    expect(strings).not.toMatch(/⭐|🏆|\bstreak\b|\bgold star\b/i);
+    // Checked against what a child is SHOWN — every prompt, explanation, hint and
+    // level name the games can produce — not the source, where the chance game's
+    // run-of-draws round is legitimately called kind: 'streak'.
+    const shown = [...MATHS_GAMES, ...SCIENCE_GAMES].flatMap((g) => {
+      const out: string[] = [g.title, g.hook, ...g.levels];
+      for (const level of [1, 2, 3] as const) {
+        for (let i = 0; i < 5; i += 1) {
+          const r = g.generate(level, i);
+          out.push(g.prompt(r));
+          if (g.kind === 'solve') {
+            out.push(g.explain(r));
+            out.push(g.check(r, g.emptyAnswer(r)).hint ?? '');
+          } else {
+            out.push(g.why(r));
+          }
+        }
+      }
+      return out;
+    });
+    const hits = shown.filter((t) => /⭐|🏆|🥇|\bstreak\b|\bgold star\b|\bpoints?\b to win/i.test(t));
+    expect(hits).toEqual([]);
   });
 
   it('states the result instead of praising the child', () => {

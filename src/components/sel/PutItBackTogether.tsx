@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   EMPTY_SLOTS, PUT_IT_BACK_TOGETHER_META, ROLE_WORD, SCENARIOS,
-  alternativeFrames, coverageOf, endingKey, isAccepted, isFull, lastLineOf, lift, looseRoles,
-  narrate, orderOf, panelOf, place, placeAt, plateLines, plateTitle, runOf, scatterOf, shift,
+  alternativeFrames, coverageOf, endingKey, isAccepted, isFull, lastLineOf, lift, looseRoles, orderOf, panelOf, place, placeAt, plateLines, plateTitle, runOf, scatterOf, shift,
 } from '../../sel/put-it-back-together';
 import type { Frame, PanelRole, Scenario, Slots } from '../../sel/put-it-back-together';
 import { drawer } from '../../lib/drawer';
@@ -376,14 +375,6 @@ export function PutItBackTogether() {
         </button>
         <button type="button" className="bench-btn" onClick={startOver} disabled={phase === 'running'}>
           Take it apart.
-        </button>
-        <button
-          type="button"
-          className="bench-btn"
-          onClick={() => order && say(narrate(scenario, order))}
-          disabled={phase !== 'done'}
-        >
-          Say it again.
         </button>
         <button type="button" className="bench-btn" onClick={keep} disabled={phase !== 'done'}>
           Keep this strip.

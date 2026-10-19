@@ -1,4 +1,8 @@
 import type { ComponentType } from 'react';
+import '../styles/workshop.css';
+import '../styles/sel.css';
+import '../styles/print.css';
+import '../styles/lc/bridge.css';
 import type { GrownUpNote } from '../notes/types';
 import { parentNote } from '../components/parentNotes';
 import WhatHappensNext from '../components/sel/WhatHappensNext';

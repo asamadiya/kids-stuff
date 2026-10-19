@@ -212,9 +212,6 @@ export function WhatHappensNext() {
             />
             <p className="bench__figure-caption">{strip.setupWord}</p>
           </div>
-          <button type="button" className="bench-btn" onClick={() => say(strip.setupWord)}>
-            Read this out
-          </button>
         </div>
 
         <div className="bench__row">{strip.roads.map(roadChoice)}</div>

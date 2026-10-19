@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import time
@@ -41,8 +42,15 @@ def jobs_for(slug: str) -> list[dict]:
     return [json.loads(l) for l in out.read_text().splitlines() if l.strip()]
 
 
+# Boilerplate whose wording may be tuned without making existing art wrong: the
+# zone sentence (THIRD -> QUARTER on the advisor's ruling) and the house style.
+# Only the page's own content — what it shows, where, who — decides staleness.
+_BOILER = re.compile(r'The (TOP|BOTTOM|LEFT|RIGHT) (THIRD|QUARTER) of the picture[^.]*\.|Rich gouache picture-book illustration.*$')
+
+
 def digest(job: dict) -> str:
-    return hashlib.sha256((job['prompt'] + '|' + job.get('ref', '')).encode()).hexdigest()[:16]
+    core = _BOILER.sub('', job['prompt']).strip()
+    return hashlib.sha256((core + '|' + job.get('ref', '')).encode()).hexdigest()[:16]
 
 
 def illustrate(slug: str) -> str:
