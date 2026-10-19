@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -20,6 +20,17 @@ import { Choice } from '../../play/parts';
  * down. Try removes the supports and draws the beam settled, in the same frame
  * and scale, with each side's total written out. Level 3 shows two towers and
  * asks which one falls. All drawing is static SVG with fixed states.
+ *
+ * Nothing he must read to play: each answer is a picture of that outcome (the
+ * beam settled left, level or right; both towers with the named one's top
+ * block tipping off), its words a small label under it. Tapping one draws the
+ * guess on the board at once, dashed blue: the beam where he says it settles,
+ * the top block he says tips off, or both towers boxed for "neither". A side's
+ * turning total is a row of gold dots, one per step for every block, under a
+ * small block for each group, mirrored out from the middle so the two rows are
+ * compared by length; "1 + 3 = 4" stays only as a small label under the row.
+ * One block on step 2 over two dots beside two blocks over one dot each is
+ * "one balances two" shown, not stated.
  *
  * Levels:
  *  1. One thing changes at a time: more blocks at the same step, or one block
@@ -299,18 +310,81 @@ function PropPosts() {
   );
 }
 
+const GOLD = '#f2a900';
+const BLOCK_FILL = '#d9622b';
+/** Where a guess is drawn on the board: blue, a colour nothing else here uses. */
+const GUESS = '#1c6dd0';
+/** Centre-to-centre spacing of the turn dots. Uniform, so row length is the total. */
+const PITCH = 20;
+const DOT_Y = 50;
+
+/** One entry per block, its step number, from the middle out. */
+const blockSteps = (s: Steps): number[] => s.flatMap((n, i) => Array.from({ length: n }, () => i + 1));
+
+/**
+ * One side's turning total as objects: a gold dot per step for every block,
+ * each block's dots under a bracket with a small block over it, running out
+ * from the middle. The dots are evenly spaced, so the longer row turns more.
+ */
+function PullRow({ steps, side }: { readonly steps: Steps; readonly side: -1 | 1 }) {
+  const at = (i: number) => CX + side * (24 + i * PITCH);
+  const groups = blockSteps(steps).reduce<{ first: number; n: number }[]>(
+    (acc, n) => [...acc, { first: acc.length ? acc[acc.length - 1].first + acc[acc.length - 1].n : 0, n }],
+    [],
+  );
+  return (
+    <g>
+      {groups.map(({ first, n }) => {
+        const a = at(first);
+        const b = at(first + n - 1);
+        const mid = (a + b) / 2;
+        return (
+          <g key={first}>
+            <rect x={mid - 6} y="20" width="12" height="12" rx="2" fill={BLOCK_FILL} stroke={INK} strokeWidth="2" />
+            <path d={`M${a - side * 8} 41 V36 H${b + side * 8} V41`} fill="none" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+            {Array.from({ length: n }, (_, i) => (
+              <circle key={i} cx={at(first + i)} cy={DOT_Y} r="7" fill={GOLD} stroke={INK} strokeWidth="2" />
+            ))}
+          </g>
+        );
+      })}
+      <text x={CX + side * 16} y="74" textAnchor={side < 0 ? 'end' : 'start'} fontSize="13" fontWeight="600" fill="#5a4636">
+        {sumText(steps)}
+      </text>
+    </g>
+  );
+}
+
 function Pulls({ round }: { readonly round: LeverRound }) {
   return (
     <>
-      <text x="14" y="34" fontSize="18" fontWeight="700" fill={INK}>
-        Left: {sumText(round.left)}
-      </text>
-      <text x="386" y="34" textAnchor="end" fontSize="18" fontWeight="700" fill={INK}>
-        Right: {sumText(round.right)}
-      </text>
+      <line x1={CX} y1="18" x2={CX} y2="62" stroke={INK} strokeWidth="2" strokeDasharray="4 4" />
+      <PullRow steps={round.left} side={-1} />
+      <PullRow steps={round.right} side={1} />
     </>
   );
 }
+
+/** His guess, drawn in the frame: a dashed blue beam where he says it settles. */
+function BeamGuess({ t }: { readonly t: Tip }) {
+  return (
+    <rect
+      x={CX - BEAM_HALF - 5}
+      y={PY - BEAM_T - 5}
+      width={BEAM_HALF * 2 + 10}
+      height={BEAM_T + 10}
+      rx="7"
+      fill="none"
+      stroke={GUESS}
+      strokeWidth="4"
+      strokeDasharray="12 7"
+      transform={ANGLE[t] ? `rotate(${ANGLE[t]} ${CX} ${PY})` : undefined}
+    />
+  );
+}
+
+const isTip = (a: Answer): a is Tip => a === 'left' || a === 'level' || a === 'right';
+const isFall = (a: Answer): a is Fall => a === 'green' || a === 'orange' || a === 'neither';
 
 const TIP_WORDS: Record<Tip, string> = {
   left: 'the left side goes down',
@@ -318,17 +392,27 @@ const TIP_WORDS: Record<Tip, string> = {
   right: 'the right side goes down',
 };
 
-function LeverSetup({ round, stage }: { readonly round: LeverRound; readonly stage: BoardProps<Round, Answer>['stage'] }) {
+function LeverSetup({
+  round,
+  stage,
+  guess,
+}: {
+  readonly round: LeverRound;
+  readonly stage: BoardProps<Round, Answer>['stage'];
+  readonly guess: Answer;
+}) {
   const help = stage === 'hint' || stage === 'worked';
+  const g = isTip(guess) ? guess : null;
   return (
     <Frame
-      label={`A beam held level on two props. Left: ${sideText(round.left)}. Right: ${sideText(round.right)}.`}
+      label={`A beam held level on two props. Left: ${sideText(round.left)}. Right: ${sideText(round.right)}.${g ? ` Your guess, dashed: ${TIP_WORDS[g]}.` : ''}`}
       names={LEVER_NAMES}
     >
       {stage === 'worked' ? <Pulls round={round} /> : null}
       <PropPosts />
       <Pivot />
       <Beam round={round} angle={0} marks={help} />
+      {g ? <BeamGuess t={g} /> : null}
     </Frame>
   );
 }
@@ -442,12 +526,55 @@ function towerText(xs: readonly number[]): string {
   return `${xs.length} blocks${straight ? ', straight' : ', not straight'}`;
 }
 
-function TowerSetup({ round, stage }: { readonly round: TowerRound; readonly stage: BoardProps<Round, Answer>['stage'] }) {
+/**
+ * His guess on the towers, dashed blue: the named tower's top block drawn
+ * tipping off its outer edge, or, for "neither", a box round each tower.
+ */
+function TowerGuess({ f, round }: { readonly f: Fall; readonly round: TowerRound }) {
+  const dash = { fill: 'none', stroke: GUESS, strokeWidth: 4, strokeDasharray: '10 6' } as const;
+  if (f === 'neither') {
+    return (
+      <g>
+        {([
+          [GREEN, round.green],
+          [ORANGE, round.orange],
+        ] as const).map(([t, xs]) => {
+          const x0 = blockX(t, Math.min(...xs)) - 6;
+          const x1 = blockX(t, Math.max(...xs)) + BW + 6;
+          const y0 = blockY(xs.length - 1) - 6;
+          return <rect key={t.name} x={x0} y={y0} width={x1 - x0} height={FLOOR - y0} rx="6" {...dash} />;
+        })}
+      </g>
+    );
+  }
+  const t = f === 'green' ? GREEN : ORANGE;
+  const xs = f === 'green' ? round.green : round.orange;
+  const top = xs.length - 1;
+  const x = blockX(t, xs[top]);
+  const y = blockY(top);
+  const cx = t.out > 0 ? x + BW : x;
+  return <rect x={x} y={y} width={BW} height={BH} rx="3" {...dash} transform={`rotate(${t.out * 35} ${cx} ${y + BH})`} />;
+}
+
+function TowerSetup({
+  round,
+  stage,
+  guess,
+}: {
+  readonly round: TowerRound;
+  readonly stage: BoardProps<Round, Answer>['stage'];
+  readonly guess: Answer;
+}) {
   const evidence: Evidence = stage === 'worked' ? 'full' : stage === 'hint' ? 'dot' : 'none';
+  const g = isFall(guess) ? guess : null;
   return (
-    <Frame label={`Two towers. Green: ${towerText(round.green)}. Orange: ${towerText(round.orange)}.`} names={TOWER_NAMES}>
+    <Frame
+      label={`Two towers. Green: ${towerText(round.green)}. Orange: ${towerText(round.orange)}.${g ? ` Your guess, dashed: ${FALL_WORDS[g]}.` : ''}`}
+      names={TOWER_NAMES}
+    >
       <Tower t={GREEN} xs={round.green} after={false} evidence={evidence} />
       <Tower t={ORANGE} xs={round.orange} after={false} evidence={evidence} />
+      {g ? <TowerGuess f={g} round={round} /> : null}
     </Frame>
   );
 }
@@ -463,36 +590,75 @@ function TowerOutcome({ round }: { readonly round: TowerRound }) {
 
 /* ------------------------------------------------------------------ board -- */
 
-/** A small drawn beam for each lever choice, so the choice reads without words. */
+/** Choice icon geometry: a beam on a pivot over a floor, 96 x 60. */
+const ICON_FLOOR = 54;
+const ICON_PIVOT = 36;
+const ICON_HALF = 42;
+const ICON_TILT = (Math.asin((ICON_FLOOR - ICON_PIVOT) / ICON_HALF) * 180) / Math.PI;
+const ICON_ANGLE: Record<Tip, number> = { left: -ICON_TILT, level: 0, right: ICON_TILT };
+const ICON: CSSProperties = { width: 96, height: 60 };
+
+/**
+ * The lever outcome as a picture: the same beam with one block at each end,
+ * settled the way that choice says — left end on the floor, level, or right
+ * end on the floor. No props, as after Try.
+ */
 function TipIcon({ t }: { readonly t: Tip }) {
   return (
-    <svg width="56" height="34" viewBox="0 0 56 34" aria-hidden="true">
-      <polygon points="28,22 21,32 35,32" fill="#f2a900" stroke={INK} strokeWidth="2" />
-      <rect x="4" y="16" width="48" height="6" rx="2" fill="#8a5a14" stroke={INK} strokeWidth="2" transform={`rotate(${ANGLE[t] * 1.4} 28 22)`} />
+    <svg width="96" height="60" viewBox="0 0 96 60" aria-hidden="true" style={ICON}>
+      <line x1="2" y1={ICON_FLOOR} x2="94" y2={ICON_FLOOR} stroke={INK} strokeWidth="2.5" />
+      <polygon points={`48,${ICON_PIVOT} 40,${ICON_FLOOR} 56,${ICON_FLOOR}`} fill={GOLD} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <g transform={ICON_ANGLE[t] ? `rotate(${ICON_ANGLE[t]} 48 ${ICON_PIVOT})` : undefined}>
+        <rect x={48 - ICON_HALF} y={ICON_PIVOT - 7} width={ICON_HALF * 2} height="7" rx="2" fill="#8a5a14" stroke={INK} strokeWidth="2" />
+        <rect x={48 - ICON_HALF + 4} y={ICON_PIVOT - 19} width="12" height="12" rx="2" fill={BLOCK_FILL} stroke={INK} strokeWidth="2" />
+        <rect x={48 + ICON_HALF - 16} y={ICON_PIVOT - 19} width="12" height="12" rx="2" fill={BLOCK_FILL} stroke={INK} strokeWidth="2" />
+      </g>
     </svg>
   );
 }
 
-/** A small drawn tower for each tower choice: the named one's top block tipping off, or both standing. */
+/**
+ * The tower outcome as a picture: both towers on a floor, the named one's top
+ * block tipping off its outer edge, or both standing for "neither".
+ */
 function FallIcon({ f }: { readonly f: Fall }) {
-  const block = (key: string, x: number, y: number, fill: string, transform?: string) => (
-    <rect key={key} x={x} y={y} width="18" height="10" rx="1.5" fill={fill} stroke={INK} strokeWidth="2" transform={transform} />
-  );
-  if (f === 'neither') {
-    return (
-      <svg width="44" height="42" viewBox="0 0 44 42" aria-hidden="true">
-        {[0, 1, 2].flatMap((i) => [block(`g${i}`, 2, 10 + i * 10, GREEN.fill), block(`o${i}`, 24, 10 + i * 10, ORANGE.fill)])}
-      </svg>
-    );
-  }
-  const t = f === 'green' ? GREEN : ORANGE;
-  const corner = t.out > 0 ? 31 : 13;
+  const tower = (t: TowerSpec, x: number) => {
+    const tips = f === (t === GREEN ? 'green' : 'orange');
+    const corner = t.out > 0 ? x + 22 : x;
+    return [0, 1, 2].map((i) => (
+      <rect
+        key={`${t.name}${i}`}
+        x={x}
+        y={ICON_FLOOR - (i + 1) * 13}
+        width="22"
+        height="13"
+        rx="2"
+        fill={t.fill}
+        stroke={INK}
+        strokeWidth="2"
+        transform={tips && i === 2 ? `rotate(${t.out * 40} ${corner} ${ICON_FLOOR - 26})` : undefined}
+      />
+    ));
+  };
   return (
-    <svg width="44" height="42" viewBox="0 0 44 42" aria-hidden="true">
-      {block('b0', 13, 30, t.fill)}
-      {block('b1', 13, 20, t.fill)}
-      {block('top', 13, 10, t.fill, `rotate(${t.out * 30} ${corner} 20)`)}
+    <svg width="96" height="60" viewBox="0 0 96 60" aria-hidden="true" style={ICON}>
+      <line x1="2" y1={ICON_FLOOR} x2="94" y2={ICON_FLOOR} stroke={INK} strokeWidth="2.5" />
+      {tower(GREEN, 22)}
+      {tower(ORANGE, 52)}
     </svg>
+  );
+}
+
+const CHOICE_BODY: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 };
+const CHOICE_WORDS: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+/** The picture first, its words small underneath. */
+function ChoiceBody({ picture, words }: { readonly picture: ReactNode; readonly words: string }) {
+  return (
+    <span style={CHOICE_BODY}>
+      {picture}
+      <span style={CHOICE_WORDS}>{words}</span>
+    </span>
   );
 }
 
@@ -519,7 +685,8 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
   const worked = stage === 'worked';
   const locked = stage === 'solved' || worked;
   const right = outcome(round);
-  const setup = round.kind === 'lever' ? <LeverSetup round={round} stage={stage} /> : <TowerSetup round={round} stage={stage} />;
+  const setup =
+    round.kind === 'lever' ? <LeverSetup round={round} stage={stage} guess={answer} /> : <TowerSetup round={round} stage={stage} guess={answer} />;
   return (
     <div className="board board--balance">
       {worked ? (
@@ -547,8 +714,7 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
                 ariaLabel={words}
                 mark={worked && t === right ? 'right' : null}
               >
-                <TipIcon t={t} />
-                {words}
+                <ChoiceBody picture={<TipIcon t={t} />} words={words} />
               </Choice>
             ))
           : TOWER_CHOICES.map(([f, words]) => (
@@ -560,8 +726,7 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
                 ariaLabel={words}
                 mark={worked && f === right ? 'right' : null}
               >
-                <FallIcon f={f} />
-                {words}
+                <ChoiceBody picture={<FallIcon f={f} />} words={words} />
               </Choice>
             ))}
       </div>

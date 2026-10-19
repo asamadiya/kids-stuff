@@ -26,6 +26,15 @@ import { Choice } from '../../play/parts';
  *     answer: it takes skip-counting in 4s, 6s or 12s. The wrong choices are
  *     the usual slips: metres for units, marks for spaces, joins for units.
  *
+ * Control: tap-to-choose only. Every choice is a picture over a small word:
+ * the thing itself (levels 1-2), two equal bars between the same two lines
+ * ("Same length"), or that many tiny units in rows of five over the digit
+ * (level 3). A tap shows on the board at once: the chosen thing's lane is
+ * ringed in gold ("Same length" rings both), or a guess box under the ruler
+ * holds that many tiny units and the digit. The tiny units are one fixed size
+ * whatever the unit, so they say how many, never how long: they cannot be
+ * laid against the big thing to read off the answer before Try.
+ *
  * Static SVG only: fixed setup and fixed outcome, no motion.
  */
 
@@ -210,13 +219,13 @@ const CAR_BODY = 'M0.05 0.25 L0 0.7 Q0.05 0.85 0.4 0.88 L1 0.92 L1.4 1.45 L2.7 1
  */
 const WHALE_BODY = 'M0 1.92 Q0.8 1.84 1.6 1.72 Q8 0.3 15 0.2 Q21 0.3 23.3 1.3 Q24 1.7 24 2.3 Q24 3 23 3.3 Q19 4 13 3.9 Q6 3.6 1.6 2.28 Q0.8 2.24 0 2.14 Z';
 
-/** The outline that carries the thing's length; a ghost is this alone, pale. */
-function silhouette(id: ThingId, ghost: boolean): ReactNode {
+/** The outline that carries the thing's length; a ghost is this alone, pale. `sw` is the outline in px. */
+function silhouette(id: ThingId, ghost: boolean, sw = 2.5): ReactNode {
   const { metres: L, tall: H } = THINGS[id];
   const paint = ghost
     ? { fill: COLOUR[id], fillOpacity: 0.18, stroke: MARK[id], strokeWidth: 2, strokeDasharray: '4 3', ...NS }
     : // The child lies on a mat; the mat is the outline that carries his length.
-      { fill: id === 'child' ? '#f3e3c3' : COLOUR[id], stroke: INK, strokeWidth: 2.5, strokeLinejoin: 'round' as const, ...NS };
+      { fill: id === 'child' ? '#f3e3c3' : COLOUR[id], stroke: INK, strokeWidth: sw, strokeLinejoin: 'round' as const, ...NS };
   switch (id) {
     case 'trex':
     case 'young-trex':
@@ -233,17 +242,17 @@ function silhouette(id: ThingId, ghost: boolean): ReactNode {
   }
 }
 
-function Wheel({ x, r }: { readonly x: number; readonly r: number }) {
+function Wheel({ x, r, k }: { readonly x: number; readonly r: number; readonly k: number }) {
   return (
     <g>
-      <circle cx={x} cy={r} r={r} fill="#3a3330" stroke={INK} strokeWidth="2" {...NS} />
+      <circle cx={x} cy={r} r={r} fill="#3a3330" stroke={INK} strokeWidth={2 * k} {...NS} />
       <circle cx={x} cy={r} r={r * 0.4} fill="#c9ced6" />
     </g>
   );
 }
 
-/** Eyes, wheels, windows: drawn over the silhouette, never past its ends. */
-function details(id: ThingId): ReactNode {
+/** Eyes, wheels, windows: drawn over the silhouette, never past its ends. `k` scales the px strokes for tiny copies. */
+function details(id: ThingId, k = 1): ReactNode {
   const { metres: L, tall: H } = THINGS[id];
   switch (id) {
     case 'trex':
@@ -251,8 +260,8 @@ function details(id: ThingId): ReactNode {
       return (
         <g>
           <circle cx={0.9 * L} cy={0.92 * H} r={0.012 * L} fill={INK} />
-          <path d={`M${L} ${0.86 * H} L${0.86 * L} ${0.83 * H}`} stroke={INK} strokeWidth="2" {...NS} />
-          <path d={`M${0.7 * L} ${0.6 * H} L${0.74 * L} ${0.5 * H} L${0.76 * L} ${0.53 * H}`} fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" {...NS} />
+          <path d={`M${L} ${0.86 * H} L${0.86 * L} ${0.83 * H}`} stroke={INK} strokeWidth={2 * k} {...NS} />
+          <path d={`M${0.7 * L} ${0.6 * H} L${0.74 * L} ${0.5 * H} L${0.76 * L} ${0.53 * H}`} fill="none" stroke={INK} strokeWidth={2.5 * k} strokeLinecap="round" {...NS} />
         </g>
       );
     case 'bus':
@@ -263,28 +272,28 @@ function details(id: ThingId): ReactNode {
         <g>
           <rect x="0" y="1.4" width={bx} height="0.14" fill={INK} />
           {Array.from({ length: n }, (_, i) => (
-            <rect key={i} x={0.6 + i * 1.05} y="1.9" width="0.75" height="0.85" rx="0.08" fill="#dfeef7" stroke={INK} strokeWidth="1.5" {...NS} />
+            <rect key={i} x={0.6 + i * 1.05} y="1.9" width="0.75" height="0.85" rx="0.08" fill="#dfeef7" stroke={INK} strokeWidth={1.5 * k} {...NS} />
           ))}
-          <Wheel x={0.25 * L} r={0.5} />
-          <Wheel x={L - 0.9} r={0.5} />
+          <Wheel x={0.25 * L} r={0.5} k={k} />
+          <Wheel x={L - 0.9} r={0.5} k={k} />
         </g>
       );
     }
     case 'car':
       return (
         <g>
-          <path d="M1.15 0.97 L1.5 1.36 L2 1.36 L2 0.97 Z M2.1 0.97 L2.1 1.36 L2.62 1.36 L3.08 0.97 Z" fill="#dfeef7" stroke={INK} strokeWidth="1.5" {...NS} />
-          <Wheel x={0.85} r={0.33} />
-          <Wheel x={3.1} r={0.33} />
+          <path d="M1.15 0.97 L1.5 1.36 L2 1.36 L2 0.97 Z M2.1 0.97 L2.1 1.36 L2.62 1.36 L3.08 0.97 Z" fill="#dfeef7" stroke={INK} strokeWidth={1.5 * k} {...NS} />
+          <Wheel x={0.85} r={0.33} k={k} />
+          <Wheel x={3.1} r={0.33} k={k} />
         </g>
       );
     case 'whale':
       return (
         <g>
           {/* Small dorsal fin set on the back, two-thirds of the way to the tail, tip swept back. */}
-          <path d="M6.7 3.33 L4.8 3.5 L5 3.07 Z" fill="#4a7090" stroke={INK} strokeWidth="1.5" {...NS} />
-          <path d="M18.6 0.75 L16.7 0.05 L17.4 0.62 Z" fill="#4a7090" stroke={INK} strokeWidth="1.5" {...NS} />
-          <path d="M24 2 Q22 1.5 20 1.4" fill="none" stroke={INK} strokeWidth="2" {...NS} />
+          <path d="M6.7 3.33 L4.8 3.5 L5 3.07 Z" fill="#4a7090" stroke={INK} strokeWidth={1.5 * k} {...NS} />
+          <path d="M18.6 0.75 L16.7 0.05 L17.4 0.62 Z" fill="#4a7090" stroke={INK} strokeWidth={1.5 * k} {...NS} />
+          <path d="M24 2 Q22 1.5 20 1.4" fill="none" stroke={INK} strokeWidth={2 * k} {...NS} />
           <circle cx="19.7" cy="1.8" r="0.18" fill={INK} />
         </g>
       );
@@ -328,17 +337,113 @@ function Icon({ id }: { readonly id: ThingId }) {
   );
 }
 
-/** "Same length" as a picture: two bars between the same two dashed lines. */
-function SameIcon() {
+/**
+ * "Same length" as a picture: a bar in each of this round's two colours, one
+ * over the other, both starting and ending on the same two dashed lines. Bars,
+ * not the things themselves: a car stretched to a bus's length would be a
+ * false picture of the car.
+ */
+function SameIcon({ ids }: { readonly ids: readonly ThingId[] }) {
   return (
     <svg width="76" height="34" viewBox="0 0 76 34" aria-hidden="true">
-      <rect x="8" y="5" width="60" height="9" rx="2" fill={COLOUR.bus} stroke={INK} strokeWidth="2" />
-      <rect x="8" y="20" width="60" height="9" rx="2" fill={COLOUR.trex} stroke={INK} strokeWidth="2" />
+      {ids.map((id, i) => (
+        <rect key={id} x="8" y={5 + i * 15} width="60" height="9" rx="2" fill={COLOUR[id]} stroke={INK} strokeWidth="2" />
+      ))}
       <line x1="8" y1="1" x2="8" y2="33" stroke={INK} strokeWidth="2" strokeDasharray="3 2" />
       <line x1="68" y1="1" x2="68" y2="33" stroke={INK} strokeWidth="2" strokeDasharray="3 2" />
     </svg>
   );
 }
+
+const range = (n: number) => Array.from({ length: n }, (_, i) => i);
+
+/*
+ * Tiny units: the unit's own picture at one fixed width whatever the unit, in
+ * rows of five. They say how many, never how long, so a guess drawn with them
+ * cannot be laid against the big thing to read the answer off before Try.
+ */
+const TW = 24;
+const TGAP = 2;
+const tinyPitch = (id: ThingId) => (TW * THINGS[id].tall) / THINGS[id].metres + 4;
+const tallyW = (n: number) => Math.min(n, 5) * (TW + TGAP) - TGAP;
+const tallyH = (id: ThingId, n: number) => Math.ceil(n / 5) * tinyPitch(id) - 4;
+
+/** `n` tiny units in rows of five, top-left at (x, y). */
+function Tally({ id, n, x, y }: { readonly id: ThingId; readonly n: number; readonly x: number; readonly y: number }) {
+  const { metres: L, tall: H } = THINGS[id];
+  const k = TW / L;
+  return (
+    <g>
+      {range(n).map((i) => (
+        <g key={i} transform={`translate(${x + (i % 5) * (TW + TGAP)} ${y + Math.floor(i / 5) * tinyPitch(id) + H * k}) scale(${k} ${-k})`}>
+          {silhouette(id, false, 1)}
+          {details(id, 0.4)}
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** A count choice's picture: that many tiny units, grouped in fives. */
+function TallyIcon({ id, n }: { readonly id: ThingId; readonly n: number }) {
+  const w = tallyW(n) + 4;
+  const h = tallyH(id, n) + 4;
+  return (
+    <svg width={w} height={h} viewBox={`-2 -2 ${w} ${h}`} aria-hidden="true">
+      <Tally id={id} n={n} x={0} y={0} />
+    </svg>
+  );
+}
+
+/** The guess box under the ruler: the tallest tally among the choices, plus padding. */
+const guessBox = (unit: ThingId, options: readonly number[]) => {
+  const most = Math.max(...options);
+  return { w: tallyW(most) + 64, h: Math.max(...options.map((n) => tallyH(unit, n))) + 18 };
+};
+
+/**
+ * His guess on the board, right under the ruler: that many tiny units in fives
+ * and the digit beside them, or a dashed box with "?" before he taps. Its own
+ * picture, not part of the frame, so the Before frame keeps exactly the
+ * Outcome frame's shape and both panes stay at one scale.
+ */
+function Guess({ unit, options, n, label }: { readonly unit: ThingId; readonly options: readonly number[]; readonly n: number | null; readonly label: string }) {
+  const { w, h } = guessBox(unit, options);
+  return (
+    <svg width={w + 4} height={h + 4} viewBox={`-2 -2 ${w + 4} ${h + 4}`} role="img" aria-label={label} style={{ alignSelf: 'center' }}>
+      <rect
+        x={0}
+        y={0}
+        width={w}
+        height={h}
+        rx="10"
+        fill={n === null ? '#fffdf7' : GOLD_TINT}
+        stroke={n === null ? SOFT : INK}
+        strokeWidth="2.5"
+        strokeDasharray={n === null ? '7 5' : undefined}
+      />
+      {n === null ? (
+        <text x={w / 2} y={h / 2 + 8} fontSize="24" fontWeight="700" textAnchor="middle" fill={SOFT}>
+          ?
+        </text>
+      ) : (
+        <>
+          <Tally id={unit} n={n} x={12} y={(h - tallyH(unit, n)) / 2} />
+          <text x={w - 26} y={h / 2 + 8} fontSize="24" fontWeight="700" textAnchor="middle" fill={INK}>
+            {n}
+          </text>
+        </>
+      )}
+    </svg>
+  );
+}
+
+/** A choice's face: the picture first, its word or digit underneath. */
+const FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' } as const;
+const WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)' } as const;
+
+const GOLD = '#f2a900';
+const GOLD_TINT = '#fff1c9';
 
 /* ------------------------------------------------------------ the frame -- */
 
@@ -454,21 +559,28 @@ const tag = (id: ThingId) => (id === 'child' ? 'Child, lying down' : THINGS[id].
 
 /**
  * Compare rounds: every thing in its lane, starting at `starts` (metres); ghosts lined up from 0.
- * Drawn in layers — things, then ghosts, then dashed marks, then labels — so a
+ * Drawn in layers — gold rings, things, then ghosts, then dashed marks, then labels — so a
  * ghost's far end and its mark are never hidden under the thing they overlap.
  */
-function Lanes({ round, starts, measured, marks, ghosts }: {
+function Lanes({ round, starts, measured, marks, ghosts, chosen = null }: {
   readonly round: Round;
   readonly starts: readonly number[];
   readonly measured: boolean;
   readonly marks: boolean;
   readonly ghosts: boolean;
+  /** His pick: that lane is ringed in gold; 'same' rings every lane. */
+  readonly chosen?: Answer;
 }) {
   if (round.mode === 'count') return null;
   const f = frameOf(round);
   const at = round.lanes.map((l, i) => ({ l, i, x: px(f, starts[i]), xEnd: px(f, starts[i] + len(l)) }));
   return (
     <g>
+      {at.map(({ l, i }) =>
+        chosen === 'same' || chosen === l.id ? (
+          <rect key={`ring${i}`} x={X0 - 14} y={f.tops[i] - 2} width={W - X0 + 8} height={f.grounds[i] - f.tops[i] + 6} rx="8" fill={GOLD_TINT} fillOpacity="0.45" stroke={GOLD} strokeWidth="3.5" />
+        ) : null,
+      )}
       {at.map(({ l, i, x }) => <Drawn key={`thing${i}`} id={l.id} x={x} ground={f.grounds[i]} s={f.s} />)}
       {ghosts ? at.map(({ l, i }) => <Drawn key={`ghost${i}`} id={l.id} x={px(f, 0)} ground={f.grounds[i]} s={f.s} ghost />) : null}
       {at.map(({ l, i, x, xEnd }) => (
@@ -537,15 +649,21 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
 
   if (round.mode === 'count') {
     const u = THINGS[round.unit];
+    const n = typeof answer === 'number' ? answer : null;
+    const said = n === null ? 'Your guess: empty.' : `Your guess: ${n} small ${n === 1 ? u.noun : u.plural}.`;
     return (
       <div className="board board--scale">
         <FrameSvg round={round} label={altText(round, false)} note="Drawn to one scale.">
           <Units round={round} solid={1} ghosts={worked ? round.answer - 1 : 0} marks={marks} />
         </FrameSvg>
+        <Guess unit={round.unit} options={round.options} n={n} label={said} />
         <div className="choices" role="group" aria-label="Your guess">
-          {round.options.map((n) => (
-            <Choice key={n} selected={answer === n} onTap={pick(n)} disabled={locked} ariaLabel={`${n} ${u.plural}`}>
-              {n}
+          {round.options.map((k) => (
+            <Choice key={k} selected={answer === k} onTap={pick(k)} disabled={locked} ariaLabel={`${k} ${k === 1 ? u.noun : u.plural}`}>
+              <span style={FACE}>
+                <TallyIcon id={round.unit} n={k} />
+                <span style={{ fontSize: 'var(--t-lg)', fontWeight: 700 }}>{k}</span>
+              </span>
             </Choice>
           ))}
         </div>
@@ -560,22 +678,29 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     );
   }
 
+  const ids = round.lanes.map((l) => l.id);
+  const said =
+    answer === 'same' ? ' Every lane is ringed in gold.' : typeof answer === 'string' ? ` The ${THINGS[answer].noun} is ringed in gold.` : '';
   return (
     <div className="board board--scale">
-      <FrameSvg round={round} label={altText(round, false)} note="Drawn to one scale.">
-        <Lanes round={round} starts={round.lanes.map((l) => l.start)} measured={false} marks={marks && !worked} ghosts={worked} />
+      <FrameSvg round={round} label={altText(round, false) + said} note="Drawn to one scale.">
+        <Lanes round={round} starts={round.lanes.map((l) => l.start)} measured={false} marks={marks && !worked} ghosts={worked} chosen={answer} />
       </FrameSvg>
       <div className="choices" role="group" aria-label="Your guess">
         {round.lanes.map((l) => (
           <Choice key={l.id} selected={answer === l.id} onTap={pick(l.id)} disabled={locked} ariaLabel={THINGS[l.id].label}>
-            <Icon id={l.id} />
-            {THINGS[l.id].label}
+            <span style={FACE}>
+              <Icon id={l.id} />
+              <span style={WORD}>{THINGS[l.id].label}</span>
+            </span>
           </Choice>
         ))}
         {round.mode === 'longer' ? (
           <Choice selected={answer === 'same'} onTap={pick('same')} disabled={locked} ariaLabel="Same length">
-            <SameIcon />
-            Same length
+            <span style={FACE}>
+              <SameIcon ids={ids} />
+              <span style={WORD}>Same length</span>
+            </span>
           </Choice>
         ) : null}
       </div>

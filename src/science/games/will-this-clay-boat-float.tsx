@@ -12,8 +12,13 @@ import { Choice } from '../../play/parts';
  * is a sinking material".
  *
  * Shape: predict → Try → before/after side by side → why. The prediction is
- * a tap-to-choose between Floats and Sinks; it is compared, never marked
- * wrong. All drawing is static SVG with fixed states.
+ * a tap-to-choose between two pictures: the same thing resting on the water
+ * (Floats) and lying on the bottom (Sinks), each word small underneath. It is
+ * compared, never marked wrong. Tapping a guess draws it on the tub at once —
+ * a gold outline where the thing would end up, and a dashed arrow down to it —
+ * so the guess sits in the Before pane beside what really happened. The clay
+ * boat is drawn beside the ball it was pressed from, so "the same clay" is seen,
+ * not read. All drawing is static SVG with fixed states.
  *
  * Levels:
  *  1. One object at a time from a familiar set: a clay ball, a clay boat, a
@@ -140,20 +145,96 @@ function ThingShape({ thing, at, marbles = 0 }: { readonly thing: Thing; readonl
   }
 }
 
+const INK = '#24170f';
+const GOLD = '#f2a900';
+
+/** Half the drawn width of each thing, so the guess ring fits round it. */
+const HALF: Record<Thing, number> = {
+  'clay-ball': 20,
+  pebble: 11,
+  stone: 26,
+  wood: 34,
+  log: 102,
+  spoon: 46,
+  'steel-bowl': 46,
+  'clay-boat': 52,
+  'loaded-boat': 52,
+};
+
+type Guess = Exclude<Answer, null>;
+
+const GUESSES: readonly (readonly [Guess, string])[] = [
+  ['floats', 'Floats'],
+  ['sinks', 'Sinks'],
+];
+
+/** A guess button's picture: this round's thing resting on the water, or lying on the bottom. */
+function GuessPicture({ round, value }: { readonly round: Round; readonly value: Guess }) {
+  return (
+    <svg viewBox="76 92 248 156" width="124" height="78" aria-hidden="true">
+      <rect x="84" y="100" width="232" height="140" rx="12" fill="#f5f0e6" stroke={INK} strokeWidth="4" />
+      <rect x="88" y={WATER_Y} width="224" height="86" rx="10" fill="#8fc3e8" />
+      <line x1="88" y1={WATER_Y} x2="312" y2={WATER_Y} stroke="#3e7fb2" strokeWidth="3" />
+      <ThingShape thing={round.thing} at={value === 'floats' ? 'top' : 'bottom'} marbles={round.marbles} />
+    </svg>
+  );
+}
+
+/** The child's guess, drawn on the tub the moment it is tapped: a faint copy where it would end up, ringed in gold, with an arrow down to it. */
+function GuessMark({ round, value }: { readonly round: Round; readonly value: Guess }) {
+  const at = value === 'floats' ? 'top' : 'bottom';
+  const cy = (at === 'top' ? WATER_Y - 14 : 214) - 6;
+  const tip = cy - 30;
+  return (
+    <g aria-hidden="true">
+      <g opacity="0.4">
+        <ThingShape thing={round.thing} at={at} marbles={round.marbles} />
+      </g>
+      <ellipse cx="200" cy={cy} rx={Math.max(HALF[round.thing] + 12, 30)} ry="28" fill="none" stroke={GOLD} strokeWidth="4" strokeDasharray="10 7" />
+      <line x1="200" y1="68" x2="200" y2={tip - 10} stroke={GOLD} strokeWidth="5" strokeDasharray="8 6" />
+      <path d={`M188 ${tip - 12} L212 ${tip - 12} L200 ${tip} z`} fill={GOLD} stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/**
+ * For the clay boat: the ball it was pressed from, with an arrow to the boat
+ * wherever the boat is drawn — "the same clay" shown, not said.
+ */
+function SameClay({ tx, ty }: { readonly tx: number; readonly ty: number }) {
+  const bx = 78;
+  const by = 40;
+  const a = Math.atan2(ty - by, tx - bx);
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const pt = (back: number, side: number) => `${tx - back * c - side * s} ${ty - back * s + side * c}`;
+  return (
+    <g aria-hidden="true">
+      <circle cx={bx} cy={by} r="20" fill="#c86b4a" stroke={INK} strokeWidth="3" />
+      <path d={`M${bx + 26 * c} ${by + 26 * s} L${pt(12, 0)}`} stroke={INK} strokeWidth="4" fill="none" />
+      <path d={`M${pt(0, 0)} L${pt(14, 8)} L${pt(14, -8)} z`} fill={INK} />
+    </g>
+  );
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
   return (
     <div className="board board--float">
-      <Tub label={`${NAME[round.thing]}, held above a tub of water`}>
+      <Tub label={`${NAME[round.thing]}, held above a tub of water${answer ? `; your guess: it ${answer}` : ''}`}>
+        {round.thing === 'clay-boat' ? <SameClay tx={144} ty={40} /> : null}
+        {answer ? <GuessMark round={round} value={answer} /> : null}
         <ThingShape thing={round.thing} at="above" marbles={round.marbles} />
       </Tub>
       <div className="choices" role="group" aria-label="Your guess">
-        <Choice selected={answer === 'floats'} onTap={() => setAnswer('floats')} disabled={locked}>
-          Floats
-        </Choice>
-        <Choice selected={answer === 'sinks'} onTap={() => setAnswer('sinks')} disabled={locked}>
-          Sinks
-        </Choice>
+        {GUESSES.map(([value, text]) => (
+          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={text}>
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <GuessPicture round={round} value={value} />
+              <span style={{ fontSize: 'var(--t-xs)', fontWeight: 600 }}>{text}</span>
+            </span>
+          </Choice>
+        ))}
       </div>
       {stage === 'hint' || stage === 'worked' ? (
         <p className="board-caption">Look at its shape. Is it tight and small for its weight, or wide and full of air?</p>
@@ -165,6 +246,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
 function Outcome({ round }: { readonly round: Round; readonly level: Level }) {
   return (
     <Tub label={`${NAME[round.thing]} ${round.floats ? 'floats' : 'sinks to the bottom'}`}>
+      {round.thing === 'clay-boat' ? <SameClay tx={144} ty={120} /> : null}
       <ThingShape thing={round.thing} at={round.floats ? 'top' : 'bottom'} marbles={round.marbles} />
     </Tub>
   );

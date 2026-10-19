@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -12,9 +12,12 @@ import { Choice } from '../../play/parts';
  * anything metal" and its cousin "shiny things stick".
  *
  * Shape: predict → Try → before/after side by side → why. The prediction is a
- * tap-to-choose between two outcomes; it is compared, never marked wrong. All
- * drawing is static SVG with fixed states, and the outcome is drawn in the
- * same frame and scale as the setup.
+ * tap-to-choose between two outcomes; it is compared, never marked wrong. Each
+ * choice is a picture of its outcome (this round's thing hanging from the
+ * magnet or resting on the table; two magnets touching or slid apart), with
+ * the words small underneath. Tapping one draws that guess on the board in
+ * dashed gold at once. All drawing is static SVG with fixed states, and the
+ * outcome is drawn in the same frame and scale as the setup.
  *
  * Levels:
  *  1. Metal, wood, plastic: one thing at a time under a horseshoe magnet held
@@ -246,6 +249,8 @@ const STUCK_X = 165;
 
 /** Height of each drawing; every thing is drawn with its top at y = 0, centred on x = 0. */
 const H: Record<Thing, number> = { nail: 16, wood: 34, comb: 22, clip: 14, eraser: 18, pin: 14, foil: 30, cap: 13, coin: 13, nut: 22, diya: 26, can: 60 };
+/** Widest reach of each drawing either side of x = 0, so a ring can hug it. */
+const W: Record<Thing, number> = { nail: 42, wood: 34, comb: 37, clip: 25, eraser: 26, pin: 33, foil: 18, cap: 17, coin: 18, nut: 21, diya: 36, can: 19 };
 
 function ThingShape({ thing }: { readonly thing: Thing }) {
   switch (thing) {
@@ -390,14 +395,38 @@ function Placed({ thing, cx, top, ghost }: { readonly thing: Thing; readonly cx:
 
 const restTop = (t: Thing) => TABLE_Y - H[t];
 
-function PickBefore({ thing, stage }: { readonly thing: Thing; readonly stage: BoardProps<Round, Answer>['stage'] }) {
+const GUESS_DASH = '7 6';
+
+/**
+ * The child's guess, drawn on the board the moment a choice is tapped: dashed
+ * gold, so it reads as "what you said", not as what happened. Picks it up puts
+ * a faint copy of the thing on the magnet's north tip inside a dashed ring;
+ * Stays down rings the thing where it rests.
+ */
+function PickGuess({ thing, guess }: { readonly thing: Thing; readonly guess: Result }) {
+  const w = W[thing];
+  if (guess !== 'pulls') {
+    return <rect x={200 - w - 8} y={restTop(thing) - 8} width={2 * w + 16} height={H[thing] + 12} rx="10" fill="none" stroke={GOLD} strokeWidth="4" strokeDasharray={GUESS_DASH} />;
+  }
+  return (
+    <g>
+      <g opacity="0.45">
+        <Placed thing={thing} cx={STUCK_X} top={TIP_Y} />
+      </g>
+      <rect x={STUCK_X - w - 6} y={TIP_Y - 4} width={2 * w + 12} height={H[thing] + 10} rx="8" fill="none" stroke={GOLD} strokeWidth="4" strokeDasharray={GUESS_DASH} />
+    </g>
+  );
+}
+
+function PickBefore({ thing, stage, guess }: { readonly thing: Thing; readonly stage: BoardProps<Round, Answer>['stage']; readonly guess: Answer }) {
   const worked = stage === 'worked';
   const lifts = pulled(thing);
   return (
-    <Frame label={`A horseshoe magnet held above ${NAME[thing]} on a table`}>
+    <Frame label={`A horseshoe magnet held above ${NAME[thing]} on a table${guess && !worked ? `; your guess: ${guess === 'pulls' ? 'it picks it up' : 'it stays down'}` : ''}`}>
       <Horseshoe />
       <Table thing={thing} mark={stage === 'hint' || worked} />
       <Placed thing={thing} cx={200} top={restTop(thing)} ghost={worked && lifts} />
+      {guess && !worked ? <PickGuess thing={thing} guess={guess} /> : null}
       {worked && !lifts ? (
         <g>
           <rect x={156} y={restTop(thing) - 8} width="88" height={H[thing] + 10} rx="10" fill="none" stroke={GOLD} strokeWidth="5" />
@@ -582,7 +611,17 @@ function Move({ round, dashed }: { readonly round: PolesRound; readonly dashed?:
   return <Arrow x1={from} y1={72} x2={to} y2={72} dashed={dashed} />;
 }
 
-function PolesBefore({ round, stage }: { readonly round: PolesRound; readonly stage: BoardProps<Round, Answer>['stage'] }) {
+/**
+ * The child's guess on the track, the moment a choice is tapped: a dashed gold
+ * arrow above the free magnet, in to the taped magnet for Pull together, out
+ * along the track for Push apart. Direction only; how far is the model's.
+ */
+function PolesGuess({ round, guess }: { readonly round: PolesRound; readonly guess: Result }) {
+  const mid = markX(round.gap) + BAR_W / 2;
+  return guess === 'pulls' ? <Arrow x1={mid} y1={56} x2={ZERO_X + 6} y2={56} dashed /> : <Arrow x1={mid} y1={56} x2={mid + 64} y2={56} dashed />;
+}
+
+function PolesBefore({ round, stage, guess }: { readonly round: PolesRound; readonly stage: BoardProps<Round, Answer>['stage']; readonly guess: Answer }) {
   const worked = stage === 'worked';
   const hint = stage === 'hint';
   const at = worked ? endMark(round) : round.gap;
@@ -591,12 +630,14 @@ function PolesBefore({ round, stage }: { readonly round: PolesRound; readonly st
   // that is the far end he can still see.
   const freeRing = worked || (hint && !round.hidden) ? 'near' : hint ? 'far' : undefined;
   const facing = round.hidden && !worked ? 'the paper-covered end' : `the ${FULL[round.right]} end`;
+  const said = guess && !worked ? `; your guess: ${guess === 'pulls' ? 'pull together' : 'push apart'}` : '';
   return (
-    <Frame label={`A taped magnet's ${FULL[round.left]} end faces ${facing} of a free magnet, ${round.gap} marks away`}>
+    <Frame label={`A taped magnet's ${FULL[round.left]} end faces ${facing} of a free magnet, ${round.gap} marks away${said}`}>
       <Track from={worked ? round.gap : undefined} to={worked ? at : undefined} />
       <TapedBar round={round} ring={hint || worked} />
       <FreeBar round={round} at={at} ring={freeRing} tag={!worked} paper={paper} />
       {worked ? <Move round={round} dashed /> : null}
+      {guess && !worked ? <PolesGuess round={round} guess={guess} /> : null}
     </Frame>
   );
 }
@@ -617,27 +658,63 @@ function PolesAfter({ round }: { readonly round: PolesRound }) {
 }
 
 /**
- * A small picture on each choice, so the two buttons differ without reading:
- * lifted off the table or resting on it; arrows in or arrows out.
+ * Each choice is a picture of its outcome, so the two buttons differ without
+ * reading. Levels 1-2 crop the board's own scene to the magnet and table and
+ * draw this round's thing in it: hanging from the north tip, or resting on the
+ * table. Level 3 draws two plain bar magnets on the track, touching or slid
+ * apart, with the arrow of the move. The bars carry no pole colours, so the
+ * picture never gives away the end hidden under the paper.
  */
-function ChoiceIcon({ value, setup }: { readonly value: Result; readonly setup: Round['setup'] }) {
-  const line = { fill: 'none', stroke: INK, strokeWidth: 3.5, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
+function PickPicture({ thing, value }: { readonly thing: Thing; readonly value: Result }) {
+  const lifts = value === 'pulls';
   return (
-    <svg width="48" height="36" viewBox="0 0 48 36" aria-hidden="true" focusable="false">
-      {setup === 'pick' ? (
-        <>
-          <line x1="4" y1="32" x2="44" y2="32" stroke={TABLE} strokeWidth="4" strokeLinecap="round" />
-          <rect x="13" y={value === 'pulls' ? 12 : 22} width="22" height="8" rx="2" fill={STEEL} stroke={INK} strokeWidth="2" />
-          {value === 'pulls' ? <path d="M24 9 V1 M24 1 l-5 5 M24 1 l5 5" {...line} strokeWidth={3} /> : null}
-        </>
-      ) : value === 'pulls' ? (
-        <path d="M4 18 H19 M19 18 l-6 -6 M19 18 l-6 6 M44 18 H29 M29 18 l6 -6 M29 18 l6 6" {...line} />
-      ) : (
-        <path d="M19 18 H5 M5 18 l6 -6 M5 18 l6 6 M29 18 H43 M43 18 l-6 -6 M43 18 l-6 6" {...line} />
-      )}
+    <svg width="78" height="120" viewBox="116 0 140 216" aria-hidden="true" focusable="false">
+      <Horseshoe />
+      <rect x="118" y={TABLE_Y} width="136" height="14" rx="3" fill={TABLE} stroke={INK} strokeWidth="3" />
+      <Placed thing={thing} cx={lifts ? STUCK_X : 200} top={lifts ? TIP_Y : restTop(thing)} />
     </svg>
   );
 }
+
+function PlainBar({ x }: { readonly x: number }) {
+  return (
+    <g stroke={INK} strokeWidth="2.5">
+      <rect x={x} y="28" width="22" height="20" fill="#cfc6b8" />
+      <rect x={x + 22} y="28" width="22" height="20" fill="#e8e1d5" />
+    </g>
+  );
+}
+
+/** A solid ink arrow along y = 12 from x1 to x2, thick enough to read at button size. */
+function BoldArrow({ x1, x2 }: { readonly x1: number; readonly x2: number }) {
+  const d = Math.sign(x2 - x1);
+  return (
+    <g fill={INK} stroke={INK} strokeLinejoin="round">
+      <line x1={x1} y1="12" x2={x2 - d * 10} y2="12" strokeWidth="5" strokeLinecap="round" />
+      <polygon points={`${x2},12 ${x2 - d * 14},3 ${x2 - d * 14},21`} strokeWidth="1.5" />
+    </g>
+  );
+}
+
+function PolesPicture({ value }: { readonly value: Result }) {
+  const together = value === 'pulls';
+  const freeX = together ? 52 : 88;
+  return (
+    <svg width="112" height="72" viewBox="0 0 136 88" aria-hidden="true" focusable="false">
+      <line x1="2" y1="62" x2="134" y2="62" stroke={INK} strokeWidth="2.5" />
+      {Array.from({ length: 6 }, (_, m) => (
+        <line key={m} x1={52 + m * 16} y1="62" x2={52 + m * 16} y2="70" stroke={INK} strokeWidth="2" />
+      ))}
+      <PlainBar x={8} />
+      <rect x="12" y="22" width="9" height="32" rx="1.5" fill="#e9dcc0" stroke={INK} strokeWidth="1.5" />
+      <PlainBar x={freeX} />
+      {together ? <BoldArrow x1={112} x2={60} /> : <BoldArrow x1={62} x2={130} />}
+    </svg>
+  );
+}
+
+const CHOICE_FACE: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 };
+const CHOICE_WORDS: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
 
 /* ------------------------------------------------------- board, outcome -- */
 
@@ -675,12 +752,14 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const line = caption(round, stage);
   return (
     <div className="board board--magnet">
-      {round.setup === 'pick' ? <PickBefore thing={round.thing} stage={stage} /> : <PolesBefore round={round} stage={stage} />}
+      {round.setup === 'pick' ? <PickBefore thing={round.thing} stage={stage} guess={answer} /> : <PolesBefore round={round} stage={stage} guess={answer} />}
       <div className="choices" role="group" aria-label="Your guess">
         {CHOICES[round.setup].map(([value, text]) => (
-          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked}>
-            <ChoiceIcon value={value} setup={round.setup} />
-            {text}
+          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={text}>
+            <span style={CHOICE_FACE}>
+              {round.setup === 'pick' ? <PickPicture thing={round.thing} value={value} /> : <PolesPicture value={value} />}
+              <span style={CHOICE_WORDS}>{text}</span>
+            </span>
           </Choice>
         ))}
       </div>

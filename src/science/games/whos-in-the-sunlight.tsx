@@ -23,7 +23,8 @@ import { Choice } from '../../play/parts';
  *     California and India. Day or night at one pin? The outcome shades the
  *     half turned away from the sun.
  *  2. The Earth spins. Day and night halves are drawn; the Earth turns for 6,
- *     12, 18 or 24 hours, shown as a share of one turn on a gold disc. Day or
+ *     12, 18 or 24 hours, shown as a share of one turn on a gold disc ringed by
+ *     24 hour beads, that many of them gold. Day or
  *     night at the pin then? The pins move round; the lit half stays facing
  *     the sun.
  *  3. The Moon's lit half. The Moon at one of eight places on its orbit, its
@@ -369,11 +370,14 @@ function ArcArrow({ cx, cy, r, from, to, color, width }: {
 /**
  * How far `hours` turns the Earth, drawn as a share of one whole turn: a disc
  * of four 6-hour quarters with the turned part gold, starting at the top and
- * running the way the Earth spins. Without it, "6 hours" is a number with
+ * running the way the Earth spins. Round it sit 24 hour beads, one per hour,
+ * so one whole turn is 24 beads you can count, and "6 hours" is the 6 gold
+ * beads beside the gold quarter. Without it, "6 hours" is a number with
  * nothing on the board to tell a child how far that carries the pin.
  */
 function TurnMeter({ hours }: { readonly hours: Turn }) {
-  const [cx, cy, r] = [360, 50, 20];
+  const [cx, cy, r] = [360, 48, 22];
+  const beads = Array.from({ length: 24 }, (_, i) => polar(cx, cy, r + 11, 90 + (i + 0.5) * 15));
   const deg = hours * 15;
   const [x0, y0] = polar(cx, cy, r, 90);
   const [x1, y1] = polar(cx, cy, r, 90 + deg);
@@ -385,13 +389,17 @@ function TurnMeter({ hours }: { readonly hours: Turn }) {
       ) : (
         <path d={`M${cx} ${cy} L${f(x0)} ${f(y0)} A${r} ${r} 0 ${deg > 180 ? 1 : 0} 0 ${f(x1)} ${f(y1)} Z`} fill={GOLD} />
       )}
-      <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke={INK} strokeWidth="1.5" />
-      <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} stroke={INK} strokeWidth="1.5" />
+      {/* The quarter lines run out between the beads, so each quarter turn holds 6 of them. */}
+      <line x1={cx - r - 15} y1={cy} x2={cx + r + 15} y2={cy} stroke={INK} strokeWidth="1.5" />
+      <line x1={cx} y1={cy - r - 15} x2={cx} y2={cy + r + 15} stroke={INK} strokeWidth="1.5" />
       <circle cx={cx} cy={cy} r={r} fill="none" stroke={INK} strokeWidth="2.5" />
-      <text x={cx} y={cy + r + 16} fontFamily={FONT} fontWeight="700" fontSize="13" fill={INK} textAnchor="middle">
+      {beads.map(([x, y], i) => (
+        <circle key={i} cx={f(x)} cy={f(y)} r="2.8" fill={i < hours ? GOLD : '#fff6dc'} stroke={i < hours ? INK : SOFT} strokeWidth="1.3" />
+      ))}
+      <text x={cx} y={cy + r + 26} fontFamily={FONT} fontWeight="700" fontSize="13" fill={INK} textAnchor="middle">
         {hours} hours
       </text>
-      <text x={cx} y={cy + r + 30} fontFamily={FONT} fontSize="10.5" fill={SOFT} textAnchor="middle">
+      <text x={cx} y={cy + r + 40} fontFamily={FONT} fontSize="10.5" fill={SOFT} textAnchor="middle">
         1 turn = 24 h
       </text>
     </g>
@@ -401,8 +409,54 @@ function TurnMeter({ hours }: { readonly hours: Turn }) {
 const stateAt = (place: Place, cal: number) => (isDay(place, cal) ? 'day' : 'night');
 type Help = 'hint' | 'worked' | null;
 
+/**
+ * The child's guess, drawn on the board the moment a button is tapped: the same
+ * picture as the button, in a card headed "Your guess". With no guess yet it is
+ * a dashed card holding "?". The ringed pin's dot sits under it, so the card
+ * is plainly about that place. (Level 3 draws its guess in the "From Earth"
+ * window instead, where the answer will appear.)
+ */
+function GuessCard({ x, y, size, place, children }: {
+  readonly x: number;
+  readonly y: number;
+  readonly size: number;
+  readonly place: Place;
+  /** The guessed picture, drawn in a 64 × 64 box; null for no guess yet. */
+  readonly children: ReactNode;
+}) {
+  const mid = x + size / 2;
+  return (
+    <g>
+      <text x={mid} y={y - 7} fontFamily={FONT} fontSize="11" fill={SOFT} textAnchor="middle">
+        Your guess
+      </text>
+      {children ? (
+        <svg x={x} y={y} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+          {children}
+        </svg>
+      ) : (
+        <g>
+          <rect x={x + 1.5} y={y + 1.5} width={size - 3} height={size - 3} rx="9" fill="#ffffff" stroke={SOFT} strokeWidth="2.5" strokeDasharray="6 5" />
+          <text x={mid} y={y + size / 2 + 1} fontFamily={FONT} fontWeight="700" fontSize="26" fill={SOFT} textAnchor="middle" dominantBaseline="middle">
+            ?
+          </text>
+        </g>
+      )}
+      <circle cx={mid} cy={y + size + 16} r="11" fill="none" stroke={GOLD} strokeWidth="3" />
+      <circle cx={mid} cy={y + size + 16} r="6" fill={PIN[place]} stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+const skyGuess = (guess: Answer | undefined) => (guess === 'day' || guess === 'night' ? <Sky state={guess} /> : null);
+
 /** Level 1: a plain globe before; the half turned away from the sun shaded after. */
-function FaceScene({ round, after, help }: { readonly round: Extract<Round, { kind: 'face' }>; readonly after: boolean; readonly help: Help }) {
+function FaceScene({ round, after, help, guess }: {
+  readonly round: Extract<Round, { kind: 'face' }>;
+  readonly after: boolean;
+  readonly help: Help;
+  readonly guess?: Answer;
+}) {
   const g = globeFor(round.sun);
   const places: readonly Place[] = ['california', 'india'];
   const label = after
@@ -426,12 +480,22 @@ function FaceScene({ round, after, help }: { readonly round: Extract<Round, { ki
           </g>
         );
       })}
+      {after || guess === undefined ? null : (
+        <GuessCard x={round.sun === 'left' ? 326 : 18} y={100} size={56} place={round.ask}>
+          {skyGuess(guess)}
+        </GuessCard>
+      )}
     </Frame>
   );
 }
 
 /** Level 2: day and night halves fixed toward the sun; the pins carried round by the spin. */
-function SpinScene({ round, after, help }: { readonly round: Extract<Round, { kind: 'spin' }>; readonly after: boolean; readonly help: Help }) {
+function SpinScene({ round, after, help, guess }: {
+  readonly round: Extract<Round, { kind: 'spin' }>;
+  readonly after: boolean;
+  readonly help: Help;
+  readonly guess?: Answer;
+}) {
   const g = globeFor('left');
   const cal = after ? round.cal + round.hours : round.cal;
   const start = pinDeg(g, round.ask, round.cal);
@@ -465,6 +529,11 @@ function SpinScene({ round, after, help }: { readonly round: Extract<Round, { ki
           </g>
         );
       })}
+      {after || guess === undefined ? null : (
+        <GuessCard x={334} y={138} size={52} place={round.ask}>
+          {skyGuess(guess)}
+        </GuessCard>
+      )}
     </Frame>
   );
 }
@@ -506,7 +575,12 @@ function MoonFace({ cx, cy, r, e, side }: {
 const SKY = { cx: 192, cy: 128, orbit: 78, earth: 22, moon: 13 } as const;
 const INSET = { x: 294, y: 40, w: 102, h: 130 } as const;
 
-function MoonScene({ round, after, help }: { readonly round: Extract<Round, { kind: 'moon' }>; readonly after: boolean; readonly help: Help }) {
+function MoonScene({ round, after, help, guess }: {
+  readonly round: Extract<Round, { kind: 'moon' }>;
+  readonly after: boolean;
+  readonly help: Help;
+  readonly guess?: Answer;
+}) {
   const { cx, cy, orbit, earth, moon } = SKY;
   const [mx, my] = polar(cx, cy, orbit, round.at);
   const phase = phaseOf(round.at);
@@ -562,6 +636,15 @@ function MoonScene({ round, after, help }: { readonly round: Extract<Round, { ki
             {PHASE_LABEL[phase]}
           </Label>
         </g>
+      ) : guess && guess !== 'day' && guess !== 'night' ? (
+        // The guess fills the window the moment a shape is tapped; Try puts the real view in the same place.
+        <g>
+          <MoonFace cx={ix} cy={iy} r={28} e={PHASE_E[guess]} side={litSide(round.at)} />
+          <circle cx={ix} cy={iy} r={33} fill="none" stroke={SUN} strokeWidth="2.5" strokeDasharray="5 4" />
+          <Label x={ix} y={INSET.y + INSET.h - 18} size={11}>
+            Your guess
+          </Label>
+        </g>
       ) : (
         <Label x={ix} y={iy} size={30}>
           ?
@@ -571,51 +654,87 @@ function MoonScene({ round, after, help }: { readonly round: Extract<Round, { ki
   );
 }
 
-/** A small drawing for each prediction button. */
-function Icon({ answer, side }: { readonly answer: Exclude<Answer, null>; readonly side: Side }) {
+/**
+ * Day or night at one place, as a child sees it from the window: the same
+ * house under the sun, or under the stars with its window lit. Drawn in a
+ * 64 × 64 box so it serves the answer buttons and the guess card alike.
+ */
+function Sky({ state }: { readonly state: 'day' | 'night' }) {
+  const day = state === 'day';
   return (
-    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-      {answer === 'day' ? (
+    <g>
+      <rect x="1.5" y="1.5" width="61" height="61" rx="10" fill={day ? '#bfe3ff' : NIGHT} />
+      {day ? (
         <g>
           {Array.from({ length: 8 }, (_, i) => {
-            const [x1, y1] = polar(20, 20, 12, i * 45);
-            const [x2, y2] = polar(20, 20, 18, i * 45);
+            const [x1, y1] = polar(43, 20, 11, i * 45);
+            const [x2, y2] = polar(43, 20, 16, i * 45);
             return <line key={i} x1={f(x1)} y1={f(y1)} x2={f(x2)} y2={f(y2)} stroke={RAY} strokeWidth="3" strokeLinecap="round" />;
           })}
-          <circle cx="20" cy="20" r="9" fill={SUN} stroke={INK} strokeWidth="2" />
-        </g>
-      ) : answer === 'night' ? (
-        <g>
-          <rect x="2" y="2" width="36" height="36" rx="8" fill={NIGHT} />
-          {[
-            [11, 12],
-            [27, 9],
-            [20, 22],
-            [9, 30],
-            [30, 29],
-          ].map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="2" fill="#ffffff" />
-          ))}
+          <circle cx="43" cy="20" r="8" fill={SUN} stroke={INK} strokeWidth="2" />
         </g>
       ) : (
-        <MoonFace cx={20} cy={20} r={16} e={PHASE_E[answer]} side={side} />
+        <g>
+          {[
+            [12, 12],
+            [28, 8],
+            [45, 14],
+            [55, 28],
+            [38, 27],
+            [9, 28],
+          ].map(([x, y]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r="2.2" fill="#ffffff" />
+          ))}
+        </g>
       )}
+      <path d="M1.5 48 H62.5 V52.5 A10 10 0 0 1 52.5 62.5 H11.5 A10 10 0 0 1 1.5 52.5 Z" fill={day ? '#6cbf5a' : '#2f4a35'} />
+      <rect x="13" y="36" width="20" height="14" fill={day ? '#f4d9a8' : '#6b5a4a'} stroke={INK} strokeWidth="2" />
+      <polygon points="10,37 23,26 36,37" fill={day ? '#c8553d' : '#5a3a30'} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <rect x="19" y="40" width="7" height="7" fill={day ? '#8fc8ff' : '#ffd84d'} stroke={INK} strokeWidth="1.5" />
+      <rect x="1.5" y="1.5" width="61" height="61" rx="10" fill="none" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The Moon's shape against the night sky, as in the "From Earth" window. */
+function MoonSky({ phase, side }: { readonly phase: Phase; readonly side: Side }) {
+  return (
+    <g>
+      <rect x="1.5" y="1.5" width="61" height="61" rx="10" fill="#141b33" stroke={INK} strokeWidth="3" />
+      <MoonFace cx={32} cy={32} r={21} e={PHASE_E[phase]} side={side} />
+    </g>
+  );
+}
+
+/** The picture on each prediction button: the outcome itself, drawn. */
+function Icon({ answer, side }: { readonly answer: Exclude<Answer, null>; readonly side: Side }) {
+  return (
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+      {answer === 'day' || answer === 'night' ? <Sky state={answer} /> : <MoonSky phase={answer} side={side} />}
     </svg>
   );
 }
 
-function Scene({ round, after, help }: { readonly round: Round; readonly after: boolean; readonly help: Help }) {
+function Scene({ round, after, help, guess }: {
+  readonly round: Round;
+  readonly after: boolean;
+  readonly help: Help;
+  /** The child's prediction, drawn on the board; undefined on the outcome, which shows only what happened. */
+  readonly guess?: Answer;
+}) {
   switch (round.kind) {
     case 'face':
-      return <FaceScene round={round} after={after} help={help} />;
+      return <FaceScene round={round} after={after} help={help} guess={guess} />;
     case 'spin':
-      return <SpinScene round={round} after={after} help={help} />;
+      return <SpinScene round={round} after={after} help={help} guess={guess} />;
     case 'moon':
-      return <MoonScene round={round} after={after} help={help} />;
+      return <MoonScene round={round} after={after} help={help} guess={guess} />;
   }
 }
 
 const CHOICE_LABEL: Record<Exclude<Answer, null>, string> = { day: 'Day', night: 'Night', ...PHASE_LABEL };
+const CHOICE_FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' } as const;
+const CHOICE_WORD = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)' } as const;
 
 const HINT: Record<Round['kind'], string> = {
   face: 'The gold line splits the Earth: one half faces the sun.',
@@ -632,12 +751,14 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   // (the shell goes straight to Next), so it draws the result itself, labelled.
   return (
     <div className="board board--sunlight">
-      <Scene round={round} after={stage === 'worked'} help={help} />
+      <Scene round={round} after={stage === 'worked'} help={help} guess={answer} />
       <div className="choices" role="group" aria-label="Your guess">
         {options.map((o) => (
           <Choice key={o} selected={answer === o} onTap={() => setAnswer(o)} disabled={locked} ariaLabel={CHOICE_LABEL[o]}>
-            <Icon answer={o} side={side} />
-            {CHOICE_LABEL[o]}
+            <span style={CHOICE_FACE}>
+              <Icon answer={o} side={side} />
+              <span style={CHOICE_WORD}>{CHOICE_LABEL[o]}</span>
+            </span>
           </Choice>
         ))}
       </div>

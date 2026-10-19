@@ -1,3 +1,4 @@
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -29,6 +30,17 @@ import { Choice } from '../../play/parts';
  *     tile? Backwards: how many blocks high to stop on a gold flag? Both need
  *     the rate read off last time's run (two tiles for every block), not just
  *     "higher is farther".
+ *
+ * Representation (advisor: "too much reading"): every answer button is a
+ * picture of its outcome with the word small underneath: two floors with the
+ * cars stopped far and near (or level), a run of floor tiles with the car on
+ * the last one, a stack of blocks with the car on top. A height is always
+ * counted blocks and a roll always counted tiles. On level 3 last time's run
+ * stays on the board: a thin grey column of its blocks beside the stack, and
+ * under the floor one small grey block under each pair of tiles it rolled, so
+ * "one block of height is worth two tiles" is shown, not said. Tapping a guess
+ * draws it on the board at once in teal: a frame round the chosen lane(s), a
+ * hoop on the chosen tile, or the car lifted to the chosen height.
  */
 
 /** One ramp: `span` px along the floor, the car let go `h` blocks up. */
@@ -202,8 +214,17 @@ const WOOD = '#c8913f';
 const PLANK = '#9b6a32';
 const GREY = '#8a7a6a';
 const EARLIER = '#d6cfc4';
+/** The car of last time's run, parked grey on the tile it stopped on. */
+const EARLIER_CAR = '#b3a796';
 /** Both lanes carry the same toy car: colour must not look like a variable. */
 const CAR = '#d9480f';
+/** The child's own guess, drawn on the board the moment it is tapped. */
+const GUESS = '#0d8063';
+const GUESS_TINT = '#dcf3ea';
+const GOLD_DEEP = '#b07a00';
+const TILE_ODD = '#c8643c';
+const TILE_EVEN = '#e09a6a';
+const SLOT_EDGE = '#c9bba8';
 
 type Show = 'setup' | 'hint' | 'worked' | 'outcome';
 
@@ -213,19 +234,38 @@ const startOf = (lane: Lane, floorY: number) => {
   return { x: FOOT - lane.span * f, y: floorY - RISE * f };
 };
 const tilt = (span: number) => (Math.atan2(RISE, span) * 180) / Math.PI;
-/** The middle of the tile the car stops on. */
-const stopX = (h: number) => FOOT + (tiles(h) - 0.5) * TW;
+/** The middle of floor tile `n`, and of the tile the car stops on from `h` blocks. */
+const tileX = (n: number) => FOOT + (n - 0.5) * TW;
+const stopX = (h: number) => tileX(tiles(h));
 
 /**
  * A toy car whose wheels touch (x, y); `lift` raises it off the plank's centre
  * line onto its surface. A ghost (dashed) car is where it was let go, or where
  * the worked answer says it will stop.
  */
-function Car({ x, y, rot = 0, ghost, lift = 0 }: { readonly x: number; readonly y: number; readonly rot?: number; readonly ghost?: boolean; readonly lift?: number }) {
+function Car({
+  x,
+  y,
+  rot = 0,
+  ghost,
+  lift = 0,
+  tint = CAR,
+  guess,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly rot?: number;
+  readonly ghost?: boolean;
+  readonly lift?: number;
+  /** Grey for last time's run; the car's own colour otherwise. */
+  readonly tint?: string;
+  /** The car where the child's guess lifted it: a thick teal edge. */
+  readonly guess?: boolean;
+}) {
   const paint = ghost
-    ? { fill: 'none', stroke: CAR, strokeWidth: 2, strokeDasharray: '4 3' }
-    : { fill: CAR, stroke: INK, strokeWidth: 2 };
-  const wheel = ghost ? { fill: 'none', stroke: CAR, strokeWidth: 2 } : { fill: INK };
+    ? { fill: 'none', stroke: tint, strokeWidth: 2, strokeDasharray: '4 3' }
+    : { fill: tint, stroke: guess ? GUESS : INK, strokeWidth: guess ? 3 : 2 };
+  const wheel = ghost ? { fill: 'none', stroke: tint, strokeWidth: 2 } : { fill: INK };
   return (
     <g transform={`translate(${x} ${y}) rotate(${rot}) translate(0 ${-lift})`}>
       <path d="M-7 -14 l3 -6 h8 l3 6 z" {...paint} />
@@ -236,12 +276,13 @@ function Car({ x, y, rot = 0, ghost, lift = 0 }: { readonly x: number; readonly 
   );
 }
 
-function Floor({ floorY, mark }: { readonly floorY: number; readonly mark?: number }) {
+function Floor({ floorY, mark, guess }: { readonly floorY: number; readonly mark?: number; readonly guess?: number }) {
   return (
     <g>
       <rect x={0} y={floorY} width={400} height={12} fill="#e8d9c2" />
       {Array.from({ length: FLOOR_TILES }, (_, i) => {
         const n = i + 1;
+        const bold = n === mark || n === guess;
         return (
           <g key={n}>
             <rect
@@ -249,11 +290,11 @@ function Floor({ floorY, mark }: { readonly floorY: number; readonly mark?: numb
               y={floorY}
               width={TW}
               height={12}
-              fill={n === mark ? GOLD : n % 2 ? '#c8643c' : '#e09a6a'}
-              stroke={INK}
-              strokeWidth={1}
+              fill={n === mark ? GOLD : n === guess ? GUESS_TINT : n % 2 ? TILE_ODD : TILE_EVEN}
+              stroke={n === guess ? GUESS : INK}
+              strokeWidth={n === guess ? 3 : 1}
             />
-            <text x={FOOT + (i + 0.5) * TW} y={floorY + 24} fontSize={10} textAnchor="middle" fill={n === mark ? INK : INK_SOFT} fontWeight={n === mark ? 700 : 400}>
+            <text x={FOOT + (i + 0.5) * TW} y={floorY + 24} fontSize={10} textAnchor="middle" fill={n === guess ? GUESS : bold ? INK : INK_SOFT} fontWeight={bold ? 700 : 400}>
               {n}
             </text>
           </g>
@@ -264,16 +305,47 @@ function Floor({ floorY, mark }: { readonly floorY: number; readonly mark?: numb
   );
 }
 
-/** Six numbered wooden blocks; the ramp rests on the top one. `right` is the stack's right edge. */
-function Stack({ right, floorY, mark, earlier }: { readonly right: number; readonly floorY: number; readonly mark?: number; readonly earlier?: number }) {
+/**
+ * Six numbered wooden blocks; the ramp rests on the top one. `right` is the
+ * stack's right edge. `mark` paints blocks 1..mark gold, so a height is a
+ * counted column of blocks. `earlier` is last time's height, kept on the board
+ * as a thin grey column of that many blocks beside the stack. `guess` rings
+ * blocks 1..guess in teal: the height the child has just tapped.
+ */
+function Stack({
+  right,
+  floorY,
+  mark,
+  earlier,
+  guess,
+}: {
+  readonly right: number;
+  readonly floorY: number;
+  readonly mark?: number;
+  readonly earlier?: number;
+  readonly guess?: number;
+}) {
   return (
     <g>
+      {earlier
+        ? Array.from({ length: earlier }, (_, i) => (
+            <rect key={`e${i}`} x={right - BW - 16} y={floorY - (i + 1) * BH} width={13} height={BH} fill={EARLIER} stroke={GREY} strokeWidth={1.5} />
+          ))
+        : null}
       {Array.from({ length: STACK }, (_, i) => {
         const n = i + 1;
-        const fill = n === mark ? GOLD : n === earlier ? EARLIER : WOOD;
+        const ringed = guess !== undefined && n <= guess;
         return (
           <g key={n}>
-            <rect x={right - BW} y={floorY - n * BH} width={BW} height={BH} fill={fill} stroke={INK} strokeWidth={1.5} />
+            <rect
+              x={right - BW}
+              y={floorY - n * BH}
+              width={BW}
+              height={BH}
+              fill={mark !== undefined && n <= mark ? GOLD : WOOD}
+              stroke={ringed ? GUESS : INK}
+              strokeWidth={ringed ? 3 : 1.5}
+            />
             <text x={right - BW / 2} y={floorY - n * BH + 12} fontSize={10} textAnchor="middle" fill={INK}>
               {n}
             </text>
@@ -284,23 +356,21 @@ function Stack({ right, floorY, mark, earlier }: { readonly right: number; reado
   );
 }
 
-/** The grey flag on the tile where the car stopped last time (level 3). */
+/** The grey flag and grey car on the tile where the car stopped last time (level 3). */
 function EarlierFlag({ floorY, before }: { readonly floorY: number; readonly before: number }) {
   const x = stopX(before);
   return (
     <g>
       <line x1={x} y1={floorY} x2={x} y2={floorY - 34} stroke={INK_SOFT} strokeWidth={2} />
       <path d={`M${x} ${floorY - 34} l16 6 l-16 6 z`} fill={EARLIER} stroke={GREY} strokeWidth={1.5} />
-      <text x={x > 300 ? x + 16 : x - 2} y={floorY - 40} fontSize={10} textAnchor={x > 300 ? 'end' : 'start'} fill={INK_SOFT}>
-        last time, {blocks(before)}
-      </text>
+      <Car x={x} y={floorY} tint={EARLIER_CAR} />
     </g>
   );
 }
 
 /** The gold flag on the tile the car must reach (level 3, how-high questions). Flies left near the edge. */
 function GoalFlag({ floorY, tile }: { readonly floorY: number; readonly tile: number }) {
-  const x = FOOT + (tile - 0.5) * TW;
+  const x = tileX(tile);
   const dir = x > 360 ? -1 : 1;
   return (
     <g>
@@ -311,22 +381,26 @@ function GoalFlag({ floorY, tile }: { readonly floorY: number; readonly tile: nu
 }
 
 /**
- * Brackets under the floor, one under each pair of tiles, numbered by the
- * block of height that pair is worth: grey for last time's run (hint), gold
- * for this run (worked).
+ * Under the floor: one bracket under each pair of tiles, and under each
+ * bracket one small block, so a block of starting height is drawn beside the
+ * two tiles of roll it is worth. Row one is last time's run in grey, on the
+ * board from the start on level 3. Row two is this run in gold: brackets only
+ * on a how-high hint, a block in each once worked.
  */
-function Pairs({ floorY, count, tone }: { readonly floorY: number; readonly count: number; readonly tone: 'earlier' | 'now' }) {
-  const stroke = tone === 'earlier' ? GREY : '#b07a00';
+const PAIR_ROWS = { earlier: 28, now: 50 } as const;
+
+function Pairs({ floorY, count, tone, filled = true }: { readonly floorY: number; readonly count: number; readonly tone: 'earlier' | 'now'; readonly filled?: boolean }) {
+  const y = floorY + PAIR_ROWS[tone];
+  const stroke = tone === 'earlier' ? GREY : GOLD_DEEP;
+  const fill = tone === 'earlier' ? EARLIER : GOLD;
   return (
     <g>
       {Array.from({ length: count }, (_, i) => {
         const x = FOOT + i * 2 * TW;
         return (
           <g key={i}>
-            <path d={`M${x + 2} ${floorY + 29} v5 h${2 * TW - 4} v-5`} fill="none" stroke={stroke} strokeWidth={2} />
-            <text x={x + TW} y={floorY + 46} fontSize={11} fontWeight={700} textAnchor="middle" fill={stroke}>
-              {i + 1}
-            </text>
+            <path d={`M${x + 2} ${y} v5 h${2 * TW - 4} v-5`} fill="none" stroke={stroke} strokeWidth={2} />
+            {filled ? <rect x={x + TW - 7} y={y + 8} width={14} height={12} fill={fill} stroke={stroke} strokeWidth={1.5} /> : null}
           </g>
         );
       })}
@@ -338,11 +412,18 @@ function Pairs({ floorY, count, tone }: { readonly floorY: number; readonly coun
  * One lane: stack, plank, floor tiles, car. Drawn identically for the setup
  * and the outcome, so the two panes compare at one scale.
  *  - setup: the car at its starting height (or, when the height is the
- *    question, parked beside the stack with a question mark).
- *  - hint: plus the gold block and a level line showing that height (unless
- *    the height is the question).
- *  - worked: plus a dashed car on the tile where it will stop.
+ *    question, parked beside the stack with a question mark). On level 3,
+ *    last time's run stays on the board: its blocks in grey beside the stack,
+ *    its car grey on its tile, and a grey block under each pair of tiles.
+ *  - hint: plus the gold blocks and a level line showing that height (unless
+ *    the height is the question; then gold brackets over the pairs of tiles
+ *    up to the gold flag).
+ *  - worked: plus a dashed car on the tile where it will stop, and a gold
+ *    block under each pair of tiles it rolls.
  *  - outcome: a dashed car where it was let go, the car on its stopping tile.
+ * The child's guess is drawn in teal the moment it is tapped: `chosen` frames
+ * the lane, `guessTile` puts a teal car on a tile, `guessHeight` lifts the car
+ * to that many blocks.
  */
 function LaneScene({
   lane,
@@ -351,6 +432,9 @@ function LaneScene({
   show,
   before,
   askHeight,
+  chosen,
+  guessTile,
+  guessHeight,
 }: {
   readonly lane: Lane;
   readonly floorY: number;
@@ -358,6 +442,9 @@ function LaneScene({
   readonly show: Show;
   readonly before?: number;
   readonly askHeight?: boolean;
+  readonly chosen?: boolean;
+  readonly guessTile?: number;
+  readonly guessHeight?: number;
 }) {
   const start = startOf(lane, floorY);
   const rot = tilt(lane.span);
@@ -365,22 +452,33 @@ function LaneScene({
   const hidden = !!askHeight && (show === 'setup' || show === 'hint');
   const evidence = show !== 'setup' && !hidden;
   const stopped = show === 'outcome';
+  const lifted = hidden && guessHeight !== undefined ? startOf({ span: lane.span, h: guessHeight }, floorY) : null;
   return (
     <g>
-      <Floor floorY={floorY} mark={stopped ? tiles(lane.h) : undefined} />
-      <Stack right={top.x + 2} floorY={floorY} mark={evidence ? lane.h : undefined} earlier={before} />
+      {chosen ? (
+        <rect x={4} y={floorY - 113} width={392} height={140} rx={12} fill={GUESS_TINT} stroke={GUESS} strokeWidth={4} />
+      ) : null}
+      <Floor floorY={floorY} mark={stopped ? tiles(lane.h) : undefined} guess={guessTile} />
+      <Stack right={top.x + 2} floorY={floorY} mark={evidence ? lane.h : undefined} earlier={before} guess={hidden ? guessHeight : undefined} />
       <line x1={top.x} y1={top.y} x2={FOOT} y2={floorY} stroke={PLANK} strokeWidth={6} strokeLinecap="round" />
       {evidence ? (
         <line x1={top.x + 2} y1={start.y} x2={start.x} y2={start.y} stroke={GOLD} strokeWidth={2.5} strokeDasharray="5 4" />
       ) : null}
-      {before !== undefined && show === 'hint' ? <Pairs floorY={floorY} count={before} tone="earlier" /> : null}
+      {lifted ? (
+        <line x1={top.x + 2} y1={lifted.y} x2={lifted.x} y2={lifted.y} stroke={GUESS} strokeWidth={2.5} strokeDasharray="5 4" />
+      ) : null}
+      {before !== undefined ? <Pairs floorY={floorY} count={before} tone="earlier" /> : null}
+      {before !== undefined && askHeight && show === 'hint' ? <Pairs floorY={floorY} count={lane.h} tone="now" filled={false} /> : null}
       {before !== undefined && (show === 'worked' || stopped) ? <Pairs floorY={floorY} count={lane.h} tone="now" /> : null}
       {before !== undefined ? <EarlierFlag floorY={floorY} before={before} /> : null}
       {askHeight ? <GoalFlag floorY={floorY} tile={tiles(lane.h)} /> : null}
-      {hidden ? (
+      {guessTile !== undefined ? <Car x={tileX(guessTile)} y={floorY} tint={GUESS} ghost /> : null}
+      {lifted ? (
+        <Car x={lifted.x} y={lifted.y} rot={rot} lift={2} guess />
+      ) : hidden ? (
         <g>
-          <Car x={28} y={floorY} />
-          <text x={28} y={floorY - 28} fontSize={18} fontWeight={700} textAnchor="middle" fill={INK}>
+          <Car x={24} y={floorY} />
+          <text x={24} y={floorY - 28} fontSize={18} fontWeight={700} textAnchor="middle" fill={INK}>
             ?
           </text>
         </g>
@@ -410,34 +508,45 @@ function laneLabel(lane: Lane, round: Round, name?: string): string {
   return `${who}${ramp}, let go ${blocks(lane.h)} high`;
 }
 
-/** The whole picture for a round at one stage. */
-function Scene({ round, show }: { readonly round: Round; readonly show: Show }) {
+/** The whole picture for a round at one stage, with the child's guess (if any) drawn in. */
+function Scene({ round, show, answer = null }: { readonly round: Round; readonly show: Show; readonly answer?: Answer }) {
   const model = show === 'outcome';
   if (round.kind === 'scale') {
     const { lane, before, ask } = round;
     const askHeight = ask === 'height';
+    const guess = typeof answer === 'number' ? answer : undefined;
     const setup = askHeight
-      ? `The car waits beside a stack of six blocks. A gold flag marks tile ${tiles(lane.h)}. A grey flag marks tile ${tiles(before)}, where it stopped from ${blocks(before)}.`
-      : `${laneLabel(lane, round)}. A grey flag marks tile ${tiles(before)}, where it stopped from ${blocks(before)}.`;
+      ? `The car waits beside a stack of six blocks. A gold flag marks tile ${tiles(lane.h)}. A grey car on tile ${tiles(before)} stopped there from ${blocks(before)}.`
+      : `${laneLabel(lane, round)}. A grey car on tile ${tiles(before)} stopped there from ${blocks(before)}.`;
+    const yours = guess === undefined ? '' : askHeight ? ` Your guess lifts the car ${blocks(guess)} high.` : ` Your guess: tile ${guess}.`;
     const label = model
       ? `Model result: from ${blocks(lane.h)} the car stops on tile ${tiles(lane.h)}. Last time, from ${blocks(before)}, tile ${tiles(before)}.`
-      : setup;
+      : setup + yours;
     return (
-      <svg className="board-svg" viewBox="0 0 400 195" role="img" aria-label={label}>
+      <svg className="board-svg" viewBox="0 0 400 214" role="img" aria-label={label}>
         {model ? <ModelTag /> : null}
-        <LaneScene lane={lane} floorY={SCALE_FLOOR} show={show} before={before} askHeight={askHeight} />
+        <LaneScene
+          lane={lane}
+          floorY={SCALE_FLOOR}
+          show={show}
+          before={before}
+          askHeight={askHeight}
+          guessTile={askHeight ? undefined : guess}
+          guessHeight={askHeight ? guess : undefined}
+        />
       </svg>
     );
   }
   const { a, b } = round;
+  const yours = answer === 'a' || answer === 'b' ? ` Your guess: car ${answer.toUpperCase()}.` : answer === 'same' ? ' Your guess: the same tile.' : '';
   const label = model
     ? `Model result: car A stops on tile ${tiles(a.h)}, car B on tile ${tiles(b.h)}.`
-    : `${laneLabel(a, round, 'A')}. ${laneLabel(b, round, 'B')}.`;
+    : `${laneLabel(a, round, 'A')}. ${laneLabel(b, round, 'B')}.${yours}`;
   return (
     <svg className="board-svg" viewBox="0 0 400 300" role="img" aria-label={label}>
       {model ? <ModelTag /> : null}
-      <LaneScene lane={a} floorY={PAIR_FLOORS[0]} label="A" show={show} />
-      <LaneScene lane={b} floorY={PAIR_FLOORS[1]} label="B" show={show} />
+      <LaneScene lane={a} floorY={PAIR_FLOORS[0]} label="A" show={show} chosen={answer === 'a' || answer === 'same'} />
+      <LaneScene lane={b} floorY={PAIR_FLOORS[1]} label="B" show={show} chosen={answer === 'b' || answer === 'same'} />
     </svg>
   );
 }
@@ -454,11 +563,99 @@ function ModelTag() {
 
 const PICK_LABEL: Record<Pick, string> = { a: 'Car A', b: 'Car B', same: 'Same tile' };
 
+/*
+ * The answer buttons are pictures of the outcome, drawn with the board's own
+ * car, tiles and blocks; the word is a small label underneath.
+ */
+const PIC: CSSProperties = { display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 };
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1 };
+
+function Pictured({ word, children }: { readonly word: string; readonly children: ReactNode }) {
+  return (
+    <span style={PIC}>
+      {children}
+      <span style={WORD}>{word}</span>
+    </span>
+  );
+}
+
+/** Mini floor: a plank foot and ten tiles from x 50, 14 wide, so tile n is the board's tile n. */
+const MINI_FOOT = 50;
+const MINI_TW = 14;
+const miniX = (n: number) => MINI_FOOT + (n - 0.5) * MINI_TW;
+
+/** Two little lanes, A over B, each car stopped where this answer says it will stop. */
+function PickPicture({ pick }: { readonly pick: Pick }) {
+  const stops: Record<Pick, readonly [number, number]> = { a: [8, 3], b: [3, 8], same: [6, 6] };
+  const [ta, tb] = stops[pick];
+  const lanes = [
+    { name: 'A', y: 46, tile: ta },
+    { name: 'B', y: 100, tile: tb },
+  ] as const;
+  return (
+    <svg viewBox="0 0 200 112" style={{ width: 120, height: 67 }} aria-hidden="true">
+      {lanes.map(({ name, y, tile }) => (
+        <g key={name}>
+          <circle cx={13} cy={y - 14} r={11} fill="#ffffff" stroke={INK} strokeWidth={2.5} />
+          <text x={13} y={y - 9} fontSize={14} fontWeight={700} textAnchor="middle" fill={INK}>
+            {name}
+          </text>
+          <line x1={30} y1={y - 26} x2={MINI_FOOT} y2={y} stroke={PLANK} strokeWidth={5} strokeLinecap="round" />
+          {Array.from({ length: FLOOR_TILES }, (_, i) => (
+            <rect key={i} x={MINI_FOOT + i * MINI_TW} y={y} width={MINI_TW} height={8} fill={(i + 1) % 2 ? TILE_ODD : TILE_EVEN} stroke={INK} strokeWidth={1} />
+          ))}
+          <Car x={miniX(tile)} y={y} />
+        </g>
+      ))}
+      {pick === 'same' ? <line x1={miniX(6)} y1={8} x2={miniX(6)} y2={110} stroke={INK} strokeWidth={2} strokeDasharray="4 4" /> : null}
+    </svg>
+  );
+}
+
+/** The ten-tile floor with the first `n` tiles coloured as on the board and the car on tile n. */
+function TilePicture({ n }: { readonly n: number }) {
+  return (
+    <svg viewBox="0 0 154 40" style={{ width: 136, height: 35 }} aria-hidden="true">
+      {Array.from({ length: FLOOR_TILES }, (_, i) => (
+        <rect
+          key={i}
+          x={4 + i * 14}
+          y={28}
+          width={14}
+          height={9}
+          fill={i < n ? ((i + 1) % 2 ? TILE_ODD : TILE_EVEN) : 'none'}
+          stroke={i < n ? INK : SLOT_EDGE}
+          strokeWidth={1}
+        />
+      ))}
+      <Car x={4 + (n - 0.5) * 14} y={28} />
+    </svg>
+  );
+}
+
+/** A stack of `n` wooden blocks with the car on top. One scale for every option, so taller is higher. */
+function HeightPicture({ n }: { readonly n: number }) {
+  const bh = 12;
+  return (
+    <svg viewBox="0 0 44 100" style={{ width: 42, height: 96 }} aria-hidden="true">
+      <line x1={0} y1={98} x2={44} y2={98} stroke={INK} strokeWidth={2} />
+      {Array.from({ length: n }, (_, i) => (
+        <rect key={i} x={8} y={98 - (i + 1) * bh} width={28} height={bh} fill={WOOD} stroke={INK} strokeWidth={1.5} />
+      ))}
+      <Car x={22} y={98 - n * bh} />
+    </svg>
+  );
+}
+
 function caption(round: Round, show: Show): string | null {
   if (round.kind === 'scale') {
     const { before, ask } = round;
     const { h } = round.lane;
-    if (show === 'hint') return `Grey: from ${blocks(before)} it rolled ${tiles(before)} tiles, a pair of tiles for each block.`;
+    if (show === 'hint') {
+      return ask === 'tile'
+        ? `Grey: from ${blocks(before)} it rolled ${tiles(before)} tiles, a pair of tiles for each block.`
+        : 'Grey: one block under each pair of tiles. Gold: the pairs up to the gold flag.';
+    }
     if (show === 'worked') {
       return ask === 'tile'
         ? `${blocks(h)}, a pair of tiles each: tile ${tiles(h)}. The dashed car shows where.`
@@ -478,20 +675,22 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const note = caption(round, show);
   return (
     <div className="board board--ramp">
-      <Scene round={round} show={show} />
+      <Scene round={round} show={show} answer={answer} />
       <div className="choices" role="group" aria-label="Your guess">
         {round.kind === 'scale'
           ? round.options.map((n) => {
               const text = round.ask === 'tile' ? `Tile ${n}` : blocks(n);
               return (
                 <Choice key={n} selected={answer === n} onTap={() => setAnswer(n)} disabled={locked} ariaLabel={text}>
-                  {text}
+                  <Pictured word={text}>{round.ask === 'tile' ? <TilePicture n={n} /> : <HeightPicture n={n} />}</Pictured>
                 </Choice>
               );
             })
           : (['a', 'b', 'same'] as const).map((p) => (
-              <Choice key={p} selected={answer === p} onTap={() => setAnswer(p)} disabled={locked}>
-                {PICK_LABEL[p]}
+              <Choice key={p} selected={answer === p} onTap={() => setAnswer(p)} disabled={locked} ariaLabel={PICK_LABEL[p]}>
+                <Pictured word={PICK_LABEL[p]}>
+                  <PickPicture pick={p} />
+                </Pictured>
               </Choice>
             ))}
       </div>

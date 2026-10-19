@@ -13,8 +13,16 @@ import { Choice } from '../../play/parts';
  *
  * Shape: predict (tap-to-choose: this one first / together / that one first)
  * → Try → the instant the first one touches the floor, drawn in the same frame
- * and scale as the setup, faint outlines where both started → why. Grams sit
- * over each thing, so the weight comparison is on the board, not in the prose.
+ * and scale as the setup, faint outlines where both started → why.
+ *
+ * Nothing on the board needs reading. Each guess button is a picture of its
+ * outcome (the floor, with whichever lands first already down on it), its
+ * words small underneath. Tapping one marks on the scene, in gold, the floor
+ * spot the child says is reached first, so the guess is visible where the drop
+ * happens and sits beside the result after Try. Under the scene both things sit
+ * on a pan balance that tips to the heavier side or hangs level, so heavier,
+ * lighter and "the same weight" are seen, not read; the grams stay as small
+ * labels for the grown-up.
  *
  * Levels (one idea per round, never two):
  *  1. Same-sized balls, heavy against light, from 50 or 100 cm. Together.
@@ -252,6 +260,8 @@ const SIDES: readonly Side[] = ['left', 'right'];
 const yAt = (cm: number) => FLOOR - cm * PX_H;
 const INK = '#24170f';
 const SOFT = '#5a4636';
+const GOLD = '#f2a900';
+const BRASS = '#b8862b';
 
 const FLAT: readonly Thing[] = ['page-flat', 'news-flat', 'napkin-flat', 'hanky-open', 'card-flat'];
 const CRUMPLED: readonly Thing[] = ['page-crumpled', 'news-crumpled', 'two-page-ball', 'napkin-crumpled', 'hanky-ball'];
@@ -436,11 +446,49 @@ const LETGO: Record<Round['height'], string> = { 50: '50 cm', 100: '1 m' };
 const MID = (X.left + X.right) / 2;
 
 /**
- * The scene, before or after. Same viewBox, ruler, floor and columns in both,
- * so the two panes line up when the shell sets them side by side.
+ * The child's guess, drawn on the setup: a gold arrow down to a gold spot on
+ * the floor under each thing the guess says lands first (both, for Together).
+ * The same gold spot marks "landed first" on the guess buttons.
  */
-function Scene({ round, after, sizes }: { readonly round: Round; readonly after: boolean; readonly sizes?: boolean }) {
+function GuessMarks({ round, guess }: { readonly round: Round; readonly guess: Lands }) {
   const start = yAt(round.height);
+  return (
+    <g>
+      {SIDES.filter((s) => guess === 'together' || guess === s).map((s) => {
+        const x = X[s];
+        return (
+          <g key={s}>
+            <ellipse cx={x} cy={FLOOR} rx={Math.max(extent(round[s])[0] / 2, 16) + 8} ry="7" fill={GOLD} stroke={INK} strokeWidth="2" />
+            <line x1={x} y1={start + 10} x2={x} y2={FLOOR - 22} stroke={GOLD} strokeWidth="5" strokeDasharray="10 7" strokeLinecap="round" />
+            <polygon points={`${x - 11},${FLOOR - 24} ${x + 11},${FLOOR - 24} ${x},${FLOOR - 9}`} fill={GOLD} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+const GUESS_WORDS = (round: Round, guess: Lands) =>
+  guess === 'together' ? 'Your guess: they land together.' : `Your guess: the ${name(round[guess])} lands first.`;
+
+/**
+ * The scene, before or after. Same viewBox, ruler, floor and columns in both,
+ * so the two panes line up when the shell sets them side by side. Before,
+ * the child's guess (if any) is drawn on it in gold.
+ */
+function Scene({
+  round,
+  after,
+  sizes,
+  guess,
+}: {
+  readonly round: Round;
+  readonly after: boolean;
+  readonly sizes?: boolean;
+  readonly guess?: Answer;
+}) {
+  const start = yAt(round.height);
+  const shownGuess = !after && guess ? guess : null;
   const lagging = (s: Side) => after && round.lands !== 'together' && round.lands !== s;
   const at = (s: Side) => (!after ? start : lagging(s) ? yAt(round.behind ?? 0) : FLOOR);
   const slow = SIDES.find(lagging);
@@ -453,7 +501,7 @@ function Scene({ round, after, sizes }: { readonly round: Round; readonly after:
     ? round.lands === 'together'
       ? `The ${name(round.left)} and the ${name(round.right)} land together.`
       : `The ${name(round[round.lands])} has landed; the ${name(round[slow ?? 'left'])} is still ${round.behind} cm up.`
-    : `A ${name(round.left)} and a ${name(round.right)}, held side by side ${LETGO[round.height]} above the floor.`;
+    : `A ${name(round.left)} and a ${name(round.right)}, held side by side ${LETGO[round.height]} above the floor.${shownGuess ? ` ${GUESS_WORDS(round, shownGuess)}` : ''}`;
   return (
     <svg className="board-svg" viewBox={`0 0 ${VB_W} ${VB_H}`} role="img" aria-label={label}>
       <rect x="0" y="0" width={VB_W} height={FLOOR} fill="#fff8ec" />
@@ -497,19 +545,38 @@ function Scene({ round, after, sizes }: { readonly round: Round; readonly after:
         </g>
       ) : null}
 
+      {shownGuess ? <GuessMarks round={round} guess={shownGuess} /> : null}
+
       {after ? SIDES.map((s) => <ThingShape key={`g${s}`} t={round[s]} x={X[s]} y={start} ghost />) : null}
       {SIDES.map((s) => (
         <ThingShape key={s} t={round[s]} x={X[s]} y={at(s)} />
       ))}
+
+      {/* With sizes on (Help, and after): each thing's width as a bar in the floor right under its column. */}
+      {sizes
+        ? SIDES.map((s) => {
+            const half = (across(round[s]) * PX_S) / 2;
+            const y = FLOOR + 7;
+            return (
+              <g key={`w${s}`} stroke={SOFT} strokeWidth="2.5" strokeLinecap="round">
+                <line x1={X[s] - half} y1={y} x2={X[s] + half} y2={y} />
+                <line x1={X[s] - half} y1={y - 3} x2={X[s] - half} y2={y + 3} />
+                <line x1={X[s] + half} y1={y - 3} x2={X[s] + half} y2={y + 3} />
+              </g>
+            );
+          })
+        : null}
 
       {SIDES.map((s) => (
         <g key={`n${s}`}>
           <text x={X[s]} y={FLOOR + 24} textAnchor="middle" fontSize="15" fontWeight="700" fill={INK}>
             {name(round[s])}
           </text>
-          <text x={X[s]} y={FLOOR + 46} textAnchor="middle" fontSize="15" fill={INK}>
-            {sizes ? `${grams(round[s])} g, ${across(round[s])} cm wide` : `${grams(round[s])} g`}
-          </text>
+          {sizes ? (
+            <text x={X[s]} y={FLOOR + 46} textAnchor="middle" fontSize="14" fill={SOFT}>
+              {`${across(round[s])} cm wide`}
+            </text>
+          ) : null}
         </g>
       ))}
     </svg>
@@ -528,25 +595,87 @@ function extent(t: Thing): readonly [number, number] {
 
 /**
  * The picture on each guess button, so the three guesses can be told apart
- * without reading: the floor, with the one that lands first down on it and
- * the other still up, or both down for Together. Same left/right order as the board.
+ * without reading: the floor, with the one that lands first down on it on a
+ * gold spot (the same gold the scene uses for the guess) and the other still
+ * up with a dashed line for the way it has left to fall, or both down for
+ * Together. Same left/right order as the board.
  */
 function GuessPicture({ round, value }: { readonly round: Round; readonly value: Lands }) {
-  const floor = 66;
-  const up = 32;
+  const floor = 64;
+  const up = 30;
   const col = { left: 28, right: 78 } as const;
   return (
-    <svg width="80" height="56" viewBox="0 0 106 72" aria-hidden="true" focusable="false">
+    <svg width="104" height="72" viewBox="0 0 106 72" aria-hidden="true" focusable="false" style={{ width: 104, height: 72 }}>
       <line x1="2" y1={floor} x2="104" y2={floor} stroke={INK} strokeWidth="3" strokeLinecap="round" />
       {SIDES.map((s) => {
         const [w, h] = extent(round[s]);
         const k = Math.min(1, 44 / w, 28 / h);
         // A wide sheet shrunk to fit would be a hairline; keep it thick enough to see.
         const ky = FLAT.includes(round[s]) ? Math.max(k, 0.7) : k;
-        const y = value === 'together' || value === s ? floor : up;
+        const down = value === 'together' || value === s;
+        const y = down ? floor : up;
         return (
-          <g key={s} transform={`translate(${col[s]} ${y}) scale(${k.toFixed(3)} ${ky.toFixed(3)})`}>
-            <ThingShape t={round[s]} x={0} y={0} />
+          <g key={s}>
+            {down ? (
+              <ellipse cx={col[s]} cy={floor} rx={Math.min(24, (w * k) / 2 + 5)} ry="4" fill={GOLD} stroke={INK} strokeWidth="1.5" />
+            ) : (
+              <line x1={col[s]} y1={up + 4} x2={col[s]} y2={floor - 3} stroke={SOFT} strokeWidth="2" strokeDasharray="3 3" />
+            )}
+            <g transform={`translate(${col[s]} ${y}) scale(${k.toFixed(3)} ${ky.toFixed(3)})`}>
+              <ThingShape t={round[s]} x={0} y={0} />
+            </g>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/**
+ * Weight, drawn rather than written: both things sit on the plates of a pan
+ * balance whose beam tips down on the heavier side, or stays level when they
+ * weigh the same. Grams sit small under each plate, for the grown-up.
+ */
+function Balance({ round }: { readonly round: Round }) {
+  const [gl, gr] = [grams(round.left), grams(round.right)];
+  const tilt = gl === gr ? 0 : gl > gr ? 1 : -1; // 1: left side down
+  const px = 150;
+  const py = 96;
+  const arm = 100;
+  const rad = (11 * Math.PI) / 180;
+  const end = (s: Side) => {
+    const sign = s === 'left' ? -1 : 1;
+    // Left down means a larger y on the left and a smaller one on the right.
+    return { x: px + sign * arm * Math.cos(rad * Math.abs(tilt)), y: py + (s === 'left' ? 1 : -1) * tilt * arm * Math.sin(rad) };
+  };
+  const heavy = tilt === 0 ? null : tilt > 0 ? round.left : round.right;
+  const label =
+    heavy === null
+      ? `On the balance the ${name(round.left)} and the ${name(round.right)} weigh the same: the beam is level.`
+      : `On the balance the ${name(heavy)} is heavier: its side tips down.`;
+  return (
+    <svg viewBox="0 0 300 150" role="img" aria-label={label} style={{ display: 'block', width: '100%', maxWidth: 320, height: 'auto', margin: '0 auto' }}>
+      <rect x="110" y="124" width="80" height="10" rx="4" fill={BRASS} stroke={INK} strokeWidth="2.5" />
+      <rect x={px - 7} y={py} width="14" height="28" fill={BRASS} stroke={INK} strokeWidth="2.5" />
+      <line x1={end('left').x} y1={end('left').y} x2={end('right').x} y2={end('right').y} stroke="#8a5a14" strokeWidth="8" strokeLinecap="round" />
+      <circle cx={px} cy={py} r="8" fill={GOLD} stroke={INK} strokeWidth="2.5" />
+      {SIDES.map((s) => {
+        const { x, y } = end(s);
+        const plate = y - 12;
+        const t = round[s];
+        const [w, h] = extent(t);
+        const k = Math.min(1, 80 / w, 40 / h);
+        const ky = FLAT.includes(t) ? Math.max(k, 0.7) : k;
+        return (
+          <g key={s}>
+            <line x1={x} y1={y} x2={x} y2={plate} stroke={INK} strokeWidth="4" />
+            <path d={`M${x - 46} ${plate} h92 l-8 6 h-76 z`} fill="#f6dfa8" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+            <g transform={`translate(${x} ${plate}) scale(${k.toFixed(3)} ${ky.toFixed(3)})`}>
+              <ThingShape t={t} x={0} y={0} />
+            </g>
+            <text x={x} y={y + 22} textAnchor="middle" fontSize="14" fontWeight="600" fill={SOFT}>
+              {`${grams(t)} g`}
+            </text>
           </g>
         );
       })}
@@ -567,7 +696,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         <div className="evidence">
           <figure className="evidence__pane">
             <figcaption>Let go</figcaption>
-            <Scene round={round} after={false} sizes />
+            <Scene round={round} after={false} sizes guess={answer} />
           </figure>
           <figure className="evidence__pane evidence__pane--after">
             <figcaption>What happens</figcaption>
@@ -575,14 +704,15 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </figure>
         </div>
       ) : (
-        <Scene round={round} after={false} sizes={stage !== 'answering'} />
+        <Scene round={round} after={false} sizes={stage !== 'answering'} guess={answer} />
       )}
+      <Balance round={round} />
       <div className="choices" role="group" aria-label="Your guess">
         {options.map(([value, text]) => (
           <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={text}>
             <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <GuessPicture round={round} value={value} />
-              <span>{text}</span>
+              <span style={{ fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 }}>{text}</span>
             </span>
           </Choice>
         ))}

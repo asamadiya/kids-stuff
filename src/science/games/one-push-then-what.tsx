@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -16,6 +16,13 @@ import { Choice } from '../../play/parts';
  * tap-to-choose. The setup shows the car at the instant the hand lets go, with
  * a numbered strip from the release point; the outcome is the same frame with
  * the car where it stopped. Fixed SVG states only, no motion.
+ *
+ * Every answer is a picture, the word only a small label under it: a zone is
+ * a little strip with that stretch shaded yellow and a car stopped in it (the
+ * same yellow band the tap then draws on the big strip); "which car" is two
+ * lanes with the farther car reaching the line (both reach it for "same"),
+ * the tapped lane lighting up on the board. On level 3 each lane carries its
+ * own chevrons by the hand, so "the same push" is seen twice, not only read.
  *
  * Levels (one changed variable each):
  *  1. Let go — one floor (wood), the push changes: gentle, medium, strong.
@@ -269,15 +276,15 @@ function Hand({ y }: { readonly y: number }) {
   );
 }
 
-/** "Strong push" with one to three chevrons before it, top left. */
-function PushLabel({ push, pair }: { readonly push: Push; readonly pair: boolean }) {
+/** Three chevrons, left edge at x, top at y, as many dark as the push is strong. */
+function Chevrons({ push, x, y }: { readonly push: Push; readonly x: number; readonly y: number }) {
   const n = CHEVRONS[push];
   return (
     <g>
       {Array.from({ length: 3 }, (_, i) => (
         <path
           key={i}
-          d={`M${32 + i * 12} 14 l8 7 l-8 7`}
+          d={`M${x + i * 12} ${y} l8 7 l-8 7`}
           fill="none"
           stroke={i < n ? INK : '#d8cbb5'}
           strokeWidth="3.5"
@@ -285,6 +292,15 @@ function PushLabel({ push, pair }: { readonly push: Push; readonly pair: boolean
           strokeLinejoin="round"
         />
       ))}
+    </g>
+  );
+}
+
+/** "Strong push" with one to three chevrons before it, top left. */
+function PushLabel({ push, pair }: { readonly push: Push; readonly pair: boolean }) {
+  return (
+    <g>
+      <Chevrons push={push} x={32} y={14} />
       <text x="74" y="27" fontSize="15" fontWeight="700" fill={INK}>
         {pair ? `Same ${push} push on both` : PUSH_LABEL[push]}
       </text>
@@ -308,6 +324,8 @@ interface LaneViewProps {
   readonly chosen?: boolean;
   /** Worked-answer evidence: reference flags on the strip (e.g. where this push reached on wood). */
   readonly flags?: readonly Flag[];
+  /** Level 3: this lane's own chevrons by the hand, so both lanes visibly get the same push. */
+  readonly push?: Push;
 }
 
 export interface Flag {
@@ -315,7 +333,7 @@ export interface Flag {
   readonly label: string;
 }
 
-function LaneView({ ln, y, after, title, zone, chosen, flags = [] }: LaneViewProps) {
+function LaneView({ ln, y, after, title, zone, chosen, flags = [], push }: LaneViewProps) {
   return (
     <g>
       {chosen ? <rect x="22" y={y - 76} width="374" height="134" rx="10" fill="#fff1c9" stroke="#f2a900" strokeWidth="4" /> : null}
@@ -327,6 +345,7 @@ function LaneView({ ln, y, after, title, zone, chosen, flags = [] }: LaneViewPro
           {title}
         </text>
       ) : null}
+      {push ? <Chevrons push={push} x={4} y={y - 50} /> : null}
       {flags.map((f) => (
         <g key={f.at}>
           <line x1={xAt(f.at)} y1={y - 36} x2={xAt(f.at)} y2={y} stroke="#5a4636" strokeWidth="2.5" strokeDasharray="4 3" />
@@ -392,6 +411,7 @@ function Frame({ round, after, answer = null, flags }: FrameProps) {
             title={`${i === 0 ? 'Top' : 'Bottom'}: ${laneText(ln)}`}
             chosen={!after && (answer === 'same' || answer === (i === 0 ? 'top' : 'bottom'))}
             flags={flags?.[i]}
+            push={round.push}
           />
         ))
       ) : (
@@ -499,6 +519,84 @@ const PAIR_CHOICES: ReadonlyArray<readonly [Side, string]> = [
   ['same', 'Both the same'],
 ];
 
+/* ------------------------------------------------------ answer pictures -- */
+
+/** A small toy car, the board's car in miniature: front bumper at x, wheels on the floor at y. */
+function MiniCar({ front, y }: { readonly front: number; readonly y: number }) {
+  const b = front - 22;
+  return (
+    <g stroke={INK} strokeWidth="1.5">
+      <path d={`M${b + 5} ${y - 13} l4 -6 h8 l4 6 z`} fill="#bfe0f2" />
+      <rect x={b} y={y - 13} width="22" height="9" rx="3" fill="#c8341f" />
+      <circle cx={b + 5.5} cy={y - 3.5} r="3.5" fill="#3a2a20" />
+      <circle cx={b + 16.5} cy={y - 3.5} r="3.5" fill="#3a2a20" />
+    </g>
+  );
+}
+
+const PIC_STYLE: CSSProperties = { background: '#fffaf0', borderRadius: 6, border: '2px solid #d8cbb5' };
+/** Mark m on an answer picture's little strip: 0 at x = 30, 10 at x = 114. */
+const pxAt = (m: number) => 30 + m * 8.4;
+/** Where the little car stops in each zone's picture: inside the shaded stretch. */
+const ZONE_CAR: Record<Zone, number> = { zero: 0, near: 2, middle: 5, far: 8.5 };
+
+/**
+ * One zone as a picture: the strip with mark 0 drawn long, the zone shaded in
+ * the same yellow the tap then draws on the big strip, and a car stopped in it.
+ */
+function ZonePic({ zone }: { readonly zone: Zone }) {
+  const [, , lo, hi] = ZONES.find(([z]) => z === zone)!;
+  const g = 30;
+  return (
+    <svg viewBox="0 0 124 54" width="120" height="52" style={PIC_STYLE} aria-hidden="true">
+      <rect x={pxAt(lo - 0.5)} y={g + 7} width={(hi - lo + 1) * 8.4} height="13" rx="4" fill="#fff1c9" stroke="#f2a900" strokeWidth="2" />
+      <rect x="6" y={g} width="112" height="6" fill="#c8913f" stroke={INK} strokeWidth="1.5" />
+      {Array.from({ length: 11 }, (_, m) => (
+        <line key={m} x1={pxAt(m)} y1={g + 6} x2={pxAt(m)} y2={g + (m === 0 ? 18 : 12)} stroke={INK} strokeWidth={m === 0 ? 2.5 : 1.5} />
+      ))}
+      <MiniCar front={pxAt(ZONE_CAR[zone])} y={g} />
+    </svg>
+  );
+}
+
+/**
+ * Which car goes farther, as a picture: two lanes from the same start, the
+ * answer's lane lit as the tap lights it on the board, and a dashed line at
+ * the farther car's front (through both fronts when they stop together).
+ */
+function SidePic({ side }: { readonly side: Side }) {
+  const fronts = side === 'same' ? [96, 96] : side === 'top' ? [108, 66] : [66, 108];
+  const lit = (i: number) => side === 'same' || side === (i === 0 ? 'top' : 'bottom');
+  const reach = Math.max(...fronts);
+  return (
+    <svg viewBox="0 0 124 68" width="120" height="66" style={PIC_STYLE} aria-hidden="true">
+      {[28, 58].map((g, i) => (
+        <g key={g}>
+          {lit(i) ? <rect x="3" y={g - 22} width="118" height="29" rx="5" fill="#fff1c9" stroke="#f2a900" strokeWidth="2" /> : null}
+          <rect x="8" y={g} width="110" height="5" fill="#c8913f" stroke={INK} strokeWidth="1.5" />
+          <line x1="30" y1={g} x2="30" y2={g + 8} stroke={INK} strokeWidth="2.5" />
+          <MiniCar front={fronts[i]} y={g} />
+        </g>
+      ))}
+      <line x1={reach} y1="3" x2={reach} y2="65" stroke="#5a4636" strokeWidth="2" strokeDasharray="4 3" />
+    </svg>
+  );
+}
+
+const FACE: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' };
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+/** An answer button's face: the picture first, the word small underneath. */
+function Face({ value, word }: { readonly value: Zone | Side; readonly word: string }) {
+  const zone = ZONES.some(([z]) => z === value);
+  return (
+    <span style={FACE}>
+      {zone ? <ZonePic zone={value as Zone} /> : <SidePic side={value as Side} />}
+      <span style={WORD}>{word}</span>
+    </span>
+  );
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
   const { flags, caption } = evidence(round, stage);
@@ -509,8 +607,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       <Frame round={round} after={false} answer={answer} flags={flags} />
       <div className="choices" role="group" aria-label={round.test === 'pair' ? 'Which car goes farther?' : 'Where will the car stop?'}>
         {options.map(([value, label]) => (
-          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked}>
-            {label}
+          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={label}>
+            <Face value={value} word={label} />
           </Choice>
         ))}
       </div>

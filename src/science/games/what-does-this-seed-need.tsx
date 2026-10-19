@@ -18,6 +18,12 @@ import { Choice } from '../../play/parts';
  * screen. Fixed SVG states only, no motion. The bean is a moong bean on
  * cotton wool in a clear glass, as sprouted in many Indian kitchens.
  *
+ * Every answer button is a drawing of the cup(s) as they would look if that
+ * answer came true, in the same place colours as the board, with its word
+ * small underneath. Tapping one draws the same picture in a thought bubble
+ * over each cup on the board (a dashed "?" bubble until then), so the guess
+ * sits beside the evidence, and stays there beside What happened after Try.
+ *
  * Levels (one changed thing at a time):
  *  1. Wet or dry — one glass, Day 0 → Day 2: wet or dry cotton, on the
  *     windowsill or in a dark cupboard. Does it sprout? (Dark is fine.)
@@ -488,6 +494,185 @@ function Strip({ g, at, hot }: { readonly g: Glass; readonly at: Geom; readonly 
   );
 }
 
+/* -------------------------------------------------------------- guesses -- */
+
+/**
+ * One cup as the child guesses it will look. The same small drawing is the
+ * picture on a choice button and, once tapped, the thought bubble over that
+ * cup on the board, so the guess is visible where the evidence is.
+ */
+interface Sketch {
+  readonly place: Place;
+  readonly wet: boolean;
+  readonly state: State;
+  /** A taller-or-shorter guess: a white outline plant, so it says nothing about colour. */
+  readonly plain: boolean;
+}
+
+const SPROUT: State = { look: 'sprout', cm: 0 };
+const SHORT = grown('window').after.cm;
+const TALL = grown('cupboard').after.cm;
+
+function sketchesFor(round: Round, pick: Pick): readonly Sketch[] {
+  const at = (g: Glass, state: State, plain = false): Sketch => ({ place: g.place, wet: g.wet, state, plain });
+  const asleep = (g: Glass): State => ({ look: g.wet ? 'wet-bean' : 'dry-bean', cm: 0 });
+  const [a] = round.glasses;
+  if (round.test === 'start') return [at(a, pick === 'sprouts' ? SPROUT : asleep(a))];
+  if (round.test === 'grow') {
+    return [at(a, pick === 'green' ? grown('window').after : pick === 'pale' ? grown('cupboard').after : SPROUT)];
+  }
+  if (round.ask === 'taller') {
+    const cm = pick === 'left' ? [TALL, SHORT] : pick === 'right' ? [SHORT, TALL] : [(SHORT + TALL) / 2, (SHORT + TALL) / 2];
+    return round.glasses.map((g, i) => at(g, { look: 'sprout', cm: cm[i] }, true));
+  }
+  const yes = [pick === 'left' || pick === 'both', pick === 'right' || pick === 'both'];
+  if (round.ask === 'green') return round.glasses.map((g, i) => at(g, { look: yes[i] ? 'greening' : 'pale', cm: g.before.cm }));
+  return round.glasses.map((g, i) => at(g, yes[i] ? SPROUT : asleep(g)));
+}
+
+/** The tallest guess any choice of this round draws, so every picture of the round shares one scale. */
+const tallestOf = (round: Round): number =>
+  Math.max(...optionsFor(round).flatMap(([p]) => sketchesFor(round, p).map((s) => s.state.cm)));
+
+const GAP = 4;
+/** Bottom of a sketch: just below the roots. */
+const BASE = COT + 20;
+
+interface View {
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  /** Half the width of one cup's tile. */
+  readonly half: number;
+}
+
+/** The window onto n sketches side by side; `close` crops to the top of the plant, where the colour is. */
+function sketchView(n: number, tallest: number, close = false): View {
+  const half = tallest > 0 ? (close ? 28 : 40) : 24;
+  const y = tallest > 0 ? yAt(tallest) - 14 : COT - 34;
+  return { y, half, w: n * 2 * half + (n - 1) * GAP, h: (close ? yAt(tallest) + 40 : BASE) - y };
+}
+
+const BACK: Record<Place, string> = { window: '#cfe8f5', box: '#2e231b', cupboard: '#3b2a20', fridge: '#1d3442' };
+
+/** The tile behind one sketched cup: the place's colour (sky with a sun, dark, or cold) and the cup of cotton. */
+function SketchCup({ s, gx, half, top }: { readonly s: Sketch; readonly gx: number; readonly half: number; readonly top: number }) {
+  const x = gx - half;
+  return (
+    <g>
+      <rect
+        x={x + 1}
+        y={top + 1}
+        width={2 * half - 2}
+        height={BASE - top - 2}
+        rx="6"
+        fill={BACK[s.place]}
+        stroke={s.place === 'box' ? '#b98a52' : INK}
+        strokeWidth="2"
+      />
+      {s.place === 'window' ? <circle cx={x + 9} cy={top + 8} r="5" fill="#f2b705" stroke={INK} strokeWidth="1.5" /> : null}
+      <rect x={gx - 16} y={COT - 2} width="32" height="16" fill={s.wet ? '#d3e7f3' : '#fbfaf3'} stroke="#9aa6ad" strokeWidth="1.5" />
+      {s.wet ? <rect x={gx - 15} y={COT + 9} width="30" height="5" fill="#5fa3d6" opacity="0.75" /> : null}
+      <path
+        d={`M${gx - 19} ${COT - 16} L${gx - 17} ${COT + 16} H${gx + 17} L${gx + 19} ${COT - 16}`}
+        fill="none"
+        stroke="#5f8396"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+/** A guessed height with no colour: a white stem and two white leaves. */
+function OutlinePlant({ gx, cm }: { readonly gx: number; readonly cm: number }) {
+  const top = yAt(cm);
+  return (
+    <g>
+      <Edged d={`M${gx} ${COT} V${top}`} color="#ffffff" width={3.5} />
+      <Leaf x={gx} y={top} dir={-1} size={16} fill="#ffffff" />
+      <Leaf x={gx} y={top} dir={1} size={16} fill="#ffffff" />
+    </g>
+  );
+}
+
+function SketchBody({ sketches, view }: { readonly sketches: readonly Sketch[]; readonly view: View }) {
+  return (
+    <g>
+      {sketches.map((s, i) => {
+        const gx = view.half + i * (2 * view.half + GAP);
+        return (
+          <g key={i}>
+            <SketchCup s={s} gx={gx} half={view.half} top={view.y} />
+            {s.plain ? <OutlinePlant gx={gx} cm={s.state.cm} /> : <Plant gx={gx} state={s.state} />}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** A thought bubble on the board: its box, and the trail of dots (x, y, r) down to its cup. */
+interface Bub {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  readonly trail: readonly (readonly [number, number, number])[];
+}
+
+/**
+ * The room each cup's bubble may use: sky or shadow the Before picture leaves
+ * empty, clear of the sun, the frost, the box, the ruler and the plant, so the
+ * guess never covers evidence. The bubble is fitted inside it, bottom-aligned
+ * over its trail of dots.
+ */
+function bubbleAt(round: Round, i: number): Bub {
+  if (round.glasses.length === 1) return { x: 134, y: 70, w: 92, h: 98, trail: [[176, 174, 3.5], [178, 180, 2.2]] };
+  const x0 = PAIR[i].x0;
+  const down: Bub['trail'] = [[x0 + 72, 172, 3], [x0 + 74, 179, 1.8]];
+  if (round.ask === 'green') return { x: x0 + 56, y: 62, w: 50, h: 46, trail: [[x0 + 62, 111, 2]] };
+  if (round.ask === 'taller') return { x: x0 + 56, y: 62, w: 50, h: 104, trail: down };
+  return { x: x0 + 56, y: 100, w: 50, h: 66, trail: down };
+}
+
+/** The child's guess for one cup, drawn over it; a dashed bubble with a question mark until a choice is tapped. */
+function Thought({ room, sketch, tallest, close }: { readonly room: Bub; readonly sketch: Sketch | null; readonly tallest: number; readonly close: boolean }) {
+  const v = sketchView(1, tallest, close);
+  const k = Math.min((room.w - 10) / v.w, (room.h - 10) / v.h);
+  const w = v.w * k;
+  const h = v.h * k;
+  const bx = room.x + (room.w - w - 10) / 2;
+  const by = room.y + room.h - h - 10;
+  return (
+    <g>
+      {room.trail.map(([x, y, r]) => (
+        <circle key={`${x} ${y}`} cx={x} cy={y} r={r} fill="#fffdf6" stroke={INK} strokeWidth="2" />
+      ))}
+      <rect
+        x={bx}
+        y={by}
+        width={w + 10}
+        height={h + 10}
+        rx="12"
+        fill="#fffdf6"
+        stroke={sketch ? '#f2a900' : INK}
+        strokeWidth={sketch ? 4 : 2}
+        strokeDasharray={sketch ? undefined : '6 4'}
+      />
+      {sketch ? (
+        <svg x={bx + 5} y={by + 5} width={w} height={h} viewBox={`0 ${v.y} ${v.w} ${v.h}`}>
+          <SketchBody sketches={[sketch]} view={v} />
+        </svg>
+      ) : (
+        <text x={bx + 5 + w / 2} y={by + 5 + h / 2} dy="0.35em" fontSize={Math.min(w, h) * 0.6} fontWeight="700" textAnchor="middle" fill="#8a7a68">
+          ?
+        </text>
+      )}
+    </g>
+  );
+}
+
 /* ------------------------------------------------------------ the frame -- */
 
 const LOOK_WORD: Record<Look, string> = {
@@ -578,6 +763,14 @@ function Frame({ round, after, answer = null, hot = [] }: FrameProps) {
             <Ruler x={at.rx} mark={s.cm > 0 ? s.cm : undefined} />
             <Cup gx={at.gx} wet={g.wet} />
             <Plant gx={at.gx} state={s} />
+            {after ? null : (
+              <Thought
+                room={bubbleAt(round, i)}
+                sketch={answer === null ? null : sketchesFor(round, answer)[i]}
+                tallest={tallestOf(round)}
+                close={round.ask === 'green'}
+              />
+            )}
             <Strip g={g} at={at} hot={hot} />
           </g>
         );
@@ -628,78 +821,32 @@ function why(round: Round): string {
 
 /* ------------------------------------------------------------ the board -- */
 
-/** Small pictures for the choices, so the options read without words. */
-function ChoiceIcon({ look }: { readonly look: Look | 'stop' }) {
-  const state: State =
-    look === 'stop' ? { look: 'sprout', cm: 0 } : look === 'green' ? { look: 'green', cm: 3 } : look === 'pale' ? { look: 'pale', cm: 6 } : { look, cm: 0 };
-  const top = yAt(state.cm) - 18;
-  return (
-    <svg width="44" height="44" viewBox={`${178 - 34} ${top} 68 ${COT + 20 - top}`} aria-hidden="true">
-      <rect x={178 - 30} y={COT - 2} width="60" height="14" rx="4" fill="#fbfaf3" stroke="#9aa6ad" strokeWidth="1.5" />
-      <Plant gx={178} state={state} />
-    </svg>
-  );
-}
-
-type Option = readonly [Pick, string, ReactNode?];
-
 /**
- * Two small cups for the Left / Right / Both / Neither / Same choices, so a
- * child who cannot read "Neither" still sees what each button means: the cups
- * that do the thing asked about are drawn doing it.
+ * Every choice is drawn as the outcome it predicts, 90-120 px, with its word
+ * small underneath: a child who cannot read "Neither" sees two hard beans.
+ * The same drawing appears on the board, in a thought bubble over each cup,
+ * the moment a choice is tapped.
  */
-function PairIcon({ ask, pick }: { readonly ask: Round['ask']; readonly pick: Pick }) {
-  const xs = [178, 228] as const;
-  const base = (x: number) => <rect x={x - 22} y={COT - 2} width="44" height="14" rx="4" fill="#fbfaf3" stroke="#9aa6ad" strokeWidth="1.5" />;
-  if (ask === 'taller') {
-    const cm = pick === 'left' ? [6, 3] : pick === 'right' ? [3, 6] : [4.5, 4.5];
-    const top = yAt(6) - 8;
-    return (
-      <svg width="72" height="44" viewBox={`${xs[0] - 28} ${top} 106 ${COT + 20 - top}`} aria-hidden="true">
-        {xs.map((x, i) => (
-          <g key={x}>
-            {base(x)}
-            <Edged d={`M${x} ${COT} V${yAt(cm[i])}`} color="#f4ecd0" width={8} />
-          </g>
-        ))}
-      </svg>
-    );
-  }
-  const yes = [pick === 'left' || pick === 'both', pick === 'right' || pick === 'both'];
-  const state = (on: boolean): State =>
-    ask === 'sprout' ? (on ? { look: 'sprout', cm: 0 } : { look: 'dry-bean', cm: 0 }) : on ? { look: 'greening', cm: 3 } : { look: 'pale', cm: 4 };
-  const top = yAt(ask === 'sprout' ? 0 : 4) - 18;
+function Pictured({ round, pick, word }: { readonly round: Round; readonly pick: Pick; readonly word: string }) {
+  const s = sketchesFor(round, pick);
+  const v = sketchView(s.length, tallestOf(round));
+  const k = Math.min((s.length === 1 ? 88 : 120) / v.w, 108 / v.h);
   return (
-    <svg width="72" height="44" viewBox={`${xs[0] - 28} ${top} 106 ${COT + 20 - top}`} aria-hidden="true">
-      {xs.map((x, i) => (
-        <g key={x}>
-          {base(x)}
-          <Plant gx={x} state={state(yes[i])} />
-        </g>
-      ))}
-    </svg>
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      <svg width={Math.round(v.w * k)} height={Math.round(v.h * k)} viewBox={`0 ${v.y} ${v.w} ${v.h}`} aria-hidden="true">
+        <SketchBody sketches={s} view={v} />
+      </svg>
+      <span style={{ fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1 }}>{word}</span>
+    </span>
   );
 }
 
-function optionsFor(round: Round): readonly Option[] {
-  if (round.test === 'start') {
-    return [
-      ['sprouts', 'It sprouts', <ChoiceIcon key="i" look="sprout" />],
-      ['stays', 'No sprout', <ChoiceIcon key="i" look="dry-bean" />],
-    ];
-  }
-  if (round.test === 'grow') {
-    return [
-      ['green', 'Green leaves', <ChoiceIcon key="i" look="green" />],
-      ['pale', 'Tall and pale', <ChoiceIcon key="i" look="pale" />],
-      ['stops', 'Stops growing', <ChoiceIcon key="i" look="stop" />],
-    ];
-  }
-  const picks: readonly (readonly [Pick, string])[] =
-    round.ask === 'taller'
-      ? [['left', 'Left'], ['right', 'Right'], ['same', 'Same height']]
-      : [['left', 'Left'], ['right', 'Right'], ['both', 'Both'], ['neither', 'Neither']];
-  return picks.map(([value, label]) => [value, label, <PairIcon key="i" ask={round.ask} pick={value} />] as const);
+function optionsFor(round: Round): readonly (readonly [Pick, string])[] {
+  if (round.test === 'start') return [['sprouts', 'It sprouts'], ['stays', 'No sprout']];
+  if (round.test === 'grow') return [['green', 'Green leaves'], ['pale', 'Tall and pale'], ['stops', 'Stops growing']];
+  return round.ask === 'taller'
+    ? [['left', 'Left'], ['right', 'Right'], ['same', 'Same height']]
+    : [['left', 'Left'], ['right', 'Right'], ['both', 'Both'], ['neither', 'Neither']];
 }
 
 /** On 'hint': the strip cells to ring and one sentence of fact about them. */
@@ -740,10 +887,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         <Frame round={round} after={false} answer={answer} hot={hint?.hot} />
       )}
       <div className="choices" role="group" aria-label={ask}>
-        {optionsFor(round).map(([value, label, icon]) => (
-          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked}>
-            {icon}
-            {label}
+        {optionsFor(round).map(([value, label]) => (
+          <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={label}>
+            <Pictured round={round} pick={value} word={label} />
           </Choice>
         ))}
       </div>

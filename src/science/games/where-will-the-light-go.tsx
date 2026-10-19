@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -17,6 +17,13 @@ import { Choice } from '../../play/parts';
  * Shape: predict (tap-to-choose) → Try → the result drawn in the same frame
  * and scale as the setup → why. The prediction is compared, never marked.
  * All drawing is static SVG, and the outcome is labelled as a drawn model.
+ *
+ * Reading is never needed to answer. Each choice is a picture of the guess,
+ * its word small underneath, and tapping it draws that same picture on the
+ * board in blue, a colour nothing else here uses: a dashed blue dinosaur on
+ * the wall around the shadow now (bigger, the same, or smaller), or a dashed
+ * blue bounce from the mirror to the ringed mango, ball or dinosaur. The wall
+ * is ruled in 10 cm bands, so "shadow 60 cm" is six bands tall to count.
  *
  * Levels:
  *  1. One 10 cm dinosaur moves to a new mark between a fixed torch and a
@@ -184,6 +191,11 @@ const SHADOW_CX = WALL_X + 78;
 const INK = '#24170f';
 const INK_SOFT = '#5a4636';
 const RAY = '#d9620b';
+const WALL = '#fff4cf';
+/** His guess, on the board and on the choice that makes it. */
+const GUESS = '#1c6dd0';
+const WALL_TOP = 14;
+const BAND_PX = 10 * PY_CM;
 
 const DINO_PATH =
   'M0 55 L30 40 L55 30 L62 12 L70 2 L95 4 L100 14 L88 20 L74 22 L70 34 L78 42 L80 48 L70 46 L66 58 L62 70 L66 96 L74 100 L52 100 L50 76 L44 76 L44 96 L50 100 L30 100 L32 72 L20 64 Z';
@@ -191,6 +203,83 @@ const DINO_PATH =
 const standX = (s: Stand) => LENS_X + s.at * PX_CM;
 const cutoutPx = (s: Stand) => HEIGHT_CM[s.size] * PY_CM;
 const shadowPx = (s: Stand) => shadowCm(s) * PY_CM;
+
+/** Every other 10 cm band, on the wall and on the cutouts' measuring blocks. */
+const BAND = '#f3d98e';
+const BAND_LINE = '#d9b65a';
+
+/**
+ * The wall ruled in 10 cm bands from the shadows' foot upwards, so "shadow
+ * 40 cm" is four bands to count, in the same blocks the cutouts are measured in.
+ */
+function WallBands() {
+  const n = Math.floor((BEAM_Y - WALL_TOP) / BAND_PX);
+  const x = WALL_X + 1.5;
+  const w = SH_W - 10 - 1.5 - x;
+  return (
+    <g>
+      {Array.from({ length: n }, (_, k) => {
+        const y = BEAM_Y - (k + 1) * BAND_PX;
+        return (
+          <g key={k}>
+            {k % 2 === 1 ? <rect x={x} y={y} width={w} height={BAND_PX} fill={BAND} /> : null}
+            <line x1={x} y1={y} x2={x + w} y2={y} stroke={BAND_LINE} strokeWidth="1.5" />
+          </g>
+        );
+      })}
+      <line x1={x} y1={BEAM_Y} x2={x + w} y2={BEAM_Y} stroke={BAND_LINE} strokeWidth="1.5" />
+    </g>
+  );
+}
+
+/** A cutout's height as 10 cm blocks beside it: one for the small dinosaur, two for the big. */
+function Blocks({ stand, ghost }: { readonly stand: Stand; readonly ghost?: boolean }) {
+  const x = standX(stand) + (cutoutPx(stand) * SQUISH) / 2 + 3;
+  return (
+    <g>
+      {Array.from({ length: HEIGHT_CM[stand.size] / 10 }, (_, k) => (
+        <rect
+          key={k}
+          x={x}
+          y={BEAM_Y - (k + 1) * BAND_PX}
+          width="8"
+          height={BAND_PX}
+          fill={ghost ? 'none' : k % 2 === 1 ? BAND : WALL}
+          stroke={ghost ? INK_SOFT : INK}
+          strokeWidth="1.5"
+          strokeDasharray={ghost ? '4 3' : undefined}
+        />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * The tallest a guess is drawn, leaving room for the labels above it. A 60 cm
+ * shadow already nearly fills the wall, so a "bigger" guess on it is clipped
+ * to the wall's sides rather than spilling into the dark.
+ */
+const GUESS_MAX = 240;
+
+/** His guess as a height on the wall: the shadow now, made bigger, kept, or made smaller. */
+function guessPx(now: number, c: Change): number {
+  if (c === 'same') return now;
+  return c === 'bigger' ? Math.min(Math.max(now * 1.6, now + 2 * BAND_PX), GUESS_MAX) : now * 0.55;
+}
+
+/** A dinosaur outline in dashed blue, haloed so it shows on the dark shadow as well as the wall, kept inside the wall. */
+function GuessDino({ cx, base, h }: { readonly cx: number; readonly base: number; readonly h: number }) {
+  const w = h * SQUISH;
+  const t = `translate(${cx - w / 2} ${base - h}) scale(${w / 100} ${h / 100})`;
+  const ww = SH_W - 10 - WALL_X;
+  const wh = TABLE_Y - WALL_TOP;
+  return (
+    <svg x={WALL_X} y={WALL_TOP} width={ww} height={wh} viewBox={`${WALL_X} ${WALL_TOP} ${ww} ${wh}`} overflow="hidden">
+      <path d={DINO_PATH} transform={t} fill="rgba(28,109,208,0.14)" stroke={WALL} strokeWidth="6" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <path d={DINO_PATH} transform={t} fill="none" stroke={GUESS} strokeWidth="3" strokeDasharray="7 5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
 
 function Dino({ cx, h, fill, dashed }: { readonly cx: number; readonly h: number; readonly fill: string; readonly dashed?: boolean }) {
   const w = h * SQUISH;
@@ -217,6 +306,7 @@ function Cutout({ stand, ghost, label }: { readonly stand: Stand; readonly ghost
       <line x1={x} y1={BEAM_Y} x2={x} y2={TABLE_Y - 4} stroke={ghost ? INK_SOFT : '#8a5a14'} strokeWidth={ghost ? 2 : 4} strokeDasharray={ghost ? '5 4' : undefined} />
       <rect x={x - 9} y={TABLE_Y - 5} width="18" height="5" fill={ghost ? 'none' : '#8a5a14'} stroke={ghost ? INK_SOFT : INK} strokeWidth="1.5" strokeDasharray={ghost ? '4 3' : undefined} />
       <Dino cx={x} h={h} fill={ghost ? 'none' : '#3f8f3a'} dashed={ghost} />
+      {label ? <Blocks stand={stand} ghost={ghost} /> : null}
       {label ? (
         <text x={x} y={BEAM_Y - h - 8} textAnchor="middle" fontSize="13" fontWeight="700" fill={INK} stroke="#fff" strokeWidth="4" paintOrder="stroke">
           {HEIGHT_CM[stand.size]} cm
@@ -234,14 +324,15 @@ const RAY_TEXT = '#a3440a';
  * outline crosses it. With a dashed outline as well, the two labels stack,
  * coloured like the shape each names, so near-equal heights never collide.
  */
-function ShadowLabels({ solid, dashed, dashedWord }: { readonly solid: Stand; readonly dashed?: Stand; readonly dashedWord?: string }) {
+function ShadowLabels({ solid, dashed, dashedWord, above = 0 }: { readonly solid: Stand; readonly dashed?: Stand; readonly dashedWord?: string; readonly above?: number }) {
   const lines: Array<readonly [string, string]> = [[INK, `shadow ${shadowCm(solid)} cm`]];
   if (dashed) {
     const line = [RAY_TEXT, `${dashedWord}: ${shadowCm(dashed)} cm`] as const;
     if (shadowCm(dashed) >= shadowCm(solid)) lines.unshift(line);
     else lines.push(line);
   }
-  const base = BEAM_Y - Math.max(shadowPx(solid), dashed ? shadowPx(dashed) : 0) - 8;
+  const top = Math.max(shadowPx(solid), dashed ? shadowPx(dashed) : 0, above);
+  const base = Math.max(BEAM_Y - top - 8, WALL_TOP + 17 + (lines.length - 1) * 17);
   return (
     <g>
       {lines.map(([fill, text], i) => (
@@ -316,7 +407,8 @@ function ShadowFrame({ label, footer, children }: { readonly label: string; read
     <svg className="board-svg" viewBox={`0 0 ${SH_W} ${SH_H}`} role="img" aria-label={label}>
       <rect x="0" y="0" width={SH_W} height={TABLE_Y} fill="#3b3550" />
       <polygon points={`${LENS_X},${BEAM_Y - 10} ${WALL_X},14 ${WALL_X},${TABLE_Y} ${LENS_X},${BEAM_Y + 10}`} fill="#ffe7a0" opacity="0.85" />
-      <rect x={WALL_X} y="14" width={SH_W - WALL_X - 10} height={TABLE_Y - 14} fill="#fff4cf" stroke={INK} strokeWidth="3" />
+      <rect x={WALL_X} y={WALL_TOP} width={SH_W - WALL_X - 10} height={TABLE_Y - WALL_TOP} fill={WALL} stroke={INK} strokeWidth="3" />
+      <WallBands />
       <rect x="0" y={TABLE_Y} width={SH_W} height="26" fill="#d9a35f" stroke={INK} strokeWidth="2" />
       <text x={SH_W / 2} y={SH_H - 8} textAnchor="middle" fontSize="14" fontWeight="700" fill={INK}>
         {footer}
@@ -458,28 +550,56 @@ const CHANGES: ReadonlyArray<readonly [Change, string]> = [
   ['same', 'Same size'],
   ['smaller', 'Smaller'],
 ];
-/** Shadow heights for the choice pictures: the shadow now, then the new one. */
-const CHANGE_ICON: Record<Change, readonly [number, number]> = { bigger: [18, 34], same: [26, 26], smaller: [34, 18] };
+/** The little wall in each choice picture, ruled in bands like the board's, so the two heights can be counted. */
+const ICON_BAND = 13;
+const ICON_FLOOR = 62;
+/** Shadow heights in bands for the choice pictures: the shadow now (dark), then his guess (dashed blue). */
+const CHANGE_BANDS: Record<Change, readonly [number, number]> = { bigger: [2, 4], same: [3, 3], smaller: [4, 2] };
 
-/** Two shadow shapes on one floor line, so a pre-reader can tell the three choices apart. */
+/**
+ * A choice drawn as the guess it makes: on a banded wall, the shadow now in
+ * dark and the guessed shadow in dashed blue, the same blue dinosaur the tap
+ * then draws on the board's wall.
+ */
 function ChangeIcon({ change: c }: { readonly change: Change }) {
-  const [a, b] = CHANGE_ICON[c];
-  const shape = (x: number, h: number) => (
-    <path
-      d={DINO_PATH}
-      transform={`translate(${x - (h * SQUISH) / 2} ${36 - h}) scale(${(h * SQUISH) / 100} ${h / 100})`}
-      fill="#3a2c22"
-    />
-  );
+  const [a, b] = CHANGE_BANDS[c];
+  const place = (cx: number, n: number) => {
+    const h = n * ICON_BAND;
+    const w = h * SQUISH;
+    return `translate(${cx - w / 2} ${ICON_FLOOR - h}) scale(${w / 100} ${h / 100})`;
+  };
   return (
-    <svg width="64" height="40" viewBox="0 0 64 40" aria-hidden="true">
-      <line x1="2" y1="37" x2="62" y2="37" stroke={INK_SOFT} strokeWidth="2" />
-      {shape(15, a)}
-      <path d="M27 22 h8 m-4 -4 l4 4 l-4 4" fill="none" stroke={RAY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      {shape(49, b)}
+    <svg width="112" height="70" viewBox="0 0 112 70" aria-hidden="true">
+      <rect x="2" y="6" width="108" height={ICON_FLOOR - 6} fill={WALL} stroke={INK_SOFT} strokeWidth="1.5" />
+      {[0, 1, 2, 3].map((k) => (
+        <g key={k}>
+          {k % 2 === 1 ? <rect x="3" y={ICON_FLOOR - (k + 1) * ICON_BAND} width="106" height={ICON_BAND} fill={BAND} /> : null}
+          <line x1="3" y1={ICON_FLOOR - (k + 1) * ICON_BAND} x2="109" y2={ICON_FLOOR - (k + 1) * ICON_BAND} stroke={BAND_LINE} strokeWidth="1" />
+        </g>
+      ))}
+      <path d={DINO_PATH} transform={place(30, a)} fill="#3a2c22" />
+      <path d="M50 40 h10 m-4 -4 l4 4 l-4 4" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={DINO_PATH}
+        transform={place(82, b)}
+        fill="rgba(28,109,208,0.14)"
+        stroke={GUESS}
+        strokeWidth="2.5"
+        strokeDasharray="5 3"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+      <line x1="2" y1={ICON_FLOOR} x2="110" y2={ICON_FLOOR} stroke={INK} strokeWidth="2" />
     </svg>
   );
 }
+
+/** A choice's face: the picture first, its word small underneath. */
+const FACE: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' };
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+const isChange = (a: Answer): a is Change => a === 'bigger' || a === 'same' || a === 'smaller';
+const isTarget = (a: Answer): a is Target => a === 'mango' || a === 'ball' || a === 'dino';
 
 const TARGETS: readonly Target[] = ['mango', 'ball', 'dino'];
 const TARGET_LABEL: Record<Target, string> = { mango: 'Mango', ball: 'Ball', dino: 'Dinosaur' };
@@ -497,10 +617,12 @@ function ShadowBoard({ round, answer, setAnswer, stage }: PartProps<ShadowRound>
   const { from, to } = round;
   const help = stage === 'hint' || stage === 'worked';
   const swap = from.size !== to.size;
+  const guess = isChange(answer) ? guessPx(shadowPx(from), answer) : 0;
+  const guessText = isChange(answer) ? ` Your guess, dashed blue on the wall: ${CHANGES.find(([c]) => c === answer)![1].toLowerCase()}.` : '';
   return (
     <div className="board board--light">
       <ShadowFrame
-        label={`A ${HEIGHT_CM[from.size]} cm dinosaur at the ${from.at} cm mark makes a ${shadowCm(from)} cm shadow on the wall. A dashed ${HEIGHT_CM[to.size]} cm dinosaur stands at the ${to.at} cm mark.`}
+        label={`A ${HEIGHT_CM[from.size]} cm dinosaur at the ${from.at} cm mark makes a ${shadowCm(from)} cm shadow on the wall. A dashed ${HEIGHT_CM[to.size]} cm dinosaur stands at the ${to.at} cm mark.${guessText}`}
         footer={swap ? `Torch and wall stay put. Dashed: the ${to.size} one, instead.` : 'Torch and wall stay put. Dashed: where it moves to.'}
       >
         <Shadow stand={from} />
@@ -515,13 +637,16 @@ function ShadowBoard({ round, answer, setAnswer, stage }: PartProps<ShadowRound>
         ) : help ? (
           <line x1={LENS_X} y1={BEAM_Y} x2={standX(to)} y2={BEAM_Y - cutoutPx(to)} stroke={RAY} strokeWidth="3" strokeDasharray="8 6" strokeLinecap="round" />
         ) : null}
-        <ShadowLabels solid={from} dashed={stage === 'worked' ? to : undefined} dashedWord="new shadow" />
+        {guess ? <GuessDino cx={SHADOW_CX} base={BEAM_Y} h={guess} /> : null}
+        <ShadowLabels solid={from} dashed={stage === 'worked' ? to : undefined} dashedWord="new shadow" above={guess} />
       </ShadowFrame>
       <div className="choices" role="group" aria-label="Your guess">
         {CHANGES.map(([c, text]) => (
-          <Choice key={c} selected={answer === c} onTap={() => setAnswer(c)} disabled={stage === 'solved'}>
-            <ChangeIcon change={c} />
-            {text}
+          <Choice key={c} selected={answer === c} onTap={() => setAnswer(c)} disabled={stage === 'solved'} ariaLabel={text}>
+            <span style={FACE}>
+              <ChangeIcon change={c} />
+              <span style={WORD}>{text}</span>
+            </span>
           </Choice>
         ))}
       </div>
@@ -538,15 +663,35 @@ function ShadowBoard({ round, answer, setAnswer, stage }: PartProps<ShadowRound>
 
 const stepsTo = (r: MirrorRound, p: Point) => (ROWS - p[1]) / r.dir[1];
 
+/** His guess on the grid: a dashed blue bounce from where the beam meets the mirror, to a ringed target. */
+function GuessBounce({ from, target, at }: { readonly from: Point; readonly target: Target; readonly at: Point }) {
+  const [x1, y1] = px(from);
+  const [x2, y2] = px(at);
+  return (
+    <g aria-hidden="true">
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#fbf6ea" strokeWidth="8" strokeLinecap="round" />
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={GUESS} strokeWidth="4" strokeDasharray="9 7" strokeLinecap="round" />
+      <circle cx={x2} cy={y2} r="22" fill="rgba(28,109,208,0.14)" stroke={GUESS} strokeWidth="3.5" strokeDasharray="7 5" />
+      <TargetIcon target={target} at={[x2, y2]} />
+    </g>
+  );
+}
+
 function MirrorBoard({ round, answer, setAnswer, stage }: PartProps<MirrorRound>) {
   const help = stage === 'hint' || stage === 'worked';
   const hit = hitPoint(round);
   const end = round.targets[round.reaches];
   const dx = Math.abs(round.dir[0]);
   const dy = round.dir[1];
+  const guess = isTarget(answer) ? answer : null;
   return (
     <div className="board board--light">
-      <MirrorFrame round={round} label="A torch shines down at a flat mirror. A mango, a ball and a dinosaur sit above it." footer="flat mirror">
+      <MirrorFrame
+        round={round}
+        label={`A torch shines down at a flat mirror. A mango, a ball and a dinosaur sit above it.${guess ? ` Your guess, dashed blue: the light bounces to the ${TARGET_NAME[guess]}.` : ''}`}
+        footer="flat mirror"
+      >
+        {guess ? <GuessBounce from={hit} target={guess} at={round.targets[guess]} /> : null}
         {help ? <Steps from={round.torch} dir={round.dir} count={stepsTo(round, round.torch)} /> : null}
         {stage === 'worked' ? (
           <>
@@ -557,11 +702,13 @@ function MirrorBoard({ round, answer, setAnswer, stage }: PartProps<MirrorRound>
       </MirrorFrame>
       <div className="choices" role="group" aria-label="Your guess">
         {TARGETS.map((t) => (
-          <Choice key={t} selected={answer === t} onTap={() => setAnswer(t)} disabled={stage === 'solved'}>
-            <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-              <TargetIcon target={t} at={[20, 20]} />
-            </svg>
-            {TARGET_LABEL[t]}
+          <Choice key={t} selected={answer === t} onTap={() => setAnswer(t)} disabled={stage === 'solved'} ariaLabel={TARGET_LABEL[t]}>
+            <span style={FACE}>
+              <svg width="64" height="64" viewBox="0 0 40 40" aria-hidden="true">
+                <TargetIcon target={t} at={[20, 20]} />
+              </svg>
+              <span style={WORD}>{TARGET_LABEL[t]}</span>
+            </span>
           </Choice>
         ))}
       </div>

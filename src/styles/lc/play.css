@@ -31,7 +31,7 @@
 .feedback--ok { background: var(--raised); border-color: var(--g-deep); }
 .shell__controls { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; justify-content: flex-end; }
 .shell__dots { display: flex; gap: var(--s2); margin-right: auto; }
-.dot { width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--ink-soft); }
+.dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--ink-soft); }
 .dot.is-done { background: var(--ink-soft); }
 .dot.is-now { border-color: var(--g-deep); background: var(--g-tint); }
 .shell__done { text-align: center; padding: var(--s7) var(--s4); background: var(--g-tint); border: var(--line) solid var(--ink); border-radius: var(--radius); }

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -152,6 +152,11 @@ const WOOD_DEEP = '#8a5528';
 const TEAL = 'var(--science, #0d8063)';
 const TEAL_DEEP = 'var(--science-deep, #075c46)';
 const GOLD = 'var(--gold, #f2a900)';
+const GOLD_TINT = 'var(--gold-tint, #fff1c9)';
+const PAPER = 'var(--paper, #fff8ec)';
+const INK_SOFT = 'var(--ink-soft, #5a4636)';
+/** Centimetre blocks under the overhang alternate colour every five, so 16 reads as 5, 5, 5 and 1. */
+const CM_FIVE = ['#5fa3cf', '#ffffff'] as const;
 
 /** How far the tip is pushed down (setup) — and so how far it swings each way (outcome). */
 const DEPTH: Record<Pluck, number> = { gentle: 10, hard: 22 };
@@ -246,17 +251,30 @@ function LetGoArrow({ s }: { readonly s: Setup }) {
   );
 }
 
-/** A measuring bracket under the part that sticks out past the table. */
+/**
+ * Under the part that sticks out past the table: one block per centimetre, so
+ * the length is a row of things to count, lined up under the ruler it measures.
+ * Both rows start at the same table edge, so the two rows compare by eye too.
+ */
 function Bracket({ s, focus }: { readonly s: Setup; readonly focus: boolean }) {
   const x2 = tipX(s);
-  const col = focus ? GOLD : INK;
-  const w = focus ? 5 : 2.5;
   return (
     <g>
-      <line x1={EDGE} y1="106" x2={x2} y2="106" stroke={col} strokeWidth={w} />
-      <line x1={EDGE} y1="100" x2={EDGE} y2="112" stroke={col} strokeWidth={w} />
-      <line x1={x2} y1="100" x2={x2} y2="112" stroke={col} strokeWidth={w} />
-      <text x={(EDGE + x2) / 2} y="129" textAnchor="middle" fontSize="16" fontWeight="700" fill={INK}>
+      {Array.from({ length: s.out }, (_, i) => (
+        <rect
+          key={i}
+          x={EDGE + i * PX + 0.75}
+          y="100"
+          width={PX - 1.5}
+          height="12"
+          rx="1.5"
+          fill={CM_FIVE[Math.floor(i / 5) % 2]}
+          stroke={INK}
+          strokeWidth="1"
+        />
+      ))}
+      {focus ? <rect x={EDGE - 3} y="97" width={x2 - EDGE + 6} height="18" rx="4" fill="none" stroke={GOLD} strokeWidth="4" /> : null}
+      <text x={(EDGE + x2) / 2} y="131" textAnchor="middle" fontSize="16" fontWeight="700" fill={INK}>
         {s.out} cm
       </text>
     </g>
@@ -341,11 +359,66 @@ function focusOf(ask: Ask): Exclude<Focus, null> {
   return ask === 'sound' ? 'finger' : ask === 'higher' || ask === 'lower' ? 'length' : 'push';
 }
 
+/** A big numeral badge, the same one drawn on the answer button for that ruler. */
+function Badge({ n, x, y, r }: { readonly n: 1 | 2; readonly x: number; readonly y: number; readonly r: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r} fill={PAPER} stroke={INK} strokeWidth={r > 10 ? 3 : 2} />
+      <text x={x} y={y + r * 0.42} textAnchor="middle" fontSize={r * 1.25} fontWeight="700" fill={INK}>
+        {n}
+      </text>
+    </g>
+  );
+}
+
 function RowLabel({ n }: { readonly n: 1 | 2 }) {
   return (
-    <text x="12" y="24" fontSize="18" fontWeight="700" fill={INK}>
-      Ruler {n}
-    </text>
+    <g>
+      <text x="12" y="28" fontSize="15" fontWeight="600" fill={INK_SOFT}>
+        Ruler
+      </text>
+      <Badge n={n} x={74} y={22} r={15} />
+    </g>
+  );
+}
+
+/**
+ * What the child's tap changes on the board: the row of the ruler picked gets
+ * a gold ground and border, the same gold as the pressed button. "Same" rings
+ * both rows and puts an equals sign between them.
+ */
+function PickMark({ pick }: { readonly pick: Pick | null }) {
+  if (pick === null) return null;
+  const ring = (row: 0 | 1, dashed: boolean) => (
+    <rect
+      key={row}
+      x="5"
+      y={row * ROW + 5}
+      width={W - 10}
+      height={ROW - 10}
+      rx="14"
+      fill={GOLD_TINT}
+      stroke={GOLD}
+      strokeWidth="6"
+      strokeDasharray={dashed ? '14 8' : undefined}
+    />
+  );
+  if (pick !== 'same') return ring(pick === 'a' ? 0 : 1, false);
+  return (
+    <g>
+      {ring(0, true)}
+      {ring(1, true)}
+    </g>
+  );
+}
+
+function EqualsMark({ pick }: { readonly pick: Pick | null }) {
+  if (pick !== 'same') return null;
+  return (
+    <g>
+      <circle cx={W - 26} cy={ROW} r="14" fill={GOLD} stroke={INK} strokeWidth="3" />
+      <path d={`M${W - 34} ${ROW - 4} h16 M${W - 34} ${ROW + 4} h16`} stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+    </g>
   );
 }
 
@@ -417,8 +490,8 @@ function Frame({ label, footer, children }: { readonly label: string; readonly f
       aria-label={footer ? `${label} ${footer}` : label}
       style={{ fontFamily: 'var(--font-display, system-ui, sans-serif)' }}
     >
-      {children}
       <line x1="8" y1={ROW} x2={W - 8} y2={ROW} stroke="var(--rule, #ead9bf)" strokeWidth="3" />
+      {children}
       {footer ? (
         <text x={W / 2} y={ROW * 2 + 16} textAnchor="middle" fontSize="13" fill="var(--ink-soft, #5a4636)">
           {footer}
@@ -444,18 +517,21 @@ function outcomeLabel(r: Round): string {
   return `Ruler 1: ${swingLabel(a, b)}, ${noteLabel(a, b)}. Ruler 2: ${swingLabel(b, a)}, ${noteLabel(b, a)}.`;
 }
 
-function SetupFrame({ round, focus }: { readonly round: Round; readonly focus: Focus }) {
+function SetupFrame({ round, focus, pick }: { readonly round: Round; readonly focus: Focus; readonly pick: Pick | null }) {
   return (
     <Frame label={setupLabel(round)}>
+      <PickMark pick={pick} />
       <SetupRow s={round.a} n={1} focus={focus} />
       <SetupRow s={round.b} n={2} focus={focus} />
+      <EqualsMark pick={pick} />
     </Frame>
   );
 }
 
-function OutcomeFrame({ round, focus }: { readonly round: Round; readonly focus: Focus }) {
+function OutcomeFrame({ round, focus, pick = null }: { readonly round: Round; readonly focus: Focus; readonly pick?: Pick | null }) {
   return (
     <Frame label={outcomeLabel(round)} footer={MODEL_FOOTER}>
+      <PickMark pick={pick} />
       <OutcomeRow s={round.a} o={round.b} n={1} focus={focus} />
       <OutcomeRow s={round.b} o={round.a} n={2} focus={focus} />
     </Frame>
@@ -507,26 +583,172 @@ const SAME: Record<Ask, string | null> = {
   softer: 'Just as loud',
 };
 
+/* ------------------------------------------------------ answer buttons -- */
+
+/** Thumbnail scale: the button ruler is the board ruler at under half size, same edge, same overhang. */
+const T_PX = 4;
+const T_EDGE = 34;
+const T_Y = 30;
+const T_DEPTH: Record<Pluck, number> = { gentle: 5, hard: 11 };
+
+function thumbPath(s: Setup): string {
+  const L = s.out * T_PX;
+  const d = T_DEPTH[s.pluck];
+  const pts = [`M2 ${T_Y}`, `L${T_EDGE} ${T_Y}`];
+  for (let i = 1; i <= 10; i += 1) {
+    const u = i / 10;
+    pts.push(`L${(T_EDGE + L * u).toFixed(1)} ${(T_Y + (d * u * u * (3 - u)) / 2).toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
+
+/**
+ * One ruler as the board draws it, small: the table edge, the overhang to
+ * scale, the tip pushed down as far as on the board, and the up arrow (let go)
+ * or the barred down arrow (held). The badge matches the row's badge.
+ */
+function RulerThumb({ s, n }: { readonly s: Setup; readonly n: 1 | 2 }) {
+  const tx = T_EDGE + s.out * T_PX;
+  const ty = T_Y + T_DEPTH[s.pluck];
+  const ax = tx - 14;
+  return (
+    <svg viewBox="0 0 112 64" width="112" height="64" aria-hidden="true" focusable="false">
+      <rect x="2" y={T_Y + 3} width={T_EDGE - 2} height="7" fill={WOOD} stroke={INK} strokeWidth="1.5" />
+      <rect x="2" y={T_Y + 10} width={T_EDGE - 2} height="9" fill={WOOD_DEEP} stroke={INK} strokeWidth="1.5" />
+      <path d={thumbPath(s)} fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+      <path d={thumbPath(s)} fill="none" stroke={PLASTIC} strokeWidth="3" strokeLinecap="round" />
+      <circle cx={tx} cy={ty - 4} r="4" fill={SKIN} stroke={INK} strokeWidth="1.5" />
+      {s.held ? (
+        <g stroke={INK} strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <path d={`M${ax} 6 V${T_Y - 6} M${ax - 4} ${T_Y - 11} L${ax} ${T_Y - 6} L${ax + 4} ${T_Y - 11} M${ax - 6} ${T_Y - 3} h12`} />
+        </g>
+      ) : (
+        <g stroke={INK} strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <path d={`M${ax} 6 V${T_Y - 6} M${ax - 4} 11 L${ax} 6 L${ax + 4} 11`} />
+        </g>
+      )}
+      <Badge n={n} x={14} y={14} r={11} />
+      {Array.from({ length: s.out }, (_, i) => (
+        <rect
+          key={i}
+          x={T_EDGE + i * T_PX + 0.4}
+          y="54"
+          width={T_PX - 0.8}
+          height="6"
+          fill={CM_FIVE[Math.floor(i / 5) % 2]}
+          stroke={INK}
+          strokeWidth="0.6"
+        />
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * "The same", drawn as the outcome it predicts, one row per ruler with an
+ * equals sign between the badges. Same note: the two tips trace the same
+ * swings, just as fast (the board's "tip in one short moment" strip). Just as
+ * loud: the two rulers swing just as wide (the board's swing and width bar).
+ */
+function SameThumb({ ask }: { readonly ask: Ask }) {
+  const note = ask === 'higher' || ask === 'lower';
+  if (note) {
+    const wave = (y: number) => {
+      const pts: string[] = [];
+      for (let i = 0; i <= 64; i += 1) {
+        const u = i / 64;
+        pts.push(`${(30 + 78 * u).toFixed(1)},${(y + 7 * Math.cos(2 * Math.PI * 4 * u)).toFixed(1)}`);
+      }
+      return <polyline points={pts.join(' ')} fill="none" stroke={TEAL} strokeWidth="3" strokeLinejoin="round" />;
+    };
+    return (
+      <svg viewBox="0 0 112 64" width="112" height="64" aria-hidden="true" focusable="false">
+        <rect x="26" y="4" width="84" height="24" rx="5" fill="var(--science-tint, #dcf3ea)" />
+        <rect x="26" y="36" width="84" height="24" rx="5" fill="var(--science-tint, #dcf3ea)" />
+        {wave(16)}
+        {wave(48)}
+        <Badge n={1} x={12} y={14} r={10} />
+        <Badge n={2} x={12} y={50} r={10} />
+        <path d="M6 29 h12 M6 35 h12" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  /** One row: the board's swing, small — the ruler at rest, both ends of its swing dashed, and the width bar. */
+  const row = (c: number) => {
+    const bend = (d: number) => {
+      const pts = [`M24 ${c}`, `L32 ${c}`];
+      for (let i = 1; i <= 8; i += 1) {
+        const u = i / 8;
+        pts.push(`L${(32 + 56 * u).toFixed(1)} ${(c + (d * u * u * (3 - u)) / 2).toFixed(1)}`);
+      }
+      return pts.join(' ');
+    };
+    return (
+      <g>
+        <rect x="24" y={c + 3} width="8" height="9" fill={WOOD} stroke={INK} strokeWidth="1.5" />
+        <path d={bend(-10)} fill="none" stroke={INK} strokeWidth="3.5" strokeDasharray="4 3" opacity="0.6" />
+        <path d={bend(10)} fill="none" stroke={INK} strokeWidth="3.5" strokeDasharray="4 3" opacity="0.6" />
+        <path d={bend(0)} fill="none" stroke={INK} strokeWidth="5" />
+        <path d={bend(0)} fill="none" stroke={PLASTIC} strokeWidth="2.5" />
+        <g stroke={INK_SOFT} strokeWidth="3" strokeLinecap="round">
+          <line x1="100" y1={c - 10} x2="100" y2={c + 10} />
+          <line x1="95" y1={c - 10} x2="105" y2={c - 10} />
+          <line x1="95" y1={c + 10} x2="105" y2={c + 10} />
+        </g>
+      </g>
+    );
+  };
+  return (
+    <svg viewBox="0 0 112 64" width="112" height="64" aria-hidden="true" focusable="false">
+      {row(16)}
+      {row(48)}
+      <Badge n={1} x={12} y={14} r={10} />
+      <Badge n={2} x={12} y={50} r={10} />
+      <path d="M6 29 h12 M6 35 h12" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const FACE: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' };
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+/** An answer button's face: the picture first, the word small underneath. */
+function Face({ pic, word }: { readonly pic: ReactNode; readonly word: string }) {
+  return (
+    <span style={FACE}>
+      {pic}
+      <span style={WORD}>{word}</span>
+    </span>
+  );
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
   const help = stage === 'hint' || stage === 'worked';
   const focus: Focus = help ? focusOf(round.ask) : null;
   const same = round.allowSame ? SAME[round.ask] : null;
-  const opts: ReadonlyArray<readonly [Pick, string]> = same
-    ? [['a', 'Ruler 1'], ['b', 'Ruler 2'], ['same', same]]
-    : [['a', 'Ruler 1'], ['b', 'Ruler 2']];
+  const opts: ReadonlyArray<readonly [Pick, string, ReactNode]> = [
+    ['a', 'Ruler 1', <RulerThumb key="a" s={round.a} n={1} />],
+    ['b', 'Ruler 2', <RulerThumb key="b" s={round.b} n={2} />],
+    ...(same ? [['same', same, <SameThumb key="same" ask={round.ask} />] as const] : []),
+  ];
   return (
     <div className="board board--sound">
-      {stage === 'worked' ? <OutcomeFrame round={round} focus={focus} /> : <SetupFrame round={round} focus={focus} />}
+      {stage === 'worked' ? (
+        <OutcomeFrame round={round} focus={focus} pick={answer} />
+      ) : (
+        <SetupFrame round={round} focus={focus} pick={answer} />
+      )}
       <div className="choices" role="group" aria-label="Your guess">
-        {opts.map(([v, text]) => (
+        {opts.map(([v, text, pic]) => (
           <Choice
             key={v}
             selected={answer === v}
             onTap={() => setAnswer(v)}
             disabled={locked}
+            ariaLabel={text}
           >
-            {text}
+            <Face pic={pic} word={text} />
           </Choice>
         ))}
       </div>

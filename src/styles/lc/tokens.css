@@ -19,6 +19,20 @@
   src: url('/kids-stuff/fonts/fredoka-var-latin.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-400-normal-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-600-normal-latin.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Andika';
   font-style: normal;
   font-weight: 400;
@@ -79,6 +93,7 @@
   /* type */
   --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --font-read: 'Andika', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --t-xs: 0.875rem;
   --t-sm: 1rem;
