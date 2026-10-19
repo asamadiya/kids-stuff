@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Card, Page } from './Page';
+import { FourUp } from './FourUp';
 import { GrownUps } from './GrownUps';
 import type { GrownUpNote } from '../notes/types';
 import { BOOKS, SHELVES, booksOn, getShelf } from '../books/registry';
@@ -132,8 +133,9 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
   return (
     <Page title={s.title} back={{ href: '#/stories', label: 'Stories' }} note={s.note} band="stories" expect={s.line}>
       <section className="hub__group" aria-label="Books">
-        <div className="cards">
-          {books.map((b) => (
+        <FourUp
+          label="Books"
+          items={books.map((b) => (
             <Card
               key={b.slug}
               href={`#/book/${b.slug}/1`}
@@ -144,7 +146,7 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
               tick={read(`book/${b.slug}`) ? 'Read before' : null}
             />
           ))}
-        </div>
+        />
       </section>
       {shelf === 'family' ? (
         <section className="hub__group" aria-labelledby="situations">
@@ -152,8 +154,9 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
             <h2 id="situations" className="hub__group-title">Try a situation</h2>
             <p className="hub__group-line">Short exercises built from the same moments as the books.</p>
           </div>
-          <div className="cards">
-            {SITUATIONS.map((x) => (
+          <FourUp
+            label="Try a situation"
+            items={SITUATIONS.map((x) => (
               <Card
                 key={x.id}
                 href={`#/situation/${x.id}`}
@@ -165,7 +168,7 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
                 tick={playedBefore(`sel/${x.id}`) || read(`sel/${x.id}`) ? 'Played before' : null}
               />
             ))}
-          </div>
+          />
         </section>
       ) : null}
       {shelf === 'people' ? (
@@ -174,8 +177,9 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
             <h2 id="longer" className="hub__group-title">Longer read-alouds</h2>
             <p className="hub__group-line">True stories from the Big Library about thinkers in India and around the world.</p>
           </div>
-          <div className="cards">
-            {CURATED_ARCHIVE.map((slug) => archiveStory(slug)).filter(Boolean).map((st) => (
+          <FourUp
+            label="Longer read-alouds"
+            items={CURATED_ARCHIVE.map((slug) => archiveStory(slug)).filter(Boolean).map((st) => (
               <Card
                 key={st!.slug}
                 href={`#/read/${st!.slug}/1`}
@@ -187,7 +191,7 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
                 tick={read(`read/${st!.slug}`) ? 'Read before' : null}
               />
             ))}
-          </div>
+          />
         </section>
       ) : null}
     </Page>
@@ -197,8 +201,9 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
 export function LibraryPage() {
   return (
     <Page title="The Big Library" back={{ href: '#/stories', label: 'Stories' }} note={LIBRARY_NOTE} band="stories" expect="Longer true stories to read aloud, one or two a night.">
-      <div className="cards">
-        {SUBJECTS.map((s) => {
+      <FourUp
+        label="Subjects"
+        items={SUBJECTS.map((s) => {
           const first = storiesIn(s.id)[0];
           return (
             <Card
@@ -211,7 +216,7 @@ export function LibraryPage() {
             />
           );
         })}
-      </div>
+      />
     </Page>
   );
 }
@@ -221,8 +226,9 @@ export function SubjectPage({ subject }: { readonly subject: string }) {
   const list = storiesIn(subject);
   return (
     <Page title={s.title} back={{ href: '#/library', label: 'The Big Library' }} note={LIBRARY_NOTE} band="stories" expect={s.line}>
-      <div className="cards">
-        {list.map((st) => (
+      <FourUp
+        label={s.title}
+        items={list.map((st) => (
           <Card
             key={st.slug}
             href={`#/read/${st.slug}/1`}
@@ -234,7 +240,7 @@ export function SubjectPage({ subject }: { readonly subject: string }) {
             tick={read(`read/${st.slug}`) ? 'Read before' : null}
           />
         ))}
-      </div>
+      />
     </Page>
   );
 }
@@ -271,8 +277,9 @@ function GameHub({
               <h2 id={`grp-${grp.id}`} className="hub__group-title">{grp.title}</h2>
               <p className="hub__group-line">{grp.line}</p>
             </div>
-            <div className="cards">
-              {list.map((g) => (
+            <FourUp
+              label={grp.title}
+              items={list.map((g) => (
                 <Card
                   key={g.id}
                   href={`#/${base}/${g.id}`}
@@ -284,7 +291,7 @@ function GameHub({
                   tick={playedBefore(g.id) ? 'Played before' : null}
                 />
               ))}
-            </div>
+            />
           </section>
         );
       })}
@@ -354,8 +361,9 @@ const MAKE_NOTE: GrownUpNote = {
 export function MakeHub() {
   return (
     <Page title="Make & Do" back={{ href: '#/', label: 'Home' }} note={MAKE_NOTE} band="make" expect="Real things to make together, away from the screen.">
-      <div className="cards">
-        {ACTIVITIES.map((a) => (
+      <FourUp
+        label="Make & Do"
+        items={ACTIVITIES.map((a) => (
           <Card
             key={a.id}
             href={`#/make/${a.id}`}
@@ -367,7 +375,7 @@ export function MakeHub() {
             tick={read(`make/${a.id}`) ? 'Done before' : null}
           />
         ))}
-      </div>
+      />
     </Page>
   );
 }

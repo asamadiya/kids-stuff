@@ -36,7 +36,7 @@
   font-size: clamp(1.125rem, 2.6cqi, 1.75rem);
   line-height: 1.4;
   color: var(--ink);
-  padding: 1.6cqi 2.4cqi;
+  padding: clamp(14px, 2cqi, 24px) clamp(16px, 2.4cqi, 28px);
   border-radius: 2.2cqi;
   background: rgba(255, 248, 236, 0.95);
   box-shadow: 0 0 0 2px rgba(36, 23, 15, 0.08);
@@ -49,8 +49,9 @@
 .spread__words p { margin: 0; }
 .spread--top .spread__words { top: 3.2cqi; left: 4cqi; right: 4cqi; }
 .spread--bottom .spread__words { bottom: 3.2cqi; left: 4cqi; right: 4cqi; }
-.spread--left .spread__words { top: 4cqi; bottom: 4cqi; left: 3.2cqi; width: 30%; max-height: none; justify-content: center; }
-.spread--right .spread__words { top: 4cqi; bottom: 4cqi; right: 3.2cqi; width: 30%; max-height: none; justify-content: center; }
+/* advisor: a content-height panel, not a full-height column over the picture. */
+.spread--left .spread__words { top: 50%; transform: translateY(-50%); left: 3.2cqi; width: 32%; max-height: 80%; }
+.spread--right .spread__words { top: 50%; transform: translateY(-50%); right: 3.2cqi; width: 32%; max-height: 80%; }
 
 /* display pages: one line, set huge */
 .spread--big .spread__words { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.6rem, 5.2cqi, 4rem); line-height: 1.12; text-align: center; letter-spacing: -0.01em; }

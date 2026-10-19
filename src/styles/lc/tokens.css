@@ -62,9 +62,10 @@
   --science: #0d8063;
   --science-tint: #dcf3ea;
   --science-deep: #075c46;
-  --make: #b5179e;
-  --make-tint: #f9e1f4;
-  --make-deep: #7d0f6c;
+  /* advisor: muted plum, not hot magenta */
+  --make: #75465e;
+  --make-tint: #f3e6ec;
+  --make-deep: #4f2c3e;
 
   --gold: #f2a900;
   --gold-tint: #fff1c9;

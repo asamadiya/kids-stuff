@@ -37,7 +37,8 @@ def encode(png: Path) -> tuple[int, int]:
 
 
 def main() -> int:
-    pngs = [p for r in ROOTS if r.exists() for p in r.rglob('*.png')]
+    # `.old-*` are pictures superseded by a later text fix; never ship them.
+    pngs = [p for r in ROOTS if r.exists() for p in r.rglob('*.png') if '.old-' not in p.name]
     with cf.ThreadPoolExecutor(8) as ex:
         sizes = list(ex.map(encode, pngs))
     a = sum(s[0] for s in sizes)

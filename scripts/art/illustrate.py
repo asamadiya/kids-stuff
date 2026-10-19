@@ -68,7 +68,10 @@ def illustrate(slug: str) -> str:
         png = Path(j['out'])
         if png.exists() and stamps.get(name) not in (None, d):
             # The page's picture was drawn for different words: keep it aside, redraw.
-            png.rename(png.with_suffix(f'.old-{stamps.get(name)}.png'))
+            # Keep the superseded picture OUTSIDE public/, so it can never be encoded or deployed.
+            keep = Path.home() / 'my_stuff/kids-stuff/.redesign/superseded' / slug
+            keep.mkdir(parents=True, exist_ok=True)
+            png.rename(keep / f'{png.stem}.old-{stamps.get(name)}.png')
             png.with_suffix('.webp').unlink(missing_ok=True)
             stale += 1
         stamps[name] = d

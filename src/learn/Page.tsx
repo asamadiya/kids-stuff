@@ -11,13 +11,14 @@ export interface PageProps {
   readonly title: string;
   readonly back?: { readonly href: string; readonly label: string } | null;
   readonly note: GrownUpNote;
-  /** Shown under the title, always visible: what a grown-up should expect here. */
+  /** One line for the grown-ups panel, ahead of the note's own "what to expect". */
   readonly expect?: string;
+  /** Retained for call sites; the decorative band was removed on the advisor's ruling. */
   readonly band?: 'stories' | 'maths' | 'science' | 'make';
   readonly children: ReactNode;
 }
 
-export function Page({ title, back, note, expect, band = 'stories', children }: PageProps) {
+export function Page({ title, back, note, expect, children }: PageProps) {
   return (
     <main id="main-content" className="lc-page" tabIndex={-1}>
       <header className="lc-top">
@@ -27,14 +28,8 @@ export function Page({ title, back, note, expect, band = 'stories', children }: 
           </a>
         ) : null}
         <h1 className="lc-top__title">{title}</h1>
-        <GrownUps note={note} title={title} />
+        <GrownUps note={expect ? { ...note, expect: `${expect} ${note.expect}` } : note} title={title} />
       </header>
-      <div className={`lc-band lc-band--${band}`} aria-hidden="true" />
-      {expect ? (
-        <p className="expect-line">
-          <b>What to expect</b> <span>{expect}</span>
-        </p>
-      ) : null}
       {children}
     </main>
   );
