@@ -12,7 +12,10 @@ import { Choice } from '../../play/parts';
  *
  * Screens are untimed (charter 1), so the card never disappears. The pull
  * towards seeing rather than counting comes from the arrangements themselves
- * and from the hint, which colours the parts instead of numbering the dots.
+ * and from the hint, which colours the parts instead of numbering the dots,
+ * and writes each part's number beside its group so the hint is seen, not
+ * read. A right answer leaves the worked card up, so the regrouping the
+ * explain line names (move three across: ten and six) is on the board.
  *
  * Levels:
  *  1. Up to five: dice patterns, a row, two scattered clusters (3 to 5).
@@ -338,7 +341,10 @@ function cardName(round: Round): string {
 function DotCard({ round, stage }: { readonly round: Round; readonly stage: BoardProps<Round, Answer>['stage'] }) {
   const card = layout(round);
   const parted = stage !== 'answering';
-  const worked = stage === 'worked';
+  // The worked answer and a right answer draw the same card: each part's
+  // number by its dots and, on two frames, the dots moved across to make ten.
+  // The explain line says "move 3 across: 10 and 6", so the board must show it.
+  const worked = stage === 'worked' || stage === 'solved';
   const [a, b] = round.parts;
   const m = gap(round);
   const [f1, f2] = card.frames;
@@ -353,7 +359,7 @@ function DotCard({ round, stage }: { readonly round: Round; readonly stage: Boar
   const label = worked
     ? `${cardName(round)}: ${a} and ${b}, ${round.total} altogether.`
     : parted
-      ? `${cardName(round)}, in two colours.`
+      ? `${cardName(round)}, in two colours: ${a} and ${b}.`
       : `${cardName(round)}.`;
 
   return (
@@ -396,19 +402,21 @@ function DotCard({ round, stage }: { readonly round: Round; readonly stage: Boar
           <path d={`M${f1.x + f1.size * 5 - 30} 40 l17 -6 l-9 -10 z`} fill={INK} />
         </g>
       ) : null}
-      {worked
-        ? round.layout === 'frames'
-          ? [m > 0 ? '10' : String(a), String(b - m)].map((t, i) => (
-              <text key={`l${i}`} x={spots[i].x} y={spots[i].y} textAnchor="middle" dominantBaseline="middle" fontSize="34" fontWeight="700" fill={INK}>
-                {t}
-              </text>
-            ))
-          : [a, b].map((n, i) => (
-              <text key={`l${i}`} x={spots[i].x} y={spots[i].y} textAnchor="middle" dominantBaseline="middle" fontSize="38" fontWeight="700" fill={PART[i]}>
+      {/* The hint's two numbers sit by the groups they count, so the hint is
+          seen on the card rather than read under it. */}
+      {worked && round.layout === 'frames'
+        ? [m > 0 ? '10' : String(a), String(b - m)].map((t, i) => (
+            <text key={`l${i}`} x={spots[i].x} y={spots[i].y} textAnchor="middle" dominantBaseline="middle" fontSize="34" fontWeight="700" fill={INK}>
+              {t}
+            </text>
+          ))
+        : parted
+          ? [a, b].map((n, i) => (
+              <text key={`l${i}`} x={spots[i].x} y={spots[i].y} textAnchor="middle" dominantBaseline="middle" fontSize={round.layout === 'frames' ? 34 : 38} fontWeight="700" fill={PART[i]}>
                 {n}
               </text>
             ))
-        : null}
+          : null}
     </svg>
   );
 }

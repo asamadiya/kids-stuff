@@ -665,6 +665,100 @@ function Caption({ x, y, children }: { readonly x: number; readonly y: number; r
   );
 }
 
+/** A drawn answer with its word kept small underneath, for a child who cannot read it yet. */
+function Pic({ label, children }: { readonly label: string; readonly children: ReactNode }) {
+  return (
+    <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' }}>
+      {children}
+      <span style={{ fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 }}>{label}</span>
+    </span>
+  );
+}
+
+const GOLD = '#f2a900';
+const SKIN = '#c68a5c';
+const HAIR = '#2b1a10';
+/** Arjun's shirt, Mia's shirt: the same colours on the board and on the answer buttons. */
+const SHIRT = ['#2a7f62', '#c2457f'] as const;
+
+/** Arjun (short hair, green shirt) or Mia (two plaits, pink shirt), drawn in a 60 x 60 box at (x, y). */
+function Kid({ who, x = 0, y = 0 }: { readonly who: 0 | 1; readonly x?: number; readonly y?: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      {who === 1 ? (
+        <g>
+          <circle cx={13} cy={30} r={6.5} fill={HAIR} />
+          <circle cx={47} cy={30} r={6.5} fill={HAIR} />
+          <circle cx={13} cy={37} r={2.6} fill={SHIRT[1]} />
+          <circle cx={47} cy={37} r={2.6} fill={SHIRT[1]} />
+        </g>
+      ) : null}
+      <path d="M7 60 Q7 43 30 43 Q53 43 53 60 Z" fill={SHIRT[who]} stroke={INK} strokeWidth={2} />
+      <circle cx={30} cy={27} r={15} fill={SKIN} stroke={INK} strokeWidth={2} />
+      <path
+        d={who === 0 ? 'M15 25 Q15 10 30 10 Q45 10 45 25 Q40 17 30 18 Q20 17 15 25 Z' : 'M15 28 Q14 10 30 10 Q46 10 45 28 Q43 19 36 17 Q29 22 21 18 Q16 21 15 28 Z'}
+        fill={HAIR}
+      />
+      <circle cx={24.5} cy={28} r={1.9} fill={INK} />
+      <circle cx={35.5} cy={28} r={1.9} fill={INK} />
+      <path d="M25 34 Q30 38.5 35 34" fill="none" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Arjun = Mia: both children with an equals sign between them, 150 x 60. */
+function BothKids() {
+  return (
+    <g>
+      <Kid who={0} />
+      <rect x={65} y={22} width={20} height={5} rx={2} fill={INK} />
+      <rect x={65} y={33} width={20} height={5} rx={2} fill={INK} />
+      <Kid who={1} x={90} />
+    </g>
+  );
+}
+
+/** A cut roti's pieces pulled a little apart from the centre, so their sizes sit side by side. */
+function Apart({ cut, c, R }: { readonly cut: Cut; readonly c: Pt; readonly R: number }) {
+  const pieces = cutRoti(cut).pieces.map((p) => {
+    const [x, y] = centroid(p);
+    const g = 0.22 / Math.hypot(x, y);
+    return p.map(([px, py]): Pt => [px + x * g, py + y * g]);
+  });
+  return <Roti c={c} R={R} pieces={pieces} whole={false} />;
+}
+
+/** The answer pictures for a judge round: the same number of pieces, all equal or not. */
+const UNEQUAL: Record<Parts, Cut> = { 2: strips([0.42]), 3: fan([160, 110, 90]), 4: fan([130, 60, 100, 70]) };
+
+/** Where loose piece j of a 2 x 2 pile has its point, in pixels; the pile's top-left corner is `o`. */
+function pileSpot(j: number, R: number, o: Pt, g: number): Pt {
+  const half = 0.866 * R;
+  return [o[0] + g / 2 + half + (j % 2) * (2 * half + g), o[1] + g / 2 + R + Math.floor(j / 2) * (R + g)];
+}
+
+/**
+ * `count` loose 1/unit pieces in a 2 x 2 pile, top row first: 2 * (1.73R + g)
+ * wide, 2 * (R + g) tall. `moved`: the pieces have been laid on the roti, so
+ * only their dashed outlines stay behind and nothing is counted twice.
+ */
+function Pile({ unit, count, R, o, g, fractions, moved }: { readonly unit: 3 | 4; readonly count: number; readonly R: number; readonly o: Pt; readonly g: number; readonly fractions?: boolean; readonly moved?: boolean }) {
+  const piece = sector(360 - 180 / unit, 360 + 180 / unit);
+  return (
+    <g>
+      {Array.from({ length: count }, (_, j) => {
+        const at = pileSpot(j, R, o, g);
+        return (
+          <g key={j}>
+            <Roti c={at} R={R} pieces={[piece]} solid={[!moved]} whole={false} />
+            {fractions ? <Frac at={labelAt(piece, at, R)} n={unit} size={R / 4.6} /> : null}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 /** How many unit pieces the cover board lays down at this stage. */
 function coverCount(round: Extract<Round, { kind: 'cover' }>, answer: Answer, stage: BoardProps<Round, Answer>['stage']): number {
   if (stage === 'worked') return needed(round);
@@ -735,8 +829,20 @@ function JudgeBoard(p: Sub<'judge'>) {
         ) : null}
       </Svg>
       <div className="choices">
-        <Choice {...choose(0, right, p)}>{`Yes, ${PLURAL[round.n]}`}</Choice>
-        <Choice {...choose(1, right, p)}>No, not equal</Choice>
+        <Choice {...choose(0, right, p)}>
+          <Pic label={`Yes, ${PLURAL[round.n]}`}>
+            <Svg w={110} h={110} width={96}>
+              <Apart cut={FAIR[round.n](0)} c={[55, 55]} R={38} />
+            </Svg>
+          </Pic>
+        </Choice>
+        <Choice {...choose(1, right, p)}>
+          <Pic label="No, not equal">
+            <Svg w={110} h={110} width={96}>
+              <Apart cut={UNEQUAL[round.n]} c={[55, 55]} R={38} />
+            </Svg>
+          </Pic>
+        </Choice>
       </div>
       {worked ? <Worked round={round} /> : null}
     </div>
@@ -744,22 +850,32 @@ function JudgeBoard(p: Sub<'judge'>) {
 }
 
 function CompareBoard(p: Sub<'compare'>) {
-  const { round, stage } = p;
+  const { round, answer, stage } = p;
   const right = correct(round);
   const shares = [round.a, round.b] as const;
   const { from, onto } = laying(round);
   const C: readonly Pt[] = [[170, 160], [490, 160]];
   const R = 120;
+  // The child he tapped gets a gold ring round their thali (both, for "the same").
+  const ringed = stage === 'worked' ? right : answer;
   return (
     <div className="board board--roti">
-      <Svg w={660} h={340} width={600} label={`Arjun has ${said(round.a)}. Mia has ${said(round.b)}.`}>
+      <Svg w={660} h={390} width={600} label={`Arjun has ${said(round.a)}. Mia has ${said(round.b)}.`}>
         {shares.map((s, i) => (
           <ShareView key={i} s={s} c={C[i]} R={R} />
         ))}
+        {shares.map((s, i) =>
+          ringed === i || ringed === 2 ? (
+            <circle key={i} cx={C[i][0]} cy={C[i][1]} r={R * (s.small ? SMALL : 1) * 1.14 + 9} fill="none" stroke={GOLD} strokeWidth={7} />
+          ) : null,
+        )}
         {shares.map((_, i) => (
-          <Caption key={i} x={C[i][0]} y={330}>
-            {WHO[i]}
-          </Caption>
+          <g key={i}>
+            <Kid who={i as 0 | 1} x={C[i][0] - 78} y={318} />
+            <Caption x={C[i][0] + 28} y={360}>
+              {WHO[i]}
+            </Caption>
+          </g>
         ))}
         {stage === 'hint' || stage === 'worked'
           ? layOn(shares[from], shares[onto]).map((pts, j) => <Overlay key={j} pts={pts} c={C[onto]} R={R} />)
@@ -767,9 +883,27 @@ function CompareBoard(p: Sub<'compare'>) {
         {stage === 'worked' ? shares.map((s, i) => <ShareLabels key={i} s={s} c={C[i]} R={R} />) : null}
       </Svg>
       <div className="choices">
-        <Choice {...choose(0, right, p)}>Arjun</Choice>
-        <Choice {...choose(1, right, p)}>Mia</Choice>
-        <Choice {...choose(2, right, p)}>The same</Choice>
+        <Choice {...choose(0, right, p)} ariaLabel="Arjun has more">
+          <Pic label="Arjun">
+            <Svg w={60} h={60} width={72}>
+              <Kid who={0} />
+            </Svg>
+          </Pic>
+        </Choice>
+        <Choice {...choose(1, right, p)} ariaLabel="Mia has more">
+          <Pic label="Mia">
+            <Svg w={60} h={60} width={72}>
+              <Kid who={1} />
+            </Svg>
+          </Pic>
+        </Choice>
+        <Choice {...choose(2, right, p)} ariaLabel="The same">
+          <Pic label="The same">
+            <Svg w={150} h={60} width={150}>
+              <BothKids />
+            </Svg>
+          </Pic>
+        </Choice>
       </div>
       {stage === 'worked' ? <Worked round={round} /> : null}
     </div>
@@ -784,18 +918,23 @@ function CoverBoard(p: Sub<'cover'>) {
   const target = half ? share(2, 1, 270) : share(1, 1, 0);
   const from = half ? 270 : 0;
   const count = coverCount(round, answer, stage);
-  const c: Pt = [180, 170];
-  const R = 130;
-  // One loose piece of the unit beside the roti, same scale, so "a quarter" is
-  // on the board before any hint: the question is how many of THIS fill that.
-  const sample = sector(360 - 180 / round.unit, 360 + 180 / round.unit);
-  const at: Pt = [480, 245];
+  // The pieces he has chosen sit loose beside the roti, same scale, from his
+  // first tap: one before he chooses, so "a quarter" is on the board before
+  // any hint. The question is how many of THESE fill that.
+  const loose = stage === 'worked' ? needed(round) : answer === null ? 1 : round.choices[answer];
+  const c: Pt = [140, 152];
+  const R = 110;
+  const pile: Pt = [292, 30];
   return (
     <div className="board board--roti">
-      <Svg w={600} h={340} width={480} label={`${half ? 'Half of a roti' : 'A whole roti'} on a thali, and one ${UNIT[round.unit]} of a roti beside it.`}>
+      <Svg
+        w={710}
+        h={300}
+        width={560}
+        label={`${half ? 'Half of a roti' : 'A whole roti'} on a thali, and ${WORD[loose]} ${loose === 1 ? UNIT[round.unit] : PLURAL[round.unit]} of a roti beside it.`}
+      >
         <ShareView s={target} c={c} R={R} />
-        <Roti c={at} R={R} pieces={[sample]} whole={false} />
-        <Frac at={labelAt(sample, at, R)} n={round.unit} size={R / 4.6} />
+        <Pile unit={round.unit} count={loose} R={R} o={pile} g={14} fractions moved={count > 0} />
         {laid(round.unit, count, from).map((pts, j) => (
           <Overlay key={j} pts={pts} c={c} R={R} red={over(j, round.unit, amount(target))} />
         ))}
@@ -810,7 +949,12 @@ function CoverBoard(p: Sub<'cover'>) {
       <div className="choices">
         {round.choices.map((n, i) => (
           <Choice key={n} {...choose(i, right, p)} ariaLabel={`${n} ${n === 1 ? UNIT[round.unit] : PLURAL[round.unit]}`}>
-            {n}
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' }}>
+              <Svg w={160} h={100} width={96}>
+                <Pile unit={round.unit} count={n} R={40} o={[0, 0]} g={10} />
+              </Svg>
+              <span>{n}</span>
+            </span>
           </Choice>
         ))}
       </div>
@@ -819,15 +963,18 @@ function CoverBoard(p: Sub<'cover'>) {
   );
 }
 
-/** Mia's two quarters, loose: two separate pieces, not yet put together, named underneath. */
+/** Mia beside her two quarters: two separate pieces, not yet put together, named underneath. */
 function LooseQuarters() {
   const R = 100;
   const piece = [sector(315, 405)];
   return (
-    <Svg w={340} h={170} width={280} label="Mia's two quarters of a roti, side by side.">
-      <Roti c={[90, 115]} R={R} pieces={piece} whole={false} />
-      <Roti c={[250, 115]} R={R} pieces={piece} whole={false} />
-      <Caption x={170} y={158}>Mia&rsquo;s two quarters</Caption>
+    <Svg w={420} h={170} width={340} label="Mia's two quarters of a roti, side by side.">
+      <g transform="translate(0 38) scale(1.5)">
+        <Kid who={1} />
+      </g>
+      <Roti c={[170, 115]} R={R} pieces={piece} whole={false} />
+      <Roti c={[330, 115]} R={R} pieces={piece} whole={false} />
+      <Caption x={250} y={158}>Mia&rsquo;s two quarters</Caption>
     </Svg>
   );
 }

@@ -28,11 +28,21 @@ import { Piece } from '../../play/parts';
  *     eggs a row should get.
  *
  * Control: tap-to-add/remove only. Each nest has its own "put an egg in"
- * piece (in the tray, every empty cup of a row is one); tapping an egg he
- * placed takes it back out. Brown eggs already in a nest are fixed. In share and group
- * rounds the eggs come out of a basket, so the basket runs out. No numbers
- * are shown while he answers; counts appear on 'hint', and the full solution
- * with its equation on 'worked'. Every state is a fixed drawing.
+ * piece (in the tray, the next empty cup of a row, marked +, so the egg lands
+ * where he tapped); tapping an egg he placed takes it back out. Brown eggs
+ * already in a nest are fixed. In share and group rounds the eggs come out of
+ * a basket, so the basket runs out.
+ *
+ * Nothing he needs is only in the words. When the question gives the eggs
+ * per nest (make, group), a pattern nest drawn with that many eggs sits above
+ * the nests, eggs in the same two columns as a real nest (in the tray, a
+ * pattern row whose eggs stand over the tray's own columns), so "is this nest
+ * right?" is a side-by-side match, not a number to remember. No numbers are
+ * shown while he answers; counts appear on 'hint', and the full solution
+ * with its equation on 'worked'. Once a tray is finished, the same array is
+ * drawn twice, boxed as rows and boxed as columns, so "4 rows of 6 is 6
+ * columns of 4" is on the board, not only in a sentence. Every state is a
+ * fixed drawing.
  */
 
 export type Kind = 'make' | 'share' | 'group';
@@ -209,9 +219,9 @@ const BROWN_EGG = '#c98a4e';
 const EGG_PATH = 'M20 3C31 3 37 19 37 30C37 40 29 46 20 46C11 46 3 40 3 30C3 19 9 3 20 3Z';
 
 /** One egg, upright. Brown for the eggs already in a nest, white for the ones he adds. */
-function Egg({ brown = false }: { readonly brown?: boolean }) {
+function Egg({ brown = false, size = 44 }: { readonly brown?: boolean; readonly size?: number }) {
   return (
-    <svg viewBox="0 0 40 48" aria-hidden="true">
+    <svg viewBox="0 0 40 48" width={size} height={size} aria-hidden="true">
       <path d={EGG_PATH} fill={brown ? BROWN_EGG : WHITE_EGG} stroke={INK} strokeWidth="2.5" />
       <ellipse cx="14" cy="19" rx="3.5" ry="7" fill="#ffffff" opacity="0.55" />
     </svg>
@@ -264,6 +274,21 @@ const trayStyle: CSSProperties = {
   background: '#cfc6b6', border: '4px solid #8c8270', borderRadius: 'var(--radius-sm)',
 };
 const cup: CSSProperties = { width: 44, height: 44, borderRadius: '50%', background: '#bdb2a0', boxShadow: 'inset 0 4px 8px rgba(36,23,15,0.25)' };
+/**
+ * The box a Piece takes up (tap size, padding, border) with none of its button
+ * look. Drawn eggs and plain cups sit in these, so a pattern egg or an empty
+ * cup stands in exactly the column a placed egg would.
+ */
+const cell: CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none',
+  minWidth: 'var(--tap)', minHeight: 'var(--tap)', padding: 'var(--s2)', border: 'var(--line) solid transparent',
+};
+const patternCard: CSSProperties = { ...nestCard, background: '#f6ead6', border: '4px dashed #8a5a2b', boxShadow: 'none' };
+const patternTray: CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 'var(--s2)', padding: 'var(--s3)', overflowX: 'auto',
+  background: '#efe9de', border: '4px dashed #8c8270', borderRadius: 'var(--radius-sm)',
+};
+const patternLabel: CSSProperties = { margin: 0, fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)' };
 
 /** What each nest shows: eggs that were already there, eggs he added, and whether he may change it. */
 interface NestView {
@@ -322,10 +347,63 @@ function Nest({ v }: { readonly v: NestView }) {
 const rowLine: CSSProperties = { display: 'flex', alignItems: 'center', gap: 'var(--s2)' };
 const rowCount: CSSProperties = { ...count, minWidth: '2.5ch', textAlign: 'center' };
 
-/** One row of the egg tray: ROW_MAX cups, eggs packed from the left so the columns line up. */
+/**
+ * The size of one group, drawn: a nest with exactly `each` eggs, dashed and
+ * pale so it reads as a picture and not a nest to fill, with no button. Its
+ * eggs wrap in the same two columns as a real nest's, so a finished nest and
+ * the pattern look alike egg for egg.
+ */
+function PatternNest({ each, showCount }: { readonly each: number; readonly showCount: boolean }) {
+  return (
+    <div style={patternCard} role="img" aria-label={`Every nest holds ${each} eggs, like this`}>
+      <div style={eggArea}>
+        {Array.from({ length: each }, (_, k) => (
+          <span key={k} style={cell}>
+            <Egg />
+          </span>
+        ))}
+      </div>
+      <Twigs />
+      {showCount ? <p style={count}>{each}</p> : null}
+      <p style={patternLabel}>every nest like this</p>
+    </div>
+  );
+}
+
+/** The size of one row, drawn over the tray: `each` eggs standing in the tray's own columns. */
+function PatternRow({ each, showCount }: { readonly each: number; readonly showCount: boolean }) {
+  return (
+    <div style={patternTray} role="img" aria-label={`Every row holds ${each} eggs, like this`}>
+      {Array.from({ length: each }, (_, k) => (
+        <span key={k} style={cell}>
+          <Egg />
+        </span>
+      ))}
+      {showCount ? <span style={rowCount}>{each}</span> : null}
+      <span style={patternLabel}>every row like this</span>
+    </div>
+  );
+}
+
+/** The next empty cup of a row, as the button: a cup with a plus in it. */
+function AddCup() {
+  return (
+    <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
+      <circle cx="22" cy="22" r="20" fill="#bdb2a0" stroke="#8c8270" strokeWidth="2" />
+      <path d="M22 11V33M11 22H33" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * One row of the egg tray: ROW_MAX cups, eggs packed from the left so the
+ * columns line up. Only the next empty cup is a button; the cups after it are
+ * part of the drawing, so the one thing to tap is the one place an egg lands.
+ */
 function TrayRow({ v }: { readonly v: NestView }) {
   const name = `row ${v.i + 1}`;
   const empty = Math.max(0, ROW_MAX - v.given - v.added);
+  const plain = v.canAdd ? empty - 1 : empty;
   return (
     <div style={rowLine} role="group" aria-label={`Row ${v.i + 1}`}>
       {Array.from({ length: v.given }, (_, k) => (
@@ -343,10 +421,15 @@ function TrayRow({ v }: { readonly v: NestView }) {
           <Egg />
         </Piece>
       ))}
-      {Array.from({ length: empty }, (_, k) => (
-        <Piece key={`e${k}`} tone={v.canAdd ? 'source' : 'ghost'} onTap={v.canAdd ? v.add : undefined} ariaLabel={`Put an egg in ${name}`}>
-          <span style={cup} />
+      {v.canAdd ? (
+        <Piece tone="source" onTap={v.add} ariaLabel={`Put an egg in ${name}`}>
+          <AddCup />
         </Piece>
+      ) : null}
+      {Array.from({ length: plain }, (_, k) => (
+        <span key={`e${k}`} style={cell} aria-hidden="true">
+          <span style={cup} />
+        </span>
       ))}
       {v.showCount ? <span style={rowCount}>{v.given + v.added}</span> : null}
     </div>
@@ -356,6 +439,51 @@ function TrayRow({ v }: { readonly v: NestView }) {
 const equationStyle: CSSProperties = {
   margin: 0, textAlign: 'center', fontWeight: 700, fontSize: 'var(--t-xl)', color: 'var(--maths-deep)',
 };
+
+/**
+ * The finished array drawn twice, side by side: once with each row ringed,
+ * once with each column ringed. The same eggs in the same places, so "4 rows
+ * of 6 is 6 columns of 4" is something he can see, not a sentence.
+ */
+function RowsAndColumns({ rows, cols }: { readonly rows: number; readonly cols: number }) {
+  const step = 26;
+  const pad = 14;
+  const w = cols * step + pad * 2;
+  const h = rows * step + pad * 2;
+  const gap = 56;
+  const width = w * 2 + gap;
+  const height = h + 30;
+  const at = (r: number, c: number) => ({ x: pad + c * step + step / 2, y: pad + r * step + step / 2 });
+  const eggs = (dx: number) =>
+    Array.from({ length: rows * cols }, (_, k) => {
+      const p = at(Math.floor(k / cols), k % cols);
+      return <ellipse key={k} cx={dx + p.x} cy={p.y} rx="7" ry="9" fill={WHITE_EGG} stroke={INK} strokeWidth="2" />;
+    });
+  const ring = { fill: 'none', strokeWidth: 3 } as const;
+  return (
+    <svg
+      className="board-svg"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label={`${rows} rows of ${cols} eggs are the same eggs as ${cols} columns of ${rows}`}
+      style={{ maxWidth: 480, alignSelf: 'center' }}
+    >
+      <rect x="2" y="2" width={w - 4} height={h - 4} rx="12" fill="#efe9de" stroke="#8c8270" strokeWidth="2" />
+      {Array.from({ length: rows }, (_, r) => (
+        <rect key={`r${r}`} x={pad + 2} y={pad + r * step + 2} width={cols * step - 4} height={step - 4} rx="11" style={{ ...ring, stroke: 'var(--maths)' }} />
+      ))}
+      {eggs(0)}
+      <text x={w + gap / 2} y={h / 2 + 12} textAnchor="middle" fontSize="36" fontWeight="700" fill={INK}>=</text>
+      <rect x={w + gap + 2} y="2" width={w - 4} height={h - 4} rx="12" fill="#efe9de" stroke="#8c8270" strokeWidth="2" />
+      {Array.from({ length: cols }, (_, c) => (
+        <rect key={`c${c}`} x={w + gap + pad + c * step + 2} y={pad + 2} width={step - 4} height={rows * step - 4} rx="11" style={{ ...ring, stroke: 'var(--ones)' }} />
+      ))}
+      {eggs(w + gap)}
+      <text x={w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{`${rows} rows of ${cols}`}</text>
+      <text x={w + gap + w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{`${cols} columns of ${rows}`}</text>
+    </svg>
+  );
+}
 
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
@@ -382,10 +510,19 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const given = sum(round.start) > 0;
   const n = noun(round);
   const { size, filled } = shape(round);
+  // The question's group size, drawn, whenever the question gives it.
+  const pattern = round.kind !== 'share';
+  const finishedTray = round.layout === 'rows' && (worked || stage === 'solved');
 
   return (
     <div className="board">
       {hasBasket ? <Basket left={left} showCount={showCount} /> : null}
+      {pattern && round.layout === 'nests' ? (
+        <div className="board-row">
+          <PatternNest each={round.each} showCount={showCount} />
+        </div>
+      ) : null}
+      {pattern && round.layout === 'rows' ? <PatternRow each={round.each} showCount={showCount} /> : null}
       {round.layout === 'nests' ? (
         <div className="board-row">
           {views.map((v) => (
@@ -400,7 +537,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         </div>
       )}
       {given && !worked ? <p className="board-caption">Brown eggs were already there. They stay.</p> : null}
-      {round.layout === 'rows' && !worked ? <p className="board-caption">Tap an empty cup to put an egg in that row.</p> : null}
+      {round.layout === 'rows' && !locked ? <p className="board-caption">Tap + to put an egg in that row.</p> : null}
+      {finishedTray && filled > 0 ? <RowsAndColumns rows={filled} cols={size} /> : null}
       {worked ? (
         <>
           <p style={equationStyle}>{equation(round)}</p>

@@ -27,7 +27,10 @@ import { Choice } from '../../play/parts';
  *     to tell a change that cannot alter the number (moving) from one that
  *     does (taking away) and combine it with the Before pairs.
  *
- * Control: tap-to-choose only (More blue / The same / More orange).
+ * Control: tap-to-choose only (More blue / The same / More orange). Each
+ * choice is a picture first: small blue dinosaurs over orange ones, partners
+ * joined by a line, the one with no partner ringed in gold (as on the worked
+ * board); the words sit underneath, small.
  * Evidence, from 'hint' on: the Before strip writes each row's count; two
  * rows now get one line from each blue dinosaur to one orange (lines never
  * cross, and no line runs under a dinosaur it does not join); an empty spot
@@ -624,21 +627,43 @@ const CHOICES: ReadonlyArray<readonly [Exclude<Answer, null>, string]> = [
   ['orange', 'More orange'],
 ];
 
-function Swatch({ answer }: { readonly answer: Exclude<Answer, null> }) {
-  const dot = (colour: Colour, cx: number) => <circle cx={cx} cy="14" r="11" fill={FILL[colour]} stroke={INK} strokeWidth="2.5" />;
+/** How many of each colour an answer's picture draws: one extra for "more", none for "the same". */
+const OUTCOME: Record<Exclude<Answer, null>, Record<Colour, number>> = {
+  blue: { blue: 3, orange: 2 },
+  same: { blue: 3, orange: 3 },
+  orange: { blue: 2, orange: 3 },
+};
+
+/**
+ * The answer as a picture, drawn the way the Before strip is: blue dinosaurs
+ * above orange, partners joined by a line, and a dinosaur with no partner
+ * ringed in gold as on the worked board. "The same" has every one joined.
+ */
+function OutcomePicture({ answer }: { readonly answer: Exclude<Answer, null> }) {
+  const n = OUTCOME[answer];
+  const pairs = Math.min(n.blue, n.orange);
+  const y: Record<Colour, number> = { blue: 17, orange: 49 };
+  const x = (i: number) => 17 + i * 29;
   return (
-    <svg viewBox="0 0 54 28" width="54" height="28" aria-hidden="true">
-      {answer === 'same' ? (
-        <>
-          {dot('blue', 14)}
-          {dot('orange', 40)}
-        </>
-      ) : (
-        dot(answer, 27)
+    <svg viewBox="0 0 92 66" width="104" height="75" aria-hidden="true">
+      {Array.from({ length: pairs }, (_, i) => (
+        <line key={`l${i}`} x1={x(i)} y1={y.blue + 11} x2={x(i)} y2={y.orange - 11} stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      ))}
+      {COLOURS.flatMap((c) =>
+        Array.from({ length: n[c] }, (_, i) => (
+          <g key={`${c}${i}`} transform={`translate(${x(i)} ${y[c]})`}>
+            {i >= pairs ? <circle r="14.5" fill="none" stroke={GOLD} strokeWidth="3.5" /> : null}
+            <circle r="11" fill={FILL[c]} stroke={INK} strokeWidth="2.5" />
+            <path d={DINO} transform="scale(0.45)" fill={PAPER} />
+          </g>
+        )),
       )}
     </svg>
   );
 }
+
+const CHOICE_FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' } as const;
+const CHOICE_WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)' } as const;
 
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
@@ -656,8 +681,10 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             disabled={locked}
             mark={locked && value === right ? 'right' : null}
           >
-            <Swatch answer={value} />
-            {label}
+            <span style={CHOICE_FACE}>
+              <OutcomePicture answer={value} />
+              <span style={CHOICE_WORD}>{label}</span>
+            </span>
           </Choice>
         ))}
       </div>

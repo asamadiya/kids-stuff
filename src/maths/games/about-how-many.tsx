@@ -30,13 +30,27 @@ import { Choice } from '../../play/parts';
  *     many" as a rule — explain() names this jar's bands, a board fact.
  *
  * Stages: the hint draws the jar of 10's level as gold bands up both jars and
- * a dashed line where the amount he checked would reach. The line stays put
+ * a dashed line where the amount he checked would reach; the bands under the
+ * line are its tens. The line stays put
  * when he taps a new amount, so it is evidence, not a tester he can slide
  * onto the beans. The worked answer (and a
  * right answer) rings every complete ten, counts on beside the jar, and draws
- * a number line with the three amounts and the real count.
+ * a number line with the three amounts and the real count. The count lies
+ * along the line too, one blue-ringed ten per stretch of ten and the loose
+ * beans after, with empty dashed places on to the largest amount, so "30" on
+ * the line is three tens.
  *
- * Control: tap-to-choose only. Three amounts under the jars.
+ * The jar of 10's ten beans are ringed in blue from the start. That ring of
+ * two rows of five is the unit everywhere else: on the buttons, on the card,
+ * round each ten in the reveal and along the number line.
+ *
+ * Control: tap-to-choose only. Three amounts under the jars, each drawn as
+ * that many blue-ringed tens in a frame five wide (top row first, like a
+ * ten-frame, the same number of places in all three) with "about 30" small
+ * underneath. The amount he taps appears at once on a gold card high up
+ * beside the jar he is judging, the same tens in the same frame. The card is
+ * small and fixed in size, so its height is never a ruler for the beans. On
+ * the worked answer the card turns blue and shows the closest amount.
  */
 
 /** Rajma (red kidney beans) or lobia (black-eyed beans): two pantry beans of about the same size. */
@@ -167,6 +181,10 @@ const TENS = '#1c6dd0';
 const TENS_DEEP = '#0f4790';
 const TENS_TINT = '#e2eefc';
 const ONES = '#27813b';
+const GOLD_TINT = '#fff1c9';
+const PLACE = '#cdbfa6';
+const GLASS = '#eef7f6';
+const BRASS = '#c99231';
 const DISPLAY = { fontFamily: 'var(--font-display)' } as const;
 
 /** Bottom of the bean area; the beans settle up from here. */
@@ -241,11 +259,11 @@ function Jar({ g, tag, children }: { readonly g: Geom; readonly tag: string; rea
   const h = BOTTOM + 8 - JAR_TOP;
   return (
     <g>
-      <rect x={g.x} y={JAR_TOP} width={g.w} height={h} rx="18" fill="#eef7f6" />
+      <rect x={g.x} y={JAR_TOP} width={g.w} height={h} rx="18" fill={GLASS} />
       <rect x={g.x + 7} y={JAR_TOP + 16} width="5" height={h - 44} rx="2.5" fill="#ffffff" />
       {children}
       <rect x={g.x} y={JAR_TOP} width={g.w} height={h} rx="18" fill="none" stroke={INK} strokeWidth="4" />
-      <rect x={g.x - 6} y={JAR_TOP - 22} width={g.w + 12} height="24" rx="6" fill="#c99231" stroke={INK} strokeWidth="4" />
+      <rect x={g.x - 6} y={JAR_TOP - 22} width={g.w + 12} height="24" rx="6" fill={BRASS} stroke={INK} strokeWidth="4" />
       <line x1={cx} y1={JAR_TOP - 22} x2={cx} y2="48" stroke={INK_SOFT} strokeWidth="2.5" />
       <rect x={cx - 40} y="12" width="80" height="36" rx="8" fill="#fffaf0" stroke={INK} strokeWidth="3" />
       <text x={cx} y="31" textAnchor="middle" dominantBaseline="central" fontSize="25" fontWeight="700" fill={INK} style={DISPLAY}>
@@ -266,6 +284,133 @@ function Beans({ g, n, bean }: { readonly g: Geom; readonly n: number; readonly 
   );
 }
 
+/** A bean too small to draw as a bean: a dot in its colour. */
+const DOT: Record<Bean, { readonly fill: string; readonly stroke?: string; readonly strokeWidth?: number }> = {
+  rajma: { fill: '#8e1b25' },
+  lobia: { fill: '#f1e6c8', stroke: '#6b5a3a', strokeWidth: 0.8 },
+};
+
+/**
+ * One ten as the jar of 10 holds it: two rows of five beans in a blue ring.
+ * Fewer beans, top row first, in a green ring are loose ones; none at all is
+ * a dashed place where a ten could go.
+ */
+function TenMark({ x, y, w, h, bean, beans = 10 }: {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  readonly bean: Bean;
+  readonly beans?: number;
+}) {
+  const sw = Math.max(1.4, Math.min(3, h / 9));
+  if (beans === 0) {
+    return <rect x={x} y={y} width={w} height={h} rx={h / 3} fill="none" stroke={PLACE} strokeWidth={sw} strokeDasharray={`${2 * sw} ${1.5 * sw}`} />;
+  }
+  const r = Math.min(w / 11, h / 6);
+  const ring = beans === 10 ? TENS : ONES;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx={h / 3} fill={ring} fillOpacity="0.1" stroke={ring} strokeWidth={sw} />
+      {Array.from({ length: beans }, (_, i) => {
+        const cx = x + (w * ((i % 5) + 0.5)) / 5;
+        const cy = y + (h * (Math.floor(i / 5) + 0.5)) / 2;
+        return (
+          <g key={i}>
+            <circle cx={cx} cy={cy} r={r} {...DOT[bean]} />
+            {bean === 'lobia' ? <circle cx={cx} cy={cy} r={r * 0.45} fill="#1f1a17" /> : null}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** Places for tens, five to a row: enough for the largest choice, the same for all three. */
+const placesFor = (round: Round) => Math.ceil(round.choices[2] / 50) * 5;
+
+/** n beans (a whole number of tens) as tens in `places` places, filled top row first, left to right. */
+function TenFrame({ n, places, x, y, w, h, gap, bean }: {
+  readonly n: number;
+  readonly places: number;
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  readonly gap: number;
+  readonly bean: Bean;
+}) {
+  return (
+    <g>
+      {Array.from({ length: places }, (_, k) => (
+        <TenMark key={k} x={x + (k % 5) * (w + gap)} y={y + Math.floor(k / 5) * (h + gap)} w={w} h={h} bean={bean} beans={k < n / 10 ? 10 : 0} />
+      ))}
+    </g>
+  );
+}
+
+/* Button picture: tens 22 x 14, 3 apart, 3 from the edge, five to a row. */
+const PIC_W = 22;
+const PIC_H = 14;
+const PIC_GAP = 3;
+const PIC_PAD = 3;
+const PIC_PX = 120;
+
+/** The picture on an answer button: the amount as tens, in the frame every button shares. */
+function AmountPicture({ n, places, bean }: { readonly n: number; readonly places: number; readonly bean: Bean }) {
+  const rows = places / 5;
+  const vw = 5 * PIC_W + 4 * PIC_GAP + 2 * PIC_PAD;
+  const vh = rows * PIC_H + (rows - 1) * PIC_GAP + 2 * PIC_PAD;
+  return (
+    <svg viewBox={`0 0 ${vw} ${vh}`} width={PIC_PX} height={Math.round((PIC_PX * vh) / vw)} aria-hidden="true">
+      <TenFrame n={n} places={places} x={PIC_PAD} y={PIC_PAD} w={PIC_W} h={PIC_H} gap={PIC_GAP} bean={bean} />
+    </svg>
+  );
+}
+
+/* The card on the shelf: the same frame a little larger, centred in the gap between the jars, below the lids. */
+const CARD_Y = 92;
+const CARD_W = 26;
+const CARD_H = 16;
+const CARD_GAP = 4;
+const CARD_PAD = 6;
+const CARD_OUTER = 5 * CARD_W + 4 * CARD_GAP + 2 * CARD_PAD;
+const cardX = (round: Round) => (REF_X + THIN_W + targetGeom(round).x - CARD_OUTER) / 2;
+
+/**
+ * His amount on the board as soon as he taps it. Its size never changes with
+ * the amount and it stands clear of both jars, so it is not a ruler for the
+ * beans. On the worked answer it turns blue and shows the closest amount.
+ */
+function GuessCard({ x, n, places, bean, shown }: { readonly x: number; readonly n: Answer; readonly places: number; readonly bean: Bean; readonly shown: boolean }) {
+  const rows = places / 5;
+  const frameH = rows * CARD_H + (rows - 1) * CARD_GAP;
+  return (
+    <g>
+      <rect x={x} y={CARD_Y} width={CARD_OUTER} height={frameH + 2 * CARD_PAD + 32} rx="10" fill={shown ? TENS_TINT : GOLD_TINT} stroke={shown ? TENS : INK} strokeWidth="3" />
+      <TenFrame n={n ?? 0} places={places} x={x + CARD_PAD} y={CARD_Y + CARD_PAD} w={CARD_W} h={CARD_H} gap={CARD_GAP} bean={bean} />
+      <text
+        x={x + CARD_OUTER / 2}
+        y={CARD_Y + CARD_PAD + frameH + 20}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="22"
+        fontWeight="700"
+        fill={shown ? TENS_DEEP : INK}
+        style={DISPLAY}
+      >
+        {n === null ? '?' : `about ${n}`}
+      </text>
+    </g>
+  );
+}
+
+/** The ring round the k-th ten of a jar: two rows in a thin jar, one row in a wide one. */
+function tenBox(g: Geom, k: number) {
+  const rowsPerTen = 10 / g.cols;
+  return { x: g.x + 3, y: BOTTOM - (k + 1) * rowsPerTen * ROW + 1.5, width: g.w - 6, height: rowsPerTen * ROW - 3 };
+}
+
 /**
  * The reveal: a blue ring round every complete ten, a green ring round each
  * loose bean, and the count-on beside the jar — 10, 20, 30, then the total.
@@ -283,18 +428,7 @@ function Reveal({ g, n }: { readonly g: Geom; readonly n: number }) {
   return (
     <g>
       {Array.from({ length: tens }, (_, k) => (
-        <rect
-          key={`t${k}`}
-          x={g.x + 3}
-          y={BOTTOM - (k + 1) * rowsPerTen * ROW + 1.5}
-          width={g.w - 6}
-          height={rowsPerTen * ROW - 3}
-          rx="8"
-          fill={TENS}
-          fillOpacity="0.1"
-          stroke={TENS}
-          strokeWidth="3"
-        />
+        <rect key={`t${k}`} {...tenBox(g, k)} rx="8" fill={TENS} fillOpacity="0.1" stroke={TENS} strokeWidth="3" />
       ))}
       {Array.from({ length: n - tens * 10 }, (_, j) => {
         const b = beanAt(g, tens * 10 + j);
@@ -339,39 +473,76 @@ function Bands({ g }: { readonly g: Geom }) {
   );
 }
 
-/** Where his chosen amount would reach in this jar. */
-function AnswerLine({ g, n }: { readonly g: Geom; readonly n: number }) {
+/**
+ * The bottom band ringed in blue exactly as the jar of 10 is: one ring in a
+ * thin jar, one ring in each half of a wide jar. That shows "one band holds
+ * the jar of 10" (and, wide, "one band holds two of them") on the beans,
+ * rather than only saying it. A ring is drawn only round ten real beans.
+ */
+function FirstBand({ g, n }: { readonly g: Geom; readonly n: number }) {
+  const halves = g.cols === 10 ? 2 : 1;
+  const w = g.w / halves;
+  return (
+    <g>
+      {Array.from({ length: halves }, (_, h) => {
+        // Ten beans in this ring: a thin jar needs 10; a wide jar's left half 15 (rows fill across), its right half 20.
+        if (n < (halves === 1 ? 10 : 15 + 5 * h)) return null;
+        const x0 = g.x + (h === 0 ? 3 : h * w + 1.5);
+        const x1 = g.x + (h === halves - 1 ? g.w - 3 : (h + 1) * w - 1.5);
+        return <rect key={h} x={x0} y={BOTTOM - BAND + 1.5} width={x1 - x0} height={BAND - 3} rx="8" fill={TENS} fillOpacity="0.1" stroke={TENS} strokeWidth="3" />;
+      })}
+    </g>
+  );
+}
+
+/** Where his checked amount would reach in this jar, with that amount beside it as tens. */
+function AnswerLine({ g, n, bean }: { readonly g: Geom; readonly n: number; readonly bean: Bean }) {
   const y = levelY(g, n);
+  const tens = n / 10;
+  const rows = Math.ceil(tens / 5);
+  const frameH = rows * CARD_H + (rows - 1) * CARD_GAP;
   return (
     <g>
       <line x1={g.x - 14} x2={g.x + g.w + 14} y1={y} y2={y} stroke={INK} strokeWidth="3" strokeDasharray="10 7" />
       <text x={g.x + g.w + 20} y={y} dominantBaseline="central" fontSize="22" fontWeight="700" fill={INK} style={DISPLAY}>
         {n}
       </text>
+      <TenFrame n={n} places={tens} x={g.x + g.w + 64} y={y - frameH / 2} w={CARD_W} h={CARD_H} gap={CARD_GAP} bean={bean} />
     </g>
   );
 }
 
-/** The kitchen shelf, the jar of 10, and the jar he estimates — one SVG, one scale. */
-function Shelf({ round, stage, answer }: { readonly round: Round; readonly stage: BoardProps<Round, Answer>['stage']; readonly answer: Answer }) {
+/** The kitchen shelf, the jar of 10, the jar he estimates and his amount — one SVG, one scale. */
+function Shelf({ round, stage, answer, tapped }: {
+  readonly round: Round;
+  readonly stage: BoardProps<Round, Answer>['stage'];
+  /** The amount he checked: where the hint's dashed line stays. */
+  readonly answer: Answer;
+  /** The amount he has tapped now: what the card shows. */
+  readonly tapped: Answer;
+}) {
   const ref = geom(REF_X, 'thin');
   const g = targetGeom(round);
   const hint = stage === 'hint';
   const shown = stage === 'worked' || stage === 'solved';
-  const what = `${round.bean === 'rajma' ? 'Red rajma' : 'Black-eyed lobia'} beans. A thin jar holding 10, and a ${round.jar} jar of the same beans.`;
+  const card = shown ? nearest(round) : tapped;
+  const what = `${round.bean === 'rajma' ? 'Red rajma' : 'Black-eyed lobia'} beans. A thin jar holding 10, ringed as one ten, and a ${round.jar} jar of the same beans.`;
+  const cardSays = card === null ? ' No amount on the card yet.' : ` The card shows about ${card}: ${card / 10} rings of ten.`;
   return (
-    <svg className="board-svg" viewBox="0 0 960 500" role="img" aria-label={shown ? `${what} Ringed in tens: ${round.count}.` : what}>
+    <svg className="board-svg" viewBox="0 0 960 500" role="img" aria-label={`${what}${shown ? ` Ringed in tens: ${round.count}.` : ''}${cardSays}`}>
       <rect x="40" y={BOTTOM + 8} width="880" height="22" rx="5" fill="#b07a3c" stroke={INK} strokeWidth="3" />
       <Jar g={ref} tag="10">
         <Beans g={ref} n={10} bean={round.bean} />
         {hint ? <Bands g={ref} /> : null}
-        {shown ? <Reveal g={ref} n={10} /> : null}
+        {shown ? <Reveal g={ref} n={10} /> : <rect {...tenBox(ref, 0)} rx="8" fill={TENS} fillOpacity="0.1" stroke={TENS} strokeWidth="3" />}
       </Jar>
+      <GuessCard x={cardX(round)} n={card} places={placesFor(round)} bean={round.bean} shown={shown} />
       <Jar g={g} tag={shown ? String(round.count) : '?'}>
         <Beans g={g} n={round.count} bean={round.bean} />
         {hint ? <Bands g={g} /> : null}
+        {hint ? <FirstBand g={g} n={round.count} /> : null}
         {shown ? <Reveal g={g} n={round.count} /> : null}
-        {hint && answer !== null ? <AnswerLine g={g} n={answer} /> : null}
+        {hint && answer !== null ? <AnswerLine g={g} n={answer} bean={round.bean} /> : null}
       </Jar>
     </svg>
   );
@@ -380,6 +551,9 @@ function Shelf({ round, stage, answer }: { readonly round: Round; readonly stage
 /**
  * The worked answer's number line: the three amounts as big ticks, the stretch
  * of numbers nearest the right one shaded, and the real count marked inside it.
+ * Under the line the count lies as objects, one ring per stretch of ten: blue
+ * tens, then a green ring of the loose beans, then dashed empty places on to
+ * the end, so each amount's tick sits over that many tens.
  */
 function NumberLine({ round }: { readonly round: Round }) {
   const [a, b, c] = round.choices;
@@ -392,12 +566,15 @@ function NumberLine({ round }: { readonly round: Round }) {
   const from = i === 0 ? 0 : (round.choices[i - 1] + best) / 2;
   const to = i === 2 ? top : (best + round.choices[i + 1]) / 2;
   const Y = 78;
+  const step = x(10) - x(0);
+  const TY = Y + 58;
+  const TH = Math.min(22, 0.6 * step);
   return (
     <svg
       className="board-svg"
-      viewBox="0 0 960 150"
+      viewBox={`0 0 960 ${TY + TH + 12}`}
       role="img"
-      aria-label={`A number line. ${round.count} is nearest to ${best}: closer than to ${[a, b, c].filter((n) => n !== best).join(' or ')}.`}
+      aria-label={`A number line. ${round.count} is nearest to ${best}: closer than to ${[a, b, c].filter((n) => n !== best).join(' or ')}. Under it, ${Math.floor(round.count / 10)} rings of ten and ${round.count % 10} loose.`}
     >
       <rect x={x(from)} y={Y - 22} width={x(to) - x(from)} height="44" rx="8" fill={TENS_TINT} stroke={TENS} strokeWidth="2.5" />
       <line x1={X0} x2={X1} y1={Y} y2={Y} stroke={INK} strokeWidth="4" strokeLinecap="round" />
@@ -409,11 +586,23 @@ function NumberLine({ round }: { readonly round: Round }) {
       </text>
       {round.choices.map((n) => (
         <g key={n}>
+          <line x1={x(n)} x2={x(n)} y1={Y + 48} y2={TY + TH + 6} stroke={n === best ? TENS_DEEP : INK} strokeWidth={n === best ? 3 : 2} strokeDasharray={n === best ? undefined : '5 4'} />
           <line x1={x(n)} x2={x(n)} y1={Y - 16} y2={Y + 16} stroke={n === best ? TENS_DEEP : INK} strokeWidth="4" />
           <text x={x(n)} y={Y + 40} textAnchor="middle" fontSize="22" fontWeight={n === best ? 700 : 600} fill={n === best ? TENS_DEEP : INK} style={DISPLAY}>
             {`about ${n}`}
           </text>
         </g>
+      ))}
+      {Array.from({ length: top / 10 }, (_, k) => (
+        <TenMark
+          key={`r${k}`}
+          x={x(k * 10) + 0.08 * step}
+          y={TY}
+          w={0.84 * step}
+          h={TH}
+          bean={round.bean}
+          beans={Math.max(0, Math.min(10, round.count - 10 * k))}
+        />
       ))}
       <path d={`M${x(round.count)} ${Y - 4} l-10 -18 h20 z`} fill="#8e1b25" stroke={INK} strokeWidth="2" />
       <text x={x(round.count)} y={Y - 32} textAnchor="middle" fontSize="26" fontWeight="700" fill={INK} style={DISPLAY}>
@@ -422,6 +611,10 @@ function NumberLine({ round }: { readonly round: Round }) {
     </svg>
   );
 }
+
+/** A choice button's face: the amount drawn as tens, the words small underneath. */
+const FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' } as const;
+const WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 } as const;
 
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const shown = stage === 'worked' || stage === 'solved';
@@ -432,9 +625,10 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   // sentence ("where 30 beans would reach") would stop describing the board.
   const [checked, setChecked] = useState<Answer>(answer);
   if (stage === 'answering' && checked !== answer) setChecked(answer);
+  const places = placesFor(round);
   return (
     <div className="board board--estimate">
-      <Shelf round={round} stage={stage} answer={checked} />
+      <Shelf round={round} stage={stage} answer={checked} tapped={answer} />
       <div className="choices" role="group" aria-label="About how many">
         {round.choices.map((n) => (
           <Choice
@@ -443,9 +637,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             onTap={() => setAnswer(n)}
             disabled={shown}
             mark={shown && n === best ? 'right' : null}
-            ariaLabel={`About ${n}`}
+            ariaLabel={`About ${n}: ${n / 10} rings of ten`}
           >
-            about {n}
+            <span style={FACE}>
+              <AmountPicture n={n} places={places} bean={round.bean} />
+              <span style={WORD}>about {n}</span>
+            </span>
           </Choice>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Choice } from '../../play/parts';
 
@@ -19,7 +19,11 @@ import { Choice } from '../../play/parts';
  *     5 (ten draws is two fives). Mixed in: a run of one colour, then "which
  *     is likelier next?" — the bag has not changed, so nothing is "due".
  *
- * Control: tap-to-choose only.
+ * Control: tap-to-choose only. Every answer button is a picture (the bag
+ * with the guessed marble coming out; a bag of four for a chance word; a
+ * ten-frame for a tally), its word small underneath, and the tapped picture
+ * appears on the board at once: in the dashed spot, on the chance line, or in
+ * the ten-frame.
  */
 
 export type Colour = 'red' | 'blue' | 'green';
@@ -45,6 +49,9 @@ export type Answer = string | null;
 export type ChanceWord = 'impossible' | 'unlikely' | 'likely' | 'certain';
 /** In the order of the chance line, from cannot happen to must happen. */
 export const WORDS: readonly ChanceWord[] = ['impossible', 'unlikely', 'likely', 'certain'];
+
+/** How many of four marbles each chance word is drawn as: none, one, most, all. */
+const OF_FOUR: Record<ChanceWord, number> = { impossible: 0, unlikely: 1, likely: 3, certain: 4 };
 
 const bag = (red: number, blue: number): Bag => ({ red, blue });
 const size = (b: Bag) => b.red + b.blue;
@@ -214,6 +221,8 @@ const CLOTH = '#f0cf86';
 const CLOTH_EDGE = '#8a5a24';
 const TIE = '#6e2a1f';
 const GOLD = '#f2a900';
+/** The selected Choice's gold, lighter: where the child's pick shows on the board. */
+const GOLD_TINT = '#fff1c9';
 
 /** Ten spots inside the bag body, in SVG units. */
 const POS: ReadonlyArray<readonly [number, number]> = [
@@ -249,11 +258,23 @@ export function inBag(b: Bag): readonly Spot[] {
   return SLOTS[n].map((i) => ({ x: POS[i][0], y: POS[i][1], c: minority.has(i) ? fewer : more }));
 }
 
-function Marble({ x, y, r, c }: { readonly x: number; readonly y: number; readonly r: number; readonly c: Colour }) {
+function Marble({ x, y, r, c, sw = 2.5 }: { readonly x: number; readonly y: number; readonly r: number; readonly c: Colour; readonly sw?: number }) {
   return (
     <g>
-      <circle cx={x} cy={y} r={r} fill={HUE[c]} stroke={INK} strokeWidth="2.5" />
+      <circle cx={x} cy={y} r={r} fill={HUE[c]} stroke={INK} strokeWidth={sw} />
       <circle cx={x - r * 0.36} cy={y - r * 0.36} r={r * 0.27} fill="#ffffff" opacity="0.6" />
+    </g>
+  );
+}
+
+/** The cloth bag alone, in the board's coordinates. `k` thickens the lines for a small copy. */
+function PotliShape({ k = 1 }: { readonly k?: number }) {
+  return (
+    <g>
+      <path d="M118 80 C 34 104, 26 252, 172 258 C 318 252, 310 104, 226 80 Z" fill={CLOTH} stroke={CLOTH_EDGE} strokeWidth={4 * k} />
+      <path d="M120 74 L 102 38 L 134 58 L 152 30 L 172 54 L 192 30 L 210 58 L 242 38 L 224 74 Z" fill={CLOTH} stroke={CLOTH_EDGE} strokeWidth={4 * k} strokeLinejoin="round" />
+      <rect x="112" y="66" width="120" height="16" rx="8" fill={TIE} stroke={INK} strokeWidth={2.5 * k} />
+      <line x1="120" y1="74" x2="224" y2="74" stroke={GOLD} strokeWidth={2 * k} strokeDasharray={`${5 * k} ${6 * k}`} />
     </g>
   );
 }
@@ -262,10 +283,7 @@ function Marble({ x, y, r, c }: { readonly x: number; readonly y: number; readon
 function Potli({ b }: { readonly b: Bag }) {
   return (
     <g>
-      <path d="M118 80 C 34 104, 26 252, 172 258 C 318 252, 310 104, 226 80 Z" fill={CLOTH} stroke={CLOTH_EDGE} strokeWidth="4" />
-      <path d="M120 74 L 102 38 L 134 58 L 152 30 L 172 54 L 192 30 L 210 58 L 242 38 L 224 74 Z" fill={CLOTH} stroke={CLOTH_EDGE} strokeWidth="4" strokeLinejoin="round" />
-      <rect x="112" y="66" width="120" height="16" rx="8" fill={TIE} stroke={INK} strokeWidth="2.5" />
-      <line x1="120" y1="74" x2="224" y2="74" stroke={GOLD} strokeWidth="2" strokeDasharray="5 6" />
+      <PotliShape />
       {inBag(b).map((s, i) => (
         <Marble key={i} x={s.x} y={s.y} r={19} c={s.c} />
       ))}
@@ -319,6 +337,43 @@ function SortedRows({ b, extra, pair }: { readonly b: Bag; readonly extra?: Colo
   );
 }
 
+/** A level 1 or streak answer: the colour that might come out, or both at the same chance. */
+type Pick = 'red' | 'blue' | 'same';
+
+const asPick = (id: string | null): Pick | null => (id === 'red' || id === 'blue' || id === 'same' ? id : null);
+
+/** One marble, or a red and a blue with "=" between them, centred on (x, y). */
+function PickMarbles({ x, y, r, pick, sw = 2.5 }: { readonly x: number; readonly y: number; readonly r: number; readonly pick: Pick; readonly sw?: number }) {
+  if (pick !== 'same') return <Marble x={x} y={y} r={r} c={pick} sw={sw} />;
+  const d = r * 1.6;
+  return (
+    <g>
+      <Marble x={x - d} y={y} r={r} c="red" sw={sw} />
+      <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={r * 1.5} fontWeight="700" fill={INK}>
+        =
+      </text>
+      <Marble x={x + d} y={y} r={r} c="blue" sw={sw} />
+    </g>
+  );
+}
+
+/** A dashed place on the board where the tapped answer appears, gold like the selected button. */
+function PickSpot({ x, y, w, h, filled }: { readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly filled: boolean }) {
+  return (
+    <rect
+      x={x - w / 2}
+      y={y - h / 2}
+      width={w}
+      height={h}
+      rx="12"
+      fill={filled ? GOLD_TINT : '#ffffff'}
+      stroke={filled ? INK : SOFT}
+      strokeWidth="3"
+      strokeDasharray="7 6"
+    />
+  );
+}
+
 /** A curved arrow: the path, then its head. */
 function Arrow({ d, tip }: { readonly d: string; readonly tip: string }) {
   return (
@@ -329,8 +384,8 @@ function Arrow({ d, tip }: { readonly d: string; readonly tip: string }) {
   );
 }
 
-/** Level 1: one marble will come out, unseen. The outcome is never drawn. */
-function OneDraw() {
+/** Level 1: one marble will come out, unseen. The outcome is never drawn; the child's guess sits beside it. */
+function OneDraw({ pick }: { readonly pick: Pick | null }) {
   return (
     <g>
       <Arrow d="M262 60 Q 360 22 444 70" tip="M450 74 l-18 -2 l9 -13 z" />
@@ -341,18 +396,35 @@ function OneDraw() {
       <text x="486" y="138" textAnchor="middle" fontSize="16" fill={SOFT}>
         one comes out, unseen
       </text>
+      <PickSpot x={580} y={86} w={88} h={60} filled={pick !== null} />
+      {pick ? <PickMarbles x={580} y={86} r={pick === 'same' ? 11 : 18} pick={pick} /> : null}
     </g>
   );
 }
 
 const TICK_X = [384, 456, 528, 594] as const;
 
-/** Level 2: the asked colour, and the chance line from cannot to must. */
+/** The marble beside the asked colour in a four-marble picture: the bag's other colour, or red and blue in turn for green. */
+const otherOf = (c: Colour, j: number): 'red' | 'blue' => (c === 'red' ? 'blue' : c === 'blue' ? 'red' : j % 2 === 0 ? 'red' : 'blue');
+
+/** A chance word as four marbles in a row, centred on (x, y): the asked colour first, then the others. */
+function FourOf({ x, y, r, gap, word, c, sw }: { readonly x: number; readonly y: number; readonly r: number; readonly gap: number; readonly word: ChanceWord; readonly c: Colour; readonly sw: number }) {
+  const n = OF_FOUR[word];
+  return (
+    <g>
+      {Array.from({ length: 4 }, (_, j) => (
+        <Marble key={j} x={x - 1.5 * gap + gap * j} y={y} r={r} c={j < n ? c : otherOf(c, j)} sw={sw} />
+      ))}
+    </g>
+  );
+}
+
+/** Level 2: the asked colour, and the chance line from cannot to must, each mark drawn as four marbles. */
 function ChanceLine({ ask, mark }: { readonly ask: Colour; readonly mark: ChanceWord | null }) {
   return (
     <g>
-      <Marble x={372} y={40} r={16} c={ask} />
-      <text x="398" y="46" fontSize="18" fontWeight="700" fill={HUE[ask]}>
+      <Marble x={372} y={26} r={14} c={ask} />
+      <text x="396" y="32" fontSize="18" fontWeight="700" fill={HUE[ask]}>
         {ask}: how likely?
       </text>
       <line x1={TICK_X[0]} y1="86" x2={TICK_X[3]} y2="86" stroke={INK} strokeWidth="4" strokeLinecap="round" />
@@ -360,9 +432,11 @@ function ChanceLine({ ask, mark }: { readonly ask: Colour; readonly mark: Chance
         const on = mark === w;
         return (
           <g key={w}>
-            {on ? <circle cx={TICK_X[i]} cy="86" r="13" fill={GOLD} stroke={INK} strokeWidth="3" /> : null}
-            <line x1={TICK_X[i]} y1="76" x2={TICK_X[i]} y2="96" stroke={INK} strokeWidth="3" />
-            <text x={TICK_X[i]} y="118" textAnchor="middle" fontSize="14" fontWeight={on ? 700 : 400} fill={on ? INK : SOFT}>
+            {on ? <rect x={TICK_X[i] - 30} y="50" width="60" height="58" rx="10" fill={GOLD_TINT} stroke={INK} strokeWidth="2.5" /> : null}
+            <FourOf x={TICK_X[i]} y={64} r={5} gap={12} word={w} c={ask} sw={1.5} />
+            {on ? <circle cx={TICK_X[i]} cy="86" r="11" fill={GOLD} stroke={INK} strokeWidth="3" /> : null}
+            <line x1={TICK_X[i]} y1="78" x2={TICK_X[i]} y2="94" stroke={INK} strokeWidth="3" />
+            <text x={TICK_X[i]} y="122" textAnchor="middle" fontSize="13" fontWeight={on ? 700 : 400} fill={on ? INK : SOFT}>
               {w}
             </text>
           </g>
@@ -372,8 +446,9 @@ function ChanceLine({ ask, mark }: { readonly ask: Colour; readonly mark: Chance
   );
 }
 
-/** Level 3: the run that already came out, each marble put back. */
-function Run({ drawn, run }: { readonly drawn: 'red' | 'blue'; readonly run: number }) {
+/** Level 3: the run that already came out, each marble put back, and the child's guess for the next one. */
+function Run({ drawn, run, pick }: { readonly drawn: 'red' | 'blue'; readonly run: number; readonly pick: Pick | null }) {
+  const nx = 404 + 44 * run;
   return (
     <g>
       {Array.from({ length: run }, (_, i) => (
@@ -384,6 +459,17 @@ function Run({ drawn, run }: { readonly drawn: 'red' | 'blue'; readonly run: num
           <Marble x={392 + 44 * i} y={70} r={16} c={drawn} />
         </g>
       ))}
+      <text x={nx} y="40" textAnchor="middle" fontSize="14" fontWeight="700" fill={INK}>
+        {run + 1}
+      </text>
+      <PickSpot x={nx} y={70} w={64} h={44} filled={pick !== null} />
+      {pick ? (
+        <PickMarbles x={nx} y={70} r={pick === 'same' ? 8 : 16} pick={pick} sw={2} />
+      ) : (
+        <text x={nx} y={72} textAnchor="middle" dominantBaseline="central" fontSize="26" fontWeight="700" fill={SOFT}>
+          ?
+        </text>
+      )}
       <Arrow d="M372 56 Q 320 18 262 54" tip="M256 58 l8 -16 l9 13 z" />
       <text x="372" y="116" fontSize="16" fill={SOFT}>
         each put back in the bag
@@ -392,56 +478,108 @@ function Run({ drawn, run }: { readonly drawn: 'red' | 'blue'; readonly run: num
   );
 }
 
-const CELL = 26;
-const STRIP_X = 360;
+const CELL = 30;
+const FRAME_X = 360;
+const FRAME_Y = 46;
 
-/** Level 3: ten draws as ten boxes. Filled only in the worked answer, as a sorted count, not an order of draws. */
-function TallyStrip({ b, show, fill }: { readonly b: Bag; readonly show: boolean; readonly fill: boolean }) {
+/** Reds in one row of a ten-frame: each row is five draws, the reds shared as evenly as they go. */
+const redsInRow = (red: number, row: 0 | 1) => (row === 0 ? Math.ceil(red / 2) : Math.floor(red / 2));
+
+/**
+ * Level 3: ten draws as a ten-frame, two rows of five, the same picture as the
+ * answer buttons. It fills with the tally the child taps, and in the worked
+ * answer with the likeliest tally: a sorted count, not an order of draws.
+ */
+function TallyFrame({ b, show, red, worked }: { readonly b: Bag; readonly show: boolean; readonly red: number | null; readonly worked: boolean }) {
   const half = size(b) === 5;
-  const e = expectedRed(b);
-  // Worked: a bag of 5 fills each half as the bag reads; a bag of 10 as one count.
-  const colourAt = (i: number): 'red' | 'blue' => (half ? (i % 5 < b.red ? 'red' : 'blue') : i < e ? 'red' : 'blue');
   return (
     <g>
-      <text x={STRIP_X} y="36" fontSize="16" fill={SOFT}>
+      <text x={FRAME_X} y="34" fontSize="16" fill={SOFT}>
         10 draws, each put back
       </text>
-      {Array.from({ length: 10 }, (_, i) => (
-        <g key={i}>
-          <rect x={STRIP_X + CELL * i} y="48" width={CELL} height={CELL} fill="#ffffff" stroke={INK} strokeWidth="2" />
-          {fill ? <Marble x={STRIP_X + CELL * i + CELL / 2} y={48 + CELL / 2} r={9} c={colourAt(i)} /> : null}
-        </g>
-      ))}
-      <rect x={STRIP_X} y="48" width={CELL * 10} height={CELL} fill="none" stroke={INK} strokeWidth="3" />
+      {([0, 1] as const).map((row) =>
+        Array.from({ length: 5 }, (_, i) => (
+          <g key={`${row}-${i}`}>
+            <rect x={FRAME_X + CELL * i} y={FRAME_Y + CELL * row} width={CELL} height={CELL} fill={red === null ? '#ffffff' : GOLD_TINT} stroke={INK} strokeWidth="2" />
+            {red === null ? null : (
+              <Marble x={FRAME_X + CELL * i + CELL / 2} y={FRAME_Y + CELL * row + CELL / 2} r={10.5} c={i < redsInRow(red, row) ? 'red' : 'blue'} sw={2} />
+            )}
+          </g>
+        )),
+      )}
+      <rect x={FRAME_X} y={FRAME_Y} width={CELL * 5} height={CELL * 2} fill="none" stroke={INK} strokeWidth="3" />
       {half && show ? (
         <g>
-          <line x1={STRIP_X + CELL * 5} y1="40" x2={STRIP_X + CELL * 5} y2="82" stroke={INK} strokeWidth="5" />
-          <text x={STRIP_X + CELL * 2.5} y="98" textAnchor="middle" fontSize="14" fill={SOFT}>
+          <line x1={FRAME_X - 6} y1={FRAME_Y + CELL} x2={FRAME_X + CELL * 5 + 6} y2={FRAME_Y + CELL} stroke={INK} strokeWidth="5" />
+          <text x={FRAME_X + CELL * 5 + 12} y={FRAME_Y + CELL / 2} dominantBaseline="central" fontSize="14" fill={SOFT}>
             first 5
           </text>
-          <text x={STRIP_X + CELL * 7.5} y="98" textAnchor="middle" fontSize="14" fill={SOFT}>
+          <text x={FRAME_X + CELL * 5 + 12} y={FRAME_Y + CELL * 1.5} dominantBaseline="central" fontSize="14" fill={SOFT}>
             next 5
           </text>
         </g>
       ) : null}
-      {fill ? (
-        <text x={STRIP_X + CELL * 5} y="124" textAnchor="middle" fontSize="18" fontWeight="700" fill={INK}>
-          {`about ${e} red, ${10 - e} blue`}
+      {worked && red !== null ? (
+        <text x={FRAME_X + CELL * 2.5} y={FRAME_Y + CELL * 2 + 24} textAnchor="middle" fontSize="18" fontWeight="700" fill={INK}>
+          {`about ${red} red, ${10 - red} blue`}
         </text>
       ) : null}
     </g>
   );
 }
 
-/** A marble and a word or number, for the inside of a Choice. */
-function Swatch({ c, text }: { readonly c: 'red' | 'blue'; readonly text: string }) {
+/** The small secondary word under a Choice's picture. */
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+/** A picture with its word underneath, for the inside of a Choice. */
+function Pictured({ word, children }: { readonly word: string; readonly children: ReactNode }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3em' }}>
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-        <Marble x={13} y={13} r={11} c={c} />
-      </svg>
-      {text}
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '0.25em' }}>
+      {children}
+      <span style={WORD}>{word}</span>
     </span>
+  );
+}
+
+/** The bag, small, with the guessed marble (or a red and a blue at the same chance) coming out of its mouth. */
+function ComesOut({ pick }: { readonly pick: Pick }) {
+  return (
+    <svg width="96" height="84" viewBox="0 0 96 84" aria-hidden="true">
+      <g transform="translate(20 28) scale(0.2373) translate(-54 -26)">
+        <PotliShape k={2.1} />
+      </g>
+      <PickMarbles x={48} y={14} r={pick === 'same' ? 10 : 13} pick={pick} sw={2} />
+    </svg>
+  );
+}
+
+/** A chance word drawn as a small bag holding four marbles: none, one, most or all of the asked colour. */
+function BagOfFour({ word, c }: { readonly word: ChanceWord; readonly c: Colour }) {
+  return (
+    <svg width="100" height="100" viewBox="54 26 236 236" aria-hidden="true">
+      <PotliShape k={1.3} />
+      <FourOf x={172} y={176} r={22} gap={48} word={word} c={c} sw={4.5} />
+    </svg>
+  );
+}
+
+const MINI = 18;
+
+/** A tally of ten drawn as ten marbles in a two-by-five frame, like the frame on the board. */
+function TenFrame({ red }: { readonly red: number }) {
+  const w = MINI * 5;
+  return (
+    <svg width={w + 4} height={MINI * 2 + 4} viewBox={`-2 -2 ${w + 4} ${MINI * 2 + 4}`} aria-hidden="true">
+      {([0, 1] as const).map((row) =>
+        Array.from({ length: 5 }, (_, i) => (
+          <g key={`${row}-${i}`}>
+            <rect x={MINI * i} y={MINI * row} width={MINI} height={MINI} fill="#ffffff" stroke={INK} strokeWidth="1" />
+            <Marble x={MINI * i + MINI / 2} y={MINI * row + MINI / 2} r={6.6} c={i < redsInRow(red, row) ? 'red' : 'blue'} sw={1.3} />
+          </g>
+        )),
+      )}
+      <rect x="0" y="0" width={w} height={MINI * 2} fill="none" stroke={INK} strokeWidth="2" />
+    </svg>
   );
 }
 
@@ -451,60 +589,25 @@ interface Option {
   readonly body: ReactNode;
 }
 
-/** How many of four marbles each chance word stands for: none, a few, most, all. */
-const OF_FOUR: Record<ChanceWord, number> = { impossible: 0, unlikely: 1, likely: 3, certain: 4 };
-
-/**
- * A chance word drawn as four marbles, so it can be read without reading:
- * the asked colour filled, any other colour hollow.
- */
-function WordPicture({ word, c }: { readonly word: ChanceWord; readonly c: Colour }) {
-  const n = OF_FOUR[word];
-  return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '0.2em' }}>
-      <svg width="72" height="20" viewBox="0 0 72 20" aria-hidden="true">
-        {Array.from({ length: 4 }, (_, i) =>
-          i < n ? (
-            <Marble key={i} x={9 + 18 * i} y={10} r={7} c={c} />
-          ) : (
-            <circle key={i} cx={9 + 18 * i} cy={10} r={7} fill="#ffffff" stroke={INK} strokeWidth="2" />
-          ),
-        )}
-      </svg>
-      {cap(word)}
-    </span>
-  );
-}
-
 function options(round: Round): readonly Option[] {
   switch (round.kind) {
     case 'compare':
     case 'streak':
       return [
-        { id: 'red', label: 'Red', body: <Swatch c="red" text="Red" /> },
-        { id: 'blue', label: 'Blue', body: <Swatch c="blue" text="Blue" /> },
-        {
-          id: 'same',
-          label: 'Same chance',
-          body: (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3em' }}>
-              <Swatch c="red" text="=" />
-              <Swatch c="blue" text="Same chance" />
-            </span>
-          ),
-        },
+        { id: 'red', label: 'Red', body: <Pictured word="Red"><ComesOut pick="red" /></Pictured> },
+        { id: 'blue', label: 'Blue', body: <Pictured word="Blue"><ComesOut pick="blue" /></Pictured> },
+        { id: 'same', label: 'Same chance', body: <Pictured word="Same chance"><ComesOut pick="same" /></Pictured> },
       ];
     case 'word':
-      return WORDS.map((w) => ({ id: w, label: cap(w), body: <WordPicture word={w} c={round.ask} /> }));
+      return WORDS.map((w) => ({ id: w, label: cap(w), body: <Pictured word={cap(w)}><BagOfFour word={w} c={round.ask} /></Pictured> }));
     case 'tally':
       return round.options.map((r) => ({
         id: tallyId(r),
         label: `${r} red and ${10 - r} blue`,
         body: (
-          <span style={{ display: 'inline-flex', gap: '0.6em' }}>
-            <Swatch c="red" text={String(r)} />
-            <Swatch c="blue" text={String(10 - r)} />
-          </span>
+          <Pictured word={`${r} red, ${10 - r} blue`}>
+            <TenFrame red={r} />
+          </Pictured>
         ),
       }));
   }
@@ -525,20 +628,25 @@ function boardLabel(round: Round): string {
   }
 }
 
+const asWord = (id: string | null): ChanceWord | null => (WORDS as readonly (string | null)[]).includes(id) ? (id as ChanceWord) : null;
+const asTally = (id: string | null): number | null => (id !== null && /^t\d+$/.test(id) ? Number(id.slice(1)) : null);
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const evidence = stage !== 'answering';
   const worked = stage === 'worked';
   const locked = stage === 'solved' || worked;
   const right = answerOf(round);
+  /** What the board draws as the answer: the child's tap, or the right one once worked. */
+  const shown = worked ? right : answer;
   return (
     <div className="board board--chance">
       <svg className="board-svg" viewBox="0 0 640 270" role="img" aria-label={boardLabel(round)}>
         <rect x="3" y="3" width="634" height="264" rx="18" fill={PAPER} stroke={INK} strokeWidth="3" />
         <Potli b={round.bag} />
-        {round.kind === 'compare' ? <OneDraw /> : null}
-        {round.kind === 'word' ? <ChanceLine ask={round.ask} mark={worked ? chanceWord(round.bag, round.ask) : null} /> : null}
-        {round.kind === 'streak' ? <Run drawn={round.drawn} run={round.run} /> : null}
-        {round.kind === 'tally' ? <TallyStrip b={round.bag} show={evidence} fill={worked} /> : null}
+        {round.kind === 'compare' ? <OneDraw pick={asPick(shown)} /> : null}
+        {round.kind === 'word' ? <ChanceLine ask={round.ask} mark={asWord(shown)} /> : null}
+        {round.kind === 'streak' ? <Run drawn={round.drawn} run={round.run} pick={asPick(shown)} /> : null}
+        {round.kind === 'tally' ? <TallyFrame b={round.bag} show={evidence} red={asTally(shown)} worked={worked} /> : null}
         {evidence ? (
           <SortedRows
             b={round.bag}

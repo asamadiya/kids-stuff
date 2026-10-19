@@ -165,6 +165,9 @@ const HUE: Record<Place, string> = { h: '#c8372d', t: '#1c6dd0', o: '#27813b' };
 const TINT: Record<Place, string> = { h: '#fbe4e0', t: '#e2eefc', o: '#e1f2e4' };
 const DEEP: Record<Place, string> = { h: '#8f2219', t: '#0f4790', o: '#1a5c2a' };
 
+/** The dark line every drawn block is outlined in. */
+const LINE = '#24170f';
+
 const TICKS = [6, 10, 14, 18, 22, 26, 30, 34, 38];
 
 /** One block, in a 44-unit box: a small cube, a rod of ten, a flat of a hundred. */
@@ -198,6 +201,49 @@ function BlockIcon({ place }: { readonly place: Place }) {
     <svg viewBox="0 0 44 44" aria-hidden="true">
       <Glyph place={place} fill="none" stroke="currentColor" />
     </svg>
+  );
+}
+
+/** A tray button's face: a plus, the block it adds, and its value small underneath. */
+function AddIcon({ p }: { readonly p: PlaceInfo }) {
+  return (
+    <span style={{ display: 'grid', justifyItems: 'center', gap: 2 }}>
+      <svg viewBox="0 0 60 44" style={{ width: 60, height: 44 }} aria-hidden="true">
+        <path d="M2 22 H14 M8 16 V28" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+        <g transform="translate(16 0)">
+          <Glyph place={p.key} fill="none" stroke="currentColor" />
+        </g>
+      </svg>
+      <span style={{ fontSize: 'var(--t-sm)' }}>{p.value}</span>
+    </span>
+  );
+}
+
+/** A column's name as a picture: its block in its colour, the word small underneath. */
+function Heading({ p }: { readonly p: PlaceInfo }) {
+  return (
+    <span style={{ display: 'grid', justifyItems: 'center', gap: 'var(--s1)', color: DEEP[p.key] }}>
+      <svg viewBox="0 0 44 44" style={{ width: 44, height: 44 }} aria-hidden="true">
+        <Glyph place={p.key} fill={HUE[p.key]} stroke={LINE} />
+      </svg>
+      <span style={{ fontWeight: 700, fontSize: 'var(--t-sm)' }}>{p.name}</span>
+    </span>
+  );
+}
+
+/**
+ * In an empty place after Check: an arrow from the emptiness up to the 0
+ * written over it. No outline of a missing block — zero does not get a block.
+ */
+function PointsTo0({ p }: { readonly p: PlaceInfo }) {
+  return (
+    <span role="img" aria-label={`No ${p.name}: the 0 above marks this place`} style={{ alignSelf: 'center', display: 'grid', justifyItems: 'center', gap: 'var(--s1)', color: DEEP[p.key] }}>
+      <svg viewBox="0 0 32 64" style={{ width: 32, height: 64 }} aria-hidden="true">
+        <line x1="16" y1="60" x2="16" y2="8" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+        <path d="M4 20 L16 5 L28 20" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span style={{ fontWeight: 700, fontSize: 'var(--t-xs)' }}>no {p.name}</span>
+    </span>
   );
 }
 
@@ -262,7 +308,7 @@ function Stack({ k, place }: { readonly k: number; readonly place: Place }) {
     <svg viewBox={`0 0 ${w} ${rows * 30}`} width={w} height={rows * 30} aria-hidden="true" style={{ justifySelf: 'center' }}>
       {Array.from({ length: k }, (_, i) => (
         <g key={i} transform={`translate(${(i % 5) * 30} ${Math.floor(i / 5) * 30}) scale(0.68)`}>
-          <Glyph place={place} fill={HUE[place]} stroke="#24170f" />
+          <Glyph place={place} fill={HUE[place]} stroke={LINE} />
         </g>
       ))}
     </svg>
@@ -288,11 +334,25 @@ function Neighbour({ n, places }: { readonly n: number; readonly places: readonl
       {caption(`This is ${n}.`)}
       <DigitRow n={n} places={places} label={`${n} written in places`} />
       <div style={grid(places.length)} aria-hidden="true">
-        {places.map((p) => (
-          <div key={p.key} style={{ display: 'grid', placeItems: 'center', minHeight: 36 }}>
-            {k[p.key] === 0 ? <span style={{ color: DEEP[p.key], fontWeight: 700 }}>no {p.name}</span> : <Stack k={k[p.key]} place={p.key} />}
-          </div>
-        ))}
+        {places.map((p) => {
+          const empty = k[p.key] === 0;
+          return (
+            <div
+              key={p.key}
+              style={{
+                display: 'grid',
+                placeItems: 'center',
+                minHeight: 52,
+                padding: 'var(--s2)',
+                borderRadius: 'var(--radius-sm)',
+                background: TINT[p.key],
+                border: `2px ${empty ? 'dashed' : 'solid'} ${DEEP[p.key]}`,
+              }}
+            >
+              {empty ? <span style={{ color: DEEP[p.key], fontWeight: 600, fontSize: 'var(--t-xs)' }}>no {p.name}</span> : <Stack k={k[p.key]} place={p.key} />}
+            </div>
+          );
+        })}
       </div>
     </section>
   );
@@ -316,11 +376,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     <div className="board board--zero">
       {round.ref !== undefined ? <Neighbour n={round.ref} places={places} /> : null}
 
-      <div style={grid(places.length)}>
+      <div style={grid(places.length)} aria-hidden="true">
         {places.map((p) => (
-          <span key={p.key} style={{ textAlign: 'center', fontWeight: 700, fontSize: 'var(--t-md)', color: DEEP[p.key] }}>
-            {p.name}
-          </span>
+          <Heading key={p.key} p={p} />
         ))}
       </div>
 
@@ -383,11 +441,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
                   <BlockIcon place={p.key} />
                 </Piece>
               ))}
-              {k === 0 && stage !== 'answering' && written(round.target, p) === '0' && !flags?.has(p.key) ? (
-                <span style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 700, color: DEEP[p.key] }}>
-                  No {p.name}.<br />Write 0.
-                </span>
-              ) : null}
+              {k === 0 && stage !== 'answering' && written(round.target, p) === '0' && !flags?.has(p.key) ? <PointsTo0 p={p} /> : null}
             </div>
           );
         })}
@@ -399,13 +453,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           return (
             <Piece
               key={p.key}
-              label={String(p.value)}
               hue={p.hue}
               tone={full ? 'ghost' : 'source'}
               onTap={locked || full ? undefined : () => add(p.key)}
               ariaLabel={full ? `The ${p.name} place holds ${MAX} at most` : `Put a ${p.unit} on the mat`}
             >
-              <BlockIcon place={p.key} />
+              <AddIcon p={p} />
             </Piece>
           );
         })}

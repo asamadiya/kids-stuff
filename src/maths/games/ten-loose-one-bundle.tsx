@@ -227,44 +227,185 @@ function explain(round: Round): string {
 
 /* ------------------------------------------------------------- pictures -- */
 
-/** One loose stick, drawn in the piece's text colour on its place colour. */
-function StickArt() {
+/**
+ * Each piece's drawing, 44 units tall and `w` wide, in currentColor. The tray,
+ * the mat and the pictures (the swap strip, the hint, the untie goal) all draw
+ * from here, so a bundle in the picture is the bundle he taps.
+ */
+const SHAPE: Record<Place, { readonly w: number; readonly el: JSX.Element }> = {
+  // One loose stick.
+  ones: { w: 44, el: <rect x="18" y="3" width="8" height="38" rx="4" fill="currentColor" /> },
+  // Ten sticks tied with a band: count them, and it is still ten.
+  tens: {
+    w: 60,
+    el: (
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <rect key={i} x={1 + i * 6} y="3" width="4" height="38" rx="2" fill="currentColor" />
+        ))}
+        <rect x="0.75" y="18" width="58.5" height="8" rx="2" fill="#f2a900" stroke="#24170f" strokeWidth="1.5" />
+      </>
+    ),
+  },
+  // Ten bundles laid side by side and tied flat: a hundred sticks.
+  hundreds: {
+    w: 96,
+    el: (
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <g key={i}>
+            <rect x={3 + i * 9.1} y="3" width="7.6" height="38" rx="1.5" fill="currentColor" />
+            <rect x={3 + i * 9.1} y="19.5" width="7.6" height="5" fill="#f2a900" />
+          </g>
+        ))}
+        <rect x="1" y="8" width="94" height="4" rx="2" fill="#24170f" />
+        <rect x="1" y="32" width="94" height="4" rx="2" fill="#24170f" />
+      </>
+    ),
+  },
+};
+
+const art = (k: Place) =>
+  function Art() {
+    const { w, el } = SHAPE[k];
+    return (
+      <svg viewBox={`0 0 ${w} 44`} style={{ width: w, height: 44 }} aria-hidden="true">
+        {el}
+      </svg>
+    );
+  };
+const StickArt = art('ones');
+const BundleArt = art('tens');
+const FlatArt = art('hundreds');
+
+/** On every tray piece: tapping it adds one of these to the mat. */
+function PlusArt() {
   return (
-    <svg viewBox="0 0 44 44" aria-hidden="true">
-      <rect x="18" y="3" width="8" height="38" rx="4" fill="currentColor" />
+    <svg viewBox="0 0 20 20" style={{ width: 20, height: 20 }} aria-hidden="true">
+      <rect x="7.5" y="1" width="5" height="18" rx="2" fill="currentColor" />
+      <rect x="1" y="7.5" width="18" height="5" rx="2" fill="currentColor" />
     </svg>
   );
 }
 
-const BUNDLE_SVG: CSSProperties = { width: 60, height: 44 };
-
-/** Ten sticks tied with a band: count them, and it is still ten. */
-function BundleArt() {
+/**
+ * A piece as a flat picture: its place-coloured tile with no border and no
+ * press shadow, so a picture never looks like a button. 52 units tall.
+ */
+const tileW = (k: Place) => SHAPE[k].w + 8;
+function tile(k: Place, x: number, key?: number) {
   return (
-    <svg viewBox="0 0 60 44" style={BUNDLE_SVG} aria-hidden="true">
-      {Array.from({ length: 10 }, (_, i) => (
-        <rect key={i} x={1 + i * 6} y="3" width="4" height="38" rx="2" fill="currentColor" />
-      ))}
-      <rect x="0.75" y="18" width="58.5" height="8" rx="2" fill="#f2a900" stroke="#24170f" strokeWidth="1.5" />
+    <g key={key} transform={`translate(${x} 0)`}>
+      <rect width={tileW(k)} height="52" rx="8" style={{ fill: HUE[k] }} />
+      <g transform="translate(4 4)" style={{ color: 'var(--paper)' }}>
+        {SHAPE[k].el}
+      </g>
+    </g>
+  );
+}
+
+/** One flat tile on its own, `h` px tall. */
+function Mini({ k, h = 28 }: { readonly k: Place; readonly h?: number }) {
+  const w = tileW(k);
+  return (
+    <svg viewBox={`0 0 ${w} 52`} style={{ width: (w * h) / 52, height: h, flex: 'none' }} aria-hidden="true">
+      {tile(k, 0)}
     </svg>
   );
 }
 
-const FLAT_SVG: CSSProperties = { width: 96, height: 44 };
+/** Ten tiles in two fives, the way the mat lays them out. Returns the drawing and its width. */
+function tenTiles(k: Place, x0: number): readonly [JSX.Element[], number] {
+  const step = tileW(k) + 6;
+  const at = (i: number) => x0 + i * step + (i >= 5 ? 14 : 0);
+  return [Array.from({ length: 10 }, (_, i) => tile(k, at(i), i)), at(9) + tileW(k) - x0];
+}
 
-/** Ten bundles laid side by side and tied flat: a hundred sticks. */
-function FlatArt() {
+/** An equals sign drawn, not typed: two bars, 30 wide, in a 52-high row. */
+function equals(x: number) {
   return (
-    <svg viewBox="0 0 96 44" style={FLAT_SVG} aria-hidden="true">
-      {Array.from({ length: 10 }, (_, i) => (
-        <g key={i}>
-          <rect x={3 + i * 9.1} y="3" width="7.6" height="38" rx="1.5" fill="currentColor" />
-          <rect x={3 + i * 9.1} y="19.5" width="7.6" height="5" fill="#f2a900" />
-        </g>
-      ))}
-      <rect x="1" y="8" width="94" height="4" rx="2" fill="#24170f" />
-      <rect x="1" y="32" width="94" height="4" rx="2" fill="#24170f" />
+    <g fill="#24170f">
+      <rect x={x} y="16" width="30" height="7" rx="3" />
+      <rect x={x} y="29" width="30" height="7" rx="3" />
+    </g>
+  );
+}
+
+/** One place up and one place down. */
+const UP: Partial<Record<Place, Place>> = { ones: 'tens', tens: 'hundreds' };
+const DOWN: Partial<Record<Place, Place>> = { hundreds: 'tens', tens: 'ones' };
+const NAMES: Record<Place, readonly [string, string]> = {
+  ones: ['loose stick', 'loose sticks'],
+  tens: ['bundle', 'bundles'],
+  hundreds: ['flat', 'flats'],
+};
+
+/**
+ * Permanently on the board: ten separate pieces, equals, the same ten tied
+ * into one bigger piece. The fact the game teaches, shown rather than said.
+ */
+function Swap({ from }: { readonly from: Place }) {
+  const to = UP[from] as Place;
+  const [ten, w] = tenTiles(from, 0);
+  const W = w + 16 + 30 + 16 + tileW(to);
+  const say = `10 ${NAMES[from][1]} = 1 ${NAMES[to][0]}`;
+  return (
+    <figure style={KEY_ITEM}>
+      <svg viewBox={`0 0 ${W} 52`} style={{ width: W * 0.7, height: 'auto', aspectRatio: `${W} / 52`, maxWidth: '100%' }} role="img" aria-label={say}>
+        {ten}
+        {equals(w + 16)}
+        {tile(to, w + 62)}
+      </svg>
+      <figcaption style={SMALL}>{say}</figcaption>
+    </figure>
+  );
+}
+
+/** The hint ring's tag, under the ringed pieces: "= one bigger piece" or "= ten smaller" (two rows of five), drawn. */
+function RingTag({ place, size, text }: { readonly place: Place; readonly size: number; readonly text: string }) {
+  const into = (size === 10 ? UP[place] : DOWN[place]) as Place;
+  const step = tileW(into) + 6;
+  const n = size === 10 ? 1 : 10;
+  const rows = n === 1 ? 1 : 2;
+  const W = 46 + Math.min(n, 5) * step - 6;
+  const H = rows * 58 - 6;
+  return (
+    <span style={RING_TAG}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: W * 0.42, height: 'auto', aspectRatio: `${W} / ${H}`, maxWidth: '100%' }} aria-hidden="true">
+        <g transform={`translate(0 ${(H - 52) / 2})`}>{equals(4)}</g>
+        {Array.from({ length: n }, (_, i) => (
+          <g key={i} transform={`translate(0 ${Math.floor(i / 5) * 58})`}>
+            {tile(into, 46 + (i % 5) * step)}
+          </g>
+        ))}
+      </svg>
+      <span style={SMALL}>{text}</span>
+    </span>
+  );
+}
+
+/**
+ * Untie rounds: how many of this piece the answer must use, as that many
+ * outlined pieces at the top of the column, so the count he is matching sits
+ * beside the pieces he is changing. None wanted is one outline, struck out.
+ */
+function Goal({ place, n }: { readonly place: Place; readonly n: number }) {
+  const w = tileW(place);
+  const ghost = (i: number, struck = false) => (
+    <svg key={i} viewBox={`0 0 ${w} 52`} style={{ width: (w * 26) / 52, height: 26 }} aria-hidden="true">
+      <rect x="2" y="2" width={w - 4} height="48" rx="7" strokeWidth="4" strokeDasharray="7 5" style={{ fill: 'var(--raised)', stroke: HUE[place] }} />
+      <g transform="translate(4 4)" style={{ color: HUE[place] }} opacity="0.4">
+        {SHAPE[place].el}
+      </g>
+      {struck ? <line x1="4" y1="48" x2={w - 4} y2="4" stroke="#24170f" strokeWidth="6" strokeLinecap="round" /> : null}
     </svg>
+  );
+  const say = n ? plural(n, NAMES[place][0], NAMES[place][1]) : `no ${NAMES[place][1]}`;
+  return (
+    <div style={GOAL} role="img" aria-label={`Use ${say}`}>
+      {n ? fives(n, (i) => ghost(i)) : ghost(0, true)}
+      <span style={SMALL}>use {say}</span>
+    </div>
   );
 }
 
@@ -330,10 +471,42 @@ const RING: CSSProperties = {
 };
 const RING_TAG: CSSProperties = {
   flexBasis: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 'var(--s1)',
+  color: 'var(--ink)',
+};
+/** Secondary words under or beside a picture: small, never the only carrier. */
+const SMALL: CSSProperties = {
   fontFamily: 'var(--font-read)',
   fontSize: 'var(--t-xs)',
-  fontWeight: 700,
-  color: 'var(--ink)',
+  fontWeight: 400,
+  color: 'var(--ink-soft)',
+};
+/** Untie rounds: the outlined pieces the answer must use, at the top of a column. */
+const GOAL: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: 'var(--s1)',
+  padding: 'var(--s2)',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--paper-2)',
+};
+/** The permanent swap pictures above the mat. */
+const KEY: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  gap: 'var(--s3) var(--s6)',
+};
+const KEY_ITEM: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 'var(--s1)',
+  maxWidth: '100%',
 };
 const COUNT: CSSProperties = {
   textAlign: 'center',
@@ -436,19 +609,24 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </Piece>
     );
     const ringed = ring && ring.place === k ? Math.min(ring.size, n) : 0;
+    const goal = round.kind === 'untie' && k !== 'ones' ? solution(round)[k] : null;
     return (
       <section key={k} style={{ ...COL, ...GROW[k] }} aria-label={`${name}: ${n}`}>
         <h3 style={{ ...COL_HEAD, color: HUE[k] }}>
-          <span>{name}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--s2)' }}>
+            <Mini k={k} />
+            {name}
+          </span>
           <span style={{ fontFamily: 'var(--font-read)', fontWeight: 400, color: 'var(--ink-soft)' }}>
             {k === 'ones' ? 'one stick' : k === 'tens' ? '10 sticks' : '100 sticks'}
           </span>
         </h3>
+        {goal === null ? null : <Goal place={k} n={goal} />}
         <div style={COL_BODY}>
-          {ringed ? (
+          {ringed && ring ? (
             <span style={RING}>
-              <span style={RING_TAG}>{ring?.tag}</span>
               {fives(ringed, piece)}
+              <RingTag place={k} size={ring.size} text={ring.tag} />
             </span>
           ) : null}
           {fives(n - ringed, (i) => piece(ringed + i))}
@@ -495,14 +673,16 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
               onTap={locked || full ? undefined : () => put(k, 1)}
               ariaLabel={`Put a ${one} on the mat`}
             >
+              <PlusArt />
               <Art />
             </Piece>
           );
         })}
       </Tray>
-      <p className="board-caption">
-        A bundle is 10 loose sticks tied together.{round.flats ? ' A flat is 10 bundles tied together.' : ''}
-      </p>
+      <div style={KEY}>
+        <Swap from="ones" />
+        {round.flats ? <Swap from="tens" /> : null}
+      </div>
     </div>
   );
 }

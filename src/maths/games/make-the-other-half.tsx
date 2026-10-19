@@ -22,9 +22,13 @@ import { Piece } from '../../play/parts';
  *     rangoli is drawn: he fills the other three quarters.
  *
  * Control: tap-to-add/remove only. Tapping an empty square on the open side
- * fills it; tapping a filled one clears it. The drawn half cannot be changed.
- * Evidence: on 'hint' the board numbers every column (or row) by its distance
- * from the line and rings the first pair of squares that did not match when the
+ * fills it; tapping a filled one clears it. The drawn half cannot be changed,
+ * and it is drawn flat (thin pale edge, square corners, no shadow) so it reads
+ * as the picture; the open squares keep the ink-bordered button look with a
+ * deep press shadow, and a tap shows its tile there at once.
+ * Evidence: on 'hint' the board marks every column (or row) with one dot per
+ * square of distance from the line, so partners carry the same dots, and rings
+ * the first pair of squares that did not match when the
  * hint stage opened. The ring is frozen there so it cannot walk him through
  * the answer square by square. After a Check miss it is the pair the hint
  * sentence names. Help can open the hint stage before any Check, and the board
@@ -260,7 +264,7 @@ function tally(round: Round, filled: ReadonlySet<number>): string {
 /** One filled square: a block of rangoli colour with a paper-white diamond, the same either way up. */
 function Tile({ hue }: { readonly hue: string }) {
   return (
-    <svg viewBox="0 0 44 44" aria-hidden="true">
+    <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
       <rect x="1" y="1" width="42" height="42" rx="5" fill={hue} />
       <path d="M22 8 L36 22 L22 36 L8 22 Z" fill="#fff8ec" />
       <circle cx="22" cy="22" r="5" fill={hue} />
@@ -272,13 +276,7 @@ const LINE = '14px';
 const LABEL = '36px';
 
 const gridWrap: CSSProperties = { overflowX: 'auto', display: 'flex', justifyContent: 'center', padding: 'var(--s2)' };
-const numberStyle: CSSProperties = {
-  display: 'grid',
-  placeItems: 'center',
-  fontWeight: 700,
-  fontSize: 'var(--t-md)',
-  color: 'var(--ink-soft)',
-};
+const pipStyle: CSSProperties = { display: 'grid', placeItems: 'center' };
 const ringStyle: CSSProperties = { outline: '5px solid var(--ink)', outlineOffset: '3px', borderRadius: 'var(--radius-sm)' };
 const cellWrap: CSSProperties = { display: 'grid' };
 /**
@@ -288,7 +286,52 @@ const cellWrap: CSSProperties = { display: 'grid' };
  */
 const waterStyle = { '--raised': '#cde6f2' } as CSSProperties;
 
-const Blank = () => <svg viewBox="0 0 44 44" aria-hidden="true" />;
+const Blank = () => <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true" />;
+
+/**
+ * The drawn half is part of the picture, not a control: flat paper squares
+ * with a thin pale edge and square corners, the same size as the buttons
+ * but with none of their thick ink border, rounding or press shadow.
+ */
+const drawnStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: 'var(--tap)',
+  minHeight: 'var(--tap)',
+  padding: 'var(--s2)',
+  border: 'var(--line) solid var(--rule)',
+  borderRadius: '4px',
+  background: 'var(--paper-2)',
+};
+/**
+ * The squares he can tap get a deep press shadow under their ink border, so
+ * the open side reads as a field of keys beside a flat drawing. Re-points the
+ * Piece's own shadow token for those cells only.
+ */
+const keyStyle = { '--shadow-press': '0 4px 0 var(--ink-soft)' } as CSSProperties;
+
+/**
+ * Distance from the line drawn as that many dots, laid along the line's
+ * normal: a column two squares from the down line gets two dots, and so does
+ * its partner on the other side, so the matching pair is seen, not read.
+ */
+function Pips({ n, along }: { readonly n: number; readonly along: 'row' | 'column' }) {
+  const len = n * 12;
+  const across = along === 'row';
+  return (
+    <svg
+      viewBox={across ? `0 0 ${len} 12` : `0 0 12 ${len}`}
+      width={across ? len : 12}
+      height={across ? 12 : len}
+      aria-hidden="true"
+    >
+      {Array.from({ length: n }, (_, i) => (
+        <circle key={i} cx={across ? i * 12 + 6 : 6} cy={across ? 6 : i * 12 + 6} r={4.5} fill="var(--ink)" />
+      ))}
+    </svg>
+  );
+}
 
 /** Grid tracks: an optional label track, the cells, and a narrow track for each mirror line. */
 function layout(round: Round) {
@@ -350,12 +393,13 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     const where = `Row ${r + 1}, column ${c + 1}`;
     const ringed = ring !== null && (ring.cell === i || ring.other === i);
     let piece: ReactNode;
-    if (inGiven(round, r, c)) {
+    const drawn = inGiven(round, r, c);
+    if (drawn) {
       const on = given.has(i);
       piece = (
-        <Piece tone="fixed" ariaLabel={`${where}: drawn, ${on ? 'filled' : 'empty'}`}>
+        <span style={drawnStyle} role="img" aria-label={`${where}: drawn, ${on ? 'filled' : 'empty'}`}>
           {on ? <Tile hue={round.hue} /> : <Blank />}
-        </Piece>
+        </span>
       );
     } else if (worked) {
       const on = solution.has(i);
@@ -376,11 +420,19 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         </Piece>
       );
     }
-    const below = pond && !inGiven(round, r, c);
+    const below = pond && !drawn;
+    const tappable = !drawn && !locked;
     return (
       <div
         key={i}
-        style={{ ...cellWrap, ...(below ? waterStyle : null), gridRow: rowTrack(r), gridColumn: colTrack(c), ...(ringed ? ringStyle : null) }}
+        style={{
+          ...cellWrap,
+          ...(below ? waterStyle : null),
+          ...(tappable ? keyStyle : null),
+          gridRow: rowTrack(r),
+          gridColumn: colTrack(c),
+          ...(ringed ? ringStyle : null),
+        }}
       >
         {piece}
       </div>
@@ -413,22 +465,25 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     );
   }
 
-  // On 'hint' and 'worked': every column (or row) numbered by its distance from the line.
+  // On 'hint' and 'worked': every column (or row) marked with one dot per
+  // square between it and the line, so partners carry the same row of dots.
   const labels: ReactNode[] = [];
   if (evidence && v) {
     for (let c = 0; c < cols; c += 1) {
+      const d = away(c, cols);
       labels.push(
-        <span key={`c${c}`} style={{ ...numberStyle, gridRow: 1, gridColumn: colTrack(c) }}>
-          {away(c, cols)}
+        <span key={`c${c}`} role="img" aria-label={`${d} from the down line`} style={{ ...pipStyle, gridRow: 1, gridColumn: colTrack(c) }}>
+          <Pips n={d} along="row" />
         </span>,
       );
     }
   }
   if (evidence && h) {
     for (let r = 0; r < rows; r += 1) {
+      const d = away(r, rows);
       labels.push(
-        <span key={`r${r}`} style={{ ...numberStyle, gridColumn: 1, gridRow: rowTrack(r) }}>
-          {away(r, rows)}
+        <span key={`r${r}`} role="img" aria-label={`${d} from the line across`} style={{ ...pipStyle, gridColumn: 1, gridRow: rowTrack(r) }}>
+          <Pips n={d} along="column" />
         </span>,
       );
     }
@@ -464,8 +519,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </div>
       {evidence ? (
         <p className="board-caption">
-          {v ? 'The numbers count squares from the down line. ' : ''}
-          {h ? 'The numbers count squares from the line across. ' : ''}
+          {v ? 'The dots count squares from the down line. ' : ''}
+          {h ? 'The dots count squares from the line across. ' : ''}
           {tally(round, shown)}
         </p>
       ) : null}
@@ -489,7 +544,7 @@ export const makeTheOtherHalf: SolveGame<Round, Answer> = {
   cover: 'art/games/make-the-other-half.png',
   note: {
     what: 'A square grid with a dashed mirror line. Half of a butterfly, kite, diya, lotus, temple or rangoli is drawn on one side; he taps squares on the other side to fill them until the picture is whole. Tapping a filled square clears it.',
-    expect: 'At level 1 he will usually match each row by eye. At level 2 the common slip is copying instead of flipping: the half is slid across, so a square at the outer edge lands next to the line. After a miss the board numbers every column (or, with a line across, every row) by its distance from the line, and rings the first pair that differs. At level 3 the line runs across. With two lines, the bottom-right quarter is the likeliest slip: its partner is a square he filled himself, not a drawn one.',
+    expect: 'At level 1 he will usually match each row by eye. At level 2 the common slip is copying instead of flipping: the half is slid across, so a square at the outer edge lands next to the line. After a miss the board marks every column (or, with a line across, every row) with one dot per square of distance from the line, and rings the first pair that differs. At level 3 the line runs across. With two lines, the bottom-right quarter is the likeliest slip: its partner is a square he filled himself, not a drawn one.',
     practising: 'Line symmetry as reflection: every square has a partner in the same row (or column), the same distance from the line, on the opposite side. Measuring distance from the line rather than from the edge of the grid. At level 3, two reflections one after the other.',
     ask: 'At level 2, after he fills three or four squares, point at one and ask: "How many squares from the line is this one? Where is its partner?"',
     next: 'Draw a chalk line on the floor and set out half a rangoli with a few flowers, rice or dal on one side. He completes the other half, then you hold a small mirror on the line so he can check it against the reflection.',

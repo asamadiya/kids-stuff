@@ -469,12 +469,64 @@ function NumberStrip({ upto, unit, mark }: { readonly upto: number; readonly uni
   );
 }
 
+const GOLD_TINT = '#ffe7a3';
+
+/** One thing singled out: new in this step, or the place the far space takes in its unit. Gold, like the +2 and the ringed number. */
+const markStyle: CSSProperties = { display: 'inline-flex', borderRadius: 10, background: GOLD_TINT, boxShadow: `0 0 0 3px ${GOLD}` };
+
+/** A thing, ringed in gold when it is the one meant. */
+const ringed = (thing: Thing, marked: boolean) =>
+  marked ? (
+    <span style={markStyle}>
+      <Icon thing={thing} />
+    </span>
+  ) : (
+    <Icon thing={thing} />
+  );
+
 /** The worked answer, drawn: the right thing in a dashed ring, so it reads as shown, not placed. */
-const Worked = ({ thing }: { readonly thing: Thing }) => (
-  <span style={{ display: 'inline-flex', borderRadius: 10, outline: `3px dashed ${DEEP}`, outlineOffset: 2 }}>
+const Worked = ({ thing, fresh = false }: { readonly thing: Thing; readonly fresh?: boolean }) => (
+  <span style={{ display: 'inline-flex', borderRadius: 10, outline: `3px dashed ${DEEP}`, outlineOffset: 2, background: fresh ? GOLD_TINT : undefined }}>
     <Icon thing={thing} />
   </span>
 );
+
+/**
+ * A thing the step before had and this step does not: left in place, faded, in a dotted gold outline,
+ * so "−2" is two things he can count where the steps are compared. Not a slot: nothing goes here.
+ */
+const Gone = ({ thing, label }: { readonly thing: Thing; readonly label: string }) => (
+  <span
+    role="img"
+    aria-label={label}
+    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--s2)', borderRadius: 'var(--radius-sm)', border: `3px dotted ${GOLD}` }}
+  >
+    <span style={{ display: 'inline-flex', opacity: 0.3 }}>
+      <Icon thing={thing} />
+    </span>
+  </span>
+);
+
+/**
+ * The unit drawn as its things and lettered A B B: the answer shown, not only said.
+ * `from` numbers the places with their space numbers (the box a far space sits in); `ring` marks one place.
+ */
+function UnitPicture({ unit, from, ring, label }: { readonly unit: readonly Thing[]; readonly from?: number; readonly ring?: number; readonly label: string }) {
+  const ls = letters(unit);
+  return (
+    <div role="img" aria-label={label} style={{ ...unitBox(true), alignSelf: 'center' }}>
+      {unit.map((t, i) => (
+        <div key={i} style={cellStyle}>
+          {ringed(t, i === ring)}
+          <span style={letterStyle}>{ls[i]}</span>
+          {from === undefined ? null : (
+            <span style={i === ring ? { ...stripCell, borderRadius: 18, background: GOLD, color: '#fff' } : stripCell}>{from + i + 1}</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const stepLabel: CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--t-sm)', minWidth: '4.5em', paddingTop: 'var(--s4)' };
 const countTag: CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--t-lg)', color: DEEP, minWidth: '3.5em', paddingTop: 'var(--s3)' };
@@ -497,12 +549,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     setAnswer({ placed, picked: answer.picked });
   };
 
-  /** One open space, as a slot. */
-  const space = (i: number, where: string, solution: Thing | null): ReactNode => {
+  /** One open space, as a slot. `fresh` rings what it holds in gold: new in this step. */
+  const space = (i: number, where: string, solution: Thing | null, fresh = false): ReactNode => {
     if (worked && solution) {
       return (
-        <Slot key={i} ariaLabel={`${where}: ${NAME[solution]}`} filled>
-          <Worked thing={solution} />
+        <Slot key={i} ariaLabel={`${where}: ${NAME[solution]}${fresh ? ', new this step' : ''}`} filled>
+          <Worked thing={solution} fresh={fresh} />
         </Slot>
       );
     }
@@ -510,19 +562,19 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     const here = worked ? undefined : answer.placed[i];
     const swap = !!holding && holding !== here;
     const label = here
-      ? `${where}: ${NAME[here]}${locked ? '' : swap ? `, put the ${NAME[holding]} here instead` : ', take it off'}`
+      ? `${where}: ${NAME[here]}${locked ? (fresh ? ', new this step' : '') : swap ? `, put the ${NAME[holding]} here instead` : ', take it off'}`
       : `${where}: empty${holding ? `, put the ${NAME[holding]} here` : ''}`;
     const tappable = !locked && (!!here || !!holding);
     return (
       <Slot key={i} ariaLabel={label} filled={!!here} ready={swap} onTap={tappable ? () => tapSpace(i) : undefined}>
-        {here ? <Icon thing={here} /> : <Blank />}
+        {here ? ringed(here, fresh) : <Blank />}
       </Slot>
     );
   };
 
-  const given = (i: number, thing: Thing, where: string) => (
-    <Slot key={i} ariaLabel={`${where}: ${NAME[thing]}`} filled>
-      <Icon thing={thing} />
+  const given = (i: number, thing: Thing, where: string, fresh = false) => (
+    <Slot key={i} ariaLabel={`${where}: ${NAME[thing]}${fresh ? ', new this step' : ''}`} filled>
+      {ringed(thing, fresh)}
     </Slot>
   );
 
@@ -557,10 +609,10 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     return (
       <div className="board">
         <Row cells={cells} unit={round.unit.length} shown={shown} label="The row" numbered={shown} />
-        {shown ? (
-          <p style={unitLine}>
-            {locked ? `Unit: ${list(round.unit)} — ${spaced(letters(round.unit))}` : `It repeats every ${round.unit.length}.`}
-          </p>
+        {locked ? (
+          <UnitPicture unit={round.unit} label={`The unit: ${list(round.unit)}, ${spaced(letters(round.unit))}`} />
+        ) : shown ? (
+          <p style={unitLine}>{`It repeats every ${round.unit.length}.`}</p>
         ) : null}
         {tray(round.tray)}
       </div>
@@ -589,7 +641,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         </div>
         {shown ? <NumberStrip upto={s} unit={n} mark={s} /> : null}
         {locked ? (
-          <p style={unitLine}>{`Space ${s} is thing ${placeInUnit(round)} of its box: ${NAME[solution]}.`}</p>
+          <UnitPicture
+            unit={round.unit}
+            from={round.target - (round.target % n)}
+            ring={round.target % n}
+            label={`The box space ${s} is in: ${list(round.unit)}. Space ${s} is thing ${placeInUnit(round)}, ${an(solution)}.`}
+          />
         ) : null}
         {tray(round.tray)}
       </div>
@@ -601,6 +658,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     const modelLetters = letters(model);
     const answerRow = worked ? row(round.into, round.bottom) : yours(round, answer);
     const mineLetters = letters(answerRow);
+    /** His row's first unit, side by side with the pattern's: the same letters in new things. */
+    const theirUnit = answerRow.slice(0, round.unit.length).filter((t): t is Thing => !!t);
     const top: Cell[] = model.map((t, i) => ({ key: i, view: given(i, t, `Top row, space ${i + 1}`), letter: modelLetters[i], num: i + 1 }));
     const bottom: Cell[] = Array.from({ length: round.bottom }, (_, i) => ({
       key: i,
@@ -614,7 +673,19 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         <Row cells={top} unit={round.unit.length} shown={shown} label="The pattern" />
         <p style={rowLabel}>Your row</p>
         <Row cells={bottom} unit={round.unit.length} shown={shown} label="Your row" />
-        {locked ? <p style={unitLine}>{`Both rows: ${spaced(letters(round.unit))}, again and again.`}</p> : null}
+        {locked ? (
+          <div style={{ ...rowStyle, alignItems: 'center' }} role="group" aria-label={`Both rows: ${spaced(letters(round.unit))}, again and again.`}>
+            <UnitPicture unit={round.unit} label={`The pattern's unit: ${list(round.unit)}, ${spaced(letters(round.unit))}`} />
+            {theirUnit.length === round.unit.length ? (
+              <>
+                <span aria-hidden="true" style={unitLine}>
+                  =
+                </span>
+                <UnitPicture unit={theirUnit} label={`Your row's unit: ${list(theirUnit)}, ${spaced(letters(theirUnit))}`} />
+              </>
+            ) : null}
+          </div>
+        ) : null}
         {tray(round.tray)}
       </div>
     );
@@ -629,18 +700,29 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         {round.steps.map((n, s) => {
           const open = s === round.open;
           const where = `Step ${s + 1}`;
-          const cells = open
-            ? Array.from({ length: CELLS }, (_, i) => space(i, `${where}, space ${i + 1}`, i < need ? round.thing : null))
-            : Array.from({ length: n }, (_, i) => given(i, round.thing, `${where}, ${i + 1} of ${n}`));
-          const count = open ? (worked ? need : built) : n;
           // The change is drawn on a step only when it and the step before it are known.
           const prevKnown = s > 0 && (s - 1 !== round.open || locked);
           const showChange = shown && prevKnown && (!open || locked);
+          // The change as things: the d new ones ringed in gold, or the d gone ones left as faded outlines.
+          const fresh = (i: number, total: number) => showChange && d > 0 && i >= total - d;
+          const gone = showChange && d < 0
+            ? Array.from({ length: -d }, (_, k) => <Gone key={`gone-${k}`} thing={round.thing} label={`${where}: one fewer ${NAME[round.thing]} than step ${s}`} />)
+            : [];
+          // Once checked, the step he built is drawn as its `need` things, so the new or gone ones sit at its end.
+          const cells = open
+            ? locked
+              ? Array.from({ length: need }, (_, i) =>
+                  worked ? space(i, `${where}, ${i + 1} of ${need}`, round.thing, fresh(i, need)) : given(i, round.thing, `${where}, ${i + 1} of ${need}`, fresh(i, need)),
+                )
+              : Array.from({ length: CELLS }, (_, i) => space(i, `${where}, space ${i + 1}`, null))
+            : Array.from({ length: n }, (_, i) => given(i, round.thing, `${where}, ${i + 1} of ${n}`, fresh(i, n)));
+          const count = open ? (worked ? need : built) : n;
           return (
             <div key={s} style={{ display: 'flex', gap: 'var(--s3)', alignItems: 'flex-start' }}>
               <span style={stepLabel}>{where}</span>
-              <div style={{ ...rowStyle, justifyContent: 'flex-start', flex: 1 }} role="group" aria-label={open ? `${where}: yours to build` : `${where}: ${n}`}>
+              <div style={{ ...rowStyle, justifyContent: 'flex-start', flex: 1 }} role="group" aria-label={open && !locked ? `${where}: yours to build` : `${where}: ${count}`}>
                 {cells}
+                {gone}
               </div>
               <span style={countTag}>
                 {shown ? count : ''}

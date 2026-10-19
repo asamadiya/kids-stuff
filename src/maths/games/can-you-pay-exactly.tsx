@@ -13,7 +13,10 @@ import { Piece, Tray } from '../../play/parts';
  * (penny 19.05 mm, nickel 21.21 mm, dime 17.91 mm, quarter 24.26 mm) in its
  * real metal colour, and the dime and quarter carry their reeded edges. The
  * face shows the value in cents (a real dime says ONE DIME), so the value
- * is never in doubt and the size never stands in for it.
+ * is never in doubt and the size never stands in for it. Under every coin,
+ * in the tray and on the counter, its worth is drawn as that many cent dots
+ * grouped in tens (two rows of five): a nickel is five dots, a dime a full
+ * ten, so the value can be counted, not only read.
  *
  * Levels:
  *  1. Pennies, nickels and dimes, prices to 19¢. Some shelves take only
@@ -26,13 +29,16 @@ import { Piece, Tray } from '../../play/parts';
  *     from a dollar, counted up from the price to 100¢.
  *
  * Control: tap-to-add/remove only. Tapping a coin in the tray puts one on
- * the counter; tapping a coin on the counter takes it back. No totals are
- * shown while he answers. On 'hint' each coin gets its running total and two
- * value bars appear at one scale (price, and his coins as segments as long
- * as their values). On 'worked' the counter holds the solution. On "exactly N
- * coins" rounds the counter shows N empty coin spots, all one size, so the
- * count is on the board and not only in the prompt. Every state is a fixed
- * drawing.
+ * the counter; tapping a coin on the counter takes it back. The price is
+ * always on the board as cent dots in tens under the counter (on change
+ * rounds, the dollar's 100 cents with the price filled in and the change as
+ * empty rings). No totals are shown while he answers. On 'hint' each coin
+ * gets its running total and his coins' cents appear under the price's, cent
+ * under cent, so too few or too many can be counted; on fewest rounds the
+ * swap the hint names is drawn as coins = coin. On 'worked' the counter holds
+ * the solution. On "exactly N coins" rounds the counter shows N empty coin
+ * spots, all one size, so the count is on the board and not only in the
+ * prompt. Every state is a fixed drawing.
  */
 
 export type Coin = 1 | 5 | 10 | 25;
@@ -182,16 +188,24 @@ const tallyWords = (answer: Answer) => {
   return ALL_COINS.filter((c) => t[c] > 0).map((c) => coinWord(c, t[c])).join(', ');
 };
 
+/** Coins that can be swapped for fewer coins of the same worth, and the sentence that names it. */
+interface Trade {
+  readonly from: readonly Coin[];
+  readonly to: readonly Coin[];
+  readonly text: string;
+}
+
 /**
  * A swap that makes the same value with fewer coins. US coins are canonical:
  * if none of these applies, the coins are already the fewest for their total.
+ * The board draws the swap (coins = coin, each with its cents) on the hint.
  */
-function trade(answer: Answer): string | null {
+function trade(answer: Answer): Trade | null {
   const t = tally(answer);
-  if (t[1] >= 5) return '5 pennies make 5¢, the same as 1 nickel.';
-  if (t[5] >= 2) return '2 nickels make 10¢, the same as 1 dime.';
-  if (t[10] >= 2 && t[5] >= 1) return '2 dimes and a nickel make 25¢, the same as 1 quarter.';
-  if (t[10] >= 3) return '3 dimes make 30¢, the same as a quarter and a nickel.';
+  if (t[1] >= 5) return { from: [1, 1, 1, 1, 1], to: [5], text: '5 pennies make 5¢, the same as 1 nickel.' };
+  if (t[5] >= 2) return { from: [5, 5], to: [10], text: '2 nickels make 10¢, the same as 1 dime.' };
+  if (t[10] >= 2 && t[5] >= 1) return { from: [10, 10, 5], to: [25], text: '2 dimes and a nickel make 25¢, the same as 1 quarter.' };
+  if (t[10] >= 3) return { from: [10, 10, 10], to: [25, 5], text: '3 dimes make 30¢, the same as a quarter and a nickel.' };
   return null;
 }
 
@@ -216,7 +230,7 @@ function check(round: Round, answer: Answer): Verdict {
     return { ok: false, hint: `${make} That is the price, in ${coinsWord(n)}, not ${round.exactly}.` };
   }
   if (round.mode === 'fewest' && n > fewestCoins(round.price, round.coins).length) {
-    return { ok: false, hint: `${cents(total)} in ${coinsWord(n)}. ${trade(answer) ?? ''}`.trim() };
+    return { ok: false, hint: `${cents(total)} in ${coinsWord(n)}. ${trade(answer)?.text ?? ''}`.trim() };
   }
   return { ok: true };
 }
@@ -246,8 +260,8 @@ const PX_PER_MM = 56 / 24.26;
 const FILL: Record<Coin, string> = { 1: '#b8733a', 5: '#a7abb1', 10: '#d3d7dc', 25: '#c3c8ce' };
 const RIM: Record<Coin, string> = { 1: '#8a4f22', 5: '#7d8187', 10: '#8e949b', 25: '#858b92' };
 
-/** One coin, face up, at its true relative size. */
-function CoinFace({ c }: { readonly c: Coin }) {
+/** One coin, face up, at its true relative size. `crossed`: the shop does not take it today. */
+function CoinFace({ c, crossed }: { readonly c: Coin; readonly crossed?: boolean }) {
   const d = Math.round(DIAMETER_MM[c] * PX_PER_MM);
   const reeded = c === 10 || c === 25;
   return (
@@ -258,7 +272,59 @@ function CoinFace({ c }: { readonly c: Coin }) {
       <text x="50" y="62" textAnchor="middle" fontSize={c === 25 ? 32 : 36} fontWeight="700" fill={INK}>
         {`${c}¢`}
       </text>
+      {crossed ? <path d="M16 16 L84 84 M84 16 L16 84" stroke="#b3261e" strokeWidth="10" strokeLinecap="round" /> : null}
     </svg>
+  );
+}
+
+/** One cent, drawn: the unit every coin and every price is counted in. */
+const CENT = 'var(--ones)';
+const DOT = 9;
+const DOT_GAP = 5;
+
+/**
+ * A coin's worth as that many cent dots, in tens of two rows of five, two
+ * tens to a line: a penny is one dot, a nickel a row of five, a dime a full
+ * ten, a quarter two tens and five. Each ten has its own outline.
+ */
+function CentDots({ n }: { readonly n: number }) {
+  const step = 5 * DOT + DOT_GAP;
+  const frames = Array.from({ length: Math.ceil(n / 10) }, (_, f) => {
+    const inFrame = Math.min(10, n - f * 10);
+    return {
+      x: (f % 2) * step,
+      y: Math.floor(f / 2) * (2 * DOT + DOT_GAP),
+      w: Math.min(5, inFrame) * DOT,
+      h: (inFrame > 5 ? 2 : 1) * DOT,
+    };
+  });
+  const width = Math.max(...frames.map((f) => f.x + f.w)) + 2;
+  const height = Math.max(...frames.map((f) => f.y + f.h)) + 2;
+  return (
+    <svg viewBox={`-1 -1 ${width} ${height}`} style={{ width, height }} aria-hidden="true">
+      {frames.map((f, i) => (
+        <rect key={`f${i}`} x={f.x} y={f.y} width={f.w} height={f.h} rx="3" fill="#fffaf0" stroke="#b9a27e" strokeWidth="1" />
+      ))}
+      {Array.from({ length: n }, (_, k) => {
+        const f = frames[Math.floor(k / 10)];
+        const w = k % 10;
+        return <circle key={k} cx={f.x + (w % 5) * DOT + DOT / 2} cy={f.y + Math.floor(w / 5) * DOT + DOT / 2} r={DOT / 2 - 1.2} fill={CENT} stroke={INK} strokeWidth="0.8" />;
+      })}
+    </svg>
+  );
+}
+
+const coinCol: CSSProperties = { display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 };
+const nameStyle: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)' };
+
+/** A coin with its worth counted out underneath, and optionally its name, small, below that. */
+function CoinWithCents({ c, name, crossed }: { readonly c: Coin; readonly name?: boolean; readonly crossed?: boolean }) {
+  return (
+    <span style={coinCol}>
+      <CoinFace c={c} crossed={crossed} />
+      <CentDots n={c} />
+      {name ? <span style={nameStyle}>{NAME[c][0]}</span> : null}
+    </span>
   );
 }
 
@@ -364,60 +430,119 @@ function Counter({ round }: { readonly round: Round }) {
   );
 }
 
-const BAR_X = 150;
-const BAR_W = 700;
+/** Cent lines: one dot per cent, fifty to a line, a small gap after each five and a wider one after each ten. */
+const CD = 14;
+const PER_LINE = 50;
+const LINE_X = 120;
+const ROW = 24;
+const PRICE_CENT = 'var(--gold)';
+/** Neighbouring coins alternate shade, so each coin's cents stay one clump. */
+const COIN_CENT = ['var(--ones)', '#9ad3a5'] as const;
+
+const dotX = (k: number) => {
+  const j = k % PER_LINE;
+  return LINE_X + j * CD + Math.floor(j / 5) * 4 + Math.floor(j / 10) * 8 + CD / 2;
+};
+
+/** The small drawn key at the start of each kind of line: a price tag, a dollar bill, or a coin. */
+function LineKey({ kind, y }: { readonly kind: 'tag' | 'dollar' | 'coin'; readonly y: number }) {
+  if (kind === 'coin') {
+    return <circle cx="70" cy={y} r="11" fill={FILL[10]} stroke={INK} strokeWidth="2.5" />;
+  }
+  if (kind === 'dollar') {
+    return (
+      <g>
+        <rect x="46" y={y - 11} width="48" height="22" rx="3" fill="#cfe3c4" stroke="#2f5b2a" strokeWidth="2.5" />
+        <ellipse cx="70" cy={y} rx="6" ry="8" fill="#e8f1e1" stroke="#2f5b2a" strokeWidth="1.5" />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <path d={`M46 ${y} L56 ${y - 11} H94 V${y + 11} H56 Z`} fill="#fff6dc" stroke={INK} strokeWidth="2.5" />
+      <circle cx="56" cy={y} r="3" fill="#c98b4a" stroke={INK} strokeWidth="1.5" />
+    </g>
+  );
+}
 
 /**
- * Two bars at one scale: what must be paid (the price, or the dollar with the
- * price inside it) and the coins on the counter, each coin as long as its
- * value. The dashed line marks where the coins must end.
+ * The price as cents you can count, under the counter, always there. On
+ * change rounds the top line is the dollar's 100 cents: the price filled in,
+ * the change still to give as empty rings. Once totals show (hint, worked,
+ * solved) his coins' cents are drawn on the line beneath, cent under cent,
+ * and a dashed mark shows where the coins must end.
  */
-function ValueBars({ round, coins }: { readonly round: Round; readonly coins: Answer }) {
+function CentLines({ round, coins, showCoins }: { readonly round: Round; readonly coins: Answer; readonly showCoins: boolean }) {
   const isChange = round.mode === 'change';
   const start = isChange ? round.price : 0;
   const goal = isChange ? DOLLAR : round.price;
-  const total = sum(coins);
-  const reach = start + total;
-  const px = BAR_W / Math.max(goal, reach, 1);
-  const x = (c: number) => BAR_X + c * px;
-  let run = start;
-  const segs = coins.map((c) => {
-    const from = run;
-    run += c;
-    return { c, from };
+  const reach = start + sum(coins);
+  const cells = Math.max(goal, showCoins ? reach : 0);
+  const lines = Math.max(1, Math.ceil(cells / PER_LINE));
+  const pair = (showCoins ? 2 : 1) * ROW + 18;
+  const top = 8 + ROW / 2;
+  const yPrice = (k: number) => top + Math.floor(k / PER_LINE) * pair;
+  const yCoin = (k: number) => yPrice(k) + ROW;
+  const coinCents: { readonly fill: string }[] = [];
+  coins.forEach((c, i) => {
+    for (let k = 0; k < c; k += 1) coinCents.push({ fill: COIN_CENT[i % 2] });
   });
+  const endX = (n: number) => dotX(n - 1) + CD / 2 + 10;
   const label = isChange
-    ? `Top: a dollar, 100 cents, with the ${round.price} cent price inside it. Bottom: the price and then your coins, reaching ${reach} cents.`
-    : `Top: the price, ${round.price} cents. Bottom: your ${coinsWord(coins.length)}, ${total} cents.`;
+    ? `A dollar as 100 cent dots: ${round.price} for the price, ${DOLLAR - round.price} empty for the change.${showCoins ? ` Under them, the price and your change reach ${reach} cents.` : ''}`
+    : `The price as ${round.price} cent dots.${showCoins ? ` Under them, your ${coinsWord(coins.length)} as ${reach} cent dots.` : ''}`;
   return (
-    <svg className="board-svg" viewBox="0 0 960 190" role="img" aria-label={label}>
-      <text x="20" y="58" fontSize="22" fontWeight="700" fill={INK}>{isChange ? 'a dollar' : 'price'}</text>
-      {isChange ? (
-        <>
-          <rect x={x(0)} y="30" width={round.price * px} height="40" fill="#f1d9a6" stroke={INK} strokeWidth="2.5" />
-          <text x={x(round.price / 2)} y="58" textAnchor="middle" fontSize="20" fontWeight="700" fill={INK}>{`${round.price}¢`}</text>
-          <rect x={x(round.price)} y="30" width={(DOLLAR - round.price) * px} height="40" fill="#ffffff" stroke={INK} strokeWidth="2.5" strokeDasharray="8 6" />
-          <text x={x((round.price + DOLLAR) / 2)} y="58" textAnchor="middle" fontSize="20" fill={INK}>change</text>
-        </>
-      ) : (
-        <rect x={x(0)} y="30" width={round.price * px} height="40" fill="#f1d9a6" stroke={INK} strokeWidth="2.5" />
+    <svg className="board-svg" viewBox={`0 0 960 ${top + (lines - 1) * pair + (showCoins ? ROW : 0) + ROW / 2 + 8}`} role="img" aria-label={label}>
+      <LineKey kind={isChange ? 'dollar' : 'tag'} y={top} />
+      {showCoins ? <LineKey kind="coin" y={top + ROW} /> : null}
+      {Array.from({ length: goal }, (_, k) =>
+        isChange && k >= round.price ? (
+          <circle key={`p${k}`} cx={dotX(k)} cy={yPrice(k)} r={CD / 2 - 1.5} fill="#ffffff" stroke={INK} strokeWidth="1.5" strokeDasharray="3 2" />
+        ) : (
+          <circle key={`p${k}`} cx={dotX(k)} cy={yPrice(k)} r={CD / 2 - 1.5} fill={PRICE_CENT} stroke={INK} strokeWidth="1.2" />
+        ),
       )}
-      <text x={x(goal) + 8} y="58" fontSize="22" fontWeight="700" fill={INK}>{`${goal}¢`}</text>
-
-      <text x="20" y="128" fontSize="22" fontWeight="700" fill={INK}>coins</text>
-      {isChange ? <rect x={x(0)} y="100" width={round.price * px} height="40" fill="#f1d9a6" opacity="0.6" stroke={INK} strokeWidth="1.5" /> : null}
-      {segs.map(({ c, from }, i) => (
-        <g key={i}>
-          <rect x={x(from)} y="100" width={c * px} height="40" fill={FILL[c]} stroke={INK} strokeWidth="2" />
-          {c * px >= 34 ? (
-            <text x={x(from + c / 2)} y="127" textAnchor="middle" fontSize="18" fontWeight="700" fill={INK}>{c}</text>
+      <text x={endX(goal)} y={yPrice(goal - 1) + 7} fontSize="20" fontWeight="700" fill={INK}>{`${goal}¢`}</text>
+      {showCoins ? (
+        <g>
+          {Array.from({ length: start }, (_, k) => (
+            <circle key={`s${k}`} cx={dotX(k)} cy={yCoin(k)} r={CD / 2 - 1.5} fill={PRICE_CENT} opacity="0.45" stroke={INK} strokeWidth="1" />
+          ))}
+          {coinCents.map(({ fill }, i) => (
+            <circle key={`c${i}`} cx={dotX(start + i)} cy={yCoin(start + i)} r={CD / 2 - 1.5} fill={fill} stroke={INK} strokeWidth="1.2" />
+          ))}
+          {reach > 0 ? (
+            <text x={endX(reach)} y={yCoin(reach - 1) + 7} fontSize="20" fontWeight="700" fill="var(--maths-deep)">{`${reach}¢`}</text>
           ) : null}
+          <line
+            x1={dotX(goal - 1) + CD / 2 + 3}
+            y1={yPrice(goal - 1) - ROW / 2}
+            x2={dotX(goal - 1) + CD / 2 + 3}
+            y2={yCoin(goal - 1) + ROW / 2}
+            stroke={INK}
+            strokeWidth="2.5"
+            strokeDasharray="5 4"
+          />
         </g>
-      ))}
-      <text x={x(reach) + 8} y="128" fontSize="22" fontWeight="700" fill={INK}>{`${reach}¢`}</text>
-      <line x1={x(goal)} y1="18" x2={x(goal)} y2="152" stroke={INK} strokeWidth="3" strokeDasharray="6 5" />
-      <text x={BAR_X} y="178" fontSize="20" fill={INK}>{`${coinsWord(coins.length)}, ${total}¢`}</text>
+      ) : null}
     </svg>
+  );
+}
+
+const tradeBox: CSSProperties = {
+  display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 'var(--s3)',
+  padding: 'var(--s3)', background: 'var(--raised)', border: '2px solid var(--rule)', borderRadius: 'var(--radius-sm)',
+};
+const eqSign: CSSProperties = { fontSize: 'var(--t-xxl)', fontWeight: 700, color: 'var(--maths-deep)', padding: '0 var(--s2)' };
+
+/** The swap the hint names, drawn: these coins = that coin, each with its cents counted out. */
+function TradeRow({ t }: { readonly t: Trade }) {
+  return (
+    <div style={tradeBox} role="img" aria-label={t.text}>
+      {t.from.map((c, i) => <CoinWithCents key={`a${i}`} c={c} />)}
+      <span style={eqSign} aria-hidden="true">=</span>
+      {t.to.map((c, i) => <CoinWithCents key={`b${i}`} c={c} />)}
+    </div>
   );
 }
 
@@ -428,7 +553,27 @@ const mat: CSSProperties = {
 };
 const stack: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 };
 const runStyle: CSSProperties = { fontWeight: 700, fontSize: 'var(--t-md)', color: 'var(--maths-deep)' };
-const emptyStyle: CSSProperties = { fontFamily: 'var(--font-read)', color: 'var(--ink-soft)', fontSize: 'var(--t-sm)', alignSelf: 'center' };
+const emptyStyle: CSSProperties = {
+  display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+  fontFamily: 'var(--font-read)', color: 'var(--ink-soft)', fontSize: 'var(--t-xs)', alignSelf: 'center',
+};
+const notTodayRow: CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--s3)' };
+
+/**
+ * The empty counter, drawn: one dashed coin spot with an arrow up from the
+ * tray below, so where a tapped coin lands is shown before he taps.
+ */
+function EmptyCounter() {
+  return (
+    <span style={emptyStyle}>
+      <svg viewBox="0 0 64 96" style={{ width: 48, height: 72 }} aria-hidden="true">
+        <circle cx="32" cy="28" r="24" fill="#f6e2c0" stroke="#8a5a2b" strokeWidth="3" strokeDasharray="7 5" />
+        <path d="M32 92 V60 M20 72 L32 58 L44 72" fill="none" stroke="var(--maths-deep)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span aria-hidden="true">tap a coin</span>
+    </span>
+  );
+}
 /** An empty coin spot on the counter, as big as a tappable piece so the row lines up. */
 const spotStyle: CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 'var(--tap)', minHeight: 'var(--tap)' };
 
@@ -466,10 +611,16 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
     : round.mode === 'count'
       ? `The counter: spots for exactly ${coinsWord(round.exactly)}`
       : 'The counter: the coins you pay';
+  const notToday = (level === 1 ? SMALL : ALL_COINS).filter((c) => !round.coins.includes(c));
+  const swap =
+    stage === 'hint' && round.mode === 'fewest' && sum(answer) === round.price && answer.length > fewestCoins(round.price, round.coins).length
+      ? trade(answer)
+      : null;
 
   return (
     <div className="board">
       <Counter round={round} />
+      <CentLines round={round} coins={onCounter} showCoins={showTotals} />
       <div style={mat} role="group" aria-label={matLabel}>
         {onCounter.map((c, i) => (
           <div key={i} style={stack}>
@@ -478,14 +629,15 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
               onTap={locked ? undefined : () => setAnswer(answer.filter((_, j) => j !== i))}
               ariaLabel={locked ? `A ${NAME[c][0]}, ${c} cents` : `Take back the ${NAME[c][0]}, ${c} cents`}
             >
-              <CoinFace c={c} />
+              <CoinWithCents c={c} />
             </Piece>
             {showTotals ? <span style={runStyle}>{cents(runs[i])}</span> : null}
           </div>
         ))}
         {Array.from({ length: spots }, (_, i) => <Spot key={`spot${i}`} />)}
-        {onCounter.length === 0 ? <span style={emptyStyle}>tap a coin</span> : null}
+        {onCounter.length === 0 && spots === 0 ? <EmptyCounter /> : null}
       </div>
+      {swap ? <TradeRow t={swap} /> : null}
       {showTotals ? (
         <p className="board-caption">
           {isChange
@@ -493,7 +645,6 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
             : `${coinsWord(onCounter.length)}, worth ${cents(sum(onCounter))}. The number under each coin is the total so far.`}
         </p>
       ) : null}
-      {showTotals ? <ValueBars round={round} coins={onCounter} /> : null}
       {worked ? (
         <p style={equationStyle}>
           {isChange
@@ -506,18 +657,20 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
         {round.coins.map((c) => (
           <Piece
             key={c}
-            label={NAME[c][0]}
             tone={locked || full ? 'ghost' : 'source'}
             onTap={locked || full ? undefined : () => setAnswer([...answer, c])}
             ariaLabel={`Put a ${NAME[c][0]}, ${c} cents, on the counter`}
           >
-            <CoinFace c={c} />
+            <CoinWithCents c={c} name />
           </Piece>
         ))}
       </Tray>
       {full && !locked ? <p className="board-caption">{`The counter holds ${MAX_COINS} coins. It is full.`}</p> : null}
-      {!worked && round.coins.length < (level === 1 ? SMALL : ALL_COINS).length ? (
-        <p className="board-caption">{`The shop takes only these coins today: ${round.coins.map((c) => NAME[c][1]).join(', ')}.`}</p>
+      {!worked && notToday.length > 0 ? (
+        <div style={notTodayRow} role="img" aria-label={`The shop takes only these coins today: ${round.coins.map((c) => NAME[c][1]).join(', ')}. Not today: ${notToday.map((c) => NAME[c][1]).join(', ')}.`}>
+          {notToday.map((c) => <CoinFace key={c} c={c} crossed />)}
+          <span className="board-caption" aria-hidden="true">not today</span>
+        </div>
       ) : null}
     </div>
   );

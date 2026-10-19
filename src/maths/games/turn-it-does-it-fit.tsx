@@ -39,6 +39,11 @@ import { Piece, Slot, Tray } from '../../play/parts';
  * goes in, where it covers most of the outline, so it visibly sticks out.
  * Tapping a placed piece (shown faint in the tray) lifts it out into his hand.
  * Nothing moves on its own: every state is a still picture.
+ *
+ * Shown, not said: where two small triangles stand in for a bigger one, the
+ * board draws that bigger triangle = the two small ones joined, all round long.
+ * The hint's colours have a picture key; the worked answer draws each piece as
+ * it started, one clockwise arrow per quarter turn, and as it goes in.
  */
 
 type Pt = readonly [number, number];
@@ -81,6 +86,23 @@ export interface Round {
   readonly solution: readonly Placement[];
   /** The mathematics, said once it fits. */
   readonly why: string;
+  /**
+   * When two small triangles stand in for one bigger one. The board then
+   * draws, all round long, the bigger triangle beside the two small ones
+   * joined into the same shape: the equivalence shown, not said.
+   */
+  readonly halves?: Halves;
+}
+
+export interface Halves {
+  /** The bigger triangle, as cut. */
+  readonly whole: Poly;
+  /** Its colour when it is one of the round's pieces; null when only the outline has it. */
+  readonly colour: Colour | null;
+  /** The two small pieces, by index. */
+  readonly parts: readonly [number, number];
+  /** Where the two small pieces lie over the whole, found by search. */
+  readonly fill: readonly Placement[];
 }
 
 export interface Answer {
@@ -315,7 +337,28 @@ function build(name: string, outline: Poly, pieces: readonly PieceDef[], why: st
   const free = new Set(quarters(o).map((q) => key(q)));
   const solution = cover(free, pieces, pieces.map((_, i) => i), w, h);
   if (!solution) throw new Error(`turn-it-does-it-fit: the pieces cannot fill the ${name}`);
-  return { name, outline: o, pieces, solution, why };
+  const halves = halvesOf(pieces);
+  return { name, outline: o, pieces, solution, why, ...(halves ? { halves } : {}) };
+}
+
+/**
+ * Two half-size triangles in a round stand in for the next size up: two MID
+ * for one BIG, two SMALL for one MID. The whole is a piece of the round when
+ * there is one, so the picture points at a triangle he can see in the tray.
+ */
+function halvesOf(pieces: readonly PieceDef[]): Halves | undefined {
+  for (const [half, whole] of [[MID, BIG], [SMALL, MID]] as const) {
+    const parts = pieces.flatMap((p, i) => (p.shape === half ? [i] : []));
+    // Only when sizes are mixed: two equal triangles alone are not standing in for anything.
+    if (parts.length < 2 || parts.length === pieces.length) continue;
+    const pair: readonly [number, number] = [parts[0], parts[1]];
+    const own = pieces.find((p) => p.shape === whole);
+    const { w, h } = box(whole);
+    const fill = cover(new Set(quarters(whole).map((q) => key(q))), pieces, pair, w, h);
+    if (!fill) throw new Error('turn-it-does-it-fit: two small triangles do not fill a bigger one');
+    return { whole, colour: own ? own.colour : null, parts: pair, fill };
+  }
+  return undefined;
 }
 
 /** Deterministic variety without Math.random: a small table walked by index. */
@@ -461,7 +504,8 @@ const S = 48;
 const INK = 'var(--ink)';
 const RED = '#C8372D';
 
-const pts = (poly: Poly, at: Pt = [0, 0]) => poly.map(([x, y]) => `${(x + at[0]) * S},${(y + at[1]) * S}`).join(' ');
+const ptsAt = (poly: Poly, k: number, at: Pt = [0, 0]) => poly.map(([x, y]) => `${(x + at[0]) * k},${(y + at[1]) * k}`).join(' ');
+const pts = (poly: Poly, at: Pt = [0, 0]) => ptsAt(poly, S, at);
 
 /** One quarter-cell as a triangle, from its "x,y,q" key. */
 function quarterPoly(k: string): Poly {
@@ -488,12 +532,12 @@ const turnWords = (n: number) => (n === 0 ? 'no turn' : n === 1 ? '1 quarter tur
 
 const frameStyle: CSSProperties = { display: 'block', background: 'var(--raised)', borderRadius: 'var(--radius-sm)' };
 
-/** A tray piece, drawn at the board's scale and at its current turn. */
-function Shape({ p, turn }: { readonly p: PieceDef; readonly turn: number }) {
+/** A tray piece, drawn at the board's scale (or `k` px a step) and at its current turn. */
+function Shape({ p, turn, k = S }: { readonly p: PieceDef; readonly turn: number; readonly k?: number }) {
   const { poly, w, h } = pose(p.shape, turn);
   return (
-    <svg viewBox={`-4 -4 ${w * S + 8} ${h * S + 8}`} style={{ width: w * S + 8, height: h * S + 8 }} aria-hidden="true">
-      <polygon points={pts(poly)} fill={HUE[p.colour]} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+    <svg viewBox={`-4 -4 ${w * k + 8} ${h * k + 8}`} style={{ width: w * k + 8, height: h * k + 8 }} aria-hidden="true">
+      <polygon points={ptsAt(poly, k)} fill={HUE[p.colour]} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
     </svg>
   );
 }
@@ -502,12 +546,93 @@ function Shape({ p, turn }: { readonly p: PieceDef; readonly turn: number }) {
  * Drawn beside the piece in his hand, so the board itself says what a second
  * tap does: a quarter turn, clockwise. A still picture, not a motion.
  */
-function TurnArrow() {
+function TurnArrow({ size = 44 }: { readonly size?: number }) {
   return (
-    <svg viewBox="0 0 44 44" style={{ width: 44, height: 44 }} aria-hidden="true">
+    <svg viewBox="0 0 44 44" style={{ width: size, height: size }} aria-hidden="true">
       <path d="M22 8 A14 14 0 1 1 8 22" fill="none" stroke={INK} strokeWidth={4} strokeLinecap="round" />
       <polygon points="8,11 1.5,23 14.5,23" fill={INK} />
     </svg>
+  );
+}
+
+/**
+ * The worked answer's turns as things to count: one clockwise arrow (the same
+ * arrow his second tap shows) for each quarter turn from where the piece
+ * started. No arrows: it goes in as it is.
+ */
+function Turns({ n }: { readonly n: number }) {
+  if (n === 0) return null;
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2 }}>
+      {Array.from({ length: n }, (_, k) => (
+        <TurnArrow key={k} size={28} />
+      ))}
+    </span>
+  );
+}
+
+/** Grid step of the picture below: smaller than the board's, so it reads as a picture and not a piece. */
+const K = 36;
+
+/**
+ * When two small triangles stand in for a bigger one, the board shows it all
+ * round long: the bigger triangle, an equals sign, and the two small ones
+ * joined into exactly that shape. A still picture, not a control.
+ */
+function SameAs({ round }: { readonly round: Round }) {
+  const h = round.halves;
+  if (!h) return null;
+  const { w, h: ht } = box(h.whole);
+  const pad = 4;
+  const gap = 44;
+  const vw = w * K * 2 + gap;
+  const mid = (ht * K) / 2;
+  const [a, b] = h.parts.map((i) => round.pieces[i].name);
+  const whole = h.colour ? `the ${h.colour} triangle` : 'one bigger triangle';
+  return (
+    <svg
+      viewBox={`${-pad} ${-pad} ${vw + 2 * pad} ${ht * K + 2 * pad}`}
+      style={{ display: 'block', width: vw + 2 * pad, height: ht * K + 2 * pad }}
+      role="img"
+      aria-label={`The ${a} and the ${b}, joined, make the same shape as ${whole}.`}
+    >
+      <polygon points={ptsAt(h.whole, K)} fill={h.colour ? HUE[h.colour] : 'var(--paper-2)'} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+      <g stroke={INK} strokeWidth={4} strokeLinecap="round">
+        <line x1={w * K + 12} y1={mid - 6} x2={w * K + gap - 12} y2={mid - 6} />
+        <line x1={w * K + 12} y1={mid + 6} x2={w * K + gap - 12} y2={mid + 6} />
+      </g>
+      <g transform={`translate(${w * K + gap} 0)`}>
+        {h.parts.map((i, n) => {
+          const p = round.pieces[i];
+          const f = h.fill[n];
+          return (
+            <polygon key={i} points={ptsAt(pose(p.shape, f.turn).poly, K, f.at)} fill={HUE[p.colour]} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+          );
+        })}
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * The hint marks, explained by picture: a gold patch beside "empty", a red
+ * striped patch beside "sticks out". The swatches are the same fills the
+ * outline uses, so he matches colour to colour; the words are only labels.
+ */
+function Key({ hatch }: { readonly hatch: string }) {
+  const swatch = (fill: string, word: string) => (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <svg viewBox="0 0 40 40" style={{ width: 40, height: 40 }} aria-hidden="true">
+        <rect x={2} y={2} width={36} height={36} rx={4} fill={fill} stroke={INK} strokeWidth={2} />
+      </svg>
+      <span style={{ fontSize: 'var(--t-xs)', color: 'var(--ink-soft)' }}>{word}</span>
+    </span>
+  );
+  return (
+    <div className="board-row" role="img" aria-label="Gold: empty. Red stripes: sticking out, or on top of another piece.">
+      {swatch('var(--gold)', 'empty')}
+      {swatch(`url(#${hatch})`, 'sticks out')}
+    </div>
   );
 }
 
@@ -587,24 +712,37 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </svg>
         </Slot>
       </div>
-      {marks ? <p className="board-caption">Gold: empty. Red stripes: sticking out, or on top of another piece.</p> : null}
+      {marks ? <Key hatch={hatch} /> : null}
       {worked ? (
         <p className="board-caption">
           {round.pieces.map((p, i) => `${cap(p.name)}: ${turnWords(turnsNeeded(p, round.solution[i].turn))}.`).join(' ')}
         </p>
       ) : null}
+      <SameAs round={round} />
       <Tray label="Pieces">
         {round.pieces.map((p, i) => {
           const isPlaced = !!answer.at[i];
-          const tone = worked || isPlaced ? 'ghost' : holding === i ? 'picked' : 'source';
+          const tone = isPlaced ? 'ghost' : holding === i ? 'picked' : 'source';
           const aria = isPlaced
             ? `Lift the ${p.name} out`
             : holding === i
               ? `Turn the ${p.name} a quarter turn`
               : `Pick up the ${p.name}`;
+          if (worked) {
+            // The worked answer as a picture: as it started, one arrow per quarter turn, as it goes in.
+            const goal = round.solution[i].turn;
+            const n = turnsNeeded(p, goal);
+            return (
+              <Piece key={i} tone="worked" ariaLabel={`${cap(p.name)}: ${turnWords(n)}`}>
+                {n > 0 ? <Shape p={p} turn={p.start} k={K} /> : null}
+                <Turns n={n} />
+                <Shape p={p} turn={goal} k={K} />
+              </Piece>
+            );
+          }
           return (
             <Piece key={i} tone={tone} ariaLabel={aria} onTap={locked ? undefined : () => tapPiece(i)}>
-              <Shape p={p} turn={worked ? round.solution[i].turn : answer.turns[i]} />
+              <Shape p={p} turn={answer.turns[i]} />
               {holding === i ? <TurnArrow /> : null}
             </Piece>
           );

@@ -34,6 +34,14 @@ import { Stepper } from '../../play/parts';
  * the clock 60 minutes, the minute stepper 30 (levels 1-2) or 15 (level 3).
  * Both wrap round the face like real hands, so 12 + 1 is 1.
  *
+ * Amounts are drawn, not only numbered. Under the minute stepper, a small face
+ * cut into one wedge per press shades the minutes it shows. Under the hour
+ * stepper, always: a whole shaded face (one turn of the long hand) beside one
+ * orange twelfth (the short hand moving on one number). On level 3 the gap
+ * sits on the arrow as long-hand turns — half a face, one face, two faces —
+ * with the words small underneath; on a hint, his own clock's distance from
+ * Now appears beneath it in the same faces.
+ *
  * Hint: what his answer does. Set: his clock gets an orange slice for the hour
  * it is in and a blue sweep for the minutes gone. Read: the same marks on the
  * fixed clock, with his reading drawn as dashed hands over it. Later: the Now
@@ -331,6 +339,92 @@ function longLine(t: number): string {
   return m === 0 ? 'Long hand on 12: 0 minutes past.' : `Long hand ${SHARE[m]}: ${m} minutes past.`;
 }
 
+interface PieProps {
+  readonly cx: number;
+  readonly cy: number;
+  readonly r: number;
+  /** Equal wedges the face is cut into, from 12. */
+  readonly parts: number;
+  /** How many wedges, from 12 clockwise, are shaded. */
+  readonly filled: number;
+  /** Shade colour: SWEEP for the long hand's minutes, SLICE for the short hand's hours. */
+  readonly fill?: string;
+  /** Which hand points at the end of the shaded wedges. */
+  readonly hand: 'long' | 'short';
+}
+
+/**
+ * A turn of one hand as countable pieces: a small face cut into equal wedges,
+ * the first `filled` shaded, the hand pointing where the shading ends — the
+ * same marks the big clock gets on a hint. Cut into 60/step wedges, one wedge
+ * is one press of the minute stepper and a whole face is one hour.
+ */
+function Pie({ cx, cy, r, parts, filled, fill = SWEEP, hand }: PieProps) {
+  const each = 360 / parts;
+  const long = hand === 'long';
+  const [hx, hy] = polar(cx, cy, r * (long ? 0.86 : 0.6), filled * each);
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={r} fill={FACE} />
+      {Array.from({ length: filled }, (_, i) => (
+        <path key={i} d={sector(cx, cy, r, i * each, (i + 1) * each)} fill={fill} fillOpacity="0.55" />
+      ))}
+      {Array.from({ length: parts }, (_, i) => {
+        const [x, y] = polar(cx, cy, r, i * each);
+        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke={INK} strokeWidth={r2(Math.max(1, r * 0.05))} />;
+      })}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={INK} strokeWidth={r2(Math.max(2, r * 0.08))} />
+      <line x1={cx} y1={cy} x2={hx} y2={hy} stroke={long ? LONG : SHORT} strokeWidth={r2(r * (long ? 0.12 : 0.2))} strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r={r2(r * 0.12)} fill={INK} />
+    </g>
+  );
+}
+
+/** `mins` of long-hand travel as a row of pies: one whole pie per hour, then the part hour. */
+function PieRow({ cx, cy, r, mins, step }: { cx: number; cy: number; r: number; mins: number; step: number }) {
+  const parts = 60 / step;
+  const wedges = Math.round(mins / step);
+  const count = Math.max(1, Math.ceil(wedges / parts));
+  const pitch = r * 2.5;
+  const x0 = cx - ((count - 1) * pitch) / 2;
+  return (
+    <g>
+      {Array.from({ length: count }, (_, i) => (
+        <Pie key={i} cx={r2(x0 + i * pitch)} cy={cy} r={r} parts={parts} filled={Math.min(parts, wedges - i * parts)} hand="long" />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * Under the hour stepper, always on the board: one whole turn of the long hand
+ * (a full blue face) is the short hand moving on one number (one orange slice
+ * of twelve). The gearing behind every clock he sets or reads, drawn rather
+ * than said.
+ */
+function HourKey({ step }: { step: number }) {
+  return (
+    <svg width="120" height="52" viewBox="0 0 120 52" role="img" aria-label="One whole turn of the long hand is one number for the short hand">
+      <Pie cx={25} cy={26} r={22} parts={60 / step} filled={60 / step} hand="long" />
+      <line x1="53" y1="21" x2="67" y2="21" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="53" y1="31" x2="67" y2="31" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+      <Pie cx={95} cy={26} r={22} parts={12} filled={1} fill={SLICE} hand="short" />
+    </svg>
+  );
+}
+
+/** Under the minute stepper, live: the minutes on the stepper as shaded wedges, one wedge a press. */
+function MinuteKey({ minutes, step }: { minutes: number; step: number }) {
+  return (
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+      <Pie cx={32} cy={32} r={29} parts={60 / step} filled={minutes / step} hand="long" />
+    </svg>
+  );
+}
+
+/** The gap as long-hand turns, for the screen-reader label (the pies say it to the eye). */
+const GAP_TURNS: Record<Gap, string> = { 30: 'half a turn', 60: 'one whole turn', 120: 'two whole turns' };
+
 /** Thick ground line shared by every destination picture. */
 function Ground({ fill }: { fill: string }) {
   return <rect x="0" y="196" width="260" height="24" rx="6" fill={fill} stroke={INK} strokeWidth="3" />;
@@ -476,22 +570,36 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   let label: string;
   if (round.task === 'later') {
     const gap = round.gap ?? 60;
-    // The arrow names the gap; "half an hour" is too wide for one line between the clocks.
+    // The gap is drawn as long-hand turns on the arrow: half a face, one whole
+    // face, two whole faces, cut into one wedge per minute-stepper press. The
+    // words stay underneath, small; "half an hour" is too wide for one line.
     const gapLines = gap === 30 ? ['half', 'an hour'] : [gap === 60 ? '1 hour' : '2 hours'];
+    // On a hint, his own clock's travel from Now in the same pies, under the
+    // arrow, so the two amounts sit side by side. Only forward and only up to
+    // three hours: further than that is not a near miss worth counting.
+    const his = norm(norm(answer) - now);
+    const hisPies = stage === 'hint' && his <= 180;
     // Hand positions, not the time: the label must not read the Now clock for him.
-    label = `Now clock: ${hands(now)}. Your clock says ${spoken(shown)}.`;
+    label = `Now clock: ${hands(now)}. On the arrow, ${GAP_TURNS[gap]} of the long hand. Your clock says ${spoken(shown)}.`;
     picture = (
       <>
         <Destination place={round.place} x={12} y={70} s={0.8} />
         <text x="380" y="58" textAnchor="middle" fontSize="30" fill={SOFT} style={font}>Now</text>
         <Clock cx={380} cy={215} r={125} t={now} />
+        <PieRow cx={570} cy={112} r={22} mins={gap} step={round.step} />
         {gapLines.map((line, i) => (
-          <text key={line} x="570" y={178 - (gapLines.length - 1 - i) * 28} textAnchor="middle" fontSize="24" fill={SOFT} style={font}>
+          <text key={line} x="570" y={160 + i * 20} textAnchor="middle" fontSize="18" fill={SOFT} style={font}>
             {line}
           </text>
         ))}
-        <line x1="522" y1="200" x2="608" y2="200" stroke={SOFT} strokeWidth="5" />
-        <path d="M606 188 L624 200 L606 212 Z" fill={SOFT} />
+        <line x1="522" y1="205" x2="608" y2="205" stroke={SOFT} strokeWidth="5" />
+        <path d="M606 193 L624 205 L606 217 Z" fill={SOFT} />
+        {hisPies ? (
+          <>
+            <PieRow cx={570} cy={268} r={16} mins={his} step={round.step} />
+            <text x="570" y="306" textAnchor="middle" fontSize="18" fill={SOFT} style={font}>your clock</text>
+          </>
+        ) : null}
         <text x="760" y="58" textAnchor="middle" fontSize="30" fill={SOFT} style={font}>We leave</text>
         <Clock cx={760} cy={215} r={125} t={shown} marks={evidence} ghost={evidence ? now : null} />
       </>
@@ -541,6 +649,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             onChange={(n) => setHour(n > hourOf(shown) ? 1 : -1)}
           />
           <span style={subStyle}>1 hour a press</span>
+          <HourKey step={round.step} />
         </div>
         {reading ? (
           <p className="board-caption" style={{ fontSize: 'var(--t-xl)', fontWeight: 700, color: INK }} aria-label={`Your reading: ${digital(shown)}`}>
@@ -559,6 +668,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             onChange={(n) => setMinute(n > minuteValue ? 1 : -1)}
           />
           <span style={subStyle}>{round.step} minutes a press</span>
+          <MinuteKey minutes={minuteValue} step={round.step} />
         </div>
       </div>
       {stage === 'hint' && round.task === 'later' ? (

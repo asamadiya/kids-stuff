@@ -34,6 +34,14 @@ import { Piece, Slot, Tray } from '../../play/parts';
  * take the place colours (ones green, tens blue, hundreds red, then the cycle
  * repeats, as Montessori materials do), so adding a card visibly moves every
  * card before it up one place.
+ *
+ * Every number is also drawn as blocks, so no amount is a bare numeral: each
+ * digit in the place chart stands over that many blocks of its place (small
+ * cube, rod of ten, flat of a hundred, then cube, long block, slab, ten times
+ * bigger each step). Under the chart a fixed key shows each swap the round
+ * needs: ten loose cubes beside the same ten joined into a rod, ten rods
+ * beside the flat they make, and so on. Each card shows its digit over that
+ * many dots in a ten-frame. The chart shows his number from the first tap.
  */
 
 export type Move = 'one' | 'digit';
@@ -192,6 +200,223 @@ const INK = '#24170f';
 const INK_SOFT = '#5a4636';
 const GOLD = '#f2a900';
 const DISPLAY = { fontFamily: 'var(--font-display)', fontWeight: 700 } as const;
+/** Block fills by place, cycling like the cards. */
+const FILL = ['var(--ones)', 'var(--tens)', 'var(--hundreds)'];
+/** One block of each place, for the key's spoken labels. */
+const UNIT_NAMES = ['one', 'ten', 'hundred', 'thousand', 'ten thousand', 'hundred thousand', 'million'];
+const fillOf = (p: number) => FILL[p % 3];
+/** The nine lines that split a length into ten equal parts. */
+const tenths = (len: number) => Array.from({ length: 9 }, (_, k) => ((k + 1) * len) / 10);
+
+/** A polygon in a place colour, lit (+) or shaded (−) by an overlay, then outlined. */
+function Face({ points, fill, shade = 0, sw = 1 }: { readonly points: string; readonly fill: string; readonly shade?: number; readonly sw?: number }) {
+  return (
+    <>
+      <polygon points={points} fill={fill} />
+      {shade !== 0 ? <polygon points={points} fill={shade > 0 ? '#ffffff' : '#000000'} fillOpacity={Math.abs(shade)} /> : null}
+      <polygon points={points} fill="none" stroke={INK} strokeWidth={sw} strokeLinejoin="round" />
+    </>
+  );
+}
+
+/**
+ * A box in cabinet projection: front w × h, d deep. `split` draws the nine
+ * lines where ten smaller blocks meet on the front face.
+ */
+function Box({ x, y, w, h, d, fill, sw = 1, split }: {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  readonly d: number;
+  readonly fill: string;
+  readonly sw?: number;
+  readonly split?: 'h' | 'v';
+}) {
+  const top = `${x},${y} ${x + w},${y} ${x + w + d},${y - d} ${x + d},${y - d}`;
+  const side = `${x + w},${y} ${x + w + d},${y - d} ${x + w + d},${y + h - d} ${x + w},${y + h}`;
+  const front = `${x},${y} ${x + w},${y} ${x + w},${y + h} ${x},${y + h}`;
+  return (
+    <g>
+      <Face points={top} fill={fill} shade={0.4} sw={sw} />
+      <Face points={side} fill={fill} shade={-0.25} sw={sw} />
+      <Face points={front} fill={fill} sw={sw} />
+      {split === 'h' ? tenths(h).map((t) => <line key={t} x1={x} x2={x + w} y1={y + t} y2={y + t} stroke={INK} strokeWidth={sw * 0.6} />) : null}
+      {split === 'v' ? tenths(w).map((t) => <line key={t} x1={x + t} x2={x + t} y1={y} y2={y + h} stroke={INK} strokeWidth={sw * 0.6} />) : null}
+    </g>
+  );
+}
+
+/**
+ * One block of place p in an 18-unit tile. Each is ten of the one before,
+ * joined the way the key joins them: a cube; a rod (ten cubes in a row); a
+ * flat (ten rods, one above another); a big cube (ten flats, front to back);
+ * a long block (ten big cubes in a row); a slab (ten long blocks, one above
+ * another); a giant cube (ten slabs, front to back).
+ */
+function Block({ p }: { readonly p: number }) {
+  const fill = fillOf(p);
+  if (p === 0) return <rect x="5" y="5" width="8" height="8" fill={fill} stroke={INK} strokeWidth="1" />;
+  if (p === 1) {
+    return (
+      <g>
+        <rect x="0.5" y="6.5" width="17" height="5" fill={fill} stroke={INK} strokeWidth="1" />
+        {tenths(17).map((t) => <line key={t} x1={0.5 + t} x2={0.5 + t} y1="6.5" y2="11.5" stroke={INK} strokeWidth="0.5" />)}
+      </g>
+    );
+  }
+  if (p === 2) {
+    return (
+      <g>
+        <rect x="0.5" y="0.5" width="17" height="17" fill={fill} stroke={INK} strokeWidth="1" />
+        {tenths(17).map((t) => <line key={t} x1="0.5" x2="17.5" y1={0.5 + t} y2={0.5 + t} stroke={INK} strokeWidth="0.5" />)}
+      </g>
+    );
+  }
+  if (p === 3) return <Box x={0.5} y={5} w={12.5} h={12.5} d={4.5} fill={fill} />;
+  if (p === 4) return <Box x={0.5} y={9} w={14} h={5} d={3} fill={fill} split="v" />;
+  if (p === 5) return <Box x={0.5} y={3} w={14.5} h={14.5} d={2.5} fill={fill} split="h" />;
+  return <Box x={0.5} y={5} w={12.5} h={12.5} d={4.5} fill={fill} sw={2} />;
+}
+
+/** Each block's drawn extent in its tile, [x0, y0, x1, y1], for the places a swap starts from (10001 needs four). */
+const EXTENT: readonly (readonly [number, number, number, number])[] = [
+  [5, 5, 13, 13],
+  [0.5, 6.5, 17.5, 11.5],
+  [0.5, 0.5, 17.5, 17.5],
+  [0.5, 0.5, 17.5, 17.5],
+];
+
+/**
+ * How ten blocks of place p sit when joined: the step from one to the next,
+ * and whether to draw the last one first (a stack drawn back to front, so the
+ * front block covers the ones behind it).
+ */
+const JOIN: readonly { readonly dx: number; readonly dy: number; readonly backFirst: boolean }[] = [
+  { dx: 8, dy: 0, backFirst: false },
+  { dx: 0, dy: 5, backFirst: false },
+  { dx: 1.6, dy: -1.6, backFirst: true },
+  { dx: 12.5, dy: 0, backFirst: false },
+];
+
+const TILE = 18;
+const LOOSE_W = 10 * (TILE + 2) + 8;
+
+/**
+ * One swap, drawn: ten loose blocks of place p (five and five), the same ten
+ * joined and tied with a gold band, and the one block of the next place that
+ * the chart uses for them.
+ */
+function Swap({ p }: { readonly p: number }) {
+  const [x0, y0, x1, y1] = EXTENT[p];
+  const { dx, dy, backFirst } = JOIN[p];
+  const tied = [x0 + Math.min(0, 9 * dx), y0 + Math.min(0, 9 * dy), x1 + Math.max(0, 9 * dx), y1 + Math.max(0, 9 * dy)];
+  const tiedW = tied[2] - tied[0];
+  const tiedH = tied[3] - tied[1];
+  const H = Math.max(TILE, tiedH) + 12;
+  const mid = H / 2;
+  const tileY = mid - TILE / 2;
+  const tx = LOOSE_W + 34 - tied[0];
+  const ty = mid - tiedH / 2 - tied[1];
+  const eq2 = LOOSE_W + 34 + tiedW + 16;
+  const W = eq2 + 34 + TILE + 2;
+  const order = Array.from({ length: 10 }, (_, i) => (backFirst ? 9 - i : i));
+  const eq = (x: number) => (
+    <text x={x} y={mid + 7} textAnchor="middle" fontSize="20" fill={INK} style={DISPLAY}>
+      =
+    </text>
+  );
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width={W * ZOOM}
+      height={H * ZOOM}
+      style={{ width: W * ZOOM, height: 'auto', maxWidth: '100%' }}
+      role="img"
+      aria-label={`Ten ${UNIT_NAMES[p]}s, the same ten ${UNIT_NAMES[p]}s joined, make one ${UNIT_NAMES[p + 1]}.`}
+    >
+      {Array.from({ length: 10 }, (_, i) => (
+        <g key={i} transform={`translate(${i * (TILE + 2) + (i >= 5 ? 8 : 0)} ${tileY})`}>
+          <Block p={p} />
+        </g>
+      ))}
+      {eq(LOOSE_W + 14)}
+      <g transform={`translate(${tx} ${ty})`}>
+        {order.map((i) => (
+          <g key={i} transform={`translate(${i * dx} ${i * dy})`}>
+            <Block p={p} />
+          </g>
+        ))}
+        <rect x={tied[0] - 3} y={tied[1] - 3} width={tiedW + 6} height={tiedH + 6} rx="4" fill="none" stroke={GOLD} strokeWidth="3" />
+      </g>
+      {eq(eq2 + 14)}
+      <g transform={`translate(${eq2 + 32} ${tileY})`}>
+        <Block p={p + 1} />
+      </g>
+    </svg>
+  );
+}
+
+/** The swaps this round's numbers use, ones up, permanently on the board. */
+function SwapKey({ swaps }: { readonly swaps: number }) {
+  if (swaps <= 0) return null;
+  return (
+    <div
+      role="group"
+      aria-label="Ten of a block make one of the next block"
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: 8, background: '#ffffff', borderRadius: 14, border: '2px solid #ead9bf', overflowX: 'auto' }}
+    >
+      {Array.from({ length: swaps }, (_, p) => (
+        <Swap key={p} p={p} />
+      ))}
+    </div>
+  );
+}
+
+/** n dots in a ten-frame (five and five): how many a digit card counts. */
+function Dots({ n }: { readonly n: number }) {
+  return (
+    <svg viewBox="0 0 52 22" width={52} height={22} style={{ width: 52, height: 22 }} aria-hidden="true">
+      {Array.from({ length: 10 }, (_, i) => {
+        const cx = 6 + (i % 5) * 10;
+        const cy = 6 + Math.floor(i / 5) * 10;
+        return i < n ? (
+          <circle key={i} cx={cx} cy={cy} r="4" fill="currentColor" />
+        ) : (
+          <circle key={i} cx={cx} cy={cy} r="3.2" fill="none" stroke="currentColor" strokeWidth="1" strokeOpacity="0.45" />
+        );
+      })}
+    </svg>
+  );
+}
+
+/** A digit card's face: the digit, and under it that many dots. */
+function CardFace({ d }: { readonly d: number }) {
+  return (
+    <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      <span style={{ fontSize: 30, lineHeight: 1, ...DISPLAY }}>{d}</span>
+      <Dots n={d} />
+    </span>
+  );
+}
+
+const PILE = 60;
+/** Drawn size of a pile and the key: 1.4 × their viewBox, so a ones cube is 11 px. */
+const ZOOM = 1.4;
+const PILE_PX = PILE * ZOOM;
+
+/** n blocks of place p, three to a row: what a digit in that place is worth. A 0 is no blocks. */
+function Pile({ n, p }: { readonly n: number; readonly p: number }) {
+  return (
+    <svg viewBox={`0 0 ${PILE} ${PILE}`} width={PILE_PX} height={PILE_PX} style={{ width: PILE_PX, height: PILE_PX }} aria-hidden="true">
+      {Array.from({ length: n }, (_, i) => (
+        <g key={i} transform={`translate(${(i % 3) * 20 + 1 + (3 - Math.min(3, n - (i - (i % 3)))) * 10} ${Math.floor(i / 3) * 20 + 1})`}>
+          <Block p={p} />
+        </g>
+      ))}
+    </svg>
+  );
+}
 
 /** The place (0 = ones) of the card at index i in a row of `len` cards. */
 const placeOf = (i: number, len: number) => len - 1 - i;
@@ -316,13 +541,15 @@ interface ChartRow {
 }
 
 /**
- * Beat-it rounds: a place chart. Columns are places, ones on the right, so
- * Dada's number and his line up digit under digit and an extra place stands
- * out as a box with nothing above it.
+ * A place chart. Columns are places, ones on the right, so Dada's number and
+ * his line up digit under digit and an extra place stands out as a box with
+ * nothing above it. Under every digit sit that many blocks of its place, so
+ * 555 against 111 is five flats against one before it is a numeral.
  */
 function PlaceChart({ rows, cols }: { readonly rows: readonly ChartRow[]; readonly cols: number }) {
-  const grid = { display: 'grid', gridTemplateColumns: `minmax(5.5em, auto) repeat(${cols}, 56px) minmax(5em, auto)`, gap: 8, alignItems: 'center', justifyContent: 'center' } as const;
+  const grid = { display: 'grid', gridTemplateColumns: `minmax(5.5em, auto) repeat(${cols}, ${PILE_PX + 4}px) minmax(5em, auto)`, gap: 8, alignItems: 'center', justifyContent: 'center' } as const;
   const places = Array.from({ length: cols }, (_, i) => cols - 1 - i);
+  const column = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 } as const;
   return (
     <div role="table" aria-label="Place chart" style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowX: 'auto', padding: 8, background: '#ffffff', borderRadius: 14, border: '2px solid #ead9bf' }}>
       <div role="row" style={grid}>
@@ -345,10 +572,19 @@ function PlaceChart({ rows, cols }: { readonly rows: readonly ChartRow[]; readon
             </span>
             {places.map((p) => {
               const i = r.digits.length - 1 - p;
-              if (i < 0) return <span key={p} role="cell" style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed #c9ad86' }} />;
+              if (i < 0) {
+                return (
+                  <span key={p} role="cell" style={column}>
+                    <span style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed #c9ad86' }} />
+                    <span style={{ width: PILE_PX, height: PILE_PX }} />
+                  </span>
+                );
+              }
+              const d = r.digits[i];
               return (
-                <span key={p} role="cell">
-                  <Cell d={String(r.digits[i])} place={p} worked={r.worked} faded={r.fadeLead && i < firstWritten} ring={p < (r.ring ?? 0)} />
+                <span key={p} role="cell" style={column} aria-label={`${d} ${PLACE_NAMES[p]}`}>
+                  <Cell d={String(d)} place={p} worked={r.worked} faded={r.fadeLead && i < firstWritten} ring={p < (r.ring ?? 0)} />
+                  <Pile n={d} p={p} />
                 </span>
               );
             })}
@@ -371,6 +607,8 @@ function chartRows(round: Round, answer: Answer, stage: Stage): { readonly rows:
   const dada: ChartRow = { name: "Dada's", digits: s, count: stage !== 'answering' };
   const yours: ChartRow = { name: 'Yours', digits: answer, fadeLead: true, count: stage !== 'answering' };
   const widest = (rows: readonly ChartRow[]) => ({ rows, cols: Math.max(...rows.map((r) => r.digits.length)) });
+  // While he builds, the chart is Dada's blocks over his: every tap shows up as blocks at once.
+  if (stage === 'answering') return widest([dada, yours]);
   if (round.move === 'one') {
     // The hint rings the 9s the sentence names; the answer rings every digit one more changed.
     const k = trailingNines(round.start);
@@ -392,29 +630,33 @@ function chartRows(round: Round, answer: Answer, stage: Stage): { readonly rows:
   return widest([dada, yours]);
 }
 
+/** The swaps the key draws: enough to explain every block in the round's answer. */
+const swapsFor = (round: Round) => placesIn(round.move === 'one' ? round.start + 1 : 10 ** placesIn(round.start)) - 1;
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'worked' || stage === 'solved';
   const worked = stage === 'worked' ? workedDigits(round) : null;
   const shown = worked ?? answer;
   const full = answer.length >= MAX_CARDS;
   const cards = round.move === 'one' ? ALL_DIGITS : ONE_ZERO;
-  const chart =
-    round.move === 'digit' || locked || (stage === 'hint' && trailingNines(round.start) > 0) ? chartRows(round, answer, stage) : null;
+  const chart = chartRows(round, answer, stage);
   return (
     <div className="board">
       {round.move === 'one' ? <NumberLine round={round} answer={answer} stage={stage} /> : null}
-      {chart ? <PlaceChart rows={chart.rows} cols={chart.cols} /> : null}
+      <PlaceChart rows={chart.rows} cols={chart.cols} />
+      <SwapKey swaps={swapsFor(round)} />
       <p className="board-caption">{worked ? 'The answer' : 'Your number'}</p>
       <Slot ariaLabel={`${worked ? 'The answer' : 'Your number'}: ${shown.length ? written(shown) : 'no cards yet'}`} filled={shown.length > 0} wide>
         {shown.map((d, i) => (
           <Piece
             key={`${i}-${d}`}
-            label={String(d)}
             hue={hueOf(i, shown.length)}
             tone={worked ? 'worked' : 'placed'}
             onTap={locked ? undefined : () => setAnswer(answer.filter((_, j) => j !== i))}
             ariaLabel={worked ? `${d}, ${PLACE_NAMES[placeOf(i, shown.length)]} place` : `Take off the ${d}`}
-          />
+          >
+            <CardFace d={d} />
+          </Piece>
         ))}
         {shown.length === 0 ? <span className="board-caption">tap a card</span> : null}
       </Slot>
@@ -422,11 +664,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         {cards.map((d) => (
           <Piece
             key={d}
-            label={String(d)}
             tone={full ? 'ghost' : 'source'}
             onTap={locked || full ? undefined : () => setAnswer([...answer, d])}
             ariaLabel={`Put a ${d} on the end`}
-          />
+          >
+            <CardFace d={d} />
+          </Piece>
         ))}
       </Tray>
     </div>

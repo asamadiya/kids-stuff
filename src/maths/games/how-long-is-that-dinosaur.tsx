@@ -30,8 +30,17 @@ import { Choice } from '../../play/parts';
  *     the eye cannot settle it from one end. More blocks is longer in some
  *     rounds and shorter in others; two rounds are equal.
  *
- * Control: tap-to-choose only. One Choice per length (levels 1-2), or one per
- * dinosaur plus "Same length" (level 3).
+ * Control: tap-to-choose only. One Choice per length (levels 1-2), each a row
+ * of that many blocks over its digit, drawn at one scale for every button; or
+ * one per dinosaur plus "Same length" (level 3), each a picture over a small
+ * word. A tap shows on the board at once: a length goes on the measuring
+ * line from tail to nose as that many little blocks and the digit; a
+ * dinosaur's row is ringed in gold ("Same length" rings both). The little
+ * blocks are far smaller than the board's, so they cannot be laid against the
+ * dinosaur: a full-size row that followed his taps could be walked onto the
+ * nose, a lookup rather than a measurement. Level 2 keeps a key on the board:
+ * three blocks standing one over each space of a bit of strip, four marks
+ * under three blocks. Level 3's key shows one big block over its small blocks.
  * Hint: the length he CHECKED drawn as a dashed row of blocks from the tail,
  * so he sees it stop short of the nose or run past it; the tail and nose
  * lines drawn bold in blue (level 1); a ghost block in the gap; the tail and
@@ -424,17 +433,44 @@ function MiniDino({ species }: { readonly species: Species }) {
   );
 }
 
-/** "Same length" drawn: a big-block bar and a small-block bar ending on the same two lines. */
-function SameIcon() {
+/** "Same length" drawn: two big blocks over the small blocks that match them, both rows ending on the same two lines. */
+function SameIcon({ ratio }: { readonly ratio: 2 | 3 }) {
+  const s = 60 / (2 * ratio);
   return (
-    <svg viewBox="0 0 72 40" width="62" height="34" aria-hidden="true">
-      <rect x="6" y="6" width="60" height="12" rx="3" fill={TEAK} stroke={INK} strokeWidth="2" />
-      <rect x="6" y="22" width="60" height="12" rx="3" fill={WOOD} stroke={INK} strokeWidth="2" />
+    <svg viewBox="0 0 72 40" width="80" height="44" aria-hidden="true">
+      {range(2).map((i) => (
+        <rect key={`b${i}`} x={6 + i * 30} y="6" width="30" height="12" rx="2.5" fill={TEAK} stroke={INK} strokeWidth="1.8" />
+      ))}
+      {range(2 * ratio).map((i) => (
+        <rect key={`s${i}`} x={6 + i * s} y="22" width={s} height="12" rx="2" fill={WOOD} stroke={INK} strokeWidth="1.8" />
+      ))}
       <line x1="6" x2="6" y1="1" y2="39" stroke={INK_SOFT} strokeWidth="2.5" strokeDasharray="4 3" />
       <line x1="66" x2="66" y1="1" y2="39" stroke={INK_SOFT} strokeWidth="2.5" strokeDasharray="4 3" />
     </svg>
   );
 }
+
+/** Little blocks: one size on every button and every measuring-line tag, far smaller than the board's. */
+const MB = 12;
+const MBH = 16;
+
+/** A length answer drawn: n little blocks end to end over its digit. */
+function BlockRow({ n }: { readonly n: number }) {
+  const w = n * MB + 4;
+  return (
+    <svg viewBox={`0 0 ${w} ${MBH + 4}`} width={w} height={MBH + 4} aria-hidden="true">
+      {range(n).map((i) => (
+        <rect key={i} x={2 + i * MB} y="2" width={MB} height={MBH} rx="2" fill={WOOD} stroke={INK} strokeWidth="1.5" />
+      ))}
+    </svg>
+  );
+}
+
+/** A choice's face: the picture first, its word or digit underneath. */
+const FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' } as const;
+const WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)' } as const;
+/** A length's digit under its blocks: readable, but the blocks come first. */
+const DIGIT = { fontSize: 'var(--t-lg)', fontWeight: 700, color: 'var(--ink)' } as const;
 
 const range = (n: number) => Array.from({ length: n }, (_, i) => i);
 
@@ -494,7 +530,55 @@ interface SceneProps<R> {
   readonly stage: Stage;
   /** The answer the hint is pinned to. */
   readonly tried: Answer;
+  /** What the board shows as chosen now: his current tap, or the solution once worked. */
+  readonly chosen: Answer;
 }
+
+const GOLD = '#f2a900';
+const GOLD_TINT = '#fff1c9';
+
+/**
+ * The measuring line from the tail line to the nose line, with the chosen
+ * length on it as little blocks and its digit (a dashed empty tag before he
+ * taps). The little blocks are a fixed small size, so they say how many,
+ * never how long: they cannot be laid against the dinosaur.
+ */
+function Measure({ x1, x2, y, n, done }: { readonly x1: number; readonly x2: number; readonly y: number; readonly n: number | null; readonly done: boolean }) {
+  const colour = done ? WORKED : INK_SOFT;
+  const tw = n === null ? 56 : n * MB + 50;
+  const th = 40;
+  const tx = (x1 + x2 - tw) / 2;
+  return (
+    <g>
+      <line x1={x1} x2={x2} y1={y} y2={y} stroke={colour} strokeWidth="3" />
+      <path d={`M${x1} ${y} l12 -7 v14 Z M${x2} ${y} l-12 -7 v14 Z`} fill={colour} />
+      <rect
+        x={tx}
+        y={y - th / 2}
+        width={tw}
+        height={th}
+        rx="10"
+        fill={n === null ? '#fffdf7' : done ? WORKED_TINT : GOLD_TINT}
+        stroke={n === null ? INK_SOFT : done ? WORKED : INK}
+        strokeWidth="3"
+        strokeDasharray={n === null ? '7 5' : undefined}
+      />
+      {n === null ? (
+        <Num x={tx + tw / 2} y={y} n="?" colour={INK_SOFT} size={24} />
+      ) : (
+        <>
+          {range(n).map((i) => (
+            <rect key={i} x={tx + 8 + i * MB} y={y - MBH / 2} width={MB} height={MBH} rx="2" fill={WOOD} stroke={INK} strokeWidth="1.5" />
+          ))}
+          <Num x={tx + 8 + n * MB + 21} y={y} n={n} colour={done ? WORKED_DEEP : INK} size={26} />
+        </>
+      )}
+    </g>
+  );
+}
+
+const lengthChosen = (chosen: Answer) => (typeof chosen === 'number' ? chosen : null);
+const sayChosen = (n: number | null) => (n === null ? 'The measuring line under it has no length on it yet.' : `The measuring line under it shows ${blocks(n)}.`);
 
 /** A dashed row of `n` blocks from x, numbered: the length he chose, laid out from the tail. */
 function TryRow({ x, y, u, h, n }: { readonly x: number; readonly y: number; readonly u: number; readonly h: number; readonly n: number }) {
@@ -518,10 +602,11 @@ const BY1 = 214;
 const BH1 = 40;
 const RY1 = 276;
 const RH1 = 34;
+const MY1 = 350;
 const W1 = 720;
-const H1 = 322;
+const H1 = 378;
 
-function BlocksScene({ round, stage, tried }: SceneProps<BlocksRound>) {
+function BlocksScene({ round, stage, tried, chosen }: SceneProps<BlocksRound>) {
   const show = stage === 'worked' || stage === 'solved';
   const hint = stage === 'hint';
   const width = round.length * U1;
@@ -529,11 +614,12 @@ function BlocksScene({ round, stage, tried }: SceneProps<BlocksRound>) {
   const bx = (i: number) => X0 + i * U1;
   const laid = range(round.length).filter((i) => i !== round.gap);
   const n = hint && typeof tried === 'number' ? tried : 0;
-  const bottom = n > 0 ? RY1 + RH1 : BY1 + BH1;
+  const bottom = MY1;
   const label = [
     `A ${NAME[round.species]} with ${blocks(laid.length)} in a row under it${round.gap === null ? '' : ', and one space with no block'}.`,
     n > 0 ? `A dashed row of ${blocks(n)} starts at the tail.` : '',
     show ? `The blocks are numbered 1 to ${round.length}, tail to nose.` : '',
+    sayChosen(lengthChosen(chosen)),
   ].filter(Boolean).join(' ');
   return (
     <Picture w={W1} h={H1} label={label}>
@@ -547,6 +633,7 @@ function BlocksScene({ round, stage, tried }: SceneProps<BlocksRound>) {
       {n > 0 ? <TryRow x={X0} y={RY1} u={U1} h={RH1} n={n} /> : null}
       <Drop x={X0} y1={tailY} y2={bottom} colour={hint ? HINT : INK_SOFT} width={hint ? 4 : 2.5} />
       <Drop x={X0 + width} y1={noseY} y2={bottom} colour={hint ? HINT : INK_SOFT} width={hint ? 4 : 2.5} />
+      <Measure x1={X0} x2={X0 + width} y={MY1} n={lengthChosen(chosen)} done={show} />
     </Picture>
   );
 }
@@ -559,10 +646,13 @@ const SY = 198;
 const SH = 58;
 const RY2 = 270;
 const RH2 = 34;
+const MY2 = 344;
 const W2 = X0 * 2 + STRIP_END * U2;
-const H2 = 316;
+const H2 = 372;
+/** Every other space on the strip is shaded, so each space is a cell to count. */
+const CELL = '#fbe2a8';
 
-function StripScene({ round, stage, tried }: SceneProps<StripRound>) {
+function StripScene({ round, stage, tried, chosen }: SceneProps<StripRound>) {
   const show = stage === 'worked' || stage === 'solved';
   const hint = stage === 'hint';
   const len = round.to - round.from;
@@ -570,16 +660,20 @@ function StripScene({ round, stage, tried }: SceneProps<StripRound>) {
   const width = len * U2;
   const { tailY, noseY } = ends(round.species, width, G2, MAXH2);
   const n = hint && typeof tried === 'number' ? tried : 0;
-  const rowEnd = n > 0 || show ? RY2 + RH2 : SY + 20;
+  const rowEnd = MY2;
   const label = [
     `A ${NAME[round.species]} above a strip marked 0 to ${STRIP_END}. Its tail is over ${round.from} and its nose over ${round.to}.`,
     n > 0 ? `A dashed row of ${blocks(n)} starts at the tail.` : '',
     show ? `The ${len} spaces from ${round.from} to ${round.to} are numbered 1 to ${len}.` : '',
+    sayChosen(lengthChosen(chosen)),
   ].filter(Boolean).join(' ');
   return (
     <Picture w={W2} h={H2} label={label}>
       <Dino species={round.species} x={mx(round.from)} width={width} ground={G2} maxH={MAXH2} />
       <rect x={mx(0) - 24} y={SY} width={STRIP_END * U2 + 48} height={SH} rx="6" fill={STRIP} stroke={INK} strokeWidth="3" />
+      {range(STRIP_END)
+        .filter((m) => m % 2 === 1)
+        .map((m) => <rect key={`c${m}`} x={mx(m)} y={SY + 2} width={U2} height={22} fill={CELL} />)}
       {show ? <rect x={mx(round.from)} y={SY + 2} width={width} height={22} fill={WORKED_TINT} /> : null}
       {range(STRIP_END + 1).map((m) => (
         <g key={m}>
@@ -599,9 +693,30 @@ function StripScene({ round, stage, tried }: SceneProps<StripRound>) {
             </g>
           ))
         : null}
-      <Drop x={mx(round.from)} y1={tailY} y2={rowEnd} />
-      <Drop x={mx(round.to)} y1={noseY} y2={rowEnd} />
+      <Drop x={mx(round.from)} y1={tailY} y2={SY + 24} />
+      <Drop x={mx(round.to)} y1={noseY} y2={SY + 24} />
+      <Drop x={mx(round.from)} y1={SY + SH} y2={rowEnd} />
+      <Drop x={mx(round.to)} y1={SY + SH} y2={rowEnd} />
+      <Measure x1={mx(round.from)} x2={mx(round.to)} y={MY2} n={lengthChosen(chosen)} done={show} />
     </Picture>
+  );
+}
+
+/** Level 2's key: three blocks standing over three spaces of a bit of strip, one block to a space, four marks. */
+function StripKey() {
+  const u = 40;
+  const x = (m: number) => 14 + m * u;
+  return (
+    <svg viewBox="0 0 150 72" width="150" height="72" role="img" aria-label="Three blocks fill three spaces on the strip, one block to a space, between four marks.">
+      {range(3).map((i) => (
+        <Block key={i} x={x(i)} y={4} w={u} h={30} look="wood" />
+      ))}
+      <rect x={4} y={40} width={142} height={28} rx="5" fill={STRIP} stroke={INK} strokeWidth="2.5" />
+      <rect x={x(1)} y={42} width={u} height={18} fill={CELL} />
+      {range(4).map((m) => (
+        <line key={m} x1={x(m)} x2={x(m)} y1={40} y2={60} stroke={INK} strokeWidth="2.5" />
+      ))}
+    </svg>
   );
 }
 
@@ -642,17 +757,22 @@ function CompareRow({ m, ratio, top, stage }: { readonly m: Measured; readonly r
   );
 }
 
-function CompareScene({ round, stage }: SceneProps<CompareRound>) {
+function CompareScene({ round, stage, chosen }: SceneProps<CompareRound>) {
   const show = stage === 'worked' || stage === 'solved';
   const say = (m: Measured) => `${m.count} ${m.unit} ${m.count === 1 ? 'block' : 'blocks'}`;
+  const ring = (side: Side) => chosen === side || chosen === 'same';
   const label = [
     `Top: a ${NAME[round.top.species]} on ${say(round.top)}. Bottom: a ${NAME[round.bottom.species]} on ${say(round.bottom)}.`,
     `One big block is as long as ${round.ratio} small blocks.`,
     show ? 'Both rows start at the same line and are counted in small blocks.' : '',
+    chosen === 'same' ? 'Both rows are ringed.' : chosen === 'top' || chosen === 'bottom' ? `The ${chosen} row is ringed.` : '',
   ].filter(Boolean).join(' ');
   return (
     <Picture w={W3} h={H3} label={label}>
       <rect x="0" y={ROW - 2} width={W3} height="4" fill={TABLE} />
+      {(['top', 'bottom'] as const).map((side, i) =>
+        ring(side) ? <rect key={side} x={6} y={i * ROW + 4} width={W3 - 12} height={ROW - 6} rx="18" fill={GOLD_TINT} stroke={GOLD} strokeWidth="6" /> : null,
+      )}
       {show ? <line x1={X0} x2={X0} y1="12" y2={H3 - 12} stroke={WORKED} strokeWidth="5" /> : null}
       <CompareRow m={round.top} ratio={round.ratio} top={0} stage={stage} />
       <CompareRow m={round.bottom} ratio={round.ratio} top={ROW} stage={stage} />
@@ -691,6 +811,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const tried = stage !== 'hint' ? null : checked.has(round) ? (checked.get(round) ?? null) : atHelp;
   const locked = stage === 'worked' || stage === 'solved';
   const sol = solution(round);
+  // What the board shows as chosen: his tap at once, the solution once worked.
+  const chosen: Answer = locked ? sol : answer;
 
   const choice = (v: number | Side, body: ReactNode, aria: string) => (
     <Choice
@@ -704,29 +826,31 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       {body}
     </Choice>
   );
-  const dino = (m: Measured, side: Side) =>
-    choice(
-      side,
-      <>
-        <MiniDino species={m.species} />
-        <span>{NAME[m.species]}</span>
-      </>,
-      `The ${NAME[m.species]} is longer`,
-    );
+  const face = (picture: ReactNode, word: ReactNode) => (
+    <span style={FACE}>
+      {picture}
+      <span style={WORD}>{word}</span>
+    </span>
+  );
+  const dino = (m: Measured, side: Side) => choice(side, face(<MiniDino species={m.species} />, NAME[m.species]), `The ${NAME[m.species]} is longer`);
 
   return (
     <div className="board board--measure">
       <p className="board-caption">{caption(round)}</p>
       {round.kind === 'blocks' ? (
-        <BlocksScene round={round} stage={stage} tried={tried} />
+        <BlocksScene round={round} stage={stage} tried={tried} chosen={chosen} />
       ) : round.kind === 'strip' ? (
-        <StripScene round={round} stage={stage} tried={tried} />
+        <StripScene round={round} stage={stage} tried={tried} chosen={chosen} />
       ) : (
-        <CompareScene round={round} stage={stage} tried={tried} />
+        <CompareScene round={round} stage={stage} tried={tried} chosen={chosen} />
       )}
       {round.kind === 'compare' ? (
         <div className="board-row">
           <Key ratio={round.ratio} />
+        </div>
+      ) : round.kind === 'strip' ? (
+        <div className="board-row">
+          <StripKey />
         </div>
       ) : null}
       <div className="choices" role="group" aria-label={round.kind === 'compare' ? 'Which is longer' : 'Length in blocks'}>
@@ -734,16 +858,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           ? [
               dino(round.top, 'top'),
               dino(round.bottom, 'bottom'),
-              choice(
-                'same',
-                <>
-                  <SameIcon />
-                  <span>Same length</span>
-                </>,
-                'They are the same length',
-              ),
+              choice('same', face(<SameIcon ratio={round.ratio} />, 'Same length'), 'They are the same length'),
             ]
-          : round.options.map((n) => choice(n, <span>{n}</span>, blocks(n)))}
+          : round.options.map((n) => choice(n, face(<BlockRow n={n} />, <span style={DIGIT}>{n}</span>), blocks(n)))}
       </div>
       {stage === 'worked' ? <p className="board-caption">{workedLine(round)}</p> : null}
     </div>

@@ -30,8 +30,10 @@ import { Piece } from '../../play/parts';
  *     fit a 10-, 12- or 14-vote tally — the reason a key exists.
  *
  * Control: tap-to-add/remove only. At the end of each open row sit two
- * pieces: tap the fruit to add one picture to that row, or the minus to take
- * the last one off. Nothing is counted for him until Check or Help: then the
+ * pieces: his fruit with a green plus adds one picture to that row, the
+ * same fruit faded with a red minus takes the last one off. A read round's
+ * clue is drawn in the open row too (see ClueDrawing), so the sentence over
+ * the board is never the only place it lives. Nothing is counted for him until Check or Help: then the
  * vote counts appear beside every tally and at the end of every row, at level
  * 3 each picture carries its "2", and a gold dashed line runs down the chart
  * where the row the clue is measured from ends. The worked answer draws the
@@ -274,8 +276,13 @@ const COUNT_W = 70;
 const STROKE = 8;
 const GATE = 40;
 
-const gridX = (round: Round) => LABEL_W + (round.mode === 'build' ? TALLY_W : 0) + 6;
-const rowW = (round: Round) => gridX(round) + round.cells * CELL + COUNT_W;
+/**
+ * Where the picture cells start. The column before them holds the tally in a
+ * build round and the drawn clue (open row only) in a read round, so the
+ * data a row is built from always sits in the row it builds.
+ */
+const GRID_X = LABEL_W + TALLY_W + 6;
+const rowW = (round: Round) => GRID_X + round.cells * CELL + COUNT_W;
 
 const INK = '#24170f';
 const RULE = '#e8d9c2';
@@ -284,6 +291,9 @@ const GOLD = '#f2a900';
 const GOLD_TINT = '#fff1c9';
 const LEAF = '#3f8f3a';
 const STALK = '#5b3a1a';
+/** The plain bars of the drawn clue, and the red of "fewer". */
+const BAR = '#f3dcb4';
+const FEWER = '#c8372d';
 
 /** Each fruit drawn in a 40 × 40 box. Fruit only: the class voted on fruit. */
 const SHAPES: Record<Fruit, ReactElement> = {
@@ -346,11 +356,14 @@ function FruitIcon({ fruit }: { readonly fruit: Fruit }) {
   );
 }
 
+/** Right edge of an n-stroke tally drawn from x = 0. */
+const tallySpan = (n: number) => (n % 5 ? Math.floor(n / 5) * GATE + ((n % 5) - 1) * STROKE : (n / 5 - 1) * GATE + 3 * STROKE + 6);
+/** How far a five-gate's slash reaches left of the first stroke. */
+const tallyLead = (n: number) => (n >= 5 ? 6 : 0);
+
 /** A tally: strokes in fives, the fifth slanted across the four. */
-function Tally({ x, n }: { readonly x: number; readonly n: number }) {
+function Tally({ x, n, y1 = 20, y2 = ROW_H - 20, color = INK }: { readonly x: number; readonly n: number; readonly y1?: number; readonly y2?: number; readonly color?: string }) {
   const gates = Math.floor(n / 5);
-  const y1 = 20;
-  const y2 = ROW_H - 20;
   const strokes: ReactElement[] = [];
   for (let g = 0; g < gates; g += 1) {
     const x0 = x + g * GATE;
@@ -362,9 +375,77 @@ function Tally({ x, n }: { readonly x: number; readonly n: number }) {
     strokes.push(<line key={`r${k}`} x1={xk} x2={xk} y1={y1} y2={y2} />);
   }
   return (
-    <g stroke={INK} strokeWidth="3.5" strokeLinecap="round">
+    <g stroke={color} strokeWidth="3.5" strokeLinecap="round">
       {strokes}
     </g>
+  );
+}
+
+/** A little chart of three bars, the longest (or shortest) picked out in gold. */
+function ExtremeGlyph({ x, y, most }: { readonly x: number; readonly y: number; readonly most: boolean }) {
+  return (
+    <g>
+      {[27, 17, 8].map((w, k) => (
+        <rect key={w} x={x} y={y + k * 9.5} width={w} height="7" rx="2" fill={(most ? k === 0 : k === 2) ? GOLD : BAR} stroke={INK} strokeWidth="1.2" />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * The clue, drawn in the open row's tally column so it needs no reading: a
+ * small copy of two chart rows sharing a left edge. The top row is the one
+ * the clue is measured from — its fruit, or a little chart with the longest
+ * or shortest bar in gold — and the bottom row is his fruit. A gold tick marks
+ * where the top row ends, the same gold as the line Help draws on the chart.
+ * "More" is blue tally strokes past the tick; "fewer" is red strokes in the
+ * gap his row stops short of it. The strokes are votes, not pictures, so at
+ * level 3 four strokes is still two pictures for him to work out.
+ */
+function ClueDrawing({ round }: { readonly round: ReadRound }) {
+  const { ref, by } = round.clue;
+  const n = Math.abs(by);
+  const more = by > 0;
+  const x0 = LABEL_W + 10;
+  const barX = x0 + 32;
+  const tick = barX + (more ? 70 : 120);
+  const top = 21;
+  const bot = 55;
+  const sx = more ? tick + 8 + tallyLead(n) : tick - 8 - tallySpan(n);
+  const hisEnd = more ? tick : sx - tallyLead(n) - 8;
+  // The run the clue names, boxed: past the tick for "more", the gap short of it for "fewer".
+  const runX = more ? tick : hisEnd;
+  const runW = more ? sx + tallySpan(n) + 8 - tick : tick - hisEnd;
+  const tone = more ? DEEP : FEWER;
+  return (
+    <g>
+      {ref.to === 'fruit' ? (
+        <svg x={x0} y={top - 13} width="26" height="26" viewBox="0 0 40 40">
+          {SHAPES[round.fruits[ref.index]]}
+        </svg>
+      ) : (
+        <ExtremeGlyph x={x0} y={top - 13} most={ref.to === 'most'} />
+      )}
+      <rect x={barX} y={top - 6} width={tick - barX} height="12" rx="6" fill={BAR} stroke={INK} strokeWidth="1.5" />
+      <svg x={x0} y={bot - 13} width="26" height="26" viewBox="0 0 40 40">
+        {SHAPES[round.fruits[round.open]]}
+      </svg>
+      <rect x={barX} y={bot - 6} width={hisEnd - barX} height="12" rx="6" fill={BAR} stroke={INK} strokeWidth="1.5" />
+      <rect x={runX} y={bot - 14} width={runW} height="28" rx="6" fill="#ffffff" stroke={tone} strokeWidth="2" strokeDasharray="4 3" />
+      <Tally x={sx} n={n} y1={bot - 10} y2={bot + 10} color={tone} />
+      <line x1={tick} x2={tick} y1="4" y2={ROW_H - 4} stroke={GOLD} strokeWidth="3" strokeDasharray="5 4" />
+    </g>
+  );
+}
+
+/** The add and take-off buttons: his fruit with a plus, or faded with a minus. */
+function StepIcon({ fruit, add }: { readonly fruit: Fruit; readonly add: boolean }) {
+  return (
+    <svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+      <g opacity={add ? 1 : 0.4}>{SHAPES[fruit]}</g>
+      <circle cx="31" cy="31" r="9" style={{ fill: add ? 'var(--ones)' : 'var(--hundreds)' }} stroke="#ffffff" strokeWidth="2" />
+      <path d={add ? 'M26 31 H36 M31 26 V36' : 'M26 31 H36'} stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -450,7 +531,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const counted = stage !== 'answering';
   const worked = stage === 'worked';
   const locked = stage === 'worked' || stage === 'solved';
-  const gx = gridX(round);
+  const gx = GRID_X;
   const width = rowW(round);
   const ref = round.mode === 'read' ? refIndex(round) : -1;
   const refX = ref >= 0 && counted ? gx + want[ref] * CELL : null;
@@ -491,6 +572,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           {NAME[fruit]}
         </text>
         {round.mode === 'build' ? <Tally x={LABEL_W + 18} n={round.votes[i]} /> : null}
+        {round.mode === 'read' && open ? <ClueDrawing round={round} /> : null}
         {round.mode === 'build' && counted ? (
           <text x={LABEL_W + TALLY_W - 6} y={ROW_H / 2 + 8} textAnchor="end" fontSize="22" fontWeight="700" fill={DEEP}>
             {round.votes[i]}
@@ -535,14 +617,15 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           onTap={locked || full ? undefined : () => set(i, mine + 1)}
           ariaLabel={`Add a picture to ${lower(fruit)}`}
         >
-          <FruitIcon fruit={fruit} />
+          <StepIcon fruit={fruit} add />
         </Piece>
         <Piece
-          label="−"
           tone={mine === 0 ? 'ghost' : 'placed'}
           onTap={locked || mine === 0 ? undefined : () => set(i, mine - 1)}
           ariaLabel={`Take a picture off ${lower(fruit)}`}
-        />
+        >
+          <StepIcon fruit={fruit} add={false} />
+        </Piece>
       </span>
     );
   };
@@ -555,11 +638,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           <text x="8" y="22" fontSize="17" fontWeight="600" fill="#5a4636">
             Fruit
           </text>
-          {round.mode === 'build' ? (
-            <text x={LABEL_W + 18} y="22" fontSize="17" fontWeight="600" fill="#5a4636">
-              Tally
-            </text>
-          ) : null}
+          <text x={LABEL_W + 18} y="22" fontSize="17" fontWeight="600" fill="#5a4636">
+            {round.mode === 'build' ? 'Tally' : 'Clue'}
+          </text>
           <text x={gx + 4} y="22" fontSize="17" fontWeight="600" fill="#5a4636">
             Picture chart
           </text>

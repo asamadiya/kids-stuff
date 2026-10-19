@@ -14,12 +14,16 @@ import { Stepper } from '../../play/parts';
  *  1. Wholes of 4 to 6, drawn in the Before row. He can still match one to one.
  *  2. Wholes of 7 to 10, drawn. Matching gets slow; counting on from the
  *     visible part starts to pay.
- *  3. Wholes of 13 to 28, given only as a numeral on a slate. The visible part
- *     sits in ten-frames, and EVERY round crosses a ten: through 10 (6 on the
- *     mat, 13 in all) or through 20 (16 on the mat, 22 in all). Counting on in
- *     ones gets long and slips; "16 and 4 is 20, and 2 more" does not.
+ *  3. Wholes of 13 to 28, written on a slate AND drawn beside it in ten-frames;
+ *     the visible part sits in ten-frames too, at one scale, frame level with
+ *     frame. EVERY round crosses a ten: through 10 (6 on the mat, 13 in all)
+ *     or through 20 (16 on the mat, 22 in all). Counting on in ones gets long
+ *     and slips; "16 and 4 is 20, and 2 more" does not, and the frames show
+ *     it: 4 empty squares in the mat's second frame, 2 in the third.
  *
  * Control: the Stepper only — two big buttons set how many are under the cup.
+ * Each press adds or takes away one dashed mango after the mat's own on the
+ * Now mat, so his number is always drawn where Before and Now are compared.
  *
  * Hint: a strip appears under the scene. Top row, all of them; bottom row,
  * the mat's mangoes followed by his number as dashed mangoes, cell under
@@ -36,7 +40,7 @@ export interface Round {
   readonly whole: number;
   /** How many the cup covers. Always at least 1. */
   readonly hidden: number;
-  /** How the whole is shown: drawn in the Before row, or as a numeral only. */
+  /** How the whole is shown: drawn in rows in Before, or as a slate numeral with the same mangoes in ten-frames. */
   readonly wholeAs: 'picture' | 'numeral';
 }
 
@@ -158,15 +162,22 @@ function Cup({ x, y, lifted }: { x: number; y: number; lifted: boolean }) {
   );
 }
 
-/** Mangoes in rows of five, centred on (cx, cy). Both mats use this, at one spacing. */
-function Rows({ n, cx, cy }: { n: number; cx: number; cy: number }) {
-  const rows = Math.ceil(n / 5);
+/**
+ * Mangoes in rows of five, the first row's top fixed: n real ones, then
+ * `guess` dashed ones for his number. Both mats use this, at one spacing, so
+ * row sits level with row and a right answer makes Now the shape of Before.
+ */
+function Rows({ n, guess = 0, cx }: { n: number; guess?: number; cx: number }) {
+  const total = n + guess;
   return (
     <g>
-      {Array.from({ length: n }, (_, i) => {
+      {Array.from({ length: total }, (_, i) => {
         const row = Math.floor(i / 5);
-        const inRow = Math.min(5, n - row * 5);
-        return <Mango key={i} x={cx + ((i % 5) - (inRow - 1) / 2) * 52} y={cy + (row - (rows - 1) / 2) * 70} s={1.1} />;
+        const inRow = Math.min(5, total - row * 5);
+        return (
+          <Mango key={i} x={cx + ((i % 5) - (inRow - 1) / 2) * 52} y={ROW_TOP + row * ROW_STEP} s={1.1}
+            look={i < n ? 'ripe' : 'guess'} />
+        );
       })}
     </g>
   );
@@ -191,27 +202,44 @@ function Pile({ n, cx, floor }: { n: number; cx: number; floor: number }) {
   );
 }
 
-/** Ten-frames, stacked, holding n mangoes (level 3: the mat's part is shown as tens and ones). */
-function Frames({ n, x, cy, cell }: { n: number; x: number; cy: number; cell: number }) {
-  const frames = Math.max(1, Math.ceil(n / 10));
-  const gap = 14;
-  const top = cy - (frames * cell * 2 + (frames - 1) * gap) / 2;
+/* Level 3's ten-frames: one cell size on both mats. A column holds three
+   frames; an overshoot on Now wraps into a second column before the cup. */
+const CELL = 32;
+const FRAME_GAP = 12;
+const FRAME_COL_GAP = 14;
+const FRAMES_PER_COL = 3;
+
+/**
+ * Ten-frames down from `top`, filled in order: n real mangoes, then `guess`
+ * dashed ones for his number, drawing at least `least` frames. A full frame
+ * is edged in the tens colour. Level 3 draws the whole and the mat's part
+ * this way at one top, so frame sits level with frame: 16 on the mat leaves
+ * 4 empty squares beside Before's full second frame, and a third frame to
+ * match Before's 2.
+ */
+function Frames({ n, guess = 0, least = 1, x, top }: { n: number; guess?: number; least?: number; x: number; top: number }) {
+  const total = n + guess;
+  const frames = Math.max(least, Math.ceil(total / 10));
   return (
     <g>
       {Array.from({ length: frames }, (_, f) => {
-        const fy = top + f * (cell * 2 + gap);
-        const here = Math.min(10, n - f * 10);
+        const fx = x + Math.floor(f / FRAMES_PER_COL) * (CELL * 5 + FRAME_COL_GAP);
+        const fy = top + (f % FRAMES_PER_COL) * (CELL * 2 + FRAME_GAP);
+        const here = Math.min(10, total - f * 10);
         return (
           <g key={f}>
-            <rect x={x - 4} y={fy - 4} width={cell * 5 + 8} height={cell * 2 + 8} rx="6" fill="#FFFFFF"
+            <rect x={fx - 4} y={fy - 4} width={CELL * 5 + 8} height={CELL * 2 + 8} rx="6" fill="#FFFFFF"
               stroke={here === 10 ? TENS : ONES} strokeWidth="5" />
             {Array.from({ length: 10 }, (_, i) => {
-              const cx = x + (i % 5) * cell;
-              const cyy = fy + Math.floor(i / 5) * cell;
+              const k = f * 10 + i;
+              const cx = fx + (i % 5) * CELL;
+              const cy = fy + Math.floor(i / 5) * CELL;
               return (
                 <g key={i}>
-                  <rect x={cx} y={cyy} width={cell} height={cell} fill="none" stroke={RULE} strokeWidth="1.5" />
-                  {i < here ? <Mango x={cx + cell / 2} y={cyy + cell / 2 + 3} s={cell / 58} /> : null}
+                  <rect x={cx} y={cy} width={CELL} height={CELL} fill="none" stroke={RULE} strokeWidth="1.5" />
+                  {k < total ? (
+                    <Mango x={cx + CELL / 2} y={cy + CELL / 2 + 3} s={CELL / 58} look={k < n ? 'ripe' : 'guess'} />
+                  ) : null}
                 </g>
               );
             })}
@@ -222,14 +250,13 @@ function Frames({ n, x, cy, cell }: { n: number; x: number; cy: number; cell: nu
   );
 }
 
-/** A school slate (pati) with the whole written on it in chalk. */
+/** A small school slate (pati) with the whole chalked on it, over the mangoes it counts. */
 function Slate({ n, cx, cy }: { n: number; cx: number; cy: number }) {
   return (
     <g>
-      <rect x={cx - 120} y={cy - 95} width="240" height="190" rx="12" fill="#9C6A2E" stroke={INK} strokeWidth="3" />
-      <rect x={cx - 104} y={cy - 79} width="208" height="158" rx="6" fill="#2F3B35" />
-      <text x={cx} y={cy + 26} textAnchor="middle" fontSize="104" fill="#F4F1E8" style={font}>{n}</text>
-      <text x={cx} y={cy + 64} textAnchor="middle" fontSize="26" fill="#D9D4C4" style={font}>mangoes</text>
+      <rect x={cx - 58} y={cy - 32} width="116" height="64" rx="8" fill="#9C6A2E" stroke={INK} strokeWidth="3" />
+      <rect x={cx - 48} y={cy - 22} width="96" height="44" rx="4" fill="#2F3B35" />
+      <text x={cx} y={cy + 16} textAnchor="middle" fontSize="44" fill="#F4F1E8" style={font}>{n}</text>
     </g>
   );
 }
@@ -242,34 +269,50 @@ const MAT_H = 250;
 const MID_Y = MAT_Y + MAT_H / 2;
 const LEFT = { x: 20, w: 290 } as const;
 const RIGHT = { x: 370, w: 570 } as const;
-const CUP_X = 800;
+const CUP_X = 835;
 const FLOOR = 300;
+/* Rows (levels 1-2): first row's centre and the row pitch, shared by both
+   mats. Four rows fit the mat: the most an overshoot can make (7 + 9). */
+const ROW_TOP = 114;
+const ROW_STEP = 64;
+const NOW_ROWS_X = RIGHT.x + 170;
+/* Frames (level 3): one top for both mats; Now's second column ends left of the cup. */
+const FRAME_TOP = MAT_Y + 14;
+const BEFORE_FRAMES_X = LEFT.x + (LEFT.w - CELL * 5) / 2;
+const NOW_FRAMES_X = RIGHT.x + 22;
 
-/** Before and now, side by side, at one scale. */
-function Scene({ round, lifted }: { round: Round; lifted: boolean }) {
+/**
+ * Before and now, side by side, at one scale. His number is drawn on Now as
+ * dashed mangoes after the mat's own, so each press of a button changes the
+ * picture, and a right answer makes Now the shape of Before.
+ */
+function Scene({ round, guess, lifted }: { round: Round; guess: number; lifted: boolean }) {
   const out = outOf(round);
   const numeral = round.wholeAs === 'numeral';
-  const before = numeral ? `The slate says ${round.whole} mangoes.` : `Before: ${round.whole} mangoes on the mat.`;
-  const now = lifted
-    ? `Now: ${out} on the mat, and the lifted cup shows ${round.hidden}.`
-    : `Now: ${out} on the mat and an upside-down cup.`;
+  const before = numeral
+    ? `Before: the slate says ${round.whole}, and ${round.whole} mangoes fill ten-frames.`
+    : `Before: ${round.whole} mangoes on the mat.`;
+  const now = `Now: ${out} on the mat and ${guess} dashed for under the cup.${lifted ? ` The lifted cup shows ${round.hidden}.` : ''}`;
   return (
     <svg className="board-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${before} ${now}`}>
-      <text x={LEFT.x + 10} y="56" fontSize="30" fill={SOFT} style={font}>{numeral ? 'All of them' : 'Before'}</text>
+      <text x={LEFT.x + 10} y="56" fontSize="30" fill={SOFT} style={font}>Before</text>
       <text x={RIGHT.x + 10} y="56" fontSize="30" fill={SOFT} style={font}>Now</text>
+      {numeral ? <Slate n={round.whole} cx={LEFT.x + LEFT.w - 64} cy={40} /> : null}
+      <Mat x={LEFT.x} y={MAT_Y} w={LEFT.w} h={MAT_H} />
       {numeral ? (
-        <Slate n={round.whole} cx={LEFT.x + LEFT.w / 2} cy={MID_Y} />
+        <Frames n={round.whole} x={BEFORE_FRAMES_X} top={FRAME_TOP} />
       ) : (
-        <>
-          <Mat x={LEFT.x} y={MAT_Y} w={LEFT.w} h={MAT_H} />
-          <Rows n={round.whole} cx={LEFT.x + LEFT.w / 2} cy={MID_Y} />
-        </>
+        <Rows n={round.whole} cx={LEFT.x + LEFT.w / 2} />
       )}
       {/* Before, then now: an arrow a non-reader can follow. */}
       <path d={`M${LEFT.x + LEFT.w + 8} ${MID_Y} H${RIGHT.x - 18}`} stroke={INK} strokeWidth="7" strokeLinecap="round" />
       <path d={`M${RIGHT.x - 24} ${MID_Y - 15} L${RIGHT.x - 6} ${MID_Y} L${RIGHT.x - 24} ${MID_Y + 15} Z`} fill={INK} />
       <Mat x={RIGHT.x} y={MAT_Y} w={RIGHT.w} h={MAT_H} />
-      {numeral ? <Frames n={out} x={RIGHT.x + 40} cy={MID_Y} cell={46} /> : <Rows n={out} cx={RIGHT.x + 170} cy={MID_Y} />}
+      {numeral ? (
+        <Frames n={out} guess={guess} least={Math.ceil(round.whole / 10)} x={NOW_FRAMES_X} top={FRAME_TOP} />
+      ) : (
+        <Rows n={out} guess={guess} cx={NOW_ROWS_X} />
+      )}
       {lifted ? <Pile n={round.hidden} cx={CUP_X} floor={FLOOR} /> : null}
       <Cup x={CUP_X} y={FLOOR} lifted={lifted} />
     </svg>
@@ -354,13 +397,17 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const under = worked ? round.hidden : answer;
   return (
     <div className="board board--cup">
-      <Scene round={round} lifted={lifted} />
+      <Scene round={round} guess={under} lifted={lifted} />
       {stage === 'hint' || worked ? <Strip round={round} under={under} worked={worked} /> : null}
       {worked ? <p className="board-caption">{workedLine(round)}</p> : null}
       <div className="board-row">
-        <svg viewBox="-100 -145 200 150" width="64" height="48" aria-hidden="true">
+        {/* The key to the buttons: the cup, and a dashed mango, the mark each press puts on Now. */}
+        <svg viewBox="-100 -145 330 150" width="104" height="48" aria-hidden="true">
           <path d="M-90 0 L-62 -128 L62 -128 L90 0 Z" fill={BRASS} stroke={INK} strokeWidth="8" strokeLinejoin="round" />
           <rect x="-95" y="-13" width="190" height="15" rx="6" fill={BRASS_DARK} stroke={INK} strokeWidth="6" />
+          <g transform="translate(170 -55) scale(2.1)">
+            <path d={BODY} fill="#FFF1C9" stroke={BRASS_DARK} strokeWidth="3" strokeDasharray="6 4" />
+          </g>
         </svg>
         <span className="board-caption">Under the cup</span>
         <Stepper value={under} onChange={setAnswer} min={0} max={round.whole} label="Mangoes under the cup" disabled={lifted} />
@@ -384,8 +431,8 @@ export const whatsUnderTheCup: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/whats-under-the-cup.png',
   note: {
-    what: "Two pictures of the same mat. Before shows every mango Dadi put down; Now shows some of them and her brass cup turned over the rest. He sets how many are under the cup with the two big buttons.",
-    expect: "At level 1 he will pair each mango in Before with one in Now and count the ones left without a partner. At level 2 the rows are long enough that pairing slips, and some children answer with the whole. At level 3 there is no Before picture, only a number on a slate, and every round crosses a ten (16 on the mat, 22 in all); counting on in ones from 16 to 22 is where he usually loses his place.",
+    what: "Two pictures of the same mat. Before shows every mango Dadi put down; Now shows some of them and her brass cup turned over the rest. He sets how many are under the cup with the two big buttons; each press draws or removes one dashed mango on Now, after the real ones.",
+    expect: "At level 1 he will pair each mango in Before with one in Now and count the ones left without a partner. At level 2 the rows are long enough that pairing slips, and some children answer with the whole. At level 3 both mats are ten-frames, with the total also chalked on a slate, and every round crosses a ten (16 on the mat, 22 in all); counting on in ones from 16 to 22 is where he usually loses his place, and filling the empty squares frame by frame is the way through.",
     practising: "Part and whole: the mangoes on the mat plus the hidden ones make all of them, so the hidden part is the whole minus the part you can see. Subtraction as finding a missing part, not only taking away. At level 3, going through the next ten: 16 + 4 = 20, then 2 more.",
     ask: "Before he presses Check, point at the cup: 'Did Dadi take any mangoes away? Then where are the rest?'",
     next: "Count 7 dried beans onto a plate together, then cover some with a steel katori while he looks away. He says how many are hidden and lifts it to see. Then he hides and you answer, and he checks you.",

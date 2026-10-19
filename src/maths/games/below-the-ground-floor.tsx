@@ -260,6 +260,132 @@ function FloorSlice({ floor, car, step, chosen, arrived, fossils }: FloorDraw) {
   );
 }
 
+/* ----------------------------------------------------------- trip card -- */
+
+/**
+ * The trip as things to count, drawn above the building: where it sets off,
+ * one gold arrow per floor travelled, where it stops. "Go up 3" in the prompt
+ * is three up-arrows here, the same gold disc as the step marks the hint and
+ * the worked answer put on the floors, so arrow can be matched to floor one
+ * by one. The unknown end is a dashed "?" plate; the floor he taps appears in
+ * it at once. Not a button: no frame, no shadow.
+ */
+const TOKEN = 46;
+const END_W = 48;
+const GAP = 10;
+const CARD_H = 82;
+/** Arrows sit on the track line, level with the middle of the two floor plates. */
+const ROW = 60;
+
+type Stage = BoardProps<Round, Answer>['stage'];
+type PlateLook = 'known' | 'unknown' | 'chosen' | 'arrived';
+type Top = 'car' | 'ghost' | 'bone' | null;
+
+const PLATE_FILL: Record<PlateLook, string> = {
+  known: '#ffffff',
+  unknown: '#ffffff',
+  chosen: 'var(--gold)',
+  arrived: 'var(--maths-tint)',
+};
+
+function Arrow({ cx, up }: { cx: number; up: boolean }) {
+  const d = up ? -1 : 1;
+  return (
+    <g>
+      <circle cx={cx} cy={ROW} r={18} fill="var(--gold)" stroke="#24170f" strokeWidth={2.5} />
+      <path
+        d={`M${cx} ${ROW - 10 * d} V${ROW + 10 * d} M${cx - 8} ${ROW + 2 * d} L${cx} ${ROW + 10 * d} L${cx + 8} ${ROW + 2 * d}`}
+        fill="none"
+        stroke="#24170f"
+        strokeWidth={3.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+/** A single bone: the fossil room is where this trip ends. Outline layer under a fill layer. */
+function Bone({ cx }: { cx: number }) {
+  const knobs = [-13, 13].flatMap((dx) => [16, 26].map((cy) => [cx + dx, cy] as const));
+  return (
+    <g>
+      <g fill="#24170f">
+        {knobs.map(([x, y]) => <circle key={`${x},${y}`} cx={x} cy={y} r={6.5} />)}
+        <rect x={cx - 13} y={16.5} width={26} height={9} />
+      </g>
+      <g fill={BONE}>
+        {knobs.map(([x, y]) => <circle key={`${x},${y}`} cx={x} cy={y} r={5} />)}
+        <rect x={cx - 13} y={18} width={26} height={6} />
+      </g>
+    </g>
+  );
+}
+
+function TripEnd({ cx, floor, look, top }: { cx: number; floor: number | null; look: PlateLook; top: Top }) {
+  return (
+    <g>
+      {top === 'car' || top === 'ghost' ? (
+        <g transform={`translate(${cx - 20 - CAR_X} -3)`}>
+          <Car ghost={top === 'ghost'} />
+        </g>
+      ) : top === 'bone' ? (
+        <Bone cx={cx} />
+      ) : null}
+      <rect
+        x={cx - 22}
+        y={46}
+        width={44}
+        height={28}
+        rx={6}
+        fill={PLATE_FILL[look]}
+        stroke="#24170f"
+        strokeWidth={2.5}
+        strokeDasharray={look === 'unknown' ? '5 4' : undefined}
+      />
+      <text x={cx} y={68} textAnchor="middle" fontSize={22} fontWeight={700} fill="#24170f">
+        {floor === null ? '?' : fmt(floor)}
+      </text>
+    </g>
+  );
+}
+
+function TripCard({ round, answer, stage }: { round: Round; answer: Answer; stage: Stage }) {
+  const locked = stage === 'worked' || stage === 'solved';
+  const n = Math.abs(round.move);
+  const width = 2 * END_W + 2 * GAP + n * TOKEN;
+  const startX = END_W / 2;
+  const stopX = width - END_W / 2;
+  // The end he is looking for shows what he tapped, or the answer once worked.
+  const asked = locked ? solution(round) : answer;
+  const look: PlateLook = asked === null ? 'unknown' : stage === 'worked' ? 'arrived' : 'chosen';
+  const start = round.find === 'start' ? { floor: asked, look } : { floor: round.start, look: 'known' as const };
+  const stop = round.find === 'end' ? { floor: asked, look } : { floor: target(round), look: 'known' as const };
+  const startTop: Top = locked ? 'ghost' : round.find === 'end' ? 'car' : null;
+  const stopTop: Top = round.fossils ? 'bone' : locked || round.find === 'start' ? 'car' : null;
+  const from = start.floor === null ? 'a floor' : `floor ${spoken(start.floor)}`;
+  const to = stop.floor === null ? 'which floor?' : `floor ${spoken(stop.floor)}`;
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <svg
+        viewBox={`0 0 ${width} ${CARD_H}`}
+        width={width}
+        height={CARD_H}
+        style={{ maxWidth: '100%', height: 'auto' }}
+        role="img"
+        aria-label={`From ${from}, ${way(round.move)} ${n} ${floors(n)}, to ${to}`}
+      >
+        <line x1={startX + 22} y1={ROW} x2={stopX - 22} y2={ROW} stroke="#24170f" strokeWidth={3} />
+        {Array.from({ length: n }, (_, i) => (
+          <Arrow key={i} cx={END_W + GAP + TOKEN * (i + 0.5)} up={round.move > 0} />
+        ))}
+        <TripEnd cx={startX} floor={start.floor} look={start.look} top={startTop} />
+        <TripEnd cx={stopX} floor={stop.floor} look={stop.look} top={stopTop} />
+      </svg>
+    </div>
+  );
+}
+
 /** A flat museum roof over floor 5, inset to match the floor slices inside their Choice buttons. */
 function Roof() {
   return (
@@ -315,6 +441,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
 
   return (
     <div className="board">
+      <TripCard round={round} answer={answer} stage={stage} />
       <div style={{ width: '100%', maxWidth: 560, margin: '0 auto' }} role="group" aria-label="The museum floors, 5 at the top to minus 3 at the bottom">
         <div style={sky}>
           <Roof />

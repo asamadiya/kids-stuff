@@ -154,15 +154,21 @@ const HUE = { 1: '#27813b', 10: '#1c6dd0' } as const;
 const PALE = { 1: '#e1f2e4', 10: '#e2eefc' } as const;
 const DEEP = { 1: '#1a5c2a', 10: '#0f4790' } as const;
 const GOLD = '#d98e00';
+/** --hundreds from tokens.css, and its dark ink; --ink for strokes. */
+const RED = '#c8372d';
+const RED_DEEP = '#8f2219';
+const INK = '#24170f';
 const TICKS = [6, 10, 14, 18, 22, 26, 30, 34, 38];
 
 /**
  * What a cell shows. `given`: the first number, solid. `moved`: a counter he
  * brought from the pile, pale with a heavy ring, so 8 + 2 stays readable
  * inside the full frame. `worked`: the drawn solution, dashed. `gap`: an empty
- * cell of the first frame, ringed in gold on the hint.
+ * cell of the first frame, ringed in gold on the hint. `target`: a faint copy
+ * of the counter in his hand, drawn in every cell it could go to, so picking
+ * one up visibly changes the frames.
  */
-type Mark = 'given' | 'moved' | 'worked' | 'gap';
+type Mark = 'given' | 'moved' | 'worked' | 'gap' | 'target';
 
 /** One counter (a disc for a one, a rod of ten for a ten) in a 44-unit box. */
 function Counter({ unit, mark }: { readonly unit: 1 | 10; readonly mark: Mark }) {
@@ -170,7 +176,7 @@ function Counter({ unit, mark }: { readonly unit: 1 | 10; readonly mark: Mark })
   const stroke = mark === 'gap' ? GOLD : DEEP[unit];
   const dash = mark === 'worked' || mark === 'gap' ? '5 4' : undefined;
   return (
-    <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
+    <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true" opacity={mark === 'target' ? 0.3 : undefined}>
       {unit === 1 ? (
         <circle cx="22" cy="22" r="17" fill={fill} stroke={stroke} strokeWidth="4" strokeDasharray={dash} />
       ) : (
@@ -196,6 +202,93 @@ const frameStyle: CSSProperties = {
   borderRadius: 12,
   background: '#ffffff',
 };
+
+/** Ten tick marks splitting a rod of height `h` from `y` into ten equal parts. */
+const tenParts = (x: number, y: number, w: number, h: number, stroke: string, width: number) =>
+  Array.from({ length: 9 }, (_, k) => (
+    <line key={k} x1={x} x2={x + w} y1={y + (h * (k + 1)) / 10} y2={y + (h * (k + 1)) / 10} stroke={stroke} strokeWidth={width} />
+  ));
+
+/**
+ * The equivalence the whole game rests on, drawn and left on the board:
+ * a full frame of ten loose ones beside the same ten tied into one rod (the
+ * rod he sees beside the frame at level 3); or, a place up, a full frame of
+ * ten rods beside the same ten rods pushed together into one hundred.
+ */
+function FullFrameIs({ unit }: { readonly unit: 1 | 10 }) {
+  const cellW = unit === 1 ? 20 : 22;
+  const cellH = unit === 1 ? 25 : 42;
+  const fy = unit === 1 ? 20 : 8;
+  const grid = (
+    <g>
+      <rect x="2" y={fy} width={cellW * 5} height={cellH * 2} rx="6" fill="#ffffff" stroke={INK} strokeWidth="3" />
+      {[1, 2, 3, 4].map((c) => (
+        <line key={c} x1={2 + cellW * c} x2={2 + cellW * c} y1={fy} y2={fy + cellH * 2} stroke="#c9ad86" strokeWidth="1.5" />
+      ))}
+      <line x1="2" x2={2 + cellW * 5} y1={fy + cellH} y2={fy + cellH} stroke="#c9ad86" strokeWidth="1.5" />
+    </g>
+  );
+  const equals = (x: number) => (
+    <g stroke={INK} strokeWidth="4" strokeLinecap="round">
+      <line x1={x} x2={x + 16} y1="39" y2="39" />
+      <line x1={x} x2={x + 16} y1="51" y2="51" />
+    </g>
+  );
+  const label = (x: number, y: number, text: string, fill: string) => (
+    <text x={x} y={y} textAnchor="middle" fontSize="13" fontWeight="700" fill={fill}>
+      {text}
+    </text>
+  );
+  const cells = Array.from({ length: CELLS }, (_, i) => ({ c: i % 5, r: Math.floor(i / 5) }));
+
+  if (unit === 1) {
+    return (
+      <svg viewBox="0 0 236 108" width="236" height="108" role="img" aria-label="A full frame of ten ones is the same as one ten-rod">
+        {grid}
+        {cells.map(({ c, r }) => (
+          <circle key={`${c}${r}`} cx={2 + cellW * c + cellW / 2} cy={fy + cellH * r + cellH / 2} r="8" fill={HUE[1]} stroke={DEEP[1]} strokeWidth="2" />
+        ))}
+        {label(52, 90, '10 ones', DEEP[1])}
+        {equals(110)}
+        {/* The same ten, tied in a column: one disc in each tenth of the rod. */}
+        <rect x="138" y="3" width="16" height="92" rx="4" fill={PALE[10]} stroke={HUE[10]} strokeWidth="3" />
+        {Array.from({ length: CELLS }, (_, k) => (
+          <circle key={k} cx="146" cy={3 + 4.6 + 9.2 * k} r="3.8" fill={HUE[1]} stroke={DEEP[1]} strokeWidth="1" />
+        ))}
+        {equals(166)}
+        <rect x="196" y="3" width="16" height="92" rx="2" fill={HUE[10]} stroke={DEEP[10]} strokeWidth="2" />
+        {tenParts(196, 3, 16, 92, '#ffffff', 1.2)}
+        {label(204, 106, '1 ten', DEEP[10])}
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 236 108" width="236" height="108" role="img" aria-label="A full frame of ten ten-rods is the same as one hundred">
+      {grid}
+      {cells.map(({ c, r }) => {
+        const x = 2 + cellW * c + 7;
+        const y = fy + cellH * r + 4;
+        return (
+          <g key={`${c}${r}`}>
+            <rect x={x} y={y} width="8" height="34" rx="1" fill={HUE[10]} stroke={DEEP[10]} strokeWidth="1" />
+            {tenParts(x, y, 8, 34, '#ffffff', 0.8)}
+          </g>
+        );
+      })}
+      {label(57, 106, '10 tens', DEEP[10])}
+      {equals(120)}
+      {/* The same ten rods pushed together and tied: one hundred. */}
+      {Array.from({ length: CELLS }, (_, k) => (
+        <g key={k}>
+          <rect x={146 + 8.4 * k} y="4" width="8.4" height="84" fill={HUE[10]} stroke={DEEP[10]} strokeWidth="0.8" />
+          {tenParts(146 + 8.4 * k, 4, 8.4, 84, '#ffffff', 0.8)}
+        </g>
+      ))}
+      <rect x="146" y="4" width="84" height="84" fill="none" stroke={RED} strokeWidth="3.5" />
+      {label(188, 106, '1 hundred', RED_DEEP)}
+    </svg>
+  );
+}
 
 const frameWrap: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s2)' };
 
@@ -257,10 +350,18 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         </Slot>
       );
     }
+    // On the hint the first frame's gaps are ringed in gold; otherwise, while a
+    // counter is in his hand, every empty cell shows a faint copy of it.
     const gap = stage === 'hint' && cell < CELLS;
     return (
       <Slot key={cell} ariaLabel={`${where}: empty${holding ? `, put the ${thing} here` : ''}`} ready={holding} onTap={holding ? () => place(cell) : undefined}>
-        {gap ? <Counter unit={unit} mark="gap" /> : <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true" />}
+        {gap ? (
+          <Counter unit={unit} mark="gap" />
+        ) : holding ? (
+          <Counter unit={unit} mark="target" />
+        ) : (
+          <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true" />
+        )}
       </Slot>
     );
   };
@@ -311,7 +412,10 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
 
   return (
     <div className="board">
-      <p className="board-caption">{caption}</p>
+      <div style={frameWrap}>
+        <FullFrameIs unit={unit} />
+        <p className="board-caption">{caption}</p>
+      </div>
       <div className="board-row" style={{ alignItems: 'flex-start', gap: 'var(--s5)' }}>
         {rods}
         {frame(0, 'First frame', first)}
