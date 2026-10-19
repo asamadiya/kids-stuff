@@ -5,11 +5,11 @@ import {
   placed, plateLines, plateTitle, remaining, scenarioById, servedLines, splitLine, word,
 } from '../../sel/five-cookies';
 import type { Outcome, Scenario, Shares } from '../../sel/five-cookies';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptServing extends Kept {
   readonly scenario: string;

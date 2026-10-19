@@ -6,11 +6,11 @@ import {
   readingFor, seesIn, sentenceFor, slotKey, spotsIn, wrapWords,
 } from '../../sel/borrowed-eyes';
 import type { ChipId, Moment, Other, Placed, PlateChip, View } from '../../sel/borrowed-eyes';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptPlate extends Kept {
   readonly moment: string;

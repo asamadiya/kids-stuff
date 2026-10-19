@@ -6,7 +6,7 @@ import {
   removePin, ruleById, ruleSummary, scenePath, stopAt, stopX, stopsWord,
 } from '../sel/the-feeling-rule';
 import type { Pin } from '../sel/the-feeling-rule';
-import { EMOTIONS } from '../games/emotions';
+import { EMOTIONS } from '../lib/emotions';
 
 const PRAISE = /great|well done|good job|correct|incorrect|wrong|naughty|bad choice|nice work|perfect|excellent|should have|better|kind of you/i;
 const SCORING = /score|streak|points|stars?\b|right answer|out of \d+ correct/i;

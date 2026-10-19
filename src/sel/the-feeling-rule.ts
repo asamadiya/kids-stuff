@@ -11,7 +11,7 @@
  * self-report, and a self-report cannot be checked. Every sentence this module
  * produces is a name or a difference, in the second person, with no comment.
  */
-import { emotionLabel } from '../games/emotions';
+import { emotionLabel } from '../lib/emotions';
 
 export const THE_FEELING_RULE_META = {
   id: 'the-feeling-rule',

@@ -5,11 +5,11 @@ import {
   narrate, orderOf, panelOf, place, placeAt, plateLines, plateTitle, runOf, scatterOf, shift,
 } from '../../sel/put-it-back-together';
 import type { Frame, PanelRole, Scenario, Slots } from '../../sel/put-it-back-together';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptStrip extends Kept {
   readonly scenario: string;

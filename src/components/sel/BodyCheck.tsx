@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PAINT_ORDER, VIEW, regionPath } from '../../sel/body-figure';
-import { drawer } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 import {
   BODYCHECK_META,
   CHECKS,

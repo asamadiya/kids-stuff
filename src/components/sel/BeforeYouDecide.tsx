@@ -5,11 +5,11 @@ import {
   readout, sheetHeight, sheetRows, timelineMarks, unaskedFacts, unaskedKinds, unaskedLine,
 } from '../../sel/before-you-decide';
 import type { Case, Decided, Fact, QuestionKind } from '../../sel/before-you-decide';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface Row extends Kept, Decided {}
 const rack = drawer<Row>('before-you-decide');

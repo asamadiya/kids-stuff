@@ -6,11 +6,11 @@ import {
   reverseLine, ruleSentence, sortedCount, unplace, wrapLines,
 } from '../../sel/not-the-same-rule';
 import type { ChipMark, ColumnId, Picks, Placements, RuleCard } from '../../sel/not-the-same-rule';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptRule extends Kept {
   readonly sentence: string;

@@ -12,7 +12,9 @@ describe('every exercise explains itself to the adult', () => {
       .filter(([, n]) => !n.what?.trim() || !n.practising?.trim() || !n.ask?.trim() || !n.honest?.trim())
       .map(([id]) => id);
     expect(empty).toEqual([]);
-    expect(Object.keys(PARENT_NOTES).length).toBeGreaterThanOrEqual(50);
+    // Only the twelve social exercises remain here; every book, game and activity
+    // carries its own GrownUpNote, enforced in books.test.ts, games-contract.test.tsx and lc-app.test.tsx.
+    expect(Object.keys(PARENT_NOTES).length).toBe(12);
   });
 
   it('never praises the exercise it describes', () => {
@@ -69,10 +71,4 @@ describe('every exercise explains itself to the adult', () => {
     }
   });
 
-  it('covers the Story Loom, which had no note at all', () => {
-    // WorkshopHub returned the Loom early, before the note was ever reached.
-    const loom = PARENT_NOTES['story-loom'];
-    expect(loom).toBeDefined();
-    expect(loom.how?.length ?? 0).toBeGreaterThanOrEqual(3);
-  });
 });

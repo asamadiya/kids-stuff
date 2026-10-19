@@ -12,7 +12,7 @@
  *
  * Pure module. No React, no DOM, no randomness, no clock of its own.
  */
-import type { Kept } from '../workshop/drawer';
+import type { Kept } from '../lib/drawer';
 
 export const BODYCHECK_META = {
   id: 'body-check',

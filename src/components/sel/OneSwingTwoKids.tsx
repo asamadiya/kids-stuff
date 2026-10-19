@@ -6,11 +6,11 @@ import {
   scenarioById, settle, splitText, spokenSplit,
 } from '../../sel/one-swing-two-kids';
 import type { EndingKind, Outcome, Reaction, Scenario } from '../../sel/one-swing-two-kids';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptRound extends Kept {
   readonly scenario: string;

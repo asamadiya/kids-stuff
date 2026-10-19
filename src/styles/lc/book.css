@@ -1,0 +1,84 @@
+/*
+ * The picture-book spread: words set inside the picture, on the calm zone the
+ * painting left for them. Landscape tablet is the main device; on a phone in
+ * portrait the art keeps its 9:7 shape and the words stack under it, because
+ * text over a postage-stamp painting is unreadable.
+ */
+
+.book { width: 100%; max-width: 1280px; margin: 0 auto; padding: var(--s3) var(--s4) var(--s5); display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.book__bar { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s3); }
+.book__title { font-size: var(--t-lg); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.spread {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1152 / 896;
+  max-height: calc(100dvh - 190px);
+  margin: 0 auto;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: var(--line) solid var(--ink);
+  background: var(--paper-2);
+  box-shadow: var(--shadow);
+  container-type: inline-size;
+}
+/* keep the 9:7 frame when height is the limit */
+@media (min-aspect-ratio: 4/3) { .spread { width: auto; height: calc(100dvh - 190px); } }
+
+.spread__art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.spread__figure { position: absolute; inset: 0; display: grid; place-items: center; background: #f7f1e4; padding: 2%; }
+.spread__figure .story-figure { width: 100%; }
+
+.spread__words {
+  position: absolute;
+  font-family: var(--font-read);
+  font-size: clamp(1.05rem, 2.55cqi, 2.05rem);
+  line-height: 1.42;
+  color: var(--ink);
+  padding: 1.6cqi 2.4cqi;
+  border-radius: 2.2cqi;
+  background: rgba(255, 248, 236, 0.88);
+  box-shadow: 0 0 0 2px rgba(36, 23, 15, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  max-height: 46%;
+  overflow: auto;
+}
+.spread__words p { margin: 0; }
+.spread--top .spread__words { top: 3.2cqi; left: 4cqi; right: 4cqi; }
+.spread--bottom .spread__words { bottom: 3.2cqi; left: 4cqi; right: 4cqi; }
+.spread--left .spread__words { top: 4cqi; bottom: 4cqi; left: 3.2cqi; width: 36%; max-height: none; justify-content: center; }
+.spread--right .spread__words { top: 4cqi; bottom: 4cqi; right: 3.2cqi; width: 36%; max-height: none; justify-content: center; }
+
+/* display pages: one line, set huge */
+.spread--big .spread__words { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.6rem, 5.2cqi, 4rem); line-height: 1.12; text-align: center; letter-spacing: -0.01em; }
+
+.refrain { background: linear-gradient(transparent 58%, rgba(242, 169, 0, 0.55) 58%); color: inherit; font-weight: 700; padding: 0 0.08em; }
+
+.book__nav { display: flex; align-items: center; justify-content: center; gap: var(--s5); margin-top: var(--s4); }
+.page-btn { width: 88px; font-size: var(--t-xl); }
+.book__count { min-width: 6ch; text-align: center; font-weight: 600; color: var(--ink-soft); }
+
+.book-end { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); align-items: start; background: var(--raised); border: var(--line) solid var(--ink); border-radius: var(--radius); padding: var(--s5); }
+.book-end__art { width: 100%; height: auto; border-radius: var(--radius-sm); border: 2px solid var(--ink); }
+.book-end__title { font-size: var(--t-xxl); color: var(--stories); margin-bottom: var(--s4); }
+.try-this { background: var(--gold-tint); border-radius: var(--radius-sm); padding: var(--s4); margin-bottom: var(--s4); font-family: var(--font-read); }
+.try-this__title { font-family: var(--font-display); font-size: var(--t-md); margin-bottom: var(--s2); }
+.try-this__steps { list-style: decimal; padding-left: 1.4em; display: grid; gap: var(--s1); }
+.try-this__safety { margin-top: var(--s3); font-size: var(--t-sm); }
+.book-end__actions { display: flex; gap: var(--s3); flex-wrap: wrap; }
+
+@media (max-width: 760px) and (orientation: portrait) {
+  .spread { aspect-ratio: auto; height: auto; max-height: none; overflow: visible; border: none; box-shadow: none; background: none; container-type: normal; }
+  .spread__art { position: static; aspect-ratio: 1152 / 896; height: auto; border-radius: var(--radius); border: var(--line) solid var(--ink); }
+  .spread__figure { position: static; border-radius: var(--radius); }
+  .spread .spread__words { position: static; width: auto; max-height: none; margin-top: var(--s3); background: none; box-shadow: none; padding: 0 var(--s1); font-size: var(--t-read); }
+  .spread--big .spread__words { font-size: var(--t-xxl); }
+  .book-end { grid-template-columns: 1fr; }
+}
+
+/* The archive read-aloud keeps its own layout; it only needs the new tokens. */
+.archive-reader .reader__head { display: flex; align-items: flex-start; gap: var(--s3); }
+.archive-reader .reader__title { flex: 1; font-family: var(--font-display); }
+.archive-reader .reader__text { font-family: var(--font-read); font-size: var(--t-md); line-height: 1.6; }

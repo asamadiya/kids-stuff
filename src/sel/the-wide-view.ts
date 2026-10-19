@@ -27,7 +27,7 @@
  * geometry.
  */
 
-import { placeOptions } from '../games/options';
+import { placeOptions } from '../lib/options';
 import { ROOMS, SEAL, TOTAL_PEOPLE } from './the-wide-view.data';
 import type { Facing, Person, Pose, Room } from './the-wide-view.data';
 

@@ -14,9 +14,9 @@ import {
   shapeOf,
 } from '../../sel/the-wide-view';
 import type { Person, Room } from '../../sel/the-wide-view';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
 
 /**
  * Three beats: look, say who stayed with you, see the room again.

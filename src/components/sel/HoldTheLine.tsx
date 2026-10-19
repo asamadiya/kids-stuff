@@ -5,11 +5,11 @@ import {
   panelFor, plateLines, plateTitle, readout, wordsFor, wrapText,
 } from '../../sel/hold-the-line';
 import type { ChipId, GlyphId, Outcome, Pick, Scenario, SlotKind } from '../../sel/hold-the-line';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptLine extends Kept {
   readonly scenario: string;

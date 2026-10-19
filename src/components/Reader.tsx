@@ -4,6 +4,8 @@ import { StoryFigure } from './StoryFigure';
 import { ReaderControls } from './ReaderControls';
 import { StoryComplete } from './StoryComplete';
 import type { Story } from '../types';
+import type { GrownUpNote } from '../notes/types';
+import { GrownUps } from '../learn/GrownUps';
 import '../styles/reader.css';
 
 export interface ReaderProps {
@@ -28,6 +30,8 @@ export interface ReaderProps {
    * no-op.
    */
   readonly announce?: (message: string) => void;
+  /** The grown-up note for this read-aloud; renders the same top-right button as every other screen. */
+  readonly note?: GrownUpNote;
 }
 
 const noop = () => {};
@@ -72,6 +76,7 @@ export function Reader({
   onExit,
   onComplete = noop,
   announce = noop,
+  note,
 }: ReaderProps) {
   const pageCount = story.pages.length;
   const current = Math.min(Math.max(0, Math.trunc(page)), pageCount);
@@ -218,9 +223,12 @@ export function Reader({
             </figure>
 
             <div className="reader__panel">
-              <h1 id="reader-story-title" className="reader__title">
-                {story.title}
-              </h1>
+              <div className="reader__head">
+                <h1 id="reader-story-title" className="reader__title">
+                  {story.title}
+                </h1>
+                {note ? <GrownUps note={{ ...note, what: `${story.subtitle} ${note.what}` }} title={story.title} /> : null}
+              </div>
               <p className="reader__text">{story.pages[current].text}</p>
               {story.pages[current].cue ? (
                 <p className="reader__cue">
