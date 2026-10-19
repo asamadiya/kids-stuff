@@ -44,8 +44,8 @@ export const book: Book = {
     {
       text: 'One verse names the number places in order. Eka is one, dasha ten, shata a hundred, sahasra a thousand. The list runs on to ten places.',
       zone: 'right',
-      art: 'Close view at chest height, Aryabhata in the left half of the picture: he holds both hands up in front of his chest, counting the places on his fingers as he recites, lips parted, eyes focused. On his left hand four fingers are folded down, one for each place he has named, and only the thumb stands up; his right hand is open with all five fingers up, the places still to come. Behind him, a little out of focus, his three students copy the same finger-counting on their own hands, concentrating; they stay in the centre of the picture. The right third is a plain, shaded ochre wall, empty.',
-      alt: 'Aryabhata counts number places on his ten fingers, four folded down, while his three students copy him.',
+      art: 'ACTION FIRST: Close view at chest height, Aryabhata in the left half of the picture, sitting cross-legged on a reed mat, reciting with lips parted and eyes focused. In front of him on the mat lies a straight row of ten small smooth river pebbles, evenly spaced; his right hand rests flat beside the fourth pebble, and the first four pebbles, the places he has already named, are pushed slightly forward out of the line. His left hand lies open on his knee. Behind him, a little out of focus, his three students lean in, each with his own row of ten pebbles, touching them one by one; they stay in the centre of the picture. The right third is a plain, shaded ochre wall, empty.',
+      alt: 'Aryabhata names the number places along a row of ten pebbles, four already pushed forward, while his students touch their own rows.',
     },
     {
       text: 'Then the verse gives a rule: each place is ten times the place before it. In plain words, ten of these make one of those.',
