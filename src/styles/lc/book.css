@@ -75,7 +75,9 @@
   .spread { aspect-ratio: auto; height: auto; max-height: none; overflow: visible; border: none; box-shadow: none; background: none; container-type: normal; }
   .spread__art { position: static; aspect-ratio: 1152 / 896; height: auto; border-radius: var(--radius); border: var(--line) solid var(--ink); }
   .spread__figure { position: static; border-radius: var(--radius); }
-  .spread .spread__words { position: static; width: auto; max-height: none; margin-top: var(--s3); background: none; box-shadow: none; padding: 0 var(--s1); font-size: var(--t-read); }
+  /* every zone: the left/right panels are centred with a transform, which
+     otherwise survives into normal flow and lifts the words onto the art */
+  .spread .spread__words { position: static; inset: auto; transform: none; width: auto; max-height: none; margin-top: var(--s3); background: none; box-shadow: none; padding: 0 var(--s1); font-size: var(--t-read); }
   .spread--big .spread__words { font-size: var(--t-xxl); }
   .book-end { grid-template-columns: 1fr; }
 }

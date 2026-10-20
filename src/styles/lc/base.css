@@ -70,12 +70,18 @@ a { color: inherit; }
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s5);
 }
+/* Two rows sized to the screen, not to a 4:3 card: on a tablet the bottom
+   row's labels fell below the fold, and on a phone a min-height pushed the
+   cards past the right edge. Art takes what is left after the label band. */
+.quad {
+  grid-template-rows: repeat(2, minmax(150px, calc((100dvh - 260px) / 2)));
+}
 .quad__card {
   position: relative;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 4 / 3;
-  min-height: 260px;
+  min-width: 0;
+  min-height: 0;
   border-radius: calc(var(--radius) + 6px);
   overflow: hidden;
   text-decoration: none;
@@ -85,9 +91,9 @@ a { color: inherit; }
   background: var(--q);
 }
 .quad__card:active { box-shadow: var(--shadow-press); transform: translateY(2px); }
-.quad__art { flex: 1; min-height: 200px; background: var(--q-tint) center 35%/cover no-repeat; border-bottom: var(--line) solid var(--ink); }
-.quad__label { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s5); min-height: 64px; }
-.quad__name { font-size: var(--t-xl); font-weight: 700; }
+.quad__art { flex: 1; min-height: 0; background: var(--q-tint) center 35%/cover no-repeat; border-bottom: var(--line) solid var(--ink); }
+.quad__label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s1) var(--s3); padding: var(--s2) var(--s5); min-height: 64px; }
+.quad__name { font-size: var(--t-xl); font-weight: 700; line-height: 1.05; }
 .quad__badge {
   font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.02em;
   background: var(--paper); color: var(--q-deep); border-radius: var(--pill); padding: var(--s1) var(--s3);
@@ -208,10 +214,12 @@ a { color: inherit; }
 
 @media (max-width: 620px) {
   .lc-page { padding: var(--s3) var(--s3) var(--s7); }
-  .quad { gap: var(--s3); }
-  .quad__card { min-height: 190px; }
-  .quad__art { min-height: 120px; }
-  .quad__label { padding: var(--s3); }
+  .home__hello { margin: var(--s2) 0 var(--s4); }
+  .home__name { font-size: var(--t-xl); }
+  .home__sub { font-size: var(--t-sm); }
+  .quad { gap: var(--s3); grid-template-rows: repeat(2, minmax(150px, calc((100dvh - 230px) / 2))); }
+  .quad__label { padding: var(--s2) var(--s3); min-height: 56px; }
+  .quad__name { font-size: var(--t-lg); }
   .quad__badge { font-size: 0.72rem; padding: 2px var(--s2); }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
   .grownups-btn { padding: 0 var(--s2); }

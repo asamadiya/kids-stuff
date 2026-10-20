@@ -210,9 +210,10 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
               type="button"
               className={`level-chip${l === level ? ' is-current' : ''}`}
               aria-pressed={l === level}
+              aria-label={`Level ${l}: ${name}`}
               onClick={() => changeLevel(l)}
             >
-              <span className="level-chip__n">{l}</span> {name}
+              <span className="level-chip__n">{l}</span> <span className="level-chip__name">{name}</span>
             </button>
           );
         })}

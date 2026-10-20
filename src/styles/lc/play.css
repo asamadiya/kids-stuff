@@ -116,8 +116,31 @@
 .balance-pan__total { font-size: var(--t-xl); font-weight: 700; color: var(--g-deep); }
 
 @media (max-width: 620px) {
-  .shell { padding: var(--s3) var(--s3) var(--s7); }
-  .shell__board { padding: var(--s3); }
+  .shell { padding: var(--s3) var(--s3) 0; }
+  .shell__bar { gap: var(--s2); margin-bottom: var(--s2); }
+  .shell__title { font-size: var(--t-lg); flex: 1; min-width: 0; }
+  /* one row of levels: numbers only, the current one keeps its name */
+  .shell__levels { flex-wrap: nowrap; margin-bottom: var(--s2); }
+  .level-chip { min-height: 44px; padding: 0 var(--s2); }
+  .level-chip:not(.is-current) .level-chip__name { display: none; }
+  .level-chip.is-current { padding-right: var(--s3); min-width: 0; }
+  .level-chip.is-current .level-chip__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .shell__prompt { font-size: var(--t-md); margin-bottom: var(--s2); }
+  .shell__board { padding: var(--s2); min-height: 0; }
+  .board { gap: var(--s2); }
+  .board-svg { max-height: 30vh; }
+  .choices { gap: var(--s2); }
+  .choice { padding: var(--s2); }
+  .choice svg { max-height: 88px; width: auto; }
   .evidence { grid-template-columns: 1fr; }
-  .shell__controls .btn { flex: 1 1 auto; }
+  .shell__feedback { min-height: 0; margin: var(--s2) 0; }
+  /* the controls stay on screen: a child should never scroll to find Check */
+  .shell__controls {
+    position: sticky; bottom: 0; z-index: 2;
+    margin: 0 calc(-1 * var(--s3)); padding: var(--s2) var(--s3) calc(var(--s2) + env(safe-area-inset-bottom));
+    background: var(--paper); border-top: 2px solid var(--rule);
+    flex-wrap: nowrap;
+  }
+  .shell__controls .btn { flex: 1 1 auto; min-width: 0; padding-inline: var(--s2); }
+  .shell__dots { display: none; }
 }

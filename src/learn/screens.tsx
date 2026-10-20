@@ -302,7 +302,7 @@ function GameHub({
 
 const MATHS_NOTE: GrownUpNote = {
   what: 'Maths games he does with his hands: building numbers from tens and ones, loading a balance, filling nests with equal groups, cutting a roti fairly, measuring a dinosaur in blocks. Each has three levels.',
-  expect: 'A set is five problems, about five minutes, then the game stops and says "Done for now". If he gets four of the last five right first time, the next set starts a level higher; two misses in a row and it steps down. He can also press a level himself.',
+  expect: 'A set is five problems, about five minutes, then the game stops and says "Done for now". If he gets four of the last five right first time, without pressing Help, the next set starts a level higher; two misses in a row and it steps down. He can also press a level himself.',
   practising: 'Place value, equality as balance, part-whole thinking, equal groups and sharing, fractions as equal parts, measuring, shapes, patterns, chance and charts — the ideas that later maths is built on.',
   ask: '"How did you know?" after a right answer — the strategy matters more than the number.',
   next: 'Each game\'s note has an off-screen version with things you have at home. Do that one next.',
@@ -311,7 +311,7 @@ const MATHS_NOTE: GrownUpNote = {
 
 const SCIENCE_NOTE: GrownUpNote = {
   what: 'Science games that ask him to predict before he looks: will it float, which one lands first, which way will the beam tip. He taps a guess, presses Try, and sees what happens beside the picture he started from.',
-  expect: 'He will often predict wrong — that is the point. Most of these are built around a common wrong idea (heavy things sink, heavy things fall faster). A wrong prediction is never marked wrong; the evidence does the work.',
+  expect: 'He will often predict wrong — that is the point. Most of these are built around a common wrong idea (heavy things sink, heavy things fall faster). A wrong prediction is never marked wrong; the evidence does the work. Levels here change only when he or you choose one, since a guess right or wrong says little about understanding.',
   practising: 'Making a prediction, comparing it with evidence, and changing his mind. The physics ideas: friction, gravity and air, stored energy, levers and balance, floating, sound, light and shadow, magnets, heat, day and night, scale, and what seeds need.',
   ask: '"What made you think that?" before Try, and "What surprised you?" after.',
   next: 'Every science game has a matching Make & Do activity. The real version is the lesson; the screen is the warm-up.',
