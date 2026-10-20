@@ -14,7 +14,7 @@ export function ActivityPage({ id }: { readonly id: string }) {
   const a = getActivity(id)!;
   useEffect(() => markRead(`make/${a.id}`), [a.id]);
   return (
-    <Page title={a.title} back={{ href: '#/make', label: 'Make & Do' }} note={a.note} band="make" expect={`${a.minutes} minutes · ${a.hook}`}>
+    <Page title={a.title} back={{ href: '#/make', label: 'Make & Do' }} note={a.note} band="make" expect={`${a.span ?? `${a.minutes} minutes`} · ${a.hook}`}>
       {a.note.safety ? (
         <p className="activity__safety">
           <b>Safety</b> {a.note.safety}

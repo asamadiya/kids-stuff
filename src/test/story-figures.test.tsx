@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { STORY_FIGURES, storyFigure } from '../components/figures';
 import { StoryFigure } from '../components/StoryFigure';
 import { STORIES } from '../stories';
+import { BOOKS } from '../books/registry';
 
 /**
  * Diagram pages.
@@ -20,7 +21,8 @@ import { STORIES } from '../stories';
  */
 afterEach(cleanup);
 
-const pagesWithFigures = STORIES.flatMap((story) =>
+// Archive read-alouds and the new picture books both reach figures by id.
+const pagesWithFigures = [...STORIES, ...BOOKS].flatMap((story) =>
   story.pages.flatMap((page, i) =>
     page.figureId ? [{ slug: story.slug, page: i + 1, figureId: page.figureId }] : [],
   ),

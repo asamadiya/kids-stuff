@@ -7,6 +7,7 @@ import { BOOKS, SHELVES, booksOn, getShelf } from '../books/registry';
 import { artSrc } from '../books/BookReader';
 import type { ShelfId } from '../books/types';
 import { SITUATIONS } from './situations';
+import type { Story } from '../types';
 import { ARCHIVE, CURATED_ARCHIVE, LIBRARY_NOTE, SUBJECTS, archiveLabel, archiveStory, storiesIn } from './library';
 import { MATHS_GAMES, MATHS_GROUPS } from '../maths/registry';
 import { SCIENCE_GAMES, SCIENCE_GROUPS } from '../science/registry';
@@ -179,16 +180,16 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
           </div>
           <FourUp
             label="Longer read-alouds"
-            items={CURATED_ARCHIVE.map((slug) => archiveStory(slug)).filter(Boolean).map((st) => (
+            items={CURATED_ARCHIVE.map((slug) => archiveStory(slug)).filter((st): st is Story => st !== undefined).map((st) => (
               <Card
-                key={st!.slug}
-                href={`#/read/${st!.slug}/1`}
-                title={st!.title}
-                hook={st!.subtitle}
-                art={`${BASE}art/${st!.slug}/cover-560.webp`}
+                key={st.slug}
+                href={`#/read/${st.slug}/1`}
+                title={st.title}
+                hook={st.subtitle}
+                art={`${BASE}art/${st.slug}/cover-560.webp`}
                 tone="stories"
                 tag={archiveLabel(st.slug)}
-                tick={read(`read/${st!.slug}`) ? 'Read before' : null}
+                tick={read(`read/${st.slug}`) ? 'Read before' : null}
               />
             ))}
           />
@@ -371,7 +372,7 @@ export function MakeHub() {
             hook={a.hook}
             art={`${BASE}art/make/${a.id}/step-1.webp`}
             tone="make"
-            tag={`${a.minutes} min · ${WHERE[a.where]}`}
+            tag={`${a.span ?? `${a.minutes} min`} · ${WHERE[a.where]}`}
             tick={read(`make/${a.id}`) ? 'Done before' : null}
           />
         ))}

@@ -15,14 +15,25 @@ import type { GrownUpNote } from '../notes/types';
  * Safety follows the advisor's charter, section 3: large materials, small parts
  * kept from the two-year-old, low drops, water supervised throughout, and no
  * loose powerful magnets, button batteries, flames, hot water or mains power.
- * Food is vegetarian; eggs are fine.
+ * Food is vegetarian; eggs are fine. Anything eaten afterwards must have stayed
+ * fresh, sprouts are cooked through, and a batch that went off is thrown away,
+ * never rinsed and eaten.
  */
 export interface Activity {
   readonly id: string;
   readonly title: string;
   readonly hook: string;
   readonly where: 'kitchen' | 'garden' | 'outdoors' | 'table';
+  /** Hands-on minutes: the whole activity in one sitting, or its setup when `span` is set. */
   readonly minutes: number;
+  /**
+   * For an activity that is not done in one sitting, the whole commitment as a
+   * short phrase shown instead of the minutes on the card and the page: a
+   * five-day experiment is not a fifteen-minute one. Keep it to a few words; it
+   * sits in a pill on a quarter-width card. The note's `expect` spells out each
+   * sitting. Absent when the whole thing is done in one sitting.
+   */
+  readonly span?: string;
   readonly need: readonly string[];
   readonly steps: readonly { readonly text: string; readonly art: string }[];
   readonly notice: string;
@@ -87,7 +98,8 @@ export const ACTIVITIES: readonly Activity[] = [
     title: 'What Time Is It, Stick?',
     hook: 'Chalk the shadow every hour and watch it turn.',
     where: 'outdoors',
-    minutes: 30,
+    minutes: 10,
+    span: 'Hourly, one sunny day',
     need: [
       'a straight stick about as long as a ruler, with a blunt top',
       'a lump of modelling clay as big as an orange',
@@ -126,14 +138,14 @@ export const ACTIVITIES: readonly Activity[] = [
     pairsWith: 'a-tiny-dinosaur-a-huge-shadow',
     note: {
       what: 'He stands a stick upright on a sunny balcony or patio and, once an hour through the day, draws its shadow in chalk and writes the hour at the tip.',
-      expect: 'He may expect the shadow to stay put, or to grow all day. It is long in the morning, shortest around the middle of the day and long again in the afternoon, and its tip swings round the stick the same way clock hands turn. While the clocks are on daylight saving time, the shortest shadow comes nearer 1 pm than noon.',
+      expect: 'Plan it for a sunny day at home: about ten minutes to set up before 9, then a few minutes every hour until about 4, and one look at 9 the next morning. He may expect the shadow to stay put, or to grow all day. It is long in the morning, shortest around the middle of the day and long again in the afternoon, and its tip swings round the stick the same way clock hands turn. While the clocks are on daylight saving time, the shortest shadow comes nearer 1 pm than noon.',
       practising: 'The sun’s position in the sky changes through the day, and a shadow always points away from the light. Also reading the hour on a clock and recording an observation at regular intervals.',
       ask: 'At the shortest mark: “This is the shortest shadow so far. Where is the sun now?” Let him point towards it without looking at it.',
       next: 'On the next sunny morning, check whether the 9 o’clock shadow falls on yesterday’s line. On a visit to Jaipur, see the Samrat Yantra at the Jantar Mantar, a giant sundial built for Maharaja Sawai Jai Singh II and completed in the 1730s.',
       honest: 'The marks hold for a few days and then drift as the seasons change, so this is a record of one day’s shadows, not a working clock. Seeing the shadow move does not mean he understands that the Earth’s turning causes it; that comes much later.',
       easier: 'Make only three marks: after breakfast, at lunch and before dinner.',
       harder: 'Measure each shadow with a ruler, write the lengths in a row, and ask him at which hour the shortest one came.',
-      safety: 'Never look straight at the sun, even for a moment, and never through glasses or a tube. Use a sun hat and sunscreen for the midday marks. Keep the clay and chalk away from the two-year-old’s mouth.',
+      safety: 'Never look straight at the sun, even for a moment, and not through sunglasses, binoculars or a tube either. Use a sun hat and sunscreen for the midday marks. On a balcony, keep him back from the railing and move away anything he could climb on. Keep the clay and chalk away from the two-year-old’s mouth.',
     },
   },
   {
@@ -142,6 +154,7 @@ export const ACTIVITIES: readonly Activity[] = [
     hook: 'Two jars of moong. One goes in the dark.',
     where: 'kitchen',
     minutes: 15,
+    span: 'Overnight soak, 5 days',
     need: [
       'a cup of whole green moong',
       'two clean glass jars, the same size',
@@ -180,14 +193,14 @@ export const ACTIVITIES: readonly Activity[] = [
     pairsWith: 'what-does-this-seed-need',
     note: {
       what: 'He soaks two equal handfuls of moong, sets one jar in a dark cupboard and one on a bright windowsill, waters both the same twice a day, and draws them side by side for about five days.',
-      expect: 'He will probably predict that the dark jar will not sprout at all. Both usually sprout within a day or two, because a seed carries its own food. Over the next days the dark sprouts grow pale yellow and lanky while the light ones open small green leaves. If either jar smells sour or grows fuzz, rinse the moong and start again.',
+      expect: 'Start the evening before with the soak. Setting up the jars takes about fifteen minutes the next morning; after that it is a minute or two each morning and evening for five days to water, sniff and draw, and the rest is waiting. He will probably predict that the dark jar will not sprout at all. Both usually sprout within a day or two, because a seed carries its own food. Over the next days the dark sprouts grow pale yellow and lanky while the light ones open small green leaves. In warm weather a jar can spoil; the safety line says what to do if one does.',
       practising: 'Seeds need water, air and warmth to sprout; light is not needed for sprouting but is needed for a seedling to make its own food and turn green. Also a fair test: same seeds, same water, one change only.',
       ask: 'On the day both jars have roots: “The dark jar sprouted too. Did it need the light?” Then, a few days later: “So what is the light for?”',
-      next: 'Rinse the sprouts, cook them lightly, and put them in a moong chilla or a sprouts sabzi so he eats what he grew. Then read The Bean in the Dark together.',
+      next: 'If the batch stayed fresh to the end, cook the sprouts that day: boil them, or stir-fry them in a sprouts sabzi, until they are steaming hot all the way through, so he eats what he grew. Never eat sprouts from a batch that went off. Then read The Bean in the Dark together.',
       honest: 'Five days shows the change in colour; it does not show why it happens. One pair of jars is a single trial, and a warmer windowsill can speed up the light jar for reasons that have nothing to do with light. Chlorophyll and photosynthesis are names for later.',
       easier: 'Look only on day one and day five, and ask which jar looks different.',
       harder: 'Add a third jar that gets no water at all, and ask him beforehand which jars will sprout.',
-      safety: 'Wash the jars well before you start. Keep the dry and soaked beans out of the two-year-old’s reach, since whole moong is a choking hazard for her. Cook the sprouts before anyone eats them; raw sprouts can carry bacteria that young children handle badly.',
+      safety: 'A grown-up washes the jars and cloths in hot soapy water first. Sniff both jars morning and evening. If either smells sour, looks slimy or grows fuzz, throw away the whole batch, both jars, without tasting any: rinsing does not make spoiled sprouts safe. Wash the jars and cloths in hot soapy water (bin any kitchen paper) and restart both jars with fresh moong, so they still start together. Eat sprouts only from a batch that stayed fresh to the end, cooked until steaming hot all the way through, never raw or lightly cooked; bacteria can hide inside the seed and multiply in the warm, damp jar. Keep the jars and beans out of the two-year-old’s reach; whole moong is a choking hazard for her.',
     },
   },
   {
@@ -294,7 +307,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'Counting rulers along one table does not mean he understands measurement. The test is whether he can say why a gap or an overlap changes the answer, and whether he can measure something you did not choose.',
       easier: 'Measure only in his feet and yours, and ask which of you got the bigger number.',
       harder: 'Ask him to guess the next item’s length in rulers before measuring, and to say how many of his feet make one ruler.',
-      safety: 'Walk heel to toe on a clear floor, away from chair legs, and keep a hand near him for balance. The ruler is not a sword; keep it below shoulder height near the two-year-old.',
+      safety: 'Walk heel to toe on a clear floor, away from chair legs, and keep a hand near him for balance; socks slip on smooth tiles, so go slowly or go barefoot. The ruler is not a sword; keep it below shoulder height near the two-year-old.',
     },
   },
   {
@@ -304,7 +317,7 @@ export const ACTIVITIES: readonly Activity[] = [
     where: 'kitchen',
     minutes: 20,
     need: [
-      'two eggs, hard-boiled and cooled by a grown-up beforehand',
+      'two eggs, hard-boiled by a grown-up, cooled and kept in the fridge',
       'a small cardboard box with a lid, such as a shoebox',
       'newspaper, old socks or cotton wool for packing',
       'a metal baking tray',
@@ -332,7 +345,7 @@ export const ACTIVITIES: readonly Activity[] = [
         art: 'Mummy holds the closed shoebox level with the top of the chair back above the baking tray, about to let go, while Arjun crouches beside the tray holding a card on which he has drawn an egg with no cracks.',
       },
       {
-        text: 'Open the box and check every side of the egg. Then peel both and eat them.',
+        text: 'Open the box and check every side of the egg. Peel the cracked one: did the white break too?',
         art: 'At the kitchen table, Arjun turns the whole, uncracked boiled egg slowly in his fingers, checking every side, while Mummy peels the cracked egg onto a small steel plate beside him.',
       },
     ],
@@ -347,7 +360,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'A whole egg shows that packing helped once. It does not show why, and a lucky landing can save a bare egg or crack a packed one. Two eggs are one comparison, not a result.',
       easier: 'Skip the guess and just compare the two shells side by side.',
       harder: 'Pack two boxes, one with paper and one with socks, and ask him beforehand which egg will do better and why.',
-      safety: 'Boil the eggs and let them cool completely before he joins in; he never goes near the pan or the hot water. Only the grown-up drops, standing on the floor; nobody climbs on the chair. Sweep up shell straight away and keep the two-year-old clear of the tray. Skip this if anyone in the house is allergic to egg.',
+      safety: 'Boil the eggs until the yolks are firm right through, cool them and keep them in the fridge until you start; he never goes near the pan or the hot water. Only the grown-up drops, standing on the floor; nobody climbs on the chair. Afterwards, peel and eat only an egg whose shell stayed whole, within two hours of taking it out of the fridge; a cracked egg goes in the bin once he has looked at it. Sweep up shell straight away and keep the two-year-old clear of the tray. Skip this if anyone in the house is allergic to egg.',
     },
   },
   {
@@ -401,7 +414,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'Balancing pennies does not show that he reads the equals sign as “same value”. The test is a written sentence like 5 = 2 + ☐ with no hanger in sight. A stiff hook can stick, so a one-penny difference may barely show; tap the hanger gently before reading it.',
       easier: 'Use only the same small numbers, 1 to 5, on each side, and no splits.',
       harder: 'Put 6 in one cup and ask him for three different ways to fill the other cup with two handfuls.',
-      safety: 'Keep the hanger at his chest height or lower, so nothing swings at his face. Count the pennies back into a closed jar afterwards; they are a choking hazard for the two-year-old.',
+      safety: 'Tape the broom handle to both chair backs so it cannot roll off, and keep the hanger at his chest height or lower, so nothing swings at his face. Count the pennies back into a closed jar afterwards; they are a choking hazard for the two-year-old.',
     },
   },
   {
@@ -451,7 +464,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'Sorting a dozen kitchen objects does not mean he can predict new ones; the test is a fresh object he has not tried. Iron and steel are names for later; “some metals” is enough for now.',
       easier: 'Use only five things: the tin, a steel spoon, a wooden spoon, a plastic cup and the foil.',
       harder: 'Ask him to find something the magnet holds through a sheet of paper, and something it does not.',
-      safety: 'Use one large fridge magnet only. Never use small or loose powerful magnets such as neodymium buttons or magnetic toy balls; if a child swallows two, they can pinch the gut together and need surgery. Keep the magnet and small objects away from the two-year-old, and check the tin rim is smooth.',
+      safety: 'Use one large fridge magnet made in one solid piece; the small magnet on the back of a decorative one can come off. Never use small or loose powerful magnets such as neodymium buttons or magnetic toy balls; if a child swallows two, or one and a bit of metal, they can pinch the gut together and need surgery. Keep the magnet and small objects away from the two-year-old. Look at the rim of the empty tin before he handles it: the edge a tin opener leaves can be sharp, so cover it with tape, and throw the lid away.',
     },
   },
   {
@@ -500,7 +513,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'One pair of ice cubes shows that the towel slowed melting. It does not show that he understands heat transfer, and a sunny spot or unequal cubes can change the result. “The towel makes cold” is a common next idea; it is wrong, and it is worth a second try.',
       easier: 'Check after ten minutes and just ask which cube is bigger.',
       harder: 'Wrap a third cube in kitchen foil only, and ask him beforehand to put the three in order of which will melt first.',
-      safety: 'Use ice cubes the size of a large grape or bigger, and keep them away from the two-year-old, who can choke on ice. Wipe up the melt water so nobody slips.',
+      safety: 'Ice is a choking hazard for the two-year-old, most of all once it has melted to the size of a grape; keep both bowls out of her reach. Wipe up the melt water at once so nobody slips.',
     },
   },
   {
@@ -549,7 +562,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'Copying a half with your help does not show he can see symmetry on his own. The test is whether he can find a mirror line in a new picture, or spot a deliberate mistake in one half. Many rangolis also have turning symmetry, which is a different idea.',
       easier: 'Use only straight lines and dots, close to the ruler.',
       harder: 'Draw two mirror lines in a plus sign and ask him to complete all four quarters from your one.',
-      safety: 'Raw dal and rice are choking hazards for the two-year-old; keep the thali well out of her reach, and sweep up spills.',
+      safety: 'Raw dal and rice are choking hazards for the two-year-old, and small enough for her to push into a nose or an ear; keep the thali well out of her reach, and sweep up spills.',
     },
   },
   {
@@ -652,7 +665,7 @@ export const ACTIVITIES: readonly Activity[] = [
       honest: 'Bundling leaves with your help does not show that he understands place value. The test is whether he can tell you, without counting, how many leaves are in 3 bundles and 4 loose, and what the 3 in 34 stands for.',
       easier: 'Stop at 20, with two bundles and a few loose leaves.',
       harder: 'Once he has 10 bundles, tie them into one bundle of a hundred and ask how to write the number.',
-      safety: 'Pick only leaves already on the ground; leave berries, mushrooms and seed pods where they are, and wash hands afterwards. Learn poison oak (leaflets in threes) and leave it alone. Keep the rubber bands from the two-year-old, and hold hands near roads.',
+      safety: 'Pick only leaves already on the ground; leave berries, mushrooms and seed pods where they are, and wash hands afterwards. Learn poison oak (leaflets in threes) and leave it alone; even its fallen, dry leaves can cause the rash. Keep the rubber bands from the two-year-old, and hold hands near roads.',
     },
   },
 ];
