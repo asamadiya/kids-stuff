@@ -85,14 +85,16 @@ describe('it is built on the bench, not on the quiz shell', () => {
     }
   });
 
-  it('speaks its prompts aloud, because he does not read fluently', () => {
+  it('marks every line that should have a recorded clip', () => {
+    // Browser speech was cut (advisor ruling RULINGS-2: the voice was rejected as
+    // robotic). `say` is now a silent seam in src/lib/say.ts; these call sites
+    // are where recorded clips will go, so each exercise must still have them.
     const mute = components.filter((c) => !/\bsay\(/.test(c.text)).map((c) => c.file);
     expect(mute).toEqual([]);
   });
 
   it('leaves the old quiz shell deleted', () => {
-    const games = readdirSync('src/games');
-    expect(games).not.toContain('comic.ts');
+    expect(readdirSync('src')).not.toContain('games');
     expect(readdirSync('src/components')).not.toContain('ComicSelGame.tsx');
   });
 });

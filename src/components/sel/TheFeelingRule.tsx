@@ -6,11 +6,11 @@ import {
   removePin, ruleById, ruleSummary, scenePath, stopAt, stopX,
 } from '../../sel/the-feeling-rule';
 import type { FeelingRule, Pin } from '../../sel/the-feeling-rule';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptRule extends Kept {
   readonly ruleId: string;

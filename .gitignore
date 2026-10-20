@@ -19,3 +19,4 @@ test-results/
 artifacts/
 .figure-render/
 __pycache__/
+.check-books/

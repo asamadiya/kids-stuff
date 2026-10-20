@@ -6,11 +6,11 @@ import {
   readingFor, seesIn, sentenceFor, slotKey, spotsIn, wrapWords,
 } from '../../sel/borrowed-eyes';
 import type { ChipId, Moment, Other, Placed, PlateChip, View } from '../../sel/borrowed-eyes';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptPlate extends Kept {
   readonly moment: string;
@@ -269,7 +269,7 @@ export function BorrowedEyes() {
                 />
               );
             })}
-            <g transform={`rotate(${notchAngle(notch, views.length)} 60 52)`} style={{ transition: 'transform 420ms ease' }}>
+            <g transform={`rotate(${notchAngle(notch, views.length)} 60 52)`}>
               <line x1="60" y1="52" x2="60" y2="24" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
             </g>
             <circle cx="60" cy="52" r="4" fill={OCHRE} />

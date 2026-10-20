@@ -1,0 +1,225 @@
+import type { ArchiveEntry } from './types';
+
+export const ENTRIES: Readonly<Record<string, ArchiveEntry>> = {
+  'aryabhata-circle-number': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Aryabhata draws circles in the dust with a peg and a cord, finds that three widths and a small leftover always fit around the edge, and writes a number recipe that gives 3.1416. The one idea: the distance around any circle is a little more than three times the distance across it.',
+      expect: '13 pages, about 9 minutes. Laying the cord around the circle (pages 3 to 5) is easy to follow; the recipe on page 7, (100 + 4) × 8 + 62,000 shared over 20,000, will pass him by unless you work it through with him.',
+      practising: 'For every circle, the distance around divided by the distance across is the same number, a little more than 3 (pi); and a close answer can be given honestly as a close answer.',
+      ask: 'On page 5: “Why do you think the giant circle and the tiny circle both fit three widths and a bit?”',
+      next: 'Wrap a string once round a steel plate, cut it there, then lay the plate’s width along the string as many times as it fits. Do the same with a bangle and a bucket lid: three and a bit every time.',
+      honest: 'The recipe giving 62832 ÷ 20000 and the word āsanna (“approaching”) are in the Aryabhatiya (499 CE); the dust, the cord and the lamp are imagined. Reading āsanna as knowing the number can never be written exactly (page 8) goes back to the Kerala commentator Nilakantha, about a thousand years later, and was proved only in the 1760s. Two slips: Kusumapura is usually identified with Pataliputra itself, not a town near it (page 1), and a lopsided circle (page 5) would not reliably give the same count, because the rule holds only for true circles.',
+    },
+  },
+  'pulley-upon-pulley': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Archimedes threads one rope through four grooved wheels and moves King Hieron’s ship with one hand, stopping calmly to fix a loop that went round the wrong wheel. The idea is that a load held by several rope sections is shared among them, so the pull is smaller but you must pull more rope.',
+      expect: '12 pages, about 9 minutes. The tangle on pages 7 and 8 is easy to follow; the trade on page 6, a long light pull for a short heavy move, usually needs real rope in his hands before it makes sense.',
+      practising: 'A pulley system shares a load among the rope sections holding it: four sections need about a quarter of the pull, and four times as much rope must be pulled through.',
+      ask: 'On page 6: “The ship only moved a little way. Why did Archimedes have to pull so much rope?”',
+      next: 'Have two grown-ups each hold a broom handle a metre apart, tie a rope to one, loop it round both handles four or five times, and let him pull the free end: he will draw the handles together against their grip. Keep small fingers away from the wraps.',
+      honest: 'Plutarch, writing about three hundred years later, says Archimedes drew a loaded ship single-handed with a compound pulley; the four wheels, the tangle and the dialogue are the story’s own, as page 11 admits. The physics is overstated: if many sailors could not shift the ship, four rope sections (less friction) would not make it feel light in one hand (page 5), and it is the rope sections, not the wheels themselves, that share the load (page 3).',
+    },
+  },
+  'the-bees-and-the-lotus-riddle': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Bhaskara plays a game with three toy bees and three flowers, lotus, jasmine and mango, showing that sorting things into groups first makes each group easy to count, and that an empty flower holds zero.',
+      expect: '12 pages, about 9 minutes. The finger-play on pages 4, 6 and 10 suits him well; page 7, where three stays three however it is split, is the real step and may need showing with objects.',
+      practising: 'Sort first, then count each group; one number splits in several ways (2 + 1 + 0 and 1 + 1 + 1 are both 3), and an empty group counts as zero.',
+      ask: 'On page 7: “Two and one and none, or one and one and one. Is it still three bees?”',
+      next: 'Mix rajma, chana and moong in a bowl, have him sort them into three katoris and count each, then set out a fourth, empty katori and ask how many it holds. Spread Them Out, in Maths, asks the same question as page 7.',
+      honest: 'Bhaskara II and his Lilavati (about 1150) are real and the book has bee-swarm verses; the toy-bee game, the child and the dialogue are invented, and Lilavati being his daughter is tradition. The bee verses usually quoted from the book name kadamba, silindhra, kutaja, jasmine, pandanus and lotus flowers, not a mango. Page 8 is wrong that bees dance around the hive: returning foragers dance on the comb inside it, and what the dance tells other bees was worked out only by Karl von Frisch in the twentieth century. The fact box puts Aryabhata in the Ujjain school; he worked at Kusumapura (Pataliputra).',
+    },
+  },
+  'the-bridge-that-held-itself-up': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Roman masons cut wedge-shaped stones, lay them over a curved wooden frame, set the keystone last and take the frame away; the arch stands because each wedge presses on its neighbours and pushes the load out to the end supports.',
+      expect: '12 pages, about 9 minutes. The wait before the keystone and the frame coming away (pages 7 to 9) hold attention; the story names “voussoir”, “abutment” and “centering”, but he only needs “wedge” and “keystone”.',
+      practising: 'Every stone in an arch is squeezed, never pulled, and the squeeze pushes outwards at the feet, so the feet must be held firm.',
+      ask: 'On page 9: “The wooden frame has gone. What is holding the stones up now?”',
+      next: 'Bend a strip of thin card into a curve between two heavy books and press lightly on its top; then slide one book away and press again. With nothing holding its foot, the arch spreads and flattens.',
+      honest: 'Wedge stones, keystones, the wooden frame (centring) and the Pont du Gard are real; the old mason, his helpers and his saying are imagined, and no single builder is named in any record. “No glue at all” fits dry-laid arches like the Pont du Gard’s, but many Roman bridges used mortar and concrete, and most aqueduct channels ran at ground level or underground, with arches only where they crossed low ground.',
+    },
+  },
+  'the-city-built-on-a-grid': {
+    kind: 'reconstructed',
+    note: {
+      what: 'The builders of Mohenjo-daro make bricks in one frame so they all match, lay out streets that cross at square corners, and build covered drains, wells, the Great Bath and a set of matching stone weights. The one idea: when everyone uses the same size and the same measure, the parts fit and trade is fair.',
+      expect: '12 pages, about 9 minutes. Matching bricks and crossing streets (pages 2 to 5) are easy; the brick rule on page 2, twice as long as wide and twice as wide as thick, needs a real brick or a toy block in his hands to see. Page 10, where no ruler’s name is known, may interest him more than you expect.',
+      practising: 'A standard unit: one frame makes every brick the same, one set of weights makes every trade the same; and a grid of straight streets crossing at right angles makes places easy to find.',
+      ask: 'On page 8: “Why would the seller and the buyer both want to use the very same stone weights?”',
+      next: 'Build a small town from matching blocks or dominoes in a grid, then try a wall from mixed household things (a book, a box, a cup) and compare. Why Is a Ruler Called a Foot?, in Make & Do, shows what happens when everyone measures with something different.',
+      honest: 'The grid streets, standard 4:2:1 bricks, covered drains, many wells, the bitumen-lined Great Bath, the binary stone weights and the undeciphered seals are all found by archaeology; the builders’ saying, the cords and the sequence of work are imagined, and “this is a true tale” on page 1 claims more than that. Page 6 says every house had its own well: many did, but others used public wells. How the city was governed is unknown, so page 10’s “many hands, one plan” is a reasonable reading, not a finding.',
+    },
+  },
+  'the-day-the-world-changed': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A huge asteroid strikes near what is now Mexico 66 million years ago, dust darkens the sky, the big dinosaurs die out, small animals get through, and the story ends on the idea that birds are living dinosaurs. There are no named people; it is a narrated picture of a real event.',
+      expect: '10 pages, about 9 minutes. The story leaves out fire and shock waves and shows the loss gently, but some five-year-olds still find page 5 sad; “66 million years” is a sound, not a length he can picture. He will hold on to “every bird is a dinosaur” and may take it to mean every dinosaur became a bird.',
+      practising: 'Evidence from rocks: a thin worldwide layer and a buried crater let scientists date an event no one saw; and the idea that small animals needing little food got through a bad time when big ones could not.',
+      ask: 'On page 6: “Why do you think the small animals got through when the giant ones could not?”',
+      next: 'Watch a pigeon or crow on the balcony and look at its feet: scaly skin, three toes pointing forward, and claws. A T. rex Beside a Bus, in Science, puts the giants that did not survive next to things he knows.',
+      honest: 'The impact, the Chicxulub crater, the iridium-rich layer and birds being living dinosaurs are the scientific consensus; every scene is pictured, since no one saw it. Pages 2, 6 and 9 blur one point: birds did not arise after the impact from small feathered dinosaurs in general. Birds had already been flying for tens of millions of years, only some bird lines survived, and feathered dinosaurs that were not birds, such as the raptors, died out with the giants. The fact box calls Luis Alvarez a geologist; he was a physicist, and his son Walter the geologist.',
+    },
+  },
+  'the-fire-made-hotter': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Haya iron-smiths near Lake Victoria pump skin bellows that push air through clay pipes running into a tall furnace; the pipes warm the air before it reaches the coals, so the fire burns hotter. The one idea: a fire needs air, and more air, already warm, makes it hotter.',
+      expect: '12 pages, about 9 minutes. The bellows rhythm and the colour of the coals (pages 5 to 8) are easy to follow; page 4’s reason for warming the air first is the abstract step. He may take “fire loves the air we breathe out” to mean fire is alive.',
+      practising: 'A fire burns using part of the air (oxygen): push more air in and it burns hotter; warm the air first and less of the fire’s heat is spent warming it.',
+      ask: 'On page 4: “Why would cold air rushing in make the fire a little cooler?”',
+      next: 'Light an agarbatti, blow out the flame, and let him watch from arm’s length while you blow gently on the glowing tip: it brightens with each breath and dulls when you stop. The match and the stick stay in your hands.',
+      honest: 'Haya iron smelting with skin bellows and clay pipes reaching into the furnace is real, described by Peter Schmidt and Donald Avery in 1978 from excavated furnaces and a smelt rebuilt in the 1970s with Haya elders who remembered the old process; the grandmother smith, the children and their words are invented, and in the Haya smelting Schmidt recorded, the smelters were men. Page 1’s “this is a true tale” claims too much: the furnaces are old but no such scene is recorded, and later metallurgists have argued that the warmed air added less heat than first claimed, as well as disputing the steel claim the fact box mentions.',
+    },
+  },
+  'the-great-bronze-buddha': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Emperor Shomu wants a giant bronze Buddha at Todai-ji in Nara; the monk Gyoki gathers help from across Japan, workers cast it in stacked sections round an earth core, gild it, and the Indian monk Bodhisena paints in the eyes in 752. The one idea: a hollow mould holds a shape, and runny metal poured in sets into that same shape.',
+      expect: '13 pages, about 9 minutes. The thumb-print and lotus-in-clay pages (3 and 6) make the mould idea clear; the gap between core and mould on page 4 is harder and may need drawing. Sizes like 500 tonnes mean nothing yet; “as much as a herd of elephants” will.',
+      practising: 'Casting: a hollow mould holds a shape, something runny poured in takes that shape, and when it hardens the mould can be taken away.',
+      ask: 'On page 4: “When the hot bronze is poured, where does it go: into the earth hill, or into the gap?”',
+      next: 'Fill a shaped ice-cube tray or jelly mould with water, freeze it, and pop the shapes out: runny in, hard out, the same shape as the hollow. Where Did the Ice Go?, in Science, follows the same freezing and melting.',
+      honest: 'Shomu, Gyoki, Bodhisena, the eye-opening of 752 and the casting in stacked sections round a core are recorded; the potter, the children and the workers’ words are imagined, and the 2.6 million helpers is the temple’s own count. Page 8 is wrong to say the bronze was stacked “over eight long years”: the casting took eight pours over about three years (747 to 749); eight years is about the length of the whole project, not of the casting. The gilding’s “quiet metal” (page 10) was mercury, whose fumes were poisonous, and the statue standing now has been heavily recast after fires; its head dates from the 1690s.',
+    },
+  },
+  'the-leaning-lotus': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Bhaskara and his daughter Lilavati push a pole painted with bands down to the bottom of a lotus pond, lift it out, and count the wet bands to read the depth; a tilted pole gives a slanted, wrong mark, so they measure again holding it straight. The book’s leaning-lotus puzzle is mentioned but not solved.',
+      expect: '12 pages, about 9 minutes. The pole going down and coming up wet (pages 3 and 4) is easy to picture; why a tilted pole reads too deep (page 6) is the hard step. Page 8’s hidden triangle is there for you, not for him.',
+      practising: 'Measuring depth directly: water lies flat, so a straight, upright marked stick shows the depth at the wet line; a tilted stick reads too much. Measure, do not guess.',
+      ask: 'On page 6: “The pole leaned over. Why did its wet mark make the water look deeper than it was?”',
+      next: 'Draw bands a finger-width apart on a long wooden spoon or a stick with a marker, stand it upright in a bucket of water, lift it and count the wet bands; then tilt it as you put it in and count again.',
+      honest: 'Bhaskara II, Ujjain and the Lilavati (about 1150) are real, and the book does have a leaning-lotus verse; the pole, the evening at the pond and the dialogue are invented, and Lilavati being his daughter is legend, as the story says. Page 2 turns the puzzle round: the verse gives the bud’s height above the water (a span, half a cubit) and how far away it sank (two cubits) and asks the depth of the water, not the height. Page 1’s “great observatory” means Ujjain’s school of astronomy; the observatory building that stands there now dates from the 1720s; and page 10’s star charts for finding the way are the story’s addition, since his astronomy calculated planet positions and eclipses.',
+    },
+  },
+  'the-long-walls-of-the-city': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Oba Ewuare and the Edo people of Benin City dig a deep ditch round the city and pile the earth on the inner side as a wall, one small basket at a time; a child learns to share a load rather than lift one too heavy. The one idea: the earth taken out of the ditch becomes the wall, so one dig makes both.',
+      expect: '12 pages, about 9 minutes. The basket carrying and the gap filled by friends (pages 3, 6 and 7) are easy to follow; that the ditch and the wall are the same earth in two places (page 10) is the idea to check he has.',
+      practising: 'Moving material, not making it: every basket out of the ditch goes onto the bank, so the drop from the top of the wall to the bottom of the ditch is the two added together. Also, many small loads add up to a large one.',
+      ask: 'On page 10: “Where did all the earth for the wall come from?”',
+      next: 'In a sandpit, or a big tray of damp soil, dig a straight trench with a spoon and pile every spoonful along one side; then stand a ruler in the trench and measure from its bottom to the top of the pile.',
+      honest: 'The Benin earthworks (iya) are real and among the largest ever built by hand, and Edo tradition credits Oba Ewuare (mid-1400s) with the deep moat and bank round the inner city; the child, the friends and the words are invented. The story runs two things together: the vast rural network on page 9, estimated at many thousands of kilometres, was dug by separate village communities over several centuries, much of it probably before Ewuare, rather than spreading out from his city wall.',
+    },
+  },
+  'the-number-hidden-in-a-word': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Scholars in Kerala hide long numbers inside words by letting each consonant stand for a digit (the Katapayadi system), and read the digits back from the last sound to the first; a student muddles a line, slows down and gets it right.',
+      expect: '12 pages, about 9 minutes. He will get the idea that a sound can stand for a number and that a rhyme is easier to remember than a row of digits; reading backwards (page 5) and the pi verse (pages 8 and 9) will be beyond him.',
+      practising: 'A code: one symbol standing for another, kept by an agreed rule; and the idea that the order you read digits in matters.',
+      ask: 'On page 1: “Which is easier to remember, three-one-four-one-five, or a little rhyme?”',
+      next: 'Make a family code: give each digit from 0 to 9 a sound, turn your flat number or a grandparent’s birthday into a silly word, and see whether he can turn the word back into the number the next day.',
+      honest: 'Katapayadi is real and was used by Kerala astronomers; Haridatta and Sankaravarman are real, Vararuci as inventor is tradition, and the student and teacher are invented. Page 3 gives wrong values: in the real system pa stands for 1 (not 5), va for 4 (not 9) and sa for 7 (not 0), while zero is ña, na or a vowel on its own; the book’s fact box gets the whole table wrong in the same way. Pages 8 and 9 are also off: the gopī-bhāgya pi verse is read from left to right, not backwards, and its earliest known source is a 20th-century book, Bharati Krishna Tirtha’s Vedic Mathematics (1965), not the old Kerala scholars.',
+    },
+  },
+  'the-rabbits-and-the-number-ladder': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Leonardo of Pisa, later called Fibonacci, sets out his book’s rabbit riddle as a ladder of rows, each made by adding the two rows before it: 1, 1, 2, 3, 5, 8, 13. A helper guesses 6, they check by adding, and the story ends on petals, pinecones and sunflowers.',
+      expect: '11 pages, about 9 minutes. He can do 1 + 1, 1 + 2 and 2 + 3 on his fingers; 5 + 3 and 8 + 5 will need objects. The rule “add the last two” is the real step, and he will not see why rabbits would follow it, because the story does not say.',
+      practising: 'A growing pattern made by a rule: each new number is the sum of the two before it. Also checking a guess by working it out.',
+      ask: 'On page 6: “The helper guessed six. How did they find out it was really five?”',
+      next: 'Lay out rows of buttons or rajma, one row under another: 1, then 1, then each new row as many as the two rows above it put together. Count each new row, up to 13. At the market, count the petals on a few flowers and look for 3, 5 or 8.',
+      honest: 'Leonardo, Bugia, Liber Abaci (1202) and the rabbit puzzle are real; the parchment ladder, the helper and the cloth rabbits are invented. In the book the puzzle is about pairs of rabbits, and its list starts 1, 2, 3, 5 rather than 1, 1, 2. The digits he learned in Bugia he himself called “the nine Indian figures”, and the same 1, 2, 3, 5, 8 numbers had been found earlier in India, by Virahanka and later Hemachandra, counting the rhythms of long and short syllables in poetry.',
+    },
+  },
+  'the-screw-that-squeezed-the-olives': {
+    kind: 'reconstructed',
+    note: {
+      what: 'On a Roman farm a girl and her grandfather crush olives under a rolling stone wheel, stack the paste in loose baskets, and squeeze out the oil with a big wooden screw turned by a long bar. Two ideas: a screw turns round-and-round into straight down, and pushing at the far end of a bar turns it far more easily.',
+      expect: '13 short pages, about 7 minutes, with four diagram pages. He will feel the lever idea (page 9) at once if he has pushed a door near its hinge; how a ridge in a groove forces the screw down (page 7) is harder, and the jar lid makes it concrete.',
+      practising: 'A screw turns a long walk round into a short, strong move down; a lever gives more turning for the same push the farther out you push. Neither needs more strength, only a better place to push.',
+      ask: 'On page 8: “Her hands were the same. Why did the bar move once Grandfather walked them to the end?”',
+      next: 'Squeeze half a lime by hand, then with a hinged nimbu squeezer, pressing near the hinge and then at the handle ends. Keep It Balanced, in Science, shows the same rule: how far from the middle a weight sits changes everything.',
+      honest: 'The rolling stone crusher, the loose baskets and the direct screw press are real Roman equipment, described by Hero of Alexandria and Pliny the Elder in the first century CE; the farm, the girl and her grandfather are invented. What runs out of the baskets is oil mixed with watery juice, which was left to settle so the oil could be skimmed off, and the screw press was a newer device that many farms of the time did without.',
+    },
+  },
+  'the-spinning-wheel-and-the-thread': {
+    kind: 'reconstructed',
+    note: {
+      what: 'In an Indus Valley city a child learns from a grown-up spinner to draw out cotton fibres and twist them, with a hand spindle weighted by a clay whorl, into one long thread; a thin spot breaks and is mended by overlapping fresh fibre. The one idea: short, weak fibres become a strong thread when they overlap and are twisted.',
+      expect: '12 pages, about 9 minutes, and one of the longer texts on this shelf. He will grasp that twisting makes fluff strong; why a thin spot breaks (page 6) and how an overlap joins two ends (page 5) need a real cotton ball. Despite the title, no spinning wheel appears until page 11.',
+      practising: 'Twist holds fibres together by friction: more fibres overlapping and more twist make a stronger thread; a thin place has too few fibres and breaks first.',
+      ask: 'On page 6: “Why did the thread break in the thin place and not somewhere else?”',
+      next: 'Pull a wisp from a cotton ball and tug it: it comes apart. Then draw out another wisp while rolling it between finger and thumb, or along your leg, and tug again. Join a fresh wisp onto the end by overlapping and twisting.',
+      honest: 'Cotton spinning in the Indus cities, the clay and stone spindle whorls and the Mehrgarh cotton fibres are found by archaeology; the courtyard, the child, the spinner and her words are invented. Page 11’s wheel is right that the charkha came much later, but whether it reached India from Iran or was developed in India is still argued.',
+    },
+  },
+  'the-stone-arc-that-calmed-the-stream': {
+    kind: 'reconstructed',
+    note: {
+      what: 'At Brewarrina, on Ngemba Country in New South Wales, many Aboriginal nations build and keep curved stone walls in the Barwon River that slow the current into quiet pools where fish gather; they share the pools by agreed rules, open gaps so young fish pass, and mend the stones after floods. The sacred account of Baiame making the traps is told on page 10.',
+      expect: '12 pages, about 9 minutes. The slowing water behind a curve (pages 3 and 4) is the idea he can hold; why the stones are there, to trap fish to eat, is said softly on pages 5, 6 and 9 and plainly in the subtitle.',
+      practising: 'Water slows and swirls behind a curved barrier, and slow water drops what it carries and lets things gather; also sharing a resource by agreed rules so it lasts.',
+      ask: 'On page 3: “The water hurries down the middle. What does it do when it comes round behind the curved stones?”',
+      next: 'In a baking tray tipped slightly, make a curved line of pebbles and pour a jug of water in at the top with a few torn leaf pieces floating on it: watch where the leaves slow, turn and collect.',
+      honest: 'The Brewarrina Fish Traps (Baiame’s Ngunnhu) are real, National Heritage listed in 2005, and the nations named are real; the scenes are a general picture with no named people, and the Baiame account is a sacred story whose full telling belongs to the custodians, as page 10 says. Their age is not settled (estimates run from a few thousand to tens of thousands of years), and the fact box lists Paakantyi and Barkindji as two nations when they are two spellings of one name.',
+    },
+    withhold: 'The whole subject is a set of fish traps that fed the nations who built them, so the story cannot be told honestly without fish caught as food, which this family does not eat.',
+  },
+  'the-sweet-water-of-the-maple': {
+    kind: 'reconstructed',
+    note: {
+      what: 'An Anishinaabe or Haudenosaunee family at the sugarbush taps maple trees in late winter and boils the thin sap for hours; a child watches from behind a safety line as samples grow darker and thicker until they become syrup. The one idea: boiling drives the water off as steam, and the sugar stays behind.',
+      expect: '12 pages, about 9 minutes. The pale and amber drops on page 6 make the change visible, and “forty pans of sap for one pan of syrup” on page 8 will impress him. He may take page 5’s “the sweetness is too heavy to fly” literally.',
+      practising: 'Evaporation separates a dissolved solid from water: the water leaves as vapour, the sugar cannot, so what remains gets more concentrated.',
+      ask: 'On page 6: “Same tree, same sap. Why is the second drop darker and thicker?”',
+      next: 'Stir a spoon of sugar into a few spoons of water, pour it onto a steel plate and leave it in a sunny window for a day or two: the water goes and a sticky sugar crust stays. Salt water leaves crystals the same way.',
+      honest: 'Maple sugaring at the sugarbush, the freeze-thaw season, the forty-to-one ratio, the word ziinzibaakwad and the Nanabozho story are real; the family and the scenes are a general picture, not one recorded camp. Sugar stays in the pan because it does not turn to vapour at boiling heat, not because it is heavy (page 5); and how widely sugar was made before European metal kettles arrived is debated by historians, though Anishinaabe and Haudenosaunee tradition holds that it is old.',
+    },
+  },
+  'the-tile-that-checked-the-corner': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Old Babylonian builders lay mudbrick walls and check each corner by pressing a flat square clay tile into it; where one edge leaves a gap, they find the first brick that drifted, reset it and check again. Page 9 adds the knotted 3-4-5 cord for laying out a square corner on the ground.',
+      expect: '12 pages, about 9 minutes, though it is the longest text in this group and runs over if read slowly. Words like “verify”, “askew” and “alignment” will need swapping for plain ones; the tile test itself (pages 3 to 5) is easy to grasp. The 3-4-5 cord on page 9 is better done with string than heard.',
+      practising: 'A right angle, the square corner: two edges of a true square both touch a true corner, and a gap on one side shows the corner is not square. Also: when something is off, look for the first place it went wrong.',
+      ask: 'On page 5: “The tile touched one side but not the other. What does the gap tell the builder?”',
+      next: 'Give him a square coaster or a sticky note as his tile and let him test corners round the house: a book, a drawer, a door frame, a tiffin box, a slice of bread. Then mark a string into 12 equal parts and pull it into a 3, 4, 5 triangle together.',
+      honest: 'Babylonian mudbrick, brick moulds, the cord-and-peg layout and the tablet Plimpton 322 are real; the builders, the tile and the scene are invented, as the fact box says. The knotted 3-4-5 rope (page 9) is not recorded for Babylonian builders, or for the Egyptian “rope-stretchers” it is more often told of, and what Plimpton 322 was for is argued, so “homework tablet” on page 10 is one guess among several.',
+    },
+  },
+  'the-wanderers-among-the-stars': {
+    kind: 'reconstructed',
+    note: {
+      what: 'The boy Aryabhata and his grandmother watch a bright amber light move night by night past a fixed spoon-shape of stars, wait out a cloudy night instead of guessing, and see it stop and go backwards for a while; the story ends with the grown Aryabhata writing that the Earth spins.',
+      expect: '12 pages, about 9 minutes. The marks beside the same three stars (pages 3 to 7) make the slow drift easy to follow; the boat on page 5 and the backward loop on page 8 are puzzling ideas he may simply accept.',
+      practising: 'Seeing slow motion by comparing against a fixed background: the stars keep their shapes, so a light that changes its place among them is a planet.',
+      ask: 'On page 4: “The spoon stars did not change. How did that help him see that the amber light had moved?”',
+      next: 'If Mars or Venus is up in the evening, find it with him, note which stars sit next to it, and look again at the same time three or four nights later; Jupiter and Saturn move too slowly to see in a week. Who’s in the Sunlight?, in Science, shows the Earth turning, the idea from page 11.',
+      honest: 'Aryabhata, the Aryabhatiya (499 CE), the boat comparison and his statement that the Earth turns are real; his childhood, the grandmother and the rooftop are invented, so page 1’s “this is a true tale” is wrong, and the boat image is his own, not a grandmother’s. The clay tablet is out of place: Indian astronomers of his time worked on dust boards and palm leaves.',
+    },
+  },
+  'the-wheel-that-tells-the-time': {
+    kind: 'reconstructed',
+    note: {
+      what: 'At the Sun Temple at Konark an old carver shows his young helper how the shadow of a spoke creeps around a stone wheel as the sun moves, so the wheel can be read like a sundial; a cloud hides the shadow and the carver will not guess the time until it returns.',
+      expect: '12 pages, about 9 minutes. That a shadow moves because the sun moves (pages 4 and 5) is the idea to hold; the eight three-hour watches on page 6 are arithmetic he will not follow yet.',
+      practising: 'A shadow points away from the sun and moves as the sun moves across the sky, so a shadow’s position can tell the time of day; no sun, no shadow, no reading.',
+      ask: 'On page 7: “The cloud covered the sun. Why could the old carver not tell the time?”',
+      next: 'Do What Time Is It, Stick?, in Make & Do: chalk a stick’s shadow every hour on a sunny day and watch it turn.',
+      honest: 'The temple, King Narasimhadeva I, about 1250, the 24 wheels and the guides who read the time from them today are real; the carver, the helper and the lesson are invented, and reading the wheels as sundials is a folk tradition, not a known purpose. Each wheel also has eight thin spokes between the eight wide ones, which the guides use for finer readings. Page 10 can be heard as the shadow coming back to the bead it left on page 4; if he asks, a sundial’s shadow moves one way only through the day.',
+    },
+  },
+  'zhang-heng-earth-dragon': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Zhang Heng, astronomer at the Han court in Luoyang, builds a bronze vessel with eight dragons holding balls over eight open-mouthed toads; one day a ball drops with no shaking felt, and days later a rider brings news of an earthquake far to the northwest. The one idea: the ground can shake too faintly for people to feel, and a hanging weight can still sense it.',
+      expect: '13 pages, about 9 minutes. The waiting and the doubters (pages 6 to 9) hold attention; how a hidden weight tips one lever (pages 3 to 5) is the hard part, and the story admits on page 11 that nobody knows.',
+      practising: 'A heavy hanging weight tends to stay put when the ground moves under it, which is how earthquake instruments still sense shaking; and patient checking before believing or disbelieving.',
+      ask: 'On page 8: “Nobody felt the ground shake. How could the machine know?”',
+      next: 'Hang a bunch of keys on a string from your hand and move your hand sharply sideways: the keys lag behind and then swing. That lag is what lets a hanging weight feel a shake.',
+      honest: 'Zhang Heng, the eight dragons and toads, the date of about 132 CE and the Longxi report are in the Book of the Later Han, written about three centuries afterwards; the dialogue is invented, the mechanism is unknown, and modern seismographs were developed in the 1800s without his design. Page 5’s explanation is the story’s own and does not hold together: it has the weight swing away from the quake yet the ball point back towards it, and since ground shaking runs back and forth, how one dropped ball could show the direction is still argued.',
+    },
+  },
+};

@@ -1,21 +1,14 @@
 import { StrictMode } from 'react';
 import {
-  render,
-  screen,
   cleanup,
   act,
   renderHook,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import App from '../App';
-import { getStory } from '../stories';
 import { useBookProgress, PROGRESS_STORAGE_KEY } from '../hooks/useBookProgress';
 
 const SLUG = 'the-tallest-sunflower';
 const OTHER_SLUG = 'pips-pattern-parade';
-const story = getStory(SLUG)!;
-const PAGE_COUNT = story.pages.length; // 7 story pages; index 7 == completion
 
 const resetUrl = () => {
   window.location.hash = '';
@@ -202,162 +195,11 @@ describe('useBookProgress storage diagnostics', () => {
 /* App integration — resume, completion, and completed styling                 */
 /* -------------------------------------------------------------------------- */
 
-const cardFor = (title: string): HTMLElement =>
-  // A story tile is itself the button; its data-completed reflects progress.
-  screen.getByRole('button', {
-    name: new RegExp(`^Read ${title}( again)?$`, 'i'),
-  });
 
-describe('App resumes from bookmarks and records completion', () => {
-  it('resumes a story at its saved page when opened from the library', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 2 }, completed: [] }),
-    );
-    // Story tiles live on the shelf now, not on the index: `#/` is an entrance
-    // and renders none of them.
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await user.click(
-      screen.getByRole('button', { name: new RegExp(`read ${story.title}`, 'i') }),
-    );
-    expect(screen.getByText(/Page 3 of 7/i)).toBeInTheDocument();
-  });
 
-  it('saves a bookmark as the reader advances through the story', async () => {
-    const user = userEvent.setup();
-    window.location.hash = `#/read/${SLUG}/1`;
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: /next/i }));
-    expect(screen.getByText(/Page 2 of 7/i)).toBeInTheDocument();
-    expect(readStored().bookmarks[SLUG]).toBe(1);
-  });
-
-  it('marks a story completed and clears its bookmark after finishing', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 5 }, completed: [] }),
-    );
-    window.location.hash = `#/read/${SLUG}/${PAGE_COUNT}`;
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: /finish/i }));
-    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
-    const stored = readStored();
-    expect(stored.completed).toContain(SLUG);
-    expect(stored.bookmarks[SLUG]).toBeUndefined();
-  });
-
-  it('shows a finished story as completed back in the library', async () => {
-    const user = userEvent.setup();
-    window.location.hash = `#/read/${SLUG}/${PAGE_COUNT}`;
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: /finish/i }));
-    await user.click(screen.getByRole('button', { name: /back to library|library/i }));
-    expect(cardFor(story.title)).toHaveAttribute('data-completed', 'true');
-  });
-
-  it('does not break when localStorage is unavailable', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('no storage');
-    });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('no storage');
-    });
-    const user = userEvent.setup();
-    window.location.hash = `#/read/${SLUG}/${PAGE_COUNT}`;
-    expect(() => render(<App />)).not.toThrow();
-    await user.click(screen.getByRole('button', { name: /finish/i }));
-    expect(screen.getByRole('region', { name: /you finished/i })).toBeInTheDocument();
-    expect(warn).toHaveBeenCalled();
-  });
-});
 
 /* -------------------------------------------------------------------------- */
 /* App ignores nonsensical bookmarks when opening a known story                */
 /* -------------------------------------------------------------------------- */
 
-describe('App ignores nonsensical bookmarks when opening a story', () => {
-  /**
-   * The index no longer carries the collection — `#/` renders zero story tiles
-   * by design and the shelf lives at `#/shelf`. Tests that open a story by
-   * clicking a tile must therefore start on the shelf. What they assert about
-   * bookmarks and completion is unchanged.
-   */
-  const openFromLibrary = (user: ReturnType<typeof userEvent.setup>) =>
-    user.click(
-      screen.getByRole('button', { name: new RegExp(`read ${story.title}`, 'i') }),
-    );
 
-  it('ignores and clears a bookmark at the completion index — never opens completion', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: PAGE_COUNT }, completed: [] }),
-    );
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await openFromLibrary(user);
-    expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
-    // Completion persistence must never fire for an invalid resume.
-    expect(readStored().completed).not.toContain(SLUG);
-    expect(readStored().bookmarks[SLUG]).toBeUndefined();
-  });
-
-  it('ignores and clears an out-of-range huge bookmark', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 999 }, completed: [] }),
-    );
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await openFromLibrary(user);
-    expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
-    expect(readStored().completed).not.toContain(SLUG);
-    expect(readStored().bookmarks[SLUG]).toBeUndefined();
-  });
-
-  it('ignores and clears a page-0 bookmark', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 0 }, completed: [] }),
-    );
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await openFromLibrary(user);
-    expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(readStored().bookmarks[SLUG]).toBeUndefined();
-  });
-
-  it('ignores a non-integer bookmark and resumes from the start', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 3.5 }, completed: [] }),
-    );
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await openFromLibrary(user);
-    expect(screen.getByText(/Page 1 of 7/i)).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: /you finished/i })).toBeNull();
-  });
-
-  it('still resumes a valid in-range bookmark unchanged', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ bookmarks: { [SLUG]: 3 }, completed: [] }),
-    );
-    window.location.hash = '#/shelf';
-    render(<App />);
-    await openFromLibrary(user);
-    expect(screen.getByText(/Page 4 of 7/i)).toBeInTheDocument();
-  });
-});

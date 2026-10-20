@@ -1,0 +1,125 @@
+/*
+ * Rikki's Learning Center — design tokens.
+ *
+ * Replaces the beige "field guide". The brief: visually rich and engaging, a
+ * delight to navigate, but NOT candy-sweet western-kid style. So: the deep,
+ * saturated colours of Indian block print and miniature painting, on warm
+ * paper; two sturdy rounded typefaces; generous targets.
+ *
+ * Every text-on-ground pair below meets WCAG AA 4.5:1, measured (the -deep inks on
+ * their tints included). The bright quadrant hues are for fills and bands;
+ * text on them is always --paper or --ink, never the hue on paper.
+ */
+
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/fredoka-var-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-400-normal-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/inter-600-normal-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Andika';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/andika-400-normal-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Andika';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/andika-700-normal-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Andika';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/andika-400-italic-latin.woff2') format('woff2');
+}
+
+:root {
+  color-scheme: light;
+
+  /* grounds */
+  --paper: #fff8ec;
+  --paper-2: #fcefd9;
+  --raised: #ffffff;
+  --ink: #24170f;
+  --ink-soft: #5a4636;
+  --rule: #ead9bf;
+  --rule-strong: #c9ad86;
+
+  /* the four quadrants: fill, tint (ground), deep (text on tint) */
+  --stories: #c9420d;
+  --stories-tint: #fde7d9;
+  --stories-deep: #8f2c05;
+  --maths: #1c6dd0;
+  --maths-tint: #e2eefc;
+  --maths-deep: #0f4790;
+  --science: #0d8063;
+  --science-tint: #dcf3ea;
+  --science-deep: #075c46;
+  /* advisor: muted plum, not hot magenta */
+  --make: #75465e;
+  --make-tint: #f3e6ec;
+  --make-deep: #4f2c3e;
+
+  --gold: #f2a900;
+  --gold-tint: #fff1c9;
+  --focus: #f2a900;
+
+  /* place value colours (Montessori), fixed across every maths board */
+  --ones: #27813b;
+  --tens: #1c6dd0;
+  --hundreds: #c8372d;
+
+  /* type */
+  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-read: 'Andika', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --t-xs: 0.875rem;
+  --t-sm: 1rem;
+  --t-md: 1.1875rem;
+  --t-lg: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+  --t-xl: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem);
+  --t-xxl: clamp(2.4rem, 1.7rem + 3vw, 4rem);
+  --t-read: clamp(1.35rem, 1.15rem + 0.9vw, 1.9rem);
+
+  /* space & shape */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4.5rem;
+  --radius: 22px;
+  --radius-sm: 14px;
+  --pill: 999px;
+  --tap: 64px;
+  /* advisor floor for anything a child can tap: 56 CSS px. */
+  --tap-sm: 56px;
+  --line: 3px;
+  --shadow: 0 2px 0 rgba(36, 23, 15, 0.12), 0 10px 24px -14px rgba(36, 23, 15, 0.45);
+  --shadow-press: 0 1px 0 rgba(36, 23, 15, 0.12);
+  --page-max: 1200px;
+}

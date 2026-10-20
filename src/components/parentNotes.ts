@@ -1,8 +1,5 @@
-import { NOTES as EARLY } from '../games/parent-notes-early';
-import { NOTES as MATHS } from '../games/parent-notes-maths';
 
 import { NOTES as SOCIAL } from '../sel/parent-notes';
-import { NOTES as WORKSHOP } from '../workshop/parent-notes';
 
 /**
  * The canonical note shape. It lives here rather than in one of the four
@@ -42,10 +39,7 @@ export interface ParentNote {
  * exercise would be worth nothing to the adult sitting next to him.
  */
 export const PARENT_NOTES: Record<string, ParentNote> = {
-  ...MATHS,
-  ...EARLY,
   ...SOCIAL,
-  ...WORKSHOP,
 };
 
 export function parentNote(id: string): ParentNote | undefined {

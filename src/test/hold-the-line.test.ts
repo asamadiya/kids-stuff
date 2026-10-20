@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
-  CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOT_LABELS,
-  allPicks, chipById, chipsFor, coverage, forceOf, heldLabel, isComplete, lineOf,
+  CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOTS, SLOT_LABELS,
+  allPicks, allSaid, chipById, chipsFor, coverage, forceOf, isComplete, lineOf,
   maxStrength, nextKindOf, outcomeOf, panelFor, panelsOf, plateLines, plateTitle, readout,
-  scenarioById, strengthOf, strongestPick, wordsFor, wrapText,
+  saidLabel, sayPart, scenarioById, strengthOf, strongestPick, wordsFor, wrapText,
 } from '../sel/hold-the-line';
 import type { ChipId, Pick, Scenario, SlotKind } from '../sel/hold-the-line';
 
-const SLOTS: readonly SlotKind[] = ['name', 'ask', 'next'];
 const idsOf = (s: Scenario, slot: SlotKind): readonly ChipId[] =>
   slot === 'name' ? s.names : slot === 'ask' ? s.asks : s.nexts;
 
@@ -328,21 +328,51 @@ describe('the plate he can put on a wall', () => {
   const s = scenarioById('controller')!;
   const p: Pick = { name: 'n-my-turn', ask: 'a-give-back', next: 'x-get-adult' };
 
-  it('records what he built, what happened, and how long he held it', () => {
+  it('records what he built, what happened, and how many times he said it out loud', () => {
     const out = outcomeOf(s, p)!;
-    const lines = plateLines(s, p, out, 2400);
+    const lines = plateLines(s, p, out, 2);
     expect(lines[0]).toContain(s.where);
     expect(lines[1]).toBe(`You said: ${lineOf(s, p)}`);
     expect(lines[2]).toBe(panelFor(s, out).says);
-    expect(lines[3]).toBe('held for 2.4 seconds');
+    expect(lines[3]).toBe('said out loud 2 times here');
     expect(plateTitle(s)).toBe(`Hold the Line — ${s.where}`);
     for (const l of lines) expect(l).not.toMatch(/great|well done|good job|correct|wrong|naughty/i);
   });
 
-  it('measures a held button in seconds and never below zero', () => {
-    expect(heldLabel(0)).toBe('held for 0.0 seconds');
-    expect(heldLabel(-500)).toBe('held for 0.0 seconds');
-    expect(heldLabel(10500)).toBe('held for 10.5 seconds');
+  it('counts the times in words a child hears, and never below zero', () => {
+    expect(saidLabel(1)).toBe('said out loud once here');
+    expect(saidLabel(3)).toBe('said out loud 3 times here');
+    expect(saidLabel(-2)).toBe('said out loud 0 times here');
+  });
+});
+
+describe('saying it out loud, one part at a time', () => {
+  it('says the three parts in the order the frame holds them', () => {
+    expect(SLOTS).toEqual(['name', 'ask', 'next']);
+    expect(Object.keys(SLOT_LABELS)).toEqual([...SLOTS]);
+  });
+
+  it('fills one dot per tap and stops at the third part', () => {
+    let said = 0;
+    const seen: number[] = [];
+    for (let i = 0; i < 6; i += 1) { said = sayPart(said); seen.push(said); }
+    expect(seen).toEqual([1, 2, 3, 3, 3, 3]);
+    expect(allSaid(2)).toBe(false);
+    expect(allSaid(3)).toBe(true);
+    expect(sayPart(-4)).toBe(1);
+    expect(sayPart(Number.NaN)).toBe(1);
+  });
+
+  /**
+   * FAILS IF REVERTED: the held button used to grow a bar on a 90ms interval.
+   * The parent forbids any motion, so no clock may change the drawing.
+   */
+  it('runs no clock that could redraw the frame', () => {
+    const strip = (t: string) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    for (const f of ['src/components/sel/HoldTheLine.tsx', 'src/sel/hold-the-line.ts']) {
+      const code = strip(readFileSync(f, 'utf8'));
+      expect(code, f).not.toMatch(/requestAnimationFrame|setInterval|setTimeout|Date\.now|performance\.now|transition|@keyframes/);
+    }
   });
 });
 

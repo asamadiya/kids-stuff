@@ -3,6 +3,7 @@ import { OliveTheStone } from './OliveTheStone';
 import { OliveScrewAndNut } from './OliveScrewAndNut';
 import { OliveTheLongBar } from './OliveTheLongBar';
 import { OliveTheSqueeze } from './OliveTheSqueeze';
+import { BoseTheThreeTraces } from './BoseTheThreeTraces';
 
 /**
  * Hand-authored diagrams, keyed by `StoryPage.figureId`.
@@ -39,6 +40,11 @@ const specs: readonly StoryFigureSpec[] = [
     id: 'olive-the-squeeze',
     caption: 'Watch the gold. Before, it is locked inside the paste. After, it has been pushed out through the weave — and the paste is still there.',
     render: () => <OliveTheSqueeze />,
+  },
+  {
+    id: 'bose-three-traces',
+    caption: 'One plate, three plants. Each dot is one touch of the lever point; the gap between two dots is how much the stalk grew in between. The spacings are drawn to show the idea, not copied from Bose’s records.',
+    render: () => <BoseTheThreeTraces />,
   },
 ];
 

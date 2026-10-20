@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
-  HAGGLES, MAX_OFFERS, ONE_SWING_TWO_KIDS_META, PORTRAITS, SCENARIOS, TAKES_ANYTHING,
-  addPlayed, amount, clampShare, clockRanOut, coverageText, endingText, offerLine, plateLines,
-  reactTo, scenarioById, settle, splitText, spokenSplit,
+  CHOICES, GROWN_UP_LABEL, ONE_SWING_TWO_KIDS_META, PLANS, SCENARIOS,
+  addPlayed, choiceLabel, choose, coverageText, framesOf, isSettled, pathText, pictureOf,
+  plateLines, replyOf, saidLine, scenarioById, storyLines,
 } from '../sel/one-swing-two-kids';
-import type { EndingKind, Outcome, Reaction, Scenario } from '../sel/one-swing-two-kids';
+import type { ChoiceId, Scenario } from '../sel/one-swing-two-kids';
 
 const byId = (id: string): Scenario => {
   const s = scenarioById(id);
@@ -12,40 +13,26 @@ const byId = (id: string): Scenario => {
   return s;
 };
 
-const splits = (s: Scenario): number[] => Array.from({ length: s.total + 1 }, (_, i) => i);
-
-/** Every reaction the exercise can produce, over every split and every round. */
-const everyReaction = (s: Scenario): Reaction[] => {
-  const out: Reaction[] = [];
-  for (const a of splits(s)) {
-    for (const b of splits(s)) {
-      for (const c of splits(s)) {
-        for (const history of [[a], [a, b], [a, b, c]]) {
-          const r = reactTo(s, history);
-          if (r) out.push(r);
-        }
-      }
+/** Every path a child can walk: plans in any order until one goes ahead. */
+const everyPath = (s: Scenario): (readonly ChoiceId[])[] => {
+  const out: (readonly ChoiceId[])[] = [];
+  const walk = (tried: readonly ChoiceId[]): void => {
+    out.push(tried);
+    if (isSettled(s, tried)) return;
+    for (const c of CHOICES) {
+      const next = choose(s, tried, c);
+      if (next !== tried) walk(next);
     }
-  }
+  };
+  walk([]);
   return out;
 };
 
-const everyOutcome = (s: Scenario): Outcome[] => {
-  const endings: EndingKind[] = ['accepted', 'took', 'left', 'ranOut'];
-  const out: Outcome[] = [];
-  for (const a of splits(s)) {
-    for (const b of splits(s)) {
-      for (const ending of endings) {
-        out.push(settle(s, [a], ending));
-        out.push(settle(s, [a, b], ending));
-      }
-    }
-  }
-  return out;
-};
+const stripComments = (src: string): string =>
+  src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
 
 describe('the shape of the thing', () => {
-  it('names itself the way every bench does', () => {
+  it('keeps the id and title every route is built on', () => {
     expect(ONE_SWING_TWO_KIDS_META.id).toBe('one-swing-two-kids');
     expect(ONE_SWING_TWO_KIDS_META.title).toBe('One Swing, Two Kids');
     expect(ONE_SWING_TWO_KIDS_META.eyebrow.split(' ').length).toBeLessThanOrEqual(3);
@@ -64,52 +51,180 @@ describe('the shape of the thing', () => {
       expect(s.setupAlt.length).toBeGreaterThan(20);
       expect(s.outcomeAlt.length).toBeGreaterThan(20);
       expect(s.short.length).toBeGreaterThan(3);
-      expect(s.total).toBeGreaterThan(2);
-      expect(Number.isInteger(s.total)).toBe(true);
+      expect(s.where.length).toBeGreaterThan(20);
     }
   });
 
-  it('borrows only faces that are already painted', () => {
-    for (const s of SCENARIOS) {
-      const faces = [s.faces.waiting, s.faces.accepted, s.faces.plenty, s.faces.none,
-        s.faces.ranOut, s.faces.left, ...s.faces.counter];
-      for (const f of faces) expect(PORTRAITS).toContain(f);
-      expect(s.faces.counter.length).toBeGreaterThan(0);
-    }
-    expect(PORTRAITS).toHaveLength(28);
-  });
-
-  it('carries no field that could hold a preferred split', () => {
-    const forbidden = ['best', 'correct', 'ideal', 'answer', 'target', 'score', 'points', 'stars', 'expected'];
+  it('carries no field that could hold a preferred plan', () => {
+    const forbidden = ['best', 'correct', 'ideal', 'answer', 'target', 'score', 'points', 'stars', 'expected', 'right'];
     for (const s of SCENARIOS) {
       for (const key of Object.keys(s)) expect(forbidden).not.toContain(key);
-      for (const key of Object.keys(s.after)) expect(forbidden).not.toContain(key);
-      for (const key of Object.keys(s.reactions)) expect(forbidden).not.toContain(key);
-    }
-  });
-
-  it('lets every whole split be offered, both ends included', () => {
-    for (const s of SCENARIOS) {
-      for (const mine of splits(s)) {
-        expect(clampShare(s, mine)).toBe(mine);
-        const r = reactTo(s, [s.total - mine]);
-        expect(r).not.toBeNull();
+      for (const r of Object.values(s.replies)) {
+        expect(Object.keys(r).sort()).toEqual(['picture', 'says', 'settled']);
       }
-      expect(clampShare(s, -4)).toBe(0);
-      expect(clampShare(s, s.total + 9)).toBe(s.total);
-      expect(clampShare(s, Number.NaN)).toBe(0);
+    }
+  });
+});
+
+describe('three drawn plans and a grown-up, every time', () => {
+  it('offers the same three plans in every place, and the grown-up last', () => {
+    expect(PLANS).toEqual(['you-first', 'them-first', 'turns']);
+    expect(CHOICES).toEqual([...PLANS, 'grown-up']);
+    for (const s of SCENARIOS) {
+      expect(Object.keys(s.replies).sort()).toEqual([...CHOICES].sort());
     }
   });
 
-  it('keeps the content invariants that say what each person can do', () => {
+  it('names each plan in a few words that match its drawing', () => {
+    const sam = byId('swing');
+    expect(choiceLabel(sam, 'you-first')).toBe('You first, then Sam');
+    expect(choiceLabel(sam, 'them-first')).toBe('Sam first, then you');
+    expect(choiceLabel(sam, 'turns')).toBe('Take turns: 10 pushes each');
+    expect(choiceLabel(sam, 'grown-up')).toBe(GROWN_UP_LABEL);
     for (const s of SCENARIOS) {
-      expect(s.reactions.counters !== null).toBe(HAGGLES.includes(s.rule));
-      expect(s.reactions.nodsNone !== null).toBe(TAKES_ANYTHING.includes(s.rule));
-      expect(s.reactions.leaves !== null).toBe(s.rule === 'walks-away');
-      expect(s.after.left !== null).toBe(s.rule === 'walks-away');
-      expect(s.walkBelow !== null).toBe(s.rule === 'walks-away');
-      expect(s.guide !== null).toBe(s.rule === 'cannot-counter');
+      expect(framesOf(s, 'you-first').frames).toEqual(['you', 'them']);
+      expect(framesOf(s, 'them-first').frames).toEqual(['them', 'you']);
+      expect(choiceLabel(s, 'you-first').startsWith('You first')).toBe(true);
+      expect(choiceLabel(s, 'them-first').startsWith(s.other)).toBe(true);
+      for (const p of PLANS) expect(choiceLabel(s, p).length).toBeLessThanOrEqual(32);
     }
+  });
+
+  it('draws only the take-turns plan going round, with one mark per unit of a turn', () => {
+    for (const s of SCENARIOS) {
+      expect(framesOf(s, 'you-first').loops).toBe(false);
+      expect(framesOf(s, 'them-first').loops).toBe(false);
+      expect(framesOf(s, 'turns').loops).toBe(true);
+      expect(framesOf(s, 'turns').ticks).toBe(s.turnTicks);
+      expect(s.turnTicks).toBeGreaterThanOrEqual(1);
+      expect(s.turnTicks).toBeLessThanOrEqual(10);
+    }
+    expect(framesOf(byId('swing'), 'turns').ticks).toBe(10);
+  });
+
+  it('always lets the grown-up end it, in every place, whatever was tried first', () => {
+    for (const s of SCENARIOS) {
+      expect(replyOf(s, 'grown-up').settled).toBe(true);
+      for (const path of everyPath(s)) {
+        if (isSettled(s, path)) continue;
+        const asked = choose(s, path, 'grown-up');
+        expect(asked).toEqual([...path, 'grown-up']);
+        expect(isSettled(s, asked)).toBe(true);
+      }
+    }
+  });
+
+  it('describes the other child in words, never with a painted face', () => {
+    for (const s of SCENARIOS) {
+      expect(s.about).toContain(s.other);
+      expect(s.about.length).toBeGreaterThan(20);
+    }
+    for (const f of ['src/sel/one-swing-two-kids.ts', 'src/components/sel/OneSwingTwoKids.tsx']) {
+      expect(stripComments(readFileSync(f, 'utf8')), f).not.toMatch(/faces\//);
+    }
+  });
+});
+
+describe('no clock, no count of tries, nothing hidden', () => {
+  /**
+   * FAILS IF REVERTED: the old version held a ten-minute band, three offers and
+   * a clock that could take every minute away. None of that may come back.
+   */
+  it('has no deadline, offer count, slider or undisclosed rule', () => {
+    for (const f of ['src/sel/one-swing-two-kids.ts', 'src/components/sel/OneSwingTwoKids.tsx']) {
+      const code = stripComments(readFileSync(f, 'utf8'));
+      expect(code, f).not.toMatch(/MAX_OFFERS|ranOut|clockRanOut|role="slider"|CounterRule|walkBelow|minutes to divide/);
+      expect(code, f).not.toMatch(/requestAnimationFrame|setInterval|setTimeout|transition|@keyframes/);
+    }
+  });
+
+  it('answers every choice with a plain sentence about what happened', () => {
+    for (const s of SCENARIOS) {
+      for (const c of CHOICES) {
+        const r = replyOf(s, c);
+        expect(r.says.length).toBeGreaterThan(20);
+        expect(r.says).toMatch(/[.”]$/);
+      }
+    }
+  });
+
+  it('gives the same answer to the same plan, so trying it twice changes nothing', () => {
+    for (const s of SCENARIOS) {
+      for (const c of CHOICES) {
+        const once = choose(s, [], c);
+        expect(choose(s, once, c)).toBe(once);
+        expect(replyOf(s, c)).toBe(replyOf(s, c));
+      }
+    }
+  });
+
+  it('ends after a plan goes ahead, and takes nothing more after that', () => {
+    for (const s of SCENARIOS) {
+      for (const path of everyPath(s)) {
+        expect(path.length).toBeLessThanOrEqual(CHOICES.length);
+        expect(new Set(path).size).toBe(path.length);
+        path.slice(0, -1).forEach((c) => expect(replyOf(s, c).settled).toBe(false));
+        if (isSettled(s, path)) for (const c of CHOICES) expect(choose(s, path, c)).toBe(path);
+      }
+    }
+    expect(isSettled(byId('swing'), [])).toBe(false);
+  });
+
+  it('shows the painted ending only where it fits what was said', () => {
+    for (const s of SCENARIOS) {
+      for (const c of CHOICES) {
+        const p = pictureOf(s, c);
+        const r = replyOf(s, c);
+        if (r.picture === null) expect(p).toBeNull();
+        else expect(p).toEqual({ src: s.outcome, alt: s.outcomeAlt });
+        // a refusal never jumps to the ending
+        if (!r.settled) expect(p).toBeNull();
+      }
+      expect(CHOICES.some((c) => pictureOf(s, c) !== null), s.id).toBe(true);
+    }
+  });
+});
+
+describe('different people meet the same plan differently', () => {
+  it('has at least one plan refused somewhere, and at least one taken everywhere but by Mia', () => {
+    const refusedSomewhere = PLANS.filter((p) => SCENARIOS.some((s) => !replyOf(s, p).settled));
+    expect(refusedSomewhere.length).toBeGreaterThan(0);
+    for (const s of SCENARIOS.filter((x) => !x.little)) {
+      expect(PLANS.some((p) => replyOf(s, p).settled), s.id).toBe(true);
+    }
+  });
+
+  it('lets no plan go ahead with every friend except the one that hands it over first', () => {
+    const friends = SCENARIOS.filter((s) => !s.little);
+    expect(friends.length).toBeGreaterThanOrEqual(3);
+    expect(friends.some((s) => !replyOf(s, 'you-first').settled)).toBe(true);
+    expect(friends.some((s) => !replyOf(s, 'turns').settled)).toBe(true);
+    // Handing it over first is always taken, which is exactly why it is not a lever:
+    expect(friends.every((s) => replyOf(s, 'them-first').settled)).toBe(true);
+  });
+
+  it('lets a plan that goes ahead still cost something', () => {
+    expect(replyOf(byId('snack'), 'you-first').settled).toBe(true);
+    expect(replyOf(byId('snack'), 'you-first').says).toContain('on his own');
+    expect(replyOf(byId('console'), 'them-first').says).toContain('take you home');
+    expect(replyOf(byId('swing'), 'them-first').says).toContain('short go');
+  });
+});
+
+describe('the two-year-old is not a negotiation', () => {
+  const mia = byId('tablet');
+
+  it('says so in one sentence rather than pretending otherwise', () => {
+    expect(mia.little).toBe(true);
+    expect(mia.guide).toMatch(/two/i);
+    expect(SCENARIOS.filter((s) => s.guide !== null)).toEqual([mia]);
+    expect(SCENARIOS.filter((s) => s.little)).toEqual([mia]);
+  });
+
+  it('takes none of the three plans, so only the grown-up ends it', () => {
+    for (const p of PLANS) expect(replyOf(mia, p).settled).toBe(false);
+    expect(choose(mia, ['you-first', 'them-first', 'turns'], 'grown-up')).toHaveLength(4);
+    expect(isSettled(mia, ['you-first', 'grown-up'])).toBe(true);
   });
 });
 
@@ -119,22 +234,17 @@ describe('nothing about him is scored, and nothing is moralised', () => {
   const allText = (): string[] => {
     const text: string[] = [ONE_SWING_TWO_KIDS_META.note, ONE_SWING_TWO_KIDS_META.title, ONE_SWING_TWO_KIDS_META.eyebrow];
     for (const s of SCENARIOS) {
-      text.push(s.stop, s.thing, s.short, s.setupAlt, s.outcomeAlt, s.other);
+      text.push(s.where, s.about, s.short, s.setupAlt, s.outcomeAlt, s.other, s.turn, s.grownUp);
       if (s.guide) text.push(s.guide);
-      text.push(...Object.values(s.reactions).filter((v): v is string => typeof v === 'string'));
-      text.push(...Object.values(s.after).filter((v): v is string => typeof v === 'string'));
-      text.push(...everyReaction(s).map((r) => r.line));
-      text.push(...everyOutcome(s).flatMap((o) => [...o.lines, endingText(s, o), ...plateLines(s, o)]));
-      for (const mine of splits(s)) {
-        text.push(offerLine(s, mine), splitText(s, mine), spokenSplit(s, mine));
-      }
+      for (const c of CHOICES) text.push(choiceLabel(s, c), saidLine(s, c), replyOf(s, c).says);
+      for (const path of everyPath(s)) text.push(...plateLines(s, path), pathText(s, path));
     }
     text.push(coverageText([]), coverageText(['swing', 'swing', 'tablet']));
     return text;
   };
 
   it('never praises, blames or grades anything he chose', () => {
-    for (const line of allText()) expect(line).not.toMatch(PRAISE);
+    for (const line of allText()) expect(line, line).not.toMatch(PRAISE);
   });
 
   it('reads back coverage, never a ratio of hits to misses', () => {
@@ -144,241 +254,25 @@ describe('nothing about him is scored, and nothing is moralised', () => {
     expect(addPlayed(['swing'], 'swing')).toEqual(['swing']);
     expect(addPlayed(['swing'], 'tablet')).toEqual(['swing', 'tablet']);
   });
-
-  it('reads the ending as two numbers and a count of offers', () => {
-    const s = byId('swing');
-    const o = settle(s, [4], 'accepted');
-    expect(endingText(s, o)).toBe('You made 1 offer. You ended at 6 and 4.');
-    expect(endingText(s, settle(s, [3, 4], 'accepted'))).toBe('You made 2 offers. You ended at 6 and 4.');
-  });
-});
-
-describe('the same play always settles the same way', () => {
-  it('answers identically however many times it is asked', () => {
-    for (const s of SCENARIOS) {
-      for (const history of [[0], [1], [s.total], [2, 3], [2, 3, 4]]) {
-        expect(reactTo(s, history)).toEqual(reactTo(s, history));
-        expect(settle(s, history, 'accepted')).toEqual(settle(s, history, 'accepted'));
-      }
-    }
-  });
-
-  it('has nothing to say before the first offer', () => {
-    for (const s of SCENARIOS) expect(reactTo(s, [])).toBeNull();
-  });
-
-  it('always divides the whole thing and nothing more', () => {
-    for (const s of SCENARIOS) {
-      for (const o of everyOutcome(s)) {
-        expect(o.mine + o.theirs).toBeLessThanOrEqual(s.total);
-        expect(o.mine).toBeGreaterThanOrEqual(0);
-        expect(o.theirs).toBeGreaterThanOrEqual(0);
-        if (o.kind === 'settled') expect(o.mine + o.theirs).toBe(s.total);
-      }
-    }
-  });
-});
-
-describe('every counterparty runs a different, undisclosed rule', () => {
-  it('gives no two of them the same rule', () => {
-    const rules = SCENARIOS.map((s) => s.rule);
-    expect(new Set(rules).size).toBe(rules.length);
-  });
-
-  it('lets no even-or-meaner split be accepted by everyone', () => {
-    for (const share of [0, 0.25, 0.5]) {
-      const accepted = SCENARIOS.filter((s) => {
-        const theirs = Math.round(s.total * share);
-        return reactTo(s, [theirs])?.kind === 'accepted';
-      });
-      expect(accepted.length).toBeLessThan(SCENARIOS.length);
-    }
-  });
-
-  it('makes a generous split easy to buy and its consequences uneven', () => {
-    for (const share of [0.75, 1]) {
-      const accepted = SCENARIOS.filter((s) => {
-        const theirs = Math.round(s.total * share);
-        return reactTo(s, [theirs])?.kind === 'accepted';
-      });
-      expect(accepted).toHaveLength(SCENARIOS.length);
-      const asked = SCENARIOS.filter((s) => settle(s, [Math.round(s.total * share)], 'accepted').asked);
-      expect(asked.length).toBeGreaterThan(0);
-      expect(asked.length).toBeLessThan(SCENARIOS.length);
-    }
-    for (const s of SCENARIOS) expect(settle(s, [s.total], 'accepted').mine).toBe(0);
-  });
-
-  it('gives each haggler a split they take and a split they will not', () => {
-    for (const s of SCENARIOS.filter((c) => HAGGLES.includes(c.rule))) {
-      const kinds = splits(s).map((theirs) => reactTo(s, [theirs])?.kind);
-      expect(kinds).toContain('accepted');
-      expect(kinds.some((k) => k === 'counter' || k === 'left')).toBe(true);
-    }
-  });
-
-  it('moves the one who splits the difference, and does not move the one who holds out', () => {
-    const sam = byId('swing');
-    const first = reactTo(sam, [2]);
-    expect(first?.kind).toBe('counter');
-    expect(first?.ask).toBe(3);
-    expect(reactTo(sam, [2, 3])?.kind).toBe('accepted');
-    expect(reactTo(sam, [4])?.kind).toBe('accepted');
-    expect(reactTo(sam, [0])?.ask).toBe(2);
-    expect(reactTo(sam, [0, 0])?.ask).toBe(1);
-
-    const tomas = byId('console');
-    expect(reactTo(tomas, [2])?.ask).toBe(8);
-    expect(reactTo(tomas, [2, 5])?.ask).toBe(8);
-    expect(reactTo(tomas, [2, 5, 7])?.ask).toBe(8);
-    expect(reactTo(tomas, [8])?.kind).toBe('accepted');
-  });
-
-  it('takes anything at all from the boy who takes anything, including nothing', () => {
-    const ravi = byId('snack');
-    for (const theirs of splits(ravi)) expect(reactTo(ravi, [theirs])?.kind).toBe('accepted');
-    expect(everyReaction(ravi).every((r) => r.ask === null)).toBe(true);
-  });
-
-  it('walks away below a line, and that costs the whole negotiation', () => {
-    const nadia = byId('window');
-    expect(nadia.walkBelow).toBe(3);
-    expect(reactTo(nadia, [2])?.kind).toBe('left');
-    expect(reactTo(nadia, [0])?.kind).toBe('left');
-    expect(reactTo(nadia, [3])?.kind).toBe('counter');
-    expect(reactTo(nadia, [4])?.kind).toBe('accepted');
-    const gone = settle(nadia, [2], 'left');
-    expect(gone.kind).toBe('left');
-    expect(gone.theirs).toBe(0);
-    expect(gone.asked).toBe(false);
-  });
-});
-
-describe('some roads cost something, and one generous road fails outright', () => {
-  it('hands over everything and gets nothing back', () => {
-    const ravi = byId('snack');
-    const o = settle(ravi, [ravi.total], 'accepted');
-    expect(o.kind).toBe('settled');
-    expect(o.mine).toBe(0);
-    expect(o.theirs).toBe(ravi.total);
-    expect(o.asked).toBe(false);
-    expect(o.lines.join(' ')).toContain('sandpit');
-  });
-
-  it('never lets that boy ask about tomorrow, however the crackers went', () => {
-    const ravi = byId('snack');
-    expect(ravi.after.tomorrowYes).toBeNull();
-    for (const theirs of splits(ravi)) expect(settle(ravi, [theirs], 'accepted').asked).toBe(false);
-  });
-
-  it('lets a hard split still end with a question about tomorrow', () => {
-    const sam = byId('swing');
-    const o = settle(sam, [5], 'accepted');
-    expect(o.mine).toBe(5);
-    expect(o.asked).toBe(true);
-    expect(settle(sam, [4, 4], 'accepted').asked).toBe(true);
-  });
-
-  it('lets the girl who walks away only ask when there was no haggling', () => {
-    const nadia = byId('window');
-    expect(settle(nadia, [4], 'accepted').asked).toBe(true);
-    expect(settle(nadia, [3, 4], 'accepted').asked).toBe(false);
-  });
-
-  it('gives the whole thing and the silence to whoever is left behind', () => {
-    const nadia = byId('window');
-    const gone = settle(nadia, [1], 'left');
-    expect(gone.mine).toBe(nadia.total);
-    expect(gone.lines.join(' ')).toContain('middle seat');
-  });
-});
-
-describe('the two-year-old is not a negotiation', () => {
-  const mia = byId('tablet');
-
-  it('says so in one sentence rather than pretending otherwise', () => {
-    expect(mia.guide).toMatch(/cannot make an offer back/i);
-    expect(SCENARIOS.filter((s) => s.guide !== null)).toHaveLength(1);
-  });
-
-  it('never counters, whatever he slides', () => {
-    for (const theirs of splits(mia)) {
-      const r = reactTo(mia, [theirs]);
-      expect(r?.kind).toBe('accepted');
-      expect(r?.ask).toBeNull();
-    }
-    expect(mia.after.tomorrowYes).toBeNull();
-  });
-
-  it('draws taking it all and giving it all honestly, and neither is marked', () => {
-    const took = settle(mia, [0], 'accepted');
-    expect(took.mine).toBe(mia.total);
-    expect(took.face).toBe('sad');
-    expect(took.lines.join(' ')).toContain('Mia did not get the tablet.');
-
-    const gave = settle(mia, [mia.total], 'accepted');
-    expect(gave.mine).toBe(0);
-    expect(gave.asked).toBe(false);
-    expect(gave.lines.join(' ')).toContain('You did not watch anything.');
-  });
-});
-
-describe('the clock, which is nobody in the room', () => {
-  it('allows three offers and then takes the decision away', () => {
-    expect(MAX_OFFERS).toBe(3);
-    const tomas = byId('console');
-    expect(clockRanOut([2], reactTo(tomas, [2]))).toBe(false);
-    expect(clockRanOut([2, 3], reactTo(tomas, [2, 3]))).toBe(false);
-    expect(clockRanOut([2, 3, 4], reactTo(tomas, [2, 3, 4]))).toBe(true);
-    const out = settle(tomas, [2, 3, 4], 'ranOut');
-    expect(out.kind).toBe('ranOut');
-    expect(out.mine).toBe(0);
-    expect(out.theirs).toBe(0);
-    expect(out.offers).toBe(3);
-    expect(out.asked).toBe(false);
-    expect(out.lines[0]).toContain('The console stayed off.');
-  });
-
-  it('does not run out when the last offer was taken', () => {
-    const sam = byId('swing');
-    expect(clockRanOut([4, 4, 4], reactTo(sam, [4, 4, 4]))).toBe(false);
-  });
-
-  it('settles at their counter when he takes it', () => {
-    const sam = byId('swing');
-    const counter = reactTo(sam, [2]);
-    expect(counter?.ask).toBe(3);
-    const o = settle(sam, [2], 'took');
-    expect(o.theirs).toBe(3);
-    expect(o.mine).toBe(7);
-    expect(o.offers).toBe(1);
-  });
 });
 
 describe('the words the room hears', () => {
-  it('states the offer as two numbers in the second person', () => {
+  it('reads back what he said, then what the other child did', () => {
     const sam = byId('swing');
-    expect(offerLine(sam, 8)).toBe('You offered 8 minutes for you and 2 for Sam.');
-    expect(offerLine(sam, 9)).toContain('9 minutes for you and 1 for Sam');
-    expect(amount(sam, 1)).toBe('1 minute');
-    expect(amount(byId('snack'), 3)).toBe('3 pieces');
-    expect(splitText(sam, 6)).toBe('6 for you · 4 for Sam');
-    expect(spokenSplit(sam, 6)).toBe('6 minutes for you, 4 for Sam');
+    expect(saidLine(sam, 'turns')).toBe('You said, “Take turns: 10 pushes each.”');
+    expect(saidLine(sam, 'grown-up')).toBe('You asked Papa to help.');
+    expect(storyLines(sam, ['you-first', 'turns'])).toEqual([
+      `You said, “You first, then Sam.” ${replyOf(sam, 'you-first').says}`,
+      `You said, “Take turns: 10 pushes each.” ${replyOf(sam, 'turns').says}`,
+    ]);
   });
 
-  it('states the counter as what they want and what it leaves', () => {
-    const line = reactTo(byId('swing'), [2])?.line ?? '';
-    expect(line).toContain('shook his head');
-    expect(line).toContain('3 minutes');
-    expect(line).toContain('7 for you');
-  });
-
-  it('puts the numbers and the aftermath on the plate, in that order', () => {
+  it('puts the situation and then the path on the plate, in order', () => {
     const sam = byId('swing');
-    const lines = plateLines(sam, settle(sam, [4], 'accepted'));
-    expect(lines[0]).toBe('the swing, 10 minutes to divide.');
-    expect(lines[1]).toBe('You 6. Sam 4.');
-    expect(lines[2]).toContain('You made 1 offer.');
-    expect(lines.length).toBeGreaterThan(4);
+    const lines = plateLines(sam, ['you-first', 'grown-up']);
+    expect(lines[0]).toBe(sam.where);
+    expect(lines).toHaveLength(3);
+    expect(lines[2]).toContain('You asked Papa to help.');
+    expect(pathText(sam, ['you-first', 'grown-up'])).toBe('You first, then Sam · Ask a grown-up to help');
   });
 });

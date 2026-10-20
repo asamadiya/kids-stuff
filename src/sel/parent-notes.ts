@@ -158,7 +158,8 @@ export const NOTES: Record<string, ParentNote> = {
   'hold-the-line': {
     what:
       'Sam has taken the controller mid-turn. He builds a sentence from three wordless chips — name the thing, ask '
-      + 'for the change, say what comes next — says it out loud, and the drawn panel shows what Sam did.',
+      + 'for the change, say what comes next — says it out loud one part at a time, tapping a dot under each part '
+      + 'as he says it, and the drawn panel shows what Sam did.',
     practising:
       'Boundary-setting as a constructed sentence rather than a mood: a flat statement of fact, a specific '
       + 'request, a stated consequence. And that walking off is a third road with its own outcome, never measured '
@@ -166,8 +167,8 @@ export const NOTES: Record<string, ParentNote> = {
     ask: 'Say your line out loud again, the way you said it to Sam. What did he do after it?',
     how: [
       'Pick one chip in each of the three trays: Name the thing, Ask for the change, What next.',
-      'Press and hold the button that says Now say it out loud, and keep holding it while he actually says the sentence.',
-      'Let go. The panel changes to what Sam did, and the bar records how long he held it.',
+      'Say the first part out loud, then tap the big button or the dot under it. Do the same for the other two parts.',
+      'After the third dot the panel changes to what Sam did, and the frame counts how many times he has said a line here.',
       'Press Change the last part and say it again, then run the same line with a different ending.',
       'It counts as done once he has said one out loud. Read silently it gives almost nothing back.',
     ],
@@ -181,26 +182,28 @@ export const NOTES: Record<string, ParentNote> = {
 
   'one-swing-two-kids': {
     what:
-      'Ten minutes and one swing. He slides a divider to say how it splits, offers it, and the other person '
-      + 'answers with a face and sometimes a counter-offer. Three offers, then the clock takes it away from both '
-      + 'of them.',
+      'One thing and two children who both want it: a swing, a controller, the last crackers, a window seat, a '
+      + 'tablet. He picks one of three drawn plans — him first, the other child first, or take turns — or asks a '
+      + 'grown-up, and reads what the other child did.',
     practising:
-      'Bargaining against an undisclosed rule. Sam splits the difference. Tomas does not move. Ravi takes whatever '
-      + 'he is handed. Nadia goes quiet below three minutes. Mia is two and cannot make an offer back.',
-    ask: 'You offered the same split to two different people. Did they both do the same thing with it?',
+      'Proposing a turn-taking plan out loud and reading the reply. The same plan meets different children '
+      + 'differently: Sam will not let him go first, Tomas gives the guest the first race, Ravi eats what is left '
+      + 'and goes off on his own. Mia is two and takes none of the three plans.',
+    ask: 'You said the same plan to Sam and to Tomas. Why did one of them say no?',
     how: [
       'Tap a picture in the Choose a situation row.',
-      'Drag the divider along the band to set the split, or nudge it one minute at a time with the two arrow buttons.',
-      'Press Offer this, and read what the other child answers underneath.',
-      'Move the divider and press Offer again. Three dots at the top right fill as the offers are spent.',
-      'The round ends when the other child accepts, walks off, or the third dot fills. No split is refused and none is scored.',
+      'Tap one of the three drawn plans: you first, the other child first, or take turns.',
+      'Read the sentence underneath. If the other child did not go along with it, tap another plan.',
+      'Tap Ask a grown-up to help at any point. It always ends the scene.',
+      'Press Keep this to put the path in the drawer, or Play it again.',
     ],
-    skills: ['inferring another person\'s rule from their answers', 'making and reading a counter-offer', 'splitting a fixed quantity'],
+    skills: ['proposing a turn-taking plan', 'reading another child\'s reply', 'knowing when to bring in an adult'],
     honest:
-      'No score: every split executes, taking all ten minutes included, and what comes back is only how long each '
-      + 'held it and whether the other asked about tomorrow. The five rules are fixed, so he will map them in two '
-      + 'or three passes and then play the rule instead of the person. The tablet board resists that: Mia cannot '
-      + 'answer, so whatever he slides simply happens.',
+      'No score and no clock: every plan reads back as a plain sentence of what happened, and going first is drawn '
+      + 'honestly rather than refused. It is small — five situations, four choices each — so he will have walked '
+      + 'every path in an afternoon. Handing the thing over first is taken by every friend, which makes it look '
+      + 'safe; the replies show what it costs. The Mia board has no plan that works, on purpose: at two, the '
+      + 'grown-up is the answer.',
   },
 
   /* --------------------------------------- fairness, rules, repair, the body */
@@ -264,7 +267,7 @@ export const NOTES: Record<string, ParentNote> = {
     ask: 'Run it again with those two panels the other way round. What did Sam do differently?',
     how: [
       'Drag the five loose panels into the five numbered slots, in whatever order he wants.',
-      'Press Run it and watch the strip play through to the last panel.',
+      'Press Run it, then press Next panel to step the strip through to the last panel.',
       'Press the left or right arrow under a panel to move it, then press Run it again.',
       'Press Say it again to hear the order read back as one sentence.',
       'No order is marked right. Stop when he has found the swap that changes what Sam does at the end.',
@@ -304,24 +307,25 @@ export const NOTES: Record<string, ParentNote> = {
   'body-check': {
     what:
       'He taps where the feeling sits — hot in the face, tight in the throat — and marks what is ordinarily true '
-      + 'around him: not eaten, slept late, loud in here. Then he runs one thing that must be genuinely executed, '
-      + 'and reads his body again.',
+      + 'around him: not eaten, slept late, loud in here. Then he does one thing, a few slow breaths or a slow '
+      + 'count, tapping once per breath or number, and reads his body again.',
     practising:
       'Interoception: locating a state as a physical signal in a named place, apart from its ordinary causes. '
       + 'The second reading is the measurement; the first alone is a description.',
-    ask: 'Read me your first marks and then your second ones. Did what you ran move any of them?',
+    ask: 'Read me your first marks and then your second ones. Did what you did move any of them?',
     how: [
       'Tap the places on the figure where the feeling sits, or tap the matching inset pictures, then press Next.',
       'Tap whichever of the five are true right now — not eaten, slept late, loud in here — then press Next.',
-      'Choose The breath disc and press and hold, or choose A wait, pick a length, and press Start the wait.',
-      'Press Check again and mark the second figure.',
-      'Press Keep this reading. If the second figure matches the first, the plate says exactly that — that is the measurement, not a failure.',
+      'Choose Slow breaths and tap the big button after each breath in and each breath out while you count.',
+      'Or choose A slow count, pick 10, 20 or 30 and a thing to do, and tap once for each number you both say.',
+      'Press Check again, mark the second figure, then Keep this reading. If it matches the first, the plate says so.',
     ],
     skills: ['interoception', 'naming where a state sits in the body', 'reading a before-and-after change'],
     honest:
       'No score, and nothing can be answered wrongly: every input is read off his own body. The remedy is '
       + 'allowed to fail — when the second reading matches the first the guide says so, not that it worked. That '
-      + 'is the best thing in it. It is also near useless opened cold: its value depends on a grown-up reaching '
-      + 'for it when something is already loud, which is when nobody does.',
+      + 'is the best thing in it. Nothing on the screen moves, so your counting voice sets the pace. It is also '
+      + 'near useless opened cold: its value depends on a grown-up reaching for it when something is already '
+      + 'loud, which is when nobody does.',
   },
 };

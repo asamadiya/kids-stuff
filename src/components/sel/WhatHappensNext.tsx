@@ -21,11 +21,11 @@ import {
   stripLine,
 } from '../../sel/what-happens-next';
 import type { Panel, Road, RoadId, Strip } from '../../sel/what-happens-next';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptRoad extends Kept {
   readonly key: string;
@@ -212,9 +212,6 @@ export function WhatHappensNext() {
             />
             <p className="bench__figure-caption">{strip.setupWord}</p>
           </div>
-          <button type="button" className="bench-btn" onClick={() => say(strip.setupWord)}>
-            Read this out
-          </button>
         </div>
 
         <div className="bench__row">{strip.roads.map(roadChoice)}</div>

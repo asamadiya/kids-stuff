@@ -10,7 +10,7 @@
  * Nothing in this module scores, ranks, corrects or prefers anything.
  */
 
-import type { Kept } from '../workshop/drawer';
+import type { Kept } from '../lib/drawer';
 
 export const MEANT_AND_LANDED_META = {
   id: 'meant-and-landed',

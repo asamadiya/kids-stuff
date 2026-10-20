@@ -1,29 +1,27 @@
 import { useRef, useState } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
+import type { ReactNode } from 'react';
 import {
-  MAX_OFFERS, ONE_SWING_TWO_KIDS_META, SCENARIOS,
-  addPlayed, clampShare, clockRanOut, coverageText, endingText, offerLine, plateLines, reactTo,
-  scenarioById, settle, splitText, spokenSplit,
+  CHOICES, ONE_SWING_TWO_KIDS_META, SCENARIOS,
+  addPlayed, choiceLabel, choose, coverageText, framesOf, isSettled, pathText, pictureOf,
+  plateLines, replyOf, saidLine, scenarioById, storyLines,
 } from '../../sel/one-swing-two-kids';
-import type { EndingKind, Outcome, Reaction, Scenario } from '../../sel/one-swing-two-kids';
-import { drawer } from '../../workshop/drawer';
-import type { Kept } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import type { ChoiceId, Scenario, Thing, Who } from '../../sel/one-swing-two-kids';
+import { drawer } from '../../lib/drawer';
+import type { Kept } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 
 interface KeptRound extends Kept {
   readonly scenario: string;
-  readonly mine: number;
-  readonly theirs: number;
-  readonly offers: number;
-  readonly asked: boolean;
+  readonly tried: readonly ChoiceId[];
 }
-const shelf = drawer<KeptRound>('one-swing-two-kids');
+/* Version 2: rounds kept by the old bargaining version held a split, not a path. */
+const shelf = drawer<KeptRound>('one-swing-two-kids', 2);
 
 const BASE = import.meta.env.BASE_URL;
 
-/* Paper, ink and hairlines. Colour identifies; it never decorates. */
+/* Paper, ink and hairlines. Colour says who is who; it never decorates. */
 const PAPER = '#f4f0e6';
 const RAISED = '#fbf9f4';
 const INK = '#22211b';
@@ -32,144 +30,230 @@ const RULE = '#ddd6c4';
 const TERRA = '#9e4b27';
 const OCHRE = '#8a6416';
 const TEAL = '#2a5957';
-
-const VIEW_W = 720;
-const VIEW_H = 212;
-const X0 = 56;
-const X1 = 664;
-const SPAN = X1 - X0;
-const BAND_Y = 96;
-const BAND_H = 42;
+const SANS = 'Inter, sans-serif';
 
 const PICTURE = { width: '100%', maxWidth: '20rem', height: 'auto', border: `1px solid ${RULE}` } as const;
-const PORTRAIT = { width: '100%', maxWidth: '8rem', height: 'auto', border: `1px solid ${RULE}` } as const;
 const THUMB = { display: 'block', width: '6rem', height: 'auto', border: `1px solid ${RULE}` } as const;
-const NUM = { fontVariantNumeric: 'tabular-nums' } as const;
+
+/* One plan is two frames and an arrow; the grown-up is one wide frame. */
+const PLAN_W = 316;
+const PLAN_H = 150;
+const FRAME_W = 140;
+const GAP = PLAN_W - FRAME_W * 2;
+const GROUND = 96;
+
+const colourOf = (who: Who): string => (who === 'you' ? TEAL : TERRA);
+
+/** How tall a plan is drawn: only the take-turns plan needs room for its dots and its loop. */
+const planHeight = (s: Scenario, c: ChoiceId): number =>
+  c !== 'grown-up' && framesOf(s, c).loops ? PLAN_H : GROUND + 22;
+
+/* ------------------------------------------------------------------ figures */
+
+type Pose = 'stand' | 'hold' | 'sit' | 'arms-out';
+
+/**
+ * A child or a grown-up, drawn as a few strokes. `y` is the ground for a
+ * standing figure and the seat for a sitting one. Size 1 is a five-year-old.
+ */
+function Person(props: { x: number; y: number; size: number; colour: string; pose: Pose }) {
+  const { x, y, size: k, colour, pose } = props;
+  const sw = 1.6;
+  const seat = pose === 'sit';
+  const hip = seat ? y : y - 14 * k;
+  const top = hip - 24 * k;
+  const r = 7 * k;
+  const arms =
+    pose === 'hold'
+      ? [`M${x - 8 * k} ${top + 4 * k}L${x - 3 * k} ${top + 13 * k}`, `M${x + 8 * k} ${top + 4 * k}L${x + 3 * k} ${top + 13 * k}`]
+      : pose === 'sit'
+        ? [`M${x - 8 * k} ${top + 4 * k}L${x - 12 * k} ${top - 6 * k}`, `M${x + 8 * k} ${top + 4 * k}L${x + 12 * k} ${top - 6 * k}`]
+        : pose === 'arms-out'
+          ? [`M${x - 8 * k} ${top + 4 * k}L${x - 24 * k} ${top + 14 * k}`, `M${x + 8 * k} ${top + 4 * k}L${x + 24 * k} ${top + 14 * k}`]
+          : [`M${x - 8 * k} ${top + 4 * k}L${x - 11 * k} ${top + 18 * k}`, `M${x + 8 * k} ${top + 4 * k}L${x + 11 * k} ${top + 18 * k}`];
+  const legs = seat
+    ? [`M${x - 3 * k} ${y}H${x + 9 * k}V${y + 12 * k}`]
+    : [`M${x - 4 * k} ${hip}L${x - 5 * k} ${y}`, `M${x + 4 * k} ${hip}L${x + 5 * k} ${y}`];
+  return (
+    <g stroke={colour} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+      {[...arms, ...legs].map((d) => <path key={d} d={d} fill="none" />)}
+      <rect x={x - 8 * k} y={top} width={16 * k} height={24 * k} rx={6 * k} fill={colour} fillOpacity={0.18} />
+      <circle cx={x} cy={top - r - 1.5} r={r} fill={RAISED} />
+    </g>
+  );
+}
+
+/** The thing, in the hands of a standing child whose hands meet at (x, y). */
+function Held({ thing, x, y }: { thing: Thing; x: number; y: number }) {
+  if (thing === 'controller') {
+    return (
+      <g stroke={INK} strokeWidth={1.4}>
+        <rect x={x - 9} y={y - 4} width={18} height={9} rx={4} fill={RAISED} />
+        <circle cx={x - 4} cy={y} r={1.2} fill={INK} />
+        <circle cx={x + 4} cy={y} r={1.2} fill={INK} />
+      </g>
+    );
+  }
+  if (thing === 'tablet') {
+    return <rect x={x - 7} y={y - 10} width={14} height={18} rx={2} fill={INK} fillOpacity={0.75} stroke={INK} strokeWidth={1.4} />;
+  }
+  return (
+    <g stroke={INK} strokeWidth={1.4}>
+      <rect x={x - 9} y={y - 6} width={18} height={13} fill={RAISED} />
+      <path d={`M${x - 9} ${y - 6}l3 -5h12l3 5`} fill="none" />
+    </g>
+  );
+}
+
+const Name = ({ x, children }: { x: number; children: string }) => (
+  <text x={x} y={GROUND + 15} textAnchor="middle" fontFamily={SANS} fontSize={12} fill={FAINT}>{children}</text>
+);
+
+/** One frame of a plan: `has` has the thing, the other one waits. */
+function Frame({ s, has }: { s: Scenario; has: Who }) {
+  const waits: Who = has === 'you' ? 'them' : 'you';
+  const sizeOf = (w: Who): number => (w === 'them' && s.little ? 0.72 : 1);
+  const nameOf = (w: Who): string => (w === 'you' ? 'you' : s.other);
+  const ground = <path d={`M0 ${GROUND}H${FRAME_W}`} stroke={RULE} strokeWidth={1} />;
+
+  if (s.thing === 'swing') {
+    return (
+      <g>
+        {ground}
+        <g stroke={INK} strokeWidth={1.6} strokeLinecap="round" fill="none">
+          <path d={`M16 12H92M16 12L8 ${GROUND}M16 12L24 ${GROUND}M92 12L84 ${GROUND}M92 12L100 ${GROUND}`} />
+          <path d="M42 12V60M66 12V60" strokeWidth={1} />
+          <path d="M36 60H72" strokeWidth={3} />
+        </g>
+        <Person x={54} y={60} size={sizeOf(has)} colour={colourOf(has)} pose="sit" />
+        <Person x={122} y={GROUND} size={sizeOf(waits)} colour={colourOf(waits)} pose="stand" />
+        <Name x={54}>{nameOf(has)}</Name>
+        <Name x={122}>{nameOf(waits)}</Name>
+      </g>
+    );
+  }
+
+  if (s.thing === 'seat') {
+    return (
+      <g>
+        <rect x={4} y={34} width={FRAME_W - 8} height={46} rx={10} fill="none" stroke={RULE} strokeWidth={1.2} />
+        <rect x={10} y={8} width={46} height={26} rx={5} fill={RAISED} stroke={INK} strokeWidth={1.4} />
+        <path d="M10 21H56" stroke={RULE} strokeWidth={1} />
+        <path d={`M4 80H${FRAME_W - 4}`} stroke={INK} strokeWidth={1.6} />
+        <Person x={34} y={80} size={sizeOf(has)} colour={colourOf(has)} pose="stand" />
+        <Person x={98} y={80} size={sizeOf(waits)} colour={colourOf(waits)} pose="stand" />
+        <Name x={34}>{nameOf(has)}</Name>
+        <Name x={98}>{nameOf(waits)}</Name>
+      </g>
+    );
+  }
+
+  const hx = 52;
+  const k = sizeOf(has);
+  return (
+    <g>
+      {ground}
+      {s.thing === 'controller' && (
+        <g stroke={INK} strokeWidth={1.4} fill="none">
+          <rect x={4} y={34} width={26} height={18} rx={2} />
+          <path d={`M17 52V${GROUND}`} />
+        </g>
+      )}
+      {s.thing === 'crackers' && <path d={`M4 70H30M8 70V${GROUND}M26 70V${GROUND}`} stroke={INK} strokeWidth={1.4} fill="none" />}
+      <Person x={hx} y={GROUND} size={k} colour={colourOf(has)} pose="hold" />
+      <Held thing={s.thing} x={hx} y={GROUND - 14 * k - 11 * k} />
+      <Person x={114} y={GROUND} size={sizeOf(waits)} colour={colourOf(waits)} pose="stand" />
+      <Name x={hx}>{nameOf(has)}</Name>
+      <Name x={114}>{nameOf(waits)}</Name>
+    </g>
+  );
+}
+
+/** A plan, drawn: who has the thing first, who next, and whether it goes round. */
+function PlanArt({ s, choice }: { s: Scenario; choice: ChoiceId }) {
+  if (choice === 'grown-up') {
+    const mid = PLAN_W / 2;
+    return (
+      <g>
+        <path d={`M0 ${GROUND}H${PLAN_W}`} stroke={RULE} strokeWidth={1} />
+        <Person x={mid} y={GROUND} size={1.45} colour={OCHRE} pose="arms-out" />
+        <Person x={mid - 62} y={GROUND} size={1} colour={TEAL} pose="stand" />
+        <Person x={mid + 62} y={GROUND} size={s.little ? 0.72 : 1} colour={TERRA} pose="stand" />
+        <Name x={mid - 62}>you</Name>
+        <Name x={mid}>{s.grownUp}</Name>
+        <Name x={mid + 62}>{s.other}</Name>
+      </g>
+    );
+  }
+  const plan = framesOf(s, choice);
+  const centre = (i: number): number => i * (FRAME_W + GAP) + FRAME_W / 2;
+  const dotsY = GROUND + 30;
+  return (
+    <g>
+      {plan.frames.map((who, i) => (
+        <g key={`${who}-${i}`} transform={`translate(${i * (FRAME_W + GAP)} 0)`}>
+          <Frame s={s} has={who} />
+        </g>
+      ))}
+      <g stroke={INK} strokeWidth={1.6} fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d={`M${FRAME_W + 6} 52H${FRAME_W + GAP - 6}`} />
+        <path d={`M${FRAME_W + GAP - 12} 46L${FRAME_W + GAP - 6} 52L${FRAME_W + GAP - 12} 58`} />
+      </g>
+      {/* one dot per unit of a turn, under the one whose turn it is */}
+      {plan.ticks > 0 && plan.frames.map((who, i) =>
+        Array.from({ length: plan.ticks }, (_, t) => (
+          <circle
+            key={`${i}-${t}`}
+            cx={centre(i) - ((plan.ticks - 1) * 9) / 2 + t * 9}
+            cy={dotsY}
+            r={3}
+            fill={colourOf(who)}
+          />
+        )))}
+      {plan.loops && (
+        <g stroke={INK} strokeWidth={1.4} fill="none" strokeLinecap="round" strokeLinejoin="round">
+          <path d={`M${centre(1)} ${dotsY + 8}V${PLAN_H - 4}H${centre(0)}V${dotsY + 8}`} />
+          <path d={`M${centre(0) - 5} ${dotsY + 14}L${centre(0)} ${dotsY + 8}L${centre(0) + 5} ${dotsY + 14}`} />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/* ------------------------------------------------------------------- bench */
 
 export function OneSwingTwoKids() {
   const [scenarioId, setScenarioId] = useState<string>(SCENARIOS[0].id);
-  const [mine, setMine] = useState<number>(Math.floor(SCENARIOS[0].total / 2));
-  const [offers, setOffers] = useState<readonly number[]>([]);
-  const [reaction, setReaction] = useState<Reaction | null>(null);
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const [tried, setTried] = useState<readonly ChoiceId[]>([]);
   const [played, setPlayed] = useState<readonly string[]>(() =>
     shelf.list().reduce<readonly string[]>((acc, k) => addPlayed(acc, k.scenario), []));
   const [kept, setKept] = useState<readonly KeptRound[]>(() => shelf.list());
   const svgRef = useRef<SVGSVGElement>(null);
 
   const s: Scenario = scenarioById(scenarioId) ?? SCENARIOS[0];
-  const locked = outcome !== null;
-  const theirs = s.total - mine;
-  const xAt = (v: number): number => X0 + (v / s.total) * SPAN;
-  const dividerX = xAt(mine);
-  const counterX = reaction && reaction.ask !== null ? xAt(s.total - reaction.ask) : null;
-  const face = outcome ? outcome.face : reaction ? reaction.face : s.faces.waiting;
-  const panel = outcome ? s.outcome : s.setup;
-  const panelAlt = outcome ? s.outcomeAlt : s.setupAlt;
-
-  /* ---------------------------------------------------------------- playing */
+  const settled = isSettled(s, tried);
+  const last = tried[tried.length - 1];
+  const after = last !== undefined ? pictureOf(s, last) : null;
 
   const begin = (next: Scenario): void => {
     setScenarioId(next.id);
-    setMine(Math.floor(next.total / 2));
-    setOffers([]);
-    setReaction(null);
-    setOutcome(null);
-    say(next.stop);
+    setTried([]);
+    say(next.where);
   };
 
-  const finish = (list: readonly number[], ending: EndingKind): void => {
-    const done = settle(s, list, ending);
-    setOutcome(done);
-    setMine(done.mine);
-    setPlayed((p) => addPlayed(p, s.id));
-    pluck(step(-7), 0.6);
-    say([...done.lines, endingText(s, done)].join(' '));
+  const pick = (c: ChoiceId): void => {
+    const next = choose(s, tried, c);
+    if (next === tried) return;
+    setTried(next);
+    const reply = replyOf(s, c);
+    pluck(step(reply.settled ? -7 : 2), reply.settled ? 0.6 : 0.22);
+    say(`${saidLine(s, c)} ${reply.says}`);
+    if (reply.settled) setPlayed((p) => addPlayed(p, s.id));
   };
-
-  const offer = (): void => {
-    if (locked || offers.length >= MAX_OFFERS) return;
-    const next = [...offers, theirs];
-    const answer = reactTo(s, next);
-    if (!answer) return;
-    setOffers(next);
-    setReaction(answer);
-    pluck(step(2), 0.22);
-    if (answer.kind === 'accepted') { finish(next, 'accepted'); return; }
-    if (answer.kind === 'left') { finish(next, 'left'); return; }
-    if (clockRanOut(next, answer)) { finish(next, 'ranOut'); return; }
-    say(`${offerLine(s, mine)} ${answer.line}`);
-  };
-
-  const take = (): void => {
-    if (locked || !reaction || reaction.kind !== 'counter') return;
-    finish(offers, 'took');
-  };
-
-  const nudge = (delta: number): void => {
-    if (locked) return;
-    const v = clampShare(s, mine + delta);
-    if (v === mine) return;
-    setMine(v);
-    pluck(step(delta > 0 ? 4 : -3), 0.18);
-    say(spokenSplit(s, v));
-  };
-
-  /* --------------------------------------------------------- sliding it about */
-
-  const valueFromX = (clientX: number): number => {
-    const svg = svgRef.current;
-    if (!svg) return mine;
-    const box = svg.getBoundingClientRect();
-    if (!box.width) return mine;
-    const vx = ((clientX - box.left) / box.width) * VIEW_W;
-    return clampShare(s, ((vx - X0) / SPAN) * s.total);
-  };
-
-  const onHandleDown = (e: ReactPointerEvent<SVGGElement>): void => {
-    if (locked) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    setDragging(true);
-    setMine(valueFromX(e.clientX));
-  };
-
-  const onHandleMove = (e: ReactPointerEvent<SVGGElement>): void => {
-    if (locked || !e.currentTarget.hasPointerCapture(e.pointerId)) return;
-    setMine(valueFromX(e.clientX));
-  };
-
-  const onHandleUp = (e: ReactPointerEvent<SVGGElement>): void => {
-    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    setDragging(false);
-    if (locked) return;
-    pluck(step(-2), 0.2);
-    say(spokenSplit(s, mine));
-  };
-
-  const onHandleKey = (e: ReactKeyboardEvent<SVGGElement>): void => {
-    if (locked) return;
-    let next: number | null = null;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = mine - 1;
-    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = mine + 1;
-    else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = s.total;
-    if (next === null) return;
-    e.preventDefault();
-    const v = clampShare(s, next);
-    setMine(v);
-    say(spokenSplit(s, v));
-  };
-
-  /* ----------------------------------------------------------------- keeping */
 
   const keep = (): void => {
-    if (!outcome) return;
-    shelf.add({
-      scenario: s.id, mine: outcome.mine, theirs: outcome.theirs,
-      offers: outcome.offers, asked: outcome.asked,
-    });
+    if (!settled) return;
+    shelf.add({ scenario: s.id, tried });
     setKept(shelf.list());
     say('kept in the drawer');
   };
@@ -179,20 +263,30 @@ export function OneSwingTwoKids() {
     setKept(shelf.list());
   };
 
-  const lines = outcome ? plateLines(s, outcome) : [s.stop, splitText(s, mine)];
+  const lines = plateLines(s, tried);
+  const title = `${ONE_SWING_TWO_KIDS_META.title} — ${s.short}`;
 
   const savePicture = (): void => {
     if (!svgRef.current) return;
-    void exportPlate(
-      svgRef.current,
-      { title: `${ONE_SWING_TWO_KIDS_META.title} — ${s.short}`, lines },
-      `one-swing-two-kids-${s.id}`,
-    );
+    void exportPlate(svgRef.current, { title, lines }, `one-swing-two-kids-${s.id}`);
   };
 
-  /* ---------------------------------------------------------------- drawing */
-
-  const ticks = Array.from({ length: s.total + 1 }, (_, i) => i);
+  /* The plate is the path he took, drawn: each plan he chose and what came of it. */
+  const ROW = 104;
+  const plateH = 56 + tried.length * ROW;
+  const plateRows: ReactNode = tried.map((c, i) => {
+    const y = 48 + i * ROW;
+    const went = replyOf(s, c).settled;
+    return (
+      <g key={c}>
+        <g transform={`translate(24 ${y}) scale(0.62)`}><PlanArt s={s} choice={c} /></g>
+        <text x={240} y={y + 40} fontFamily={SANS} fontSize={17} fill={INK}>{choiceLabel(s, c)}</text>
+        <text x={240} y={y + 64} fontFamily={SANS} fontSize={14} fill={went ? TEAL : TERRA}>
+          {went ? 'This is what happened.' : `${s.other} did not go along with it.`}
+        </text>
+      </g>
+    );
+  });
 
   return (
     <section className="bench" aria-labelledby="one-swing-two-kids-title">
@@ -208,178 +302,95 @@ export function OneSwingTwoKids() {
       <div className="bench__stage">
         <div className="bench__row">
           <figure className="bench__figure">
-            <img src={`${BASE}games/sel/${panel}.png`} alt={panelAlt} style={PICTURE} />
-            <figcaption className="bench__figure-caption">{s.thing}</figcaption>
+            <img src={`${BASE}games/sel/${s.setup}.png`} alt={s.setupAlt} style={PICTURE} />
+            <figcaption className="bench__figure-caption">{s.where}</figcaption>
           </figure>
-          <figure className="bench__figure">
-            <img src={`${BASE}games/faces/${face}.png`} alt={`${s.other}, looking ${face}.`} style={PORTRAIT} />
-            <figcaption className="bench__figure-caption">{s.other}</figcaption>
-          </figure>
+          {after && (
+            <figure className="bench__figure">
+              <img src={`${BASE}games/sel/${after.src}.png`} alt={after.alt} style={PICTURE} />
+              <figcaption className="bench__figure-caption">Later</figcaption>
+            </figure>
+          )}
         </div>
 
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          role="img"
-          aria-label={`A band of ${s.total} ${s.unit}. ${splitText(s, mine)}.`}
-        >
-          <rect x="0" y="0" width={VIEW_W} height={VIEW_H} fill={PAPER} />
-
-          <text x={X0} y="30" fontFamily="Inter, sans-serif" fontSize="13" letterSpacing="1.6" fill={FAINT}>
-            {`${s.total} ${s.unit}`.toUpperCase()}
-          </text>
-
-          {/* the three offers the clock allows, filled as they are spent */}
-          <text x={X1 - 92} y="30" fontFamily="Inter, sans-serif" fontSize="13" letterSpacing="1.6" fill={FAINT}>
-            OFFERS
-          </text>
-          {[0, 1, 2].map((i) => (
-            <circle
-              key={i} cx={X1 - 34 + i * 17} cy="25" r="5.5"
-              fill={i < offers.length ? INK : 'none'} stroke={i < offers.length ? INK : RULE} strokeWidth="1.2"
-            />
-          ))}
-
-          {/* who the two ends belong to */}
-          <text x={(X0 + dividerX) / 2} y="56" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="11" letterSpacing="1.4" fill={FAINT}>
-            YOU
-          </text>
-          <text x={(dividerX + X1) / 2} y="56" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="11" letterSpacing="1.4" fill={FAINT}>
-            {s.other.toUpperCase()}
-          </text>
-          <text x={(X0 + dividerX) / 2} y="84" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="26" fill={TEAL} style={NUM}>
-            {mine}
-          </text>
-          <text x={(dividerX + X1) / 2} y="84" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="26" fill={TERRA} style={NUM}>
-            {theirs}
-          </text>
-
-          {/* the band itself, ruled off one unit at a time */}
-          <rect x={X0} y={BAND_Y} width={SPAN} height={BAND_H} fill={RAISED} stroke={RULE} strokeWidth="1" />
-          <rect x={X0} y={BAND_Y} width={dividerX - X0} height={BAND_H} fill={TEAL} fillOpacity="0.16" />
-          <rect x={dividerX} y={BAND_Y} width={X1 - dividerX} height={BAND_H} fill={TERRA} fillOpacity="0.14" />
-          {ticks.map((t) => (
-            <g key={t}>
-              <line x1={xAt(t)} y1={BAND_Y} x2={xAt(t)} y2={BAND_Y + BAND_H} stroke={RULE} strokeWidth="1" />
-              <line x1={xAt(t)} y1={BAND_Y + BAND_H} x2={xAt(t)} y2={BAND_Y + BAND_H + 6} stroke={RULE} strokeWidth="1" />
-            </g>
-          ))}
-          <rect x={X0} y={BAND_Y} width={SPAN} height={BAND_H} fill="none" stroke={INK} strokeWidth="1.2" />
-
-          {/* what they answered with, on the same band */}
-          {counterX !== null && reaction !== null && reaction.ask !== null && (
-            <g>
-              <line
-                x1={counterX} y1={BAND_Y - 10} x2={counterX} y2={BAND_Y + BAND_H + 10}
-                stroke={OCHRE} strokeWidth="2" strokeDasharray="5 4"
-              />
-              <path
-                d={`M${counterX} ${BAND_Y - 10}L${counterX - 7} ${BAND_Y - 22}L${counterX + 7} ${BAND_Y - 22}Z`}
-                fill={OCHRE}
-              />
-              <text x={counterX - 10} y={BAND_Y + BAND_H + 46} textAnchor="end" fontFamily="Inter, sans-serif" fontSize="16" fill={OCHRE} style={NUM}>
-                {s.total - reaction.ask}
-              </text>
-              <text x={counterX + 10} y={BAND_Y + BAND_H + 46} fontFamily="Inter, sans-serif" fontSize="16" fill={OCHRE} style={NUM}>
-                {reaction.ask}
-              </text>
-            </g>
-          )}
-
-          {/* his own divider, dragged in the dividing-string hand */}
-          <g
-            role="slider"
-            tabIndex={locked ? -1 : 0}
-            aria-label={`Where the ${s.unit} divide between you and ${s.other}`}
-            aria-valuemin={0}
-            aria-valuemax={s.total}
-            aria-valuenow={mine}
-            aria-valuetext={spokenSplit(s, mine)}
-            aria-disabled={locked || undefined}
-            onPointerDown={onHandleDown}
-            onPointerMove={onHandleMove}
-            onPointerUp={onHandleUp}
-            onPointerCancel={onHandleUp}
-            onKeyDown={onHandleKey}
-            style={{ cursor: locked ? 'default' : 'ew-resize', touchAction: 'none' }}
+        {settled && (
+          <svg
+            ref={svgRef}
+            viewBox={`0 0 720 ${plateH}`}
+            role="img"
+            aria-label={`The plans you chose, in order. ${pathText(s, tried)}.`}
+            style={{ marginTop: 'var(--space-4)' }}
           >
-            <rect
-              x={dividerX - 28} y={BAND_Y - 20} width="56" height={BAND_H + 52}
-              fill="transparent" stroke="none"
-            />
-            <line
-              x1={dividerX} y1={BAND_Y - 16} x2={dividerX} y2={BAND_Y + BAND_H + 6}
-              stroke={INK} strokeWidth={dragging ? 4 : 3}
-            />
-            <path
-              d={`M${dividerX} ${BAND_Y + BAND_H + 6}L${dividerX - 13} ${BAND_Y + BAND_H + 26}L${dividerX + 13} ${BAND_Y + BAND_H + 26}Z`}
-              fill={locked ? TEAL : PAPER} stroke={INK} strokeWidth="1.5"
-            />
-            <line
-              x1={dividerX - 6} y1={BAND_Y + BAND_H + 20} x2={dividerX + 6} y2={BAND_Y + BAND_H + 20}
-              stroke={INK} strokeWidth="1"
-            />
-          </g>
-
-          <line x1={X0} y1={VIEW_H - 30} x2={X1} y2={VIEW_H - 30} stroke={RULE} strokeWidth="1" />
-          <text x={X0} y={VIEW_H - 12} fontFamily="Inter, sans-serif" fontSize="13" fill={FAINT}>
-            {s.stop}
-          </text>
-        </svg>
+            <rect x={0} y={0} width={720} height={plateH} fill={PAPER} />
+            <text x={24} y={30} fontFamily={SANS} fontSize={13} letterSpacing={1.6} fill={FAINT}>
+              {s.short.toUpperCase()}
+            </text>
+            <path d="M24 40H696" stroke={RULE} strokeWidth={1} />
+            {plateRows}
+          </svg>
+        )}
       </div>
 
-      <div className="bench__row">
-        <p className="bench__readout">{outcome ? endingText(s, outcome) : splitText(s, mine)}</p>
-      </div>
-
+      <p className="bench__note">{s.about}</p>
       {s.guide !== null && <p className="bench__note">{s.guide}</p>}
-      {reaction !== null && !locked && (
-        <p className="bench__note">{`${offerLine(s, s.total - (offers[offers.length - 1] ?? 0))} ${reaction.line}`}</p>
-      )}
-      {outcome !== null && outcome.lines.map((line) => <p className="bench__note" key={line}>{line}</p>)}
+      {storyLines(s, tried).map((line) => <p className="bench__note" key={line}>{line}</p>)}
+
+      <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
+        <p className="bench__tray-label">
+          {tried.length === 0
+            ? 'What will you say? Pick a plan.'
+            : settled
+              ? 'That is what happened.'
+              : `${s.other} did not go along with it. Pick another plan, or ask a grown-up.`}
+        </p>
+        {CHOICES.map((c) => {
+          const chosen = tried.includes(c);
+          const refused = chosen && !replyOf(s, c).settled;
+          return (
+            <button
+              key={c}
+              type="button"
+              className={chosen ? 'bench-part is-set' : 'bench-part'}
+              aria-pressed={chosen}
+              aria-label={choiceLabel(s, c)}
+              disabled={settled || chosen}
+              onClick={() => pick(c)}
+              style={{
+                display: 'grid', justifyItems: 'center', alignContent: 'space-between', gap: '0.4rem',
+                flex: '1 1 15rem', maxWidth: '22rem',
+                padding: '0.6rem', opacity: refused || (settled && !chosen) ? 0.5 : 1,
+                cursor: settled || chosen ? 'default' : 'pointer',
+              }}
+            >
+              <svg viewBox={`0 0 ${PLAN_W} ${planHeight(s, c)}`} width="100%" aria-hidden="true" focusable="false" style={{ display: 'block' }}>
+                <PlanArt s={s} choice={c} />
+              </svg>
+              <span style={{ fontSize: 'var(--step--1)', color: 'var(--ink-soft)' }}>{choiceLabel(s, c)}</span>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="bench__actions">
-        <button
-          type="button" className="bench-btn" onClick={() => nudge(-1)}
-          disabled={locked || mine <= 0}
-          aria-label={`One more ${s.unitOne} for ${s.other}`}
-        >
-          ← {s.other}
-        </button>
-        <button
-          type="button" className="bench-btn" onClick={() => nudge(1)}
-          disabled={locked || mine >= s.total}
-          aria-label={`One more ${s.unitOne} for you`}
-        >
-          You →
-        </button>
-        <button
-          type="button" className="bench-btn bench-btn--primary" onClick={offer}
-          disabled={locked || offers.length >= MAX_OFFERS}
-        >
-          {offers.length === 0 ? 'Offer this' : 'Offer again'}
-        </button>
-        {reaction !== null && reaction.kind === 'counter' && !locked && (
-          <button type="button" className="bench-btn" onClick={take}>
-            {`Take ${s.other}'s offer`}
-          </button>
-        )}
-        {locked && (
+        {settled && (
           <>
             <button type="button" className="bench-btn" onClick={keep}>Keep this</button>
-            <button type="button" className="bench-btn" onClick={() => begin(s)}>Play it again</button>
             <button type="button" className="bench-btn" onClick={savePicture}>Save the picture</button>
             <button type="button" className="bench-btn" onClick={() => printPlate()}>Print</button>
           </>
         )}
+        {tried.length > 0 && (
+          <button type="button" className="bench-btn bench-btn--primary" onClick={() => begin(s)}>Play it again</button>
+        )}
       </div>
 
-      <div className="bench__tray">
+      <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
         <p className="bench__tray-label">Choose a situation</p>
         {SCENARIOS.map((c) => (
           <button
             key={c.id} type="button"
             className={c.id === s.id ? 'bench-part is-set' : 'bench-part'}
+            aria-pressed={c.id === s.id}
             onClick={() => begin(c)}
           >
             <img src={`${BASE}games/sel/${c.setup}.png`} alt={c.short} style={THUMB} />
@@ -391,25 +402,26 @@ export function OneSwingTwoKids() {
         <p className="bench__shelf-title">In the drawer</p>
         <ul className="bench__shelf-list">
           {kept.length === 0 && <li className="bench__kept"><span className="bench__kept-meta">Nothing kept yet.</span></li>}
-          {kept.map((k) => (
-            <li className="bench__kept" key={k.id}>
-              <span className="bench__kept-name">{scenarioById(k.scenario)?.short ?? k.scenario}</span>
-              <span className="bench__kept-meta" style={NUM}>
-                {`${k.mine} and ${k.theirs} · ${k.offers} ${k.offers === 1 ? 'offer' : 'offers'}`}
-              </span>
-              <button
-                type="button" className="bench-part" onClick={() => drop(k.id)}
-                aria-label={`Take ${scenarioById(k.scenario)?.short ?? k.scenario} out of the drawer`}
-              >
-                Take out
-              </button>
-            </li>
-          ))}
+          {kept.map((k) => {
+            const ks = scenarioById(k.scenario);
+            return (
+              <li className="bench__kept" key={k.id}>
+                <span className="bench__kept-name">{ks?.short ?? k.scenario}</span>
+                <span className="bench__kept-meta">{ks ? pathText(ks, k.tried) : ''}</span>
+                <button
+                  type="button" className="bench-part" onClick={() => drop(k.id)}
+                  aria-label={`Take ${ks?.short ?? k.scenario} out of the drawer`}
+                >
+                  Take out
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
       <div className="plate-print">
-        <p className="plate-print__title">{`${ONE_SWING_TWO_KIDS_META.title} — ${s.short}`}</p>
+        <p className="plate-print__title">{title}</p>
         {lines.map((line) => <p className="plate-print__line" key={line}>{line}</p>)}
       </div>
     </section>

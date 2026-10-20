@@ -3,16 +3,19 @@
  *
  * Nothing here can be answered wrongly, because everything here is a reading
  * off his own body. He marks where the feeling sits, notes what is true around
- * him, runs one remedy that has to be genuinely executed — a breath disc that
- * only advances while his finger is down, or a wait band that only fills in
- * real time — and then takes the reading again. Two figures, side by side.
+ * him, runs one remedy that he has to actually do — slow breaths, one still
+ * card per half-breath, or a slow count, one still dot per number said out
+ * loud — and then takes the reading again. Two figures, side by side.
+ *
+ * Nothing on the screen moves by itself. Every change to the drawing is a tap
+ * he made when the breath or the number was done; no clock decides anything.
  *
  * The remedy is allowed to fail, and the guide says so plainly. There is no
  * score, no praise and no correct set of marks; every readout is a count.
  *
- * Pure module. No React, no DOM, no randomness, no clock of its own.
+ * Pure module. No React, no DOM, no randomness, no clock.
  */
-import type { Kept } from '../workshop/drawer';
+import type { Kept } from '../lib/drawer';
 
 export const BODYCHECK_META = {
   id: 'body-check',
@@ -196,42 +199,68 @@ export const CHECKS: readonly Check[] = [
 
 /* --------------------------------------------------------------- the remedy */
 
-export const BREATH_IN_MS = 4000;
-export const BREATH_OUT_MS = 6000;
-export const BREATH_CYCLE_MS = BREATH_IN_MS + BREATH_OUT_MS;
+export type BreathPhase = 'in' | 'out';
+
+export interface BreathCard {
+  readonly phase: BreathPhase;
+  /** The card's heading. */
+  readonly title: string;
+  /** How to do it. The grown-up's count sets the pace, so the screen never has to. */
+  readonly how: string;
+  /** The button he taps once the half-breath is done. */
+  readonly done: string;
+}
+
+/** Four counts in, six out: the long out-breath is the half that slows him down. */
+export const BREATH_CARDS: Readonly<Record<BreathPhase, BreathCard>> = {
+  in: {
+    phase: 'in',
+    title: 'Breathe in',
+    how: 'Slowly, through your nose, while your grown-up counts to four.',
+    done: 'I breathed in',
+  },
+  out: {
+    phase: 'out',
+    title: 'Breathe out',
+    how: 'Slowly, through your mouth, while your grown-up counts to six.',
+    done: 'I breathed out',
+  },
+};
 
 export interface BreathAt {
-  readonly phase: 'in' | 'out';
-  /** How far through the current half, from 0 to 1. */
-  readonly through: number;
-  /** How open the disc is, from 0 shut to 1 wide. */
-  readonly open: number;
-  /** Whole breaths finished so far. */
+  /** Which card is showing. */
+  readonly phase: BreathPhase;
+  /** Whole breaths finished so far, in and then out. */
   readonly whole: number;
 }
 
 /**
- * Where the disc stands after `heldMs` of finger-down time. Held time is the
- * only input: let go and it stops, press again and it carries on from there.
+ * Which card stands after `taps` deliberate taps: in, out, in, out. Taps are
+ * the only input, so nothing can turn a card while he is still breathing.
  */
-export function breathAt(heldMs: number): BreathAt {
-  const t = Number.isFinite(heldMs) ? Math.max(0, heldMs) : 0;
-  const whole = Math.floor(t / BREATH_CYCLE_MS);
-  const within = t - whole * BREATH_CYCLE_MS;
-  const drawingIn = within < BREATH_IN_MS;
-  const through = drawingIn ? within / BREATH_IN_MS : (within - BREATH_IN_MS) / BREATH_OUT_MS;
-  const eased = (1 - Math.cos(Math.PI * through)) / 2;
-  return { phase: drawingIn ? 'in' : 'out', through, open: drawingIn ? eased : 1 - eased, whole };
+export function breathAt(taps: number): BreathAt {
+  const t = Number.isFinite(taps) ? Math.max(0, Math.floor(taps)) : 0;
+  return { phase: t % 2 === 0 ? 'in' : 'out', whole: Math.floor(t / 2) };
 }
 
-export const WAIT_LENGTHS: readonly number[] = [30, 60, 90];
+/** How far he can choose to count. Each number is one dot and one slow count. */
+export const COUNT_LENGTHS: readonly number[] = [10, 20, 30];
+
+/** Dots per row on the counting card: a full row is one ten. */
+export const DOTS_PER_ROW = 10;
+
+/** One more number counted, never past the end he chose. */
+export function countOne(counted: number, to: number): number {
+  const c = Number.isFinite(counted) ? Math.max(0, Math.floor(counted)) : 0;
+  return Math.min(Math.max(0, to), c + 1);
+}
 
 export type WaitThingId = 'lie' | 'water' | 'hold' | 'window' | 'near';
 
 export interface WaitThing {
   readonly id: WaitThingId;
   readonly label: string;
-  /** How it is said back afterwards: "You waited 60 seconds, lying down." */
+  /** How it is said back afterwards: "You counted to 20, lying down." */
   readonly doing: string;
   readonly glyph: readonly string[];
 }
@@ -274,24 +303,31 @@ export const WAIT_THINGS: readonly WaitThing[] = [
   },
 ];
 
-export type RemedyRun =
-  | { readonly kind: 'breath'; readonly whole: number; readonly heldMs: number }
-  | {
-      readonly kind: 'wait';
-      readonly seconds: number;
-      readonly thing: WaitThingId;
-      readonly elapsed: number;
-      readonly finished: boolean;
-    }
-  | { readonly kind: 'none' };
-
-/** How full the wait band is, from 0 to 1. Real time only; never hurried. */
-export function waitFraction(elapsedMs: number, seconds: number): number {
-  if (!Number.isFinite(elapsedMs) || !Number.isFinite(seconds) || seconds <= 0) return 0;
-  return Math.min(1, Math.max(0, elapsedMs / (seconds * 1000)));
+/**
+ * A wait timed by the clock, the way readings were kept before the counted
+ * wait replaced the filling band. Still read, so a reading kept then says what
+ * it said; never written.
+ */
+export interface TimedWait {
+  readonly kind: 'wait';
+  readonly seconds: number;
+  readonly thing: WaitThingId;
+  readonly elapsed: number;
+  readonly finished: boolean;
 }
 
-export const wholeSeconds = (ms: number): number => (Number.isFinite(ms) ? Math.max(0, Math.floor(ms / 1000)) : 0);
+export type RemedyRun =
+  | { readonly kind: 'breath'; readonly whole: number }
+  | {
+      readonly kind: 'count';
+      /** How far he chose to count. */
+      readonly to: number;
+      readonly thing: WaitThingId;
+      /** How far he got. Stopping early is allowed and said back as it was. */
+      readonly counted: number;
+    }
+  | TimedWait
+  | { readonly kind: 'none' };
 
 /* ---------------------------------------------------------------- the record */
 
@@ -368,14 +404,20 @@ export function readingLines(marks: readonly RegionId[], checks: readonly CheckI
 export function remedyLine(run: RemedyRun): string {
   if (run.kind === 'none') return 'You did not run anything.';
   if (run.kind === 'breath') {
+    if (run.whole === 0) return 'You did not finish a whole breath.';
     return run.whole === 1
-      ? 'You held the disc for one whole breath.'
-      : `You held the disc for ${countWord(run.whole)} whole breaths.`;
+      ? 'You took one slow breath, in and out.'
+      : `You took ${countWord(run.whole)} slow breaths, in and out.`;
   }
   const doing = waitThingById(run.thing).doing;
+  if (run.kind === 'count') {
+    return run.counted >= run.to
+      ? `You counted to ${run.to}, ${doing}.`
+      : `You stopped at ${run.counted} of ${run.to}, ${doing}.`;
+  }
   return run.finished
     ? `You waited ${run.seconds} seconds, ${doing}.`
-    : `You stopped the wait at ${wholeSeconds(run.elapsed)} seconds of ${run.seconds}, ${doing}.`;
+    : `You stopped the wait at ${Math.max(0, Math.floor(run.elapsed / 1000))} seconds of ${run.seconds}, ${doing}.`;
 }
 
 const sameSet = (a: readonly RegionId[], b: readonly RegionId[]): boolean =>

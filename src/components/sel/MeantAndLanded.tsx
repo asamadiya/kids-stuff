@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState, type ReactElement, type RefObject } from 'react';
-import { drawer } from '../../workshop/drawer';
-import { say } from '../../workshop/say';
-import { pluck, step } from '../../workshop/tone';
-import { exportPlate, printPlate } from '../../workshop/plate';
+import { drawer } from '../../lib/drawer';
+import { say } from '../../lib/say';
+import { pluck, step } from '../../lib/tone';
+import { exportPlate, printPlate } from '../../lib/plate';
 import {
   LANDINGS,
   MEANT_AND_LANDED_META,
