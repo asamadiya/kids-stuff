@@ -74,7 +74,7 @@ export const theDoublingGrainsOnTheBoard: Story = {
       alt: 'Four grain piles count one, two, four, and eight while a sage points along many empty squares still waiting on the long board.',
     },
     {
-      text: 'At first the piles seemed small and easy, just a handful here and there. But doubling has a secret surprise hiding inside it. Every step does not add a little, it adds everything again. So the numbers start slow, then leap up, faster and faster. By the tenth square there are more than a thousand grains in one pile. Grown-ups have a name for this runaway growing. They call it exponential.',
+      text: 'At first the piles seemed small and easy, just a handful here and there. But doubling has a secret surprise hiding inside it. Every step does not add a little, it adds everything again. So the numbers start slow, then leap up, faster and faster. By the eleventh square there are more than a thousand grains in one pile: 1,024. Grown-ups have a name for this runaway growing. They call it exponential.',
       cue: 'Try it: start at 1 and keep doubling out loud. How fast do the numbers get big?',
       scene: {
         id: 'the-doubling-grains-on-the-board-p6',
@@ -98,7 +98,7 @@ export const theDoublingGrainsOnTheBoard: Story = {
     },
     {
       text: 'The very last square alone would need a truly staggering number of grains. Written out, the whole board would ask for about eighteen quintillion grains. That is an eighteen followed by eighteen more digits, a number too long to say quickly. It is far more wheat than all the farmers on Earth have ever harvested. Piled up, it could bury great mountains under a mighty golden sea. From one tiny grain, doubling had grown into something almost unimaginable.',
-      cue: 'Eighteen quintillion is a number with nineteen digits. Can you count to a hundred first?',
+      cue: 'Eighteen quintillion is a number with twenty digits. Can you count to a hundred first?',
       scene: {
         id: 'the-doubling-grains-on-the-board-p8',
         focus: 'an imagined golden sea of grain flowing over hills and rooftops',
