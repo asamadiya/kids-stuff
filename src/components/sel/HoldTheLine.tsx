@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
-  CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOT_LABELS,
-  chipById, chipsFor, heldLabel, isComplete, lineOf, nextKindOf, outcomeOf,
-  panelFor, plateLines, plateTitle, readout, wordsFor, wrapText,
+  CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOTS, SLOT_LABELS,
+  allSaid, chipById, chipsFor, isComplete, lineOf, nextKindOf, outcomeOf,
+  panelFor, plateLines, plateTitle, readout, saidLabel, sayPart, wordsFor, wrapText,
 } from '../../sel/hold-the-line';
 import type { ChipId, GlyphId, Outcome, Pick, Scenario, SlotKind } from '../../sel/hold-the-line';
 import { drawer } from '../../lib/drawer';
@@ -16,7 +16,8 @@ interface KeptLine extends Kept {
   readonly where: string;
   readonly line: string;
   readonly outcome: Outcome;
-  readonly heldMs: number;
+  /** Times the line was said out loud here. Lines kept before the dots carry none. */
+  readonly times?: number;
 }
 const rack = drawer<KeptLine>('hold-the-line');
 
@@ -24,10 +25,10 @@ const PAPER = '#f4f0e6', RAISED = '#fbf9f4', SUNKEN = '#eae4d5';
 const INK = '#22211b', FAINT = '#6b6757', RULE = '#ddd6c4';
 const TEAL = '#2a5957', TERRA = '#9e4b27';
 
-const SLOTS: readonly SlotKind[] = ['name', 'ask', 'next'];
-const W = 720, H = 372;
+const W = 720, H = 392;
 const SLOT_X: Readonly<Record<SlotKind, number>> = { name: 24, ask: 256, next: 488 };
 const SLOT_W = 208;
+const DOT_Y = 226;
 
 function withSlot(pick: Pick, slot: SlotKind, id: ChipId | null): Pick {
   if (slot === 'name') return { ...pick, name: id };
@@ -46,75 +47,70 @@ function mark(glyph: GlyphId, stroke: string) {
 export function HoldTheLine() {
   const [scenario, setScenario] = useState<Scenario>(SCENARIOS[0]);
   const [pick, setPick] = useState<Pick>(EMPTY_PICK);
-  const [phase, setPhase] = useState<'build' | 'hold' | 'said'>('build');
-  const [heldMs, setHeldMs] = useState(0);
-  const [holding, setHolding] = useState(false);
+  const [phase, setPhase] = useState<'build' | 'said'>('build');
+  /* Parts said out loud so far. Moves only on a tap; no clock touches it. */
+  const [said, setSaid] = useState(0);
   const [runs, setRuns] = useState(0);
   const [spoken, setSpoken] = useState<string[]>([]);
   const [kept, setKept] = useState<KeptLine[]>(() => rack.list());
-  const started = useRef<number>(0);
   const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    if (!holding) return;
-    const t = window.setInterval(() => setHeldMs(Date.now() - started.current), 90);
-    return () => window.clearInterval(t);
-  }, [holding]);
 
   const line = lineOf(scenario, pick);
   const full = isComplete(pick);
   const outcome: Outcome | null = phase === 'said' ? outcomeOf(scenario, pick) : null;
   const shown = outcome ? panelFor(scenario, outcome) : scenario.setup;
   const leaving = nextKindOf(pick) === 'exit';
+  const sayingSlot: SlotKind | null = full && phase === 'build' && !allSaid(said) ? SLOTS[said] : null;
+  const sayingId = sayingSlot ? pick[sayingSlot] : null;
 
   const place = (slot: SlotKind, id: ChipId) => {
     if (phase === 'said') return;
     const next: Pick = withSlot(pick, slot, pick[slot] === id ? null : id);
     setPick(next);
+    // A changed line is a new line: it is said again from the first part.
+    setSaid(0);
     if (next[slot]) {
       say(wordsFor(scenario, id));
       pluck(step(slot === 'name' ? -5 : slot === 'ask' ? -1 : 2));
     }
-    if (isComplete(next)) window.setTimeout(() => say(lineOf(scenario, next)), 700);
+    if (isComplete(next)) say(lineOf(scenario, next));
   };
 
   const goTo = (s: Scenario) => {
-    setScenario(s); setPick(EMPTY_PICK); setPhase('build'); setHeldMs(0); setRuns(0);
+    setScenario(s); setPick(EMPTY_PICK); setPhase('build'); setSaid(0); setRuns(0);
     say(s.setup.says);
   };
 
-  const beginHold = () => {
-    if (!full || holding || phase === 'said') return;
-    started.current = Date.now(); setHeldMs(0); setHolding(true); setPhase('hold');
-  };
-
-  const endHold = () => {
-    if (!holding) return;
-    const ms = Date.now() - started.current;
-    setHolding(false); setHeldMs(ms); setPhase('said'); setRuns((r) => r + 1);
+  /** He said the next part out loud; its dot fills. After the third, the other person answers. */
+  const sayNext = () => {
+    if (!sayingSlot) return;
+    const next = sayPart(said);
+    setSaid(next);
+    pluck(step(SLOTS.indexOf(sayingSlot) * 3 - 2), 0.3);
+    if (!allSaid(next)) return;
+    setPhase('said'); setRuns((r) => r + 1);
     setSpoken((s) => (s.includes(scenario.id) ? s : [...s, scenario.id]));
     pluck(step(4), 0.6);
     const o = outcomeOf(scenario, pick);
-    if (o) window.setTimeout(() => say(panelFor(scenario, o).says), 500);
+    if (o) say(panelFor(scenario, o).says);
   };
 
   const runAgain = () => {
-    setPick(withSlot(pick, 'next', null)); setPhase('build'); setHeldMs(0);
+    setPick(withSlot(pick, 'next', null)); setPhase('build'); setSaid(0);
   };
 
   const keep = () => {
     if (!outcome) return;
-    rack.add({ scenario: scenario.id, where: scenario.where, line, outcome, heldMs });
+    rack.add({ scenario: scenario.id, where: scenario.where, line, outcome, times: runs });
     setKept(rack.list());
   };
 
-  const caption = outcome ? plateLines(scenario, pick, outcome, heldMs) : [];
+  const caption = outcome ? plateLines(scenario, pick, outcome, runs) : [];
   const sentenceRows = useMemo(() => wrapText(line, 74), [line]);
   const reactionRows = useMemo(
     () => (outcome ? wrapText(panelFor(scenario, outcome).says, 74) : []),
     [outcome, scenario],
   );
-  const barW = Math.min(SLOT_W * 3 + 32, Math.round(Math.max(0, heldMs) / 12));
 
   return (
     <section className="bench" aria-labelledby="hold-the-line-title">
@@ -137,7 +133,7 @@ export function HoldTheLine() {
           <p className="bench__figure-caption">{scenario.where}</p>
         </div>
 
-        <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} role="img"
+        <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} role="group"
           aria-label={full
             ? `The frame holds: ${line}`
             : 'A frame with three empty slots: name the thing, ask for the change, what next.'}>
@@ -151,14 +147,21 @@ export function HoldTheLine() {
           </text>
           <path d={`M24 34 H ${W - 24}`} stroke={RULE} strokeWidth="1" />
 
-          {SLOTS.map((slot) => {
+          {SLOTS.map((slot, k) => {
             const x = SLOT_X[slot];
             const id = pick[slot];
             const chip = id ? chipById(id) : undefined;
+            const done = phase === 'said' || k < said;
+            const now = slot === sayingSlot;
+            const dot = (
+              <circle cx={x + SLOT_W / 2} cy={DOT_Y} r={now ? 12 : 10}
+                fill={done ? INK : now ? RAISED : SUNKEN}
+                stroke={done ? INK : now ? TEAL : RULE} strokeWidth={now ? 2.4 : 1.4} />
+            );
             return (
               <g key={slot}>
                 <rect x={x} y="48" width={SLOT_W} height="156" fill={chip ? RAISED : SUNKEN}
-                  stroke={chip ? TEAL : RULE} strokeWidth="1.2" />
+                  stroke={now ? TEAL : chip ? TEAL : RULE} strokeWidth={now ? 2.6 : 1.2} />
                 <text x={x + SLOT_W / 2} y="68" textAnchor="middle" fontFamily="Inter, sans-serif"
                   fontSize="10" letterSpacing="1.4" fill={FAINT}>
                   {SLOT_LABELS[slot].toUpperCase()}
@@ -176,32 +179,39 @@ export function HoldTheLine() {
                 ) : (
                   <path d={`M${x + 44} 132 h ${SLOT_W - 88}`} stroke={RULE} strokeWidth="1.4" strokeDasharray="6 6" />
                 )}
+                {/* One still dot per part. It fills when he taps it, having said that part. */}
+                {now && id ? (
+                  <g role="button" tabIndex={0} aria-label={`I said: ${wordsFor(scenario, id)}`}
+                    style={{ cursor: 'pointer' }} onClick={sayNext}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sayNext(); } }}>
+                    {dot}
+                  </g>
+                ) : (
+                  <g aria-hidden="true">{dot}</g>
+                )}
               </g>
             );
           })}
 
           {sentenceRows.slice(0, 3).map((row, i) => (
-            <text key={`s${i}`} x="24" y={232 + i * 20} fontFamily="Literata, Georgia, serif"
+            <text key={`s${i}`} x="24" y={264 + i * 20} fontFamily="Literata, Georgia, serif"
               fontSize="16" fill={INK}>
               {row}
             </text>
           ))}
 
           {reactionRows.slice(0, 2).map((row, i) => (
-            <text key={`r${i}`} x="24" y={306 + i * 18} fontFamily="Inter, sans-serif" fontSize="13"
+            <text key={`r${i}`} x="24" y={334 + i * 18} fontFamily="Inter, sans-serif" fontSize="13"
               fill={outcome === 'left' ? TERRA : FAINT}>
               {row}
             </text>
           ))}
 
           <path d={`M24 ${H - 22} H ${W - 24}`} stroke={RULE} strokeWidth="1" />
-          {heldMs > 0 && (
-            <>
-              <path d={`M24 ${H - 22} h ${barW}`} stroke={INK} strokeWidth="3" strokeLinecap="round" />
-              <text x="24" y={H - 6} fontFamily="Inter, sans-serif" fontSize="11" fill={FAINT}>
-                {heldLabel(heldMs)}
-              </text>
-            </>
+          {runs > 0 && (
+            <text x="24" y={H - 6} fontFamily="Inter, sans-serif" fontSize="11" fill={FAINT}>
+              {saidLabel(runs)}
+            </text>
           )}
         </svg>
       </div>
@@ -231,12 +241,13 @@ export function HoldTheLine() {
       <div className="bench__actions">
         {phase !== 'said' && (
           <button type="button" className="bench-btn bench-btn--primary"
-            aria-disabled={!full} aria-pressed={holding}
-            onPointerDown={beginHold} onPointerUp={endHold} onPointerLeave={endHold}
-            onPointerCancel={endHold}
-            onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); beginHold(); } }}
-            onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); endHold(); } }}>
-            {holding ? `Keep holding — ${heldLabel(heldMs)}` : 'Now say it out loud. Hold this while you say it.'}
+            aria-disabled={!full} onClick={sayNext}
+            style={{ minHeight: '3.5rem' }}>
+            {!full
+              ? 'Pick one picture for each part first'
+              : sayingId
+                ? `Say it out loud, then tap: “${wordsFor(scenario, sayingId)}”`
+                : 'Say it out loud'}
           </button>
         )}
         {phase === 'said' && outcome === 'goes-on' && (
@@ -294,7 +305,9 @@ export function HoldTheLine() {
           {kept.map((k) => (
             <li key={k.id} className="bench__kept">
               <span className="bench__kept-name">{k.line}</span>
-              <span className="bench__kept-meta">{k.where} · {heldLabel(k.heldMs)}</span>
+              <span className="bench__kept-meta">
+                {k.where}{k.times ? ` · ${saidLabel(k.times)}` : ''}
+              </span>
               <button type="button" className="bench-btn"
                 onClick={() => { rack.remove(k.id); setKept(rack.list()); }}>
                 Take off the shelf

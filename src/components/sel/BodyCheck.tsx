@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PAINT_ORDER, VIEW, regionPath } from '../../sel/body-figure';
 import { drawer } from '../../lib/drawer';
 import { say } from '../../lib/say';
@@ -6,13 +6,17 @@ import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import {
   BODYCHECK_META,
+  BREATH_CARDS,
   CHECKS,
+  COUNT_LENGTHS,
+  DOTS_PER_ROW,
   PALETTE,
   REGIONS,
-  WAIT_LENGTHS,
   WAIT_THINGS,
   breathAt,
   checkById,
+  countOne,
+  countWord,
   coverage,
   coverageLine,
   describeMarks,
@@ -23,9 +27,7 @@ import {
   regionById,
   toggleCheck,
   toggleRegion,
-  waitFraction,
   waitThingById,
-  wholeSeconds,
   type BodyCheckRecord,
   type CheckId,
   type RegionId,
@@ -36,7 +38,23 @@ import {
 const rack = drawer<BodyCheckRecord>('body-check');
 
 type Phase = 'before' | 'checks' | 'remedy' | 'after' | 'done';
-type Remedy = 'breath' | 'wait' | null;
+type Remedy = 'breath' | 'count' | null;
+
+/* The two still cards share one geometry: a full disc for in, a small one for out. */
+const DISC = { cx: 170, cy: 140, full: 104, small: 36 } as const;
+const BREATH_DOT = { x: 40, y: 284, gap: 26, r: 8, row: 24 } as const;
+const COUNT_DOT = { x: 50, y: 92, gap: 60, r: 22, row: 60 } as const;
+const SANS = 'Inter, system-ui, sans-serif';
+
+/*
+ * The kept plate fits each figure between the rule under the title and the
+ * BEFORE / AFTER labels. The scale is read off the figure's own drawing box, so
+ * the figure cannot outgrow the plate when that box changes. It once did: the
+ * scale was written for a 100 by 125 stroke figure and kept when the region
+ * figure, 300 by 440, replaced it, and the two figures ran off the plate.
+ */
+const PLATE_FIGURE_TOP = 76;
+const PLATE_FIGURE_SCALE = (326 - PLATE_FIGURE_TOP) / VIEW.height;
 
 
 
@@ -164,70 +182,29 @@ export function BodyCheck() {
   const [after, setAfter] = useState<readonly RegionId[]>([]);
   const [checks, setChecks] = useState<readonly CheckId[]>([]);
   const [remedy, setRemedy] = useState<Remedy>(null);
-  const [held, setHeld] = useState(0);
-  const [waitSeconds, setWaitSeconds] = useState(60);
-  const [waitThing, setWaitThing] = useState<WaitThingId | null>(null);
-  const [waitMs, setWaitMs] = useState(0);
-  const [waiting, setWaiting] = useState(false);
-  const [waitDone, setWaitDone] = useState(false);
+  /* Every change to the remedy drawings is one of these taps. Nothing runs on a clock. */
+  const [breathTaps, setBreathTaps] = useState(0);
+  const [countTo, setCountTo] = useState(COUNT_LENGTHS[1]);
+  const [countThing, setCountThing] = useState<WaitThingId | null>(null);
+  const [counted, setCounted] = useState(0);
   const [kept, setKept] = useState<BodyCheckRecord[]>(() => rack.list());
   const [shown, setShown] = useState<BodyCheckRecord | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const heldRef = useRef(0);
-  const fromRef = useRef<number | null>(null);
-  const rafRef = useRef(0);
-
-  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
-
-  useEffect(() => {
-    if (!waiting) return;
-    const total = waitSeconds * 1000;
-    const t0 = performance.now();
-    const id = window.setInterval(() => {
-      const e = performance.now() - t0;
-      if (e >= total) {
-        setWaitMs(total);
-        setWaitDone(true);
-        setWaiting(false);
-      } else {
-        setWaitMs(e);
-      }
-    }, 100);
-    return () => window.clearInterval(id);
-  }, [waiting, waitSeconds]);
-
-  const tick = () => {
-    if (fromRef.current === null) return;
-    setHeld(heldRef.current + (performance.now() - fromRef.current));
-    rafRef.current = requestAnimationFrame(tick);
-  };
-  const holdOn = () => {
-    if (fromRef.current !== null) return;
-    fromRef.current = performance.now();
-    rafRef.current = requestAnimationFrame(tick);
-  };
-  const holdOff = () => {
-    if (fromRef.current === null) return;
-    heldRef.current += performance.now() - fromRef.current;
-    fromRef.current = null;
-    cancelAnimationFrame(rafRef.current);
-    setHeld(heldRef.current);
-  };
-
-  const breath = breathAt(held);
-  const band = waitFraction(waitMs, waitSeconds);
+  const breath = breathAt(breathTaps);
+  const card = BREATH_CARDS[breath.phase];
+  const countDone = counted >= countTo;
   const cover = useMemo(() => coverage(kept), [kept]);
 
   const draft: BodyCheckRecord = useMemo(() => {
     const run: RemedyRun =
       remedy === 'breath'
-        ? { kind: 'breath', whole: breathAt(held).whole, heldMs: Math.round(held) }
-        : remedy === 'wait' && waitThing
-          ? { kind: 'wait', seconds: waitSeconds, thing: waitThing, elapsed: Math.round(waitMs), finished: waitDone }
+        ? { kind: 'breath', whole: breathAt(breathTaps).whole }
+        : remedy === 'count' && countThing
+          ? { kind: 'count', to: countTo, thing: countThing, counted }
           : { kind: 'none' };
     return { id: 'draft', made: new Date().toISOString(), before, after, checks, remedy: run };
-  }, [remedy, held, waitThing, waitSeconds, waitMs, waitDone, before, after, checks]);
+  }, [remedy, breathTaps, countThing, countTo, counted, before, after, checks]);
 
   const plate = shown ?? draft;
   const lines = plateLines(plate);
@@ -239,14 +216,27 @@ export function BodyCheck() {
     setAfter([]);
     setChecks([]);
     setRemedy(null);
-    setHeld(0);
-    heldRef.current = 0;
-    fromRef.current = null;
-    setWaitMs(0);
-    setWaiting(false);
-    setWaitDone(false);
-    setWaitThing(null);
+    setBreathTaps(0);
+    setCounted(0);
+    setCountThing(null);
     setShown(null);
+  };
+
+  /** One half-breath done: the next still card comes up. */
+  const breathed = () => {
+    const next = breathAt(breathTaps + 1);
+    setBreathTaps(breathTaps + 1);
+    pluck(step(next.phase === 'in' ? -5 : 2), 0.3);
+    say(BREATH_CARDS[next.phase].title);
+  };
+
+  /** One number said out loud: the next dot fills. */
+  const countedOne = () => {
+    if (countThing === null || countDone) return;
+    const next = countOne(counted, countTo);
+    setCounted(next);
+    pluck(step(next % DOTS_PER_ROW === 0 ? 4 : -2), 0.2);
+    say(String(next));
   };
 
   const tapBefore = (id: RegionId) => {
@@ -272,7 +262,11 @@ export function BodyCheck() {
 
   /* ------------------------------------------------------------------ stage */
 
-  const discR = 34 + breath.open * 76;
+  const breathRows = Math.ceil((breath.whole + 1) / DOTS_PER_ROW);
+  const breathH = BREATH_DOT.y + breathRows * BREATH_DOT.row;
+  const countRows = Math.ceil(countTo / DOTS_PER_ROW);
+  const countH = COUNT_DOT.y + countRows * COUNT_DOT.row - 18;
+  const breathCount = breath.whole === 1 ? 'one slow breath' : `${countWord(breath.whole)} slow breaths`;
 
   return (
     <section className="bench" aria-labelledby="body-check-title">
@@ -299,55 +293,133 @@ export function BodyCheck() {
           </div>
         )}
 
+        {/*
+          * Two still cards, never a moving disc. The full disc means breathe
+          * in, the small one breathe out; he turns the card with a tap when the
+          * half-breath is done, and the grown-up's count sets the pace.
+          */}
         {phase === 'remedy' && remedy === 'breath' && (
-          <svg viewBox="0 0 640 300" role="img" aria-label={`A disc that opens and shuts. ${breath.whole} whole breaths so far.`}>
-            <rect x={0} y={0} width={640} height={300} fill={PALETTE.raised} />
-            <circle cx={320} cy={150} r={112} fill="none" stroke={PALETTE.rule} strokeWidth={1} />
-            <circle cx={320} cy={150} r={34} fill="none" stroke={PALETTE.rule} strokeWidth={1} />
-            <circle
-              cx={320}
-              cy={150}
-              r={discR}
-              fill={breath.phase === 'in' ? 'rgba(42, 89, 87, 0.16)' : 'rgba(158, 75, 39, 0.14)'}
-              stroke={breath.phase === 'in' ? PALETTE.teal : PALETTE.terracotta}
-              strokeWidth={2}
-            />
-            <line x1={40} y1={266} x2={600} y2={266} stroke={PALETTE.rule} strokeWidth={1} />
-            {Array.from({ length: breath.whole }, (_, i) => (
-              <line key={i} x1={40 + i * 14} y1={252} x2={40 + i * 14} y2={266} stroke={PALETTE.ink} strokeWidth={2} />
-            ))}
-            <text x={600} y={288} textAnchor="end" fontFamily="Inter, system-ui, sans-serif" fontSize={16} fill={PALETTE.faint}>
-              {breath.whole === 1 ? '1 whole breath' : `${breath.whole} whole breaths`}
-            </text>
-          </svg>
+          <div className="bench__figure" style={{ maxWidth: '22rem' }}>
+            <svg
+              viewBox={`0 0 340 ${breathH}`}
+              role="img"
+              aria-label={`${breath.phase === 'in' ? 'A full, wide disc' : 'A small disc'}. ${card.title}. ${breathCount} so far.`}
+            >
+              <rect x={0} y={0} width={340} height={breathH} fill={PALETTE.raised} />
+              <circle cx={DISC.cx} cy={DISC.cy} r={DISC.full} fill="none" stroke={PALETTE.rule} strokeWidth={1} />
+              <circle cx={DISC.cx} cy={DISC.cy} r={DISC.small} fill="none" stroke={PALETTE.rule} strokeWidth={1} />
+              <circle
+                cx={DISC.cx}
+                cy={DISC.cy}
+                r={breath.phase === 'in' ? DISC.full : DISC.small}
+                fill={breath.phase === 'in' ? 'rgba(42, 89, 87, 0.16)' : 'rgba(158, 75, 39, 0.14)'}
+                stroke={breath.phase === 'in' ? PALETTE.teal : PALETTE.terracotta}
+                strokeWidth={2}
+              />
+              <line x1={BREATH_DOT.x - 14} y1={BREATH_DOT.y - 24} x2={340 - BREATH_DOT.x + 14} y2={BREATH_DOT.y - 24} stroke={PALETTE.rule} strokeWidth={1} />
+              {/* one dot per whole breath, and a hollow one for the breath under way */}
+              {Array.from({ length: breath.whole + 1 }, (_, i) => (
+                <circle
+                  key={i}
+                  cx={BREATH_DOT.x + 6 + (i % DOTS_PER_ROW) * BREATH_DOT.gap}
+                  cy={BREATH_DOT.y + Math.floor(i / DOTS_PER_ROW) * BREATH_DOT.row}
+                  r={BREATH_DOT.r}
+                  fill={i < breath.whole ? PALETTE.ink : 'none'}
+                  stroke={i < breath.whole ? PALETTE.ink : PALETTE.faint}
+                  strokeWidth={1.4}
+                />
+              ))}
+            </svg>
+            <h3 className="bench__title" style={{ margin: 0 }}>{card.title}</h3>
+            <p className="bench__note" style={{ textAlign: 'center', marginTop: 0 }}>{card.how}</p>
+            <button
+              type="button"
+              className="bench-btn bench-btn--primary"
+              style={{ minHeight: '4rem', minWidth: '14rem', fontSize: 'var(--step-1)' }}
+              onClick={breathed}
+            >
+              {card.done}
+            </button>
+            <p className="bench__figure-caption">{breathCount}</p>
+          </div>
         )}
 
-        {phase === 'remedy' && remedy === 'wait' && (
-          <svg viewBox="0 0 640 200" role="img" aria-label={`A band that fills as the wait passes. ${wholeSeconds(waitMs)} seconds of ${waitSeconds}.`}>
-            <rect x={0} y={0} width={640} height={200} fill={PALETTE.raised} />
-            <rect x={40} y={70} width={560} height={54} fill={PALETTE.sunken} stroke={PALETTE.rule} strokeWidth={1} />
-            <rect x={40} y={70} width={560 * band} height={54} fill="rgba(42, 89, 87, 0.28)" />
-            {WAIT_LENGTHS.map((s) => (
-              <line
-                key={s}
-                x1={40 + 560 * Math.min(1, s / waitSeconds)}
-                y1={70}
-                x2={40 + 560 * Math.min(1, s / waitSeconds)}
-                y2={124}
-                stroke={PALETTE.rule}
-                strokeWidth={1}
-              />
-            ))}
-            <line x1={40 + 560 * band} y1={58} x2={40 + 560 * band} y2={136} stroke={PALETTE.ink} strokeWidth={2} />
-            <text x={40} y={168} fontFamily="Inter, system-ui, sans-serif" fontSize={17} fill={PALETTE.faint}>
-              {wholeSeconds(waitMs)} of {waitSeconds} seconds
-            </text>
-            {waitThing && (
-              <text x={600} y={168} textAnchor="end" fontFamily="Inter, system-ui, sans-serif" fontSize={17} fill={PALETTE.faint}>
-                {waitThingById(waitThing).label}
+        {/*
+          * A slow count, one dot per number. He says the number out loud with
+          * his grown-up, then taps; the dot fills because he tapped, not because
+          * a second went by.
+          */}
+        {phase === 'remedy' && remedy === 'count' && (
+          <div className="bench__figure" style={{ maxWidth: '40rem', width: '100%' }}>
+            <svg
+              viewBox={`0 0 640 ${countH}`}
+              role="group"
+              aria-label={`${countTo} dots, one for each number. ${counted} counted.`}
+            >
+              <rect x={0} y={0} width={640} height={countH} fill={PALETTE.raised} />
+              <text x={COUNT_DOT.x - COUNT_DOT.r} y={36} fontFamily={SANS} fontSize={17} fill={PALETTE.faint}>
+                {counted} of {countTo}
               </text>
+              {countThing && (
+                <text x={640 - COUNT_DOT.x + COUNT_DOT.r} y={36} textAnchor="end" fontFamily={SANS} fontSize={17} fill={PALETTE.faint}>
+                  {waitThingById(countThing).label}
+                </text>
+              )}
+              {Array.from({ length: countTo }, (_, i) => {
+                const n = i + 1;
+                const cx = COUNT_DOT.x + (i % DOTS_PER_ROW) * COUNT_DOT.gap;
+                const cy = COUNT_DOT.y + Math.floor(i / DOTS_PER_ROW) * COUNT_DOT.row;
+                const on = n <= counted;
+                const dot = (
+                  <>
+                    <circle cx={cx} cy={cy} r={COUNT_DOT.r} fill={on ? PALETTE.teal : PALETTE.sunken} stroke={on ? PALETTE.teal : PALETTE.faint} strokeWidth={1.4} />
+                    <text x={cx} y={cy + 6} textAnchor="middle" fontFamily={SANS} fontSize={17} fill={on ? PALETTE.raised : PALETTE.faint}>
+                      {n}
+                    </text>
+                  </>
+                );
+                // Only the next dot takes a tap, so they fill strictly in order.
+                if (n !== counted + 1 || countThing === null) return <g key={n} aria-hidden="true">{dot}</g>;
+                return (
+                  <g
+                    key={n}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`I said ${n}`}
+                    style={{ cursor: 'pointer' }}
+                    onClick={countedOne}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        countedOne();
+                      }
+                    }}
+                  >
+                    {dot}
+                  </g>
+                );
+              })}
+            </svg>
+            {countThing === null ? (
+              <p className="bench__figure-caption">Choose what you will do while you count, below.</p>
+            ) : countDone ? (
+              <p className="bench__figure-caption">{`You counted to ${countTo}.`}</p>
+            ) : (
+              <>
+                <p className="bench__note" style={{ textAlign: 'center', marginTop: 0, maxWidth: 'none' }}>
+                  Say the next number out loud with your grown-up, slowly. Then tap.
+                </p>
+                <button
+                  type="button"
+                  className="bench-btn bench-btn--primary"
+                  style={{ minHeight: '4rem', minWidth: '14rem', fontSize: 'var(--step-1)' }}
+                  onClick={countedOne}
+                >
+                  {`I said ${counted + 1}`}
+                </button>
+              </>
             )}
-          </svg>
+          </div>
         )}
 
         {phase === 'done' && (
@@ -361,8 +433,15 @@ export function BodyCheck() {
               {formatDay(plate.made)}
             </text>
             <line x1={34} y1={60} x2={606} y2={60} stroke={PALETTE.rule} strokeWidth={1} />
-            <InkFigure x={70} y={84} scale={1.85} marks={plate.before} />
-            <InkFigure x={360} y={84} scale={1.85} marks={plate.after} />
+            {[162, 452].map((cx, i) => (
+              <InkFigure
+                key={cx}
+                x={cx - (VIEW.width * PLATE_FIGURE_SCALE) / 2}
+                y={PLATE_FIGURE_TOP}
+                scale={PLATE_FIGURE_SCALE}
+                marks={i === 0 ? plate.before : plate.after}
+              />
+            ))}
             {[
               { x: 162, label: 'before', count: plate.before.length },
               { x: 452, label: 'after', count: plate.after.length },
@@ -441,53 +520,53 @@ export function BodyCheck() {
 
       {phase === 'remedy' && (
         <div className="bench__tray">
-          <p className="bench__tray-label">Run one of these. The disc only moves while you hold it; the band only fills in real time.</p>
+          <p className="bench__tray-label">Do one of these. Each card or dot changes only when you tap it.</p>
           <button
             type="button"
             className={`bench-part bench-part--wide${remedy === 'breath' ? ' is-set' : ''}`}
             aria-pressed={remedy === 'breath'}
-            onClick={() => { setRemedy('breath'); setWaiting(false); }}
+            onClick={() => { setRemedy('breath'); say(BREATH_CARDS[breath.phase].title); }}
           >
-            The breath disc
+            Slow breaths
           </button>
           <button
             type="button"
-            className={`bench-part bench-part--wide${remedy === 'wait' ? ' is-set' : ''}`}
-            aria-pressed={remedy === 'wait'}
-            onClick={() => { setRemedy('wait'); setWaiting(false); setWaitMs(0); setWaitDone(false); }}
+            className={`bench-part bench-part--wide${remedy === 'count' ? ' is-set' : ''}`}
+            aria-pressed={remedy === 'count'}
+            onClick={() => { setRemedy('count'); setCounted(0); }}
           >
-            A wait
+            A slow count
           </button>
         </div>
       )}
 
-      {phase === 'remedy' && remedy === 'wait' && (
+      {phase === 'remedy' && remedy === 'count' && (
         <>
           <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
-            <p className="bench__tray-label">How long?</p>
-            {WAIT_LENGTHS.map((s) => (
+            <p className="bench__tray-label">Count to?</p>
+            {COUNT_LENGTHS.map((n) => (
               <button
-                key={s}
+                key={n}
                 type="button"
-                className={`bench-part${s === waitSeconds ? ' is-set' : ''}`}
-                aria-pressed={s === waitSeconds}
-                aria-label={`${s} seconds`}
-                onClick={() => { setWaitSeconds(s); setWaitMs(0); setWaitDone(false); setWaiting(false); }}
+                className={`bench-part${n === countTo ? ' is-set' : ''}`}
+                aria-pressed={n === countTo}
+                aria-label={`Count to ${n}`}
+                onClick={() => { setCountTo(n); setCounted(0); }}
               >
-                {s}s
+                {n}
               </button>
             ))}
           </div>
           <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
-            <p className="bench__tray-label">What will you do while you wait?</p>
+            <p className="bench__tray-label">What will you do while you count?</p>
             {WAIT_THINGS.map((w) => (
               <button
                 key={w.id}
                 type="button"
-                className={`bench-part${w.id === waitThing ? ' is-set' : ''}`}
-                aria-pressed={w.id === waitThing}
+                className={`bench-part${w.id === countThing ? ' is-set' : ''}`}
+                aria-pressed={w.id === countThing}
                 aria-label={w.label}
-                onClick={() => { setWaitThing(w.id); say(w.label); }}
+                onClick={() => { setCountThing(w.id); say(w.label); }}
               >
                 <Glyph paths={w.glyph} />
               </button>
@@ -514,41 +593,9 @@ export function BodyCheck() {
           </>
         )}
 
-        {phase === 'remedy' && remedy === 'breath' && (
-          <button
-            type="button"
-            className="bench-btn bench-btn--primary"
-            onPointerDown={holdOn}
-            onPointerUp={holdOff}
-            onPointerLeave={holdOff}
-            onPointerCancel={holdOff}
-            onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); holdOn(); } }}
-            onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); holdOff(); } }}
-          >
-            Press and hold
-          </button>
-        )}
-
-        {phase === 'remedy' && remedy === 'wait' && !waiting && !waitDone && (
-          <button
-            type="button"
-            className="bench-btn bench-btn--primary"
-            aria-disabled={waitThing === null}
-            onClick={() => { if (waitThing === null) return; setWaitMs(0); setWaitDone(false); setWaiting(true); }}
-          >
-            Start the wait
-          </button>
-        )}
-
-        {phase === 'remedy' && remedy === 'wait' && waiting && (
-          <button type="button" className="bench-btn" onClick={() => setWaiting(false)}>
-            Stop the wait
-          </button>
-        )}
-
         {phase === 'remedy' && (
           <>
-            <button type="button" className="bench-btn" onClick={() => { holdOff(); setWaiting(false); setPhase('after'); }}>
+            <button type="button" className="bench-btn" onClick={() => setPhase('after')}>
               Check again
             </button>
             <button type="button" className="bench-btn" onClick={() => setPhase('checks')}>

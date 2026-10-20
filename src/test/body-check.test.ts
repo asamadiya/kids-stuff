@@ -1,17 +1,19 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   BODYCHECK_META,
-  BREATH_CYCLE_MS,
-  BREATH_IN_MS,
+  BREATH_CARDS,
   CHECKS,
+  COUNT_LENGTHS,
+  DOTS_PER_ROW,
   FIGURE_BOX,
   FIGURE_PLATE,
   FIGURE_STROKES,
   REGIONS,
-  WAIT_LENGTHS,
   WAIT_THINGS,
   breathAt,
   compareLines,
+  countOne,
   countWord,
   coverage,
   coverageLine,
@@ -26,8 +28,6 @@ import {
   signalList,
   toggleCheck,
   toggleRegion,
-  waitFraction,
-  wholeSeconds,
   type BodyCheckRecord,
   type RegionId,
 } from '../sel/body-check';
@@ -102,13 +102,13 @@ describe('the plate and its places', () => {
 
 describe('nothing here can be answered', () => {
   it('carries no field that could hold a right answer', () => {
-    const keys = everyKey([REGIONS, CHECKS, WAIT_THINGS, BODYCHECK_META]);
+    const keys = everyKey([REGIONS, CHECKS, WAIT_THINGS, BREATH_CARDS, BODYCHECK_META]);
     expect(keys.filter((k) => SCORING_KEY.test(k))).toEqual([]);
   });
 
   it('never praises, never scolds, in any string the child can meet', () => {
     const strings = [
-      ...everyString([REGIONS, CHECKS, WAIT_THINGS, BODYCHECK_META]),
+      ...everyString([REGIONS, CHECKS, WAIT_THINGS, BREATH_CARDS, BODYCHECK_META]),
       describeMarks([]),
       describeMarks(['head', 'tummy']),
       describeChecks([]),
@@ -118,10 +118,11 @@ describe('nothing here can be answered', () => {
       ...compareLines(['head', 'tummy', 'hands'], ['tummy']),
       ...compareLines(['head'], ['head', 'legs']),
       remedyLine({ kind: 'none' }),
-      remedyLine({ kind: 'breath', whole: 0, heldMs: 100 }),
-      remedyLine({ kind: 'breath', whole: 3, heldMs: 30000 }),
+      remedyLine({ kind: 'breath', whole: 0 }),
+      remedyLine({ kind: 'breath', whole: 3 }),
+      remedyLine({ kind: 'count', to: 20, thing: 'lie', counted: 20 }),
+      remedyLine({ kind: 'count', to: 30, thing: 'near', counted: 12 }),
       remedyLine({ kind: 'wait', seconds: 60, thing: 'lie', elapsed: 60000, finished: true }),
-      remedyLine({ kind: 'wait', seconds: 90, thing: 'near', elapsed: 12000, finished: false }),
       coverageLine(coverage([])),
       coverageLine(coverage([record({ before: ['head'] })])),
     ];
@@ -199,54 +200,76 @@ describe('the two figures put side by side', () => {
   });
 });
 
-describe('the remedy is run, not chosen', () => {
-  it('advances the disc only with held time, four in and six out', () => {
-    expect(BREATH_IN_MS).toBe(4000);
-    expect(BREATH_CYCLE_MS).toBe(10000);
-    expect(breathAt(0)).toMatchObject({ phase: 'in', open: 0, whole: 0 });
-    expect(breathAt(4000)).toMatchObject({ phase: 'out', whole: 0 });
-    expect(breathAt(4000).open).toBeCloseTo(1, 6);
-    expect(breathAt(10000)).toMatchObject({ phase: 'in', whole: 1 });
-    expect(breathAt(10000).open).toBeCloseTo(0, 6);
-    expect(breathAt(25000).whole).toBe(2);
+describe('the remedy is done, one tap at a time, and nothing on the screen moves by itself', () => {
+  it('turns the breath card only on a tap: in, out, in, out', () => {
+    expect(breathAt(0)).toEqual({ phase: 'in', whole: 0 });
+    expect(breathAt(1)).toEqual({ phase: 'out', whole: 0 });
+    expect(breathAt(2)).toEqual({ phase: 'in', whole: 1 });
+    expect(breathAt(7)).toEqual({ phase: 'out', whole: 3 });
+    expect(breathAt(-3)).toEqual({ phase: 'in', whole: 0 });
+    expect(breathAt(Number.NaN)).toEqual({ phase: 'in', whole: 0 });
+    expect(breathAt(2.9)).toEqual(breathAt(2));
   });
 
-  it('is deterministic in the held time and never leaves the disc', () => {
-    for (let t = 0; t <= 30000; t += 137) {
-      const a = breathAt(t);
-      expect(a).toEqual(breathAt(t));
-      expect(a.open).toBeGreaterThanOrEqual(0);
-      expect(a.open).toBeLessThanOrEqual(1);
-      expect(a.through).toBeGreaterThanOrEqual(0);
-      expect(a.through).toBeLessThan(1.0000001);
+  it('gives each half of the breath its own still card and keeps the out-breath the longer count', () => {
+    expect(BREATH_CARDS.in.phase).toBe('in');
+    expect(BREATH_CARDS.out.phase).toBe('out');
+    expect(BREATH_CARDS.in.how).toMatch(/four/);
+    expect(BREATH_CARDS.out.how).toMatch(/six/);
+    for (const c of Object.values(BREATH_CARDS)) {
+      expect(c.title.length).toBeGreaterThan(0);
+      expect(c.done.length).toBeGreaterThan(0);
     }
-    expect(breathAt(-500).whole).toBe(0);
-    expect(breathAt(Number.NaN).open).toBe(0);
   });
 
-  it('fills the wait band in real time only, and clamps at both ends', () => {
-    expect(WAIT_LENGTHS).toEqual([30, 60, 90]);
-    expect(waitFraction(0, 60)).toBe(0);
-    expect(waitFraction(30000, 60)).toBeCloseTo(0.5, 6);
-    expect(waitFraction(999999, 60)).toBe(1);
-    expect(waitFraction(-10, 60)).toBe(0);
-    expect(waitFraction(1000, 0)).toBe(0);
-    expect(wholeSeconds(1999)).toBe(1);
-    expect(wholeSeconds(-5)).toBe(0);
+  it('fills the count one dot per tap, in order, and never past the number he chose', () => {
+    expect(COUNT_LENGTHS).toEqual([10, 20, 30]);
+    expect(COUNT_LENGTHS.every((n) => n % DOTS_PER_ROW === 0)).toBe(true);
+    expect(countOne(0, 10)).toBe(1);
+    expect(countOne(9, 10)).toBe(10);
+    expect(countOne(10, 10)).toBe(10);
+    expect(countOne(-4, 10)).toBe(1);
+    expect(countOne(Number.NaN, 20)).toBe(1);
+    let n = 0;
+    for (let i = 0; i < 40; i += 1) n = countOne(n, 20);
+    expect(n).toBe(20);
   });
 
-  it('offers five things to do and says them back in the past, whether or not the wait was finished', () => {
+  /**
+   * FAILS IF REVERTED: the disc used to open and shut on requestAnimationFrame
+   * and the wait band filled on a 100ms interval. The parent forbids any motion,
+   * so no clock may change the drawing.
+   */
+  it('runs no clock that could redraw the exercise', () => {
+    const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    for (const f of ['src/components/sel/BodyCheck.tsx', 'src/sel/body-check.ts']) {
+      const code = strip(readFileSync(f, 'utf8'));
+      expect(code, f).not.toMatch(/requestAnimationFrame|setInterval|setTimeout|performance\.now|Date\.now|transition|@keyframes/);
+    }
+  });
+
+  it('offers five things to do and says them back in the past, whether or not the count was finished', () => {
     expect(WAIT_THINGS).toHaveLength(5);
     expect(new Set(WAIT_THINGS.map((w) => w.id)).size).toBe(5);
+    expect(remedyLine({ kind: 'count', to: 20, thing: 'lie', counted: 20 })).toBe('You counted to 20, lying down.');
+    expect(remedyLine({ kind: 'count', to: 30, thing: 'water', counted: 12 })).toBe(
+      'You stopped at 12 of 30, drinking water.',
+    );
+    expect(remedyLine({ kind: 'breath', whole: 1 })).toBe('You took one slow breath, in and out.');
+    expect(remedyLine({ kind: 'breath', whole: 4 })).toBe('You took four slow breaths, in and out.');
+    expect(remedyLine({ kind: 'breath', whole: 0 })).toBe('You did not finish a whole breath.');
+    expect(remedyLine({ kind: 'none' })).toBe('You did not run anything.');
+  });
+
+  it('still reads a reading kept before the remedies became taps', () => {
     expect(remedyLine({ kind: 'wait', seconds: 60, thing: 'lie', elapsed: 60000, finished: true })).toBe(
       'You waited 60 seconds, lying down.',
     );
     expect(remedyLine({ kind: 'wait', seconds: 90, thing: 'water', elapsed: 12400, finished: false })).toBe(
       'You stopped the wait at 12 seconds of 90, drinking water.',
     );
-    expect(remedyLine({ kind: 'breath', whole: 1, heldMs: 11000 })).toBe('You held the disc for one whole breath.');
-    expect(remedyLine({ kind: 'breath', whole: 0, heldMs: 900 })).toBe('You held the disc for no whole breaths.');
-    expect(remedyLine({ kind: 'none' })).toBe('You did not run anything.');
+    const old = { kind: 'breath', whole: 2, heldMs: 21000 } as const;
+    expect(remedyLine(old)).toBe('You took two slow breaths, in and out.');
   });
 
   it('has five wordless checks, each drawable without a single letter', () => {
@@ -288,12 +311,12 @@ describe('the record he keeps', () => {
       before: ['head', 'tummy'],
       after: ['head'],
       checks: ['food', 'noise'],
-      remedy: { kind: 'wait', seconds: 30, thing: 'window', elapsed: 30000, finished: true },
+      remedy: { kind: 'count', to: 30, thing: 'window', counted: 30 },
     });
     expect(plateLines(r)).toEqual([
       'Hot in the face, tight in the tummy.',
       'You said hungry and too loud.',
-      'You waited 30 seconds, looking out of the window.',
+      'You counted to 30, looking out of the window.',
       'Before: two marks. After: one.',
       'Still hot in the face.',
     ]);

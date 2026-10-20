@@ -2,10 +2,12 @@
  * Hold the Line — assertion and boundaries.
  *
  * Something is being taken, touched, teased or pressed. He builds a sentence
- * out of wordless chips in a three-part frame, says it out loud, and the other
- * person either stops or does not. Nothing here is scored: there is no correct
- * sentence, only a stronger and a softer one, and leaving is not weaker than
- * staying — it is a different road with its own consequence.
+ * out of wordless chips in a three-part frame, says it out loud one part at a
+ * time — tapping a still dot under each part as he says it, so nothing on the
+ * screen moves by itself — and the other person either stops or does not.
+ * Nothing here is scored: there is no correct sentence, only a stronger and a
+ * softer one, and leaving is not weaker than staying — it is a different road
+ * with its own consequence.
  *
  * WHERE THE PANEL IS.
  *
@@ -96,6 +98,9 @@ export const SLOT_LABELS: Readonly<Record<SlotKind, string>> = {
   ask: 'Ask for the change',
   next: 'What next',
 };
+
+/** The three parts of the line, in the order they are said. */
+export const SLOTS: readonly SlotKind[] = ['name', 'ask', 'next'];
 
 /* ----------------------------------------------------------------- glyphs -- */
 
@@ -535,8 +540,22 @@ export function wrapText(text: string, perLine: number): readonly string[] {
   return lines;
 }
 
-export function heldLabel(heldMs: number): string {
-  return `held for ${(Math.max(0, heldMs) / 1000).toFixed(1)} seconds`;
+/**
+ * One more part of the line said out loud. He taps the part's dot as he says
+ * it, so the count only moves on a tap, and never past the three parts.
+ */
+export function sayPart(said: number): number {
+  const s = Number.isFinite(said) ? Math.max(0, Math.floor(said)) : 0;
+  return Math.min(SLOTS.length, s + 1);
+}
+
+/** True once every part has been said out loud. */
+export const allSaid = (said: number): boolean => said >= SLOTS.length;
+
+/** "said out loud once here", "said out loud 3 times here". A count, never a mark. */
+export function saidLabel(times: number): string {
+  const n = Math.max(0, Math.floor(times));
+  return `said out loud ${n === 1 ? 'once' : `${n} times`} here`;
 }
 
 /** How much of the guide he has walked. A count of places, never of answers. */
@@ -555,13 +574,13 @@ export function plateLines(
   scenario: Scenario,
   pick: Pick,
   outcome: Outcome,
-  heldMs: number,
+  times: number,
 ): readonly string[] {
   return [
     `${scenario.where}. ${scenario.setup.says}`,
     `You said: ${lineOf(scenario, pick)}`,
     panelFor(scenario, outcome).says,
-    heldLabel(heldMs),
+    saidLabel(times),
   ];
 }
 

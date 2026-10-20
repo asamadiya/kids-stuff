@@ -269,7 +269,7 @@ export function BorrowedEyes() {
                 />
               );
             })}
-            <g transform={`rotate(${notchAngle(notch, views.length)} 60 52)`} style={{ transition: 'transform 420ms ease' }}>
+            <g transform={`rotate(${notchAngle(notch, views.length)} 60 52)`}>
               <line x1="60" y1="52" x2="60" y2="24" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
             </g>
             <circle cx="60" cy="52" r="4" fill={OCHRE} />

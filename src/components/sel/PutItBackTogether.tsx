@@ -25,8 +25,6 @@ const src = (image: string) => `${BASE}games/sel/${image}.png`;
 const INK = '#22211b', FAINT = '#6b6757', RULE = '#ddd6c4', PAPER = '#f4f0e6';
 const TEAL = '#2a5957', TERRA = '#9e4b27';
 
-const FRAME_MS = 2200;
-
 /** A small ink mark for each move, so the plate reads without letters. */
 function RoleMark({ role, x, y }: { role: PanelRole; x: number; y: number }) {
   const c = INK;
@@ -80,25 +78,28 @@ export function PutItBackTogether() {
   );
 
   // ------------------------------------------------------------ playback --
+  // The strip is stepped by hand, one panel per tap. It used to turn itself
+  // every 2.2 seconds; nothing on the screen may change without a tap.
   useEffect(() => {
     if (phase !== 'running') return;
     const frame = run[at];
     if (!frame) return;
     say(frame.line);
     pluck(step(at * 2 - 5), 0.28);
-    const timer = window.setTimeout(() => {
-      if (at + 1 < run.length) {
-        setAt(at + 1);
-        return;
-      }
-      setPhase('done');
-      if (order) {
-        const key = endingKey(scenario.id, isAccepted(scenario, order));
-        setSeen((s) => (s.includes(key) ? s : [...s, key]));
-      }
-    }, FRAME_MS);
-    return () => window.clearTimeout(timer);
-  }, [phase, at, run, order, scenario]);
+  }, [phase, at, run]);
+
+  const nextPanel = () => {
+    if (phase !== 'running') return;
+    if (at + 1 < run.length) {
+      setAt(at + 1);
+      return;
+    }
+    setPhase('done');
+    if (order) {
+      const key = endingKey(scenario.id, isAccepted(scenario, order));
+      setSeen((s) => (s.includes(key) ? s : [...s, key]));
+    }
+  };
 
   // ------------------------------------------------------------- handling --
   /** Touching the strip after a run puts it back on the bench, keeping the order. */
@@ -213,6 +214,11 @@ export function PutItBackTogether() {
             />
             <p className="bench__figure-caption" aria-live="polite">{shown.line}</p>
             <p className="bench__figure-caption">{played} of {run.length}</p>
+            {phase === 'running' && (
+              <button type="button" className="bench-btn bench-btn--primary" onClick={nextPanel}>
+                {at + 1 < run.length ? 'Next panel' : 'That is the end'}
+              </button>
+            )}
           </div>
         )}
 
