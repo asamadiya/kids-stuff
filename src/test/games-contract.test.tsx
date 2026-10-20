@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent, screen } from '@testing-library/react';
 import { INCOMPLETE as MATHS_INCOMPLETE, MATHS_GAMES } from '../maths/registry';
 import { INCOMPLETE as SCIENCE_INCOMPLETE, SCIENCE_GAMES } from '../science/registry';
 import { REQUIRED_NOTE_FIELDS } from '../notes/types';
+import { GameShell } from '../play/GameShell';
 import type { AnyGame, Level } from '../play/types';
 
 /**
@@ -117,4 +118,30 @@ describe.each(ALL.map((g) => [g.id, g] as const))('%s', (_id, game) => {
     const src = String(game.Board);
     expect(src).not.toMatch(/onDrag|draggable|onPointerMove/);
   });
+
+  if (game.kind === 'investigate') {
+    it('waits for a prediction before Try, and Help ends on the evidence with no comparison', () => {
+      // The real board in the real shell: Try is muted until a tap on the board
+      // moves the answer off emptyAnswer, so every board must offer that tap.
+      const { container } = render(<GameShell game={game} backHref="#/science" backLabel="Science" />);
+      const tryIt = screen.getByRole('button', { name: 'Try it' });
+      expect(tryIt).toHaveAttribute('aria-disabled', 'true');
+      fireEvent.click(tryIt);
+      expect(screen.queryByText('What happened')).toBeNull();
+
+      const pick = container.querySelector<HTMLButtonElement>('.shell__board button[aria-pressed="false"]');
+      expect(pick, 'a choice on the board').not.toBeNull();
+      fireEvent.click(pick!);
+      expect(screen.getByRole('button', { name: 'Try it' })).not.toHaveAttribute('aria-disabled');
+      cleanup();
+
+      render(<GameShell game={game} backHref="#/science" backLabel="Science" />);
+      fireEvent.click(screen.getByRole('button', { name: 'Help' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Help' }));
+      expect(screen.getByText('What happened')).toBeInTheDocument();
+      expect(screen.getByText(/Here is what happens\./)).toBeInTheDocument();
+      expect(screen.queryByText(/Just as you said|Not what you said/)).toBeNull();
+      cleanup();
+    });
+  }
 });

@@ -3,8 +3,17 @@ import type { Level } from './types';
 /**
  * Where a child is in each game, kept per device.
  *
- * The advisor's adaptation rule, and nothing more: step up after four of the
- * last five FIRST attempts were right; step down after two misses in a row.
+ * The advisor's adaptation rule, and nothing more, for solve games only: step
+ * up after four of the last five problems were right at the FIRST Check with
+ * no Help pressed before it; step down after two misses in a row. A right
+ * answer reached with Help is not his own first try, so it never counts toward
+ * a step up — but it is not a miss either.
+ *
+ * Investigations never change the level on their own. A prediction is not a
+ * test of what he knows: counting every finished investigation as a success
+ * let five of them raise the level whatever he understood. There the level
+ * moves only by his hand or a parent's.
+ *
  * The child can always move a level by hand. Nothing here is shown to him as
  * a score — the record exists to choose the next problem, and to put a small
  * "Played before" tick on the card.
@@ -14,7 +23,7 @@ const KEY = (id: string) => `rlc/play/${id}`;
 
 export interface PlayRecord {
   readonly level: Level;
-  /** First-attempt results, newest last, at most five. */
+  /** Solve problems only: right at the first Check without Help, newest last, at most five. */
   readonly recent: readonly boolean[];
   /** Misses in a row, counting every submission. */
   readonly missStreak: number;
@@ -60,17 +69,38 @@ const up = (l: Level): Level => (l === 3 ? 3 : ((l + 1) as Level));
 const down = (l: Level): Level => (l === 1 ? 1 : ((l - 1) as Level));
 
 /**
- * Record one problem. `firstTry` is whether the FIRST submission was right;
- * `missedTwice` is whether he missed two submissions in a row on it.
- * Returns the record and whether the level changed, so the shell can say so.
+ * How one problem went, as the shell saw it. An investigation carries nothing:
+ * it is recorded as played and cannot move the level.
+ */
+export type ProblemResult =
+  | { readonly kind: 'investigate' }
+  | {
+      readonly kind: 'solve';
+      /** The FIRST Check on this problem was right. */
+      readonly rightFirst: boolean;
+      /** Help was pressed at any point on this problem. */
+      readonly helped: boolean;
+      /** He missed two Checks in a row on it. */
+      readonly missedTwice: boolean;
+    };
+
+/**
+ * Record one problem. Returns the record and whether the level changed, so the
+ * shell can say so.
  */
 export function recordProblem(
   record: PlayRecord,
-  firstTry: boolean,
-  missedTwice: boolean,
+  result: ProblemResult,
 ): { record: PlayRecord; moved: 'up' | 'down' | null } {
+  if (result.kind === 'investigate') return { record, moved: null };
+
+  // Only his own first try counts toward a step up: right at the first Check,
+  // with no Help before it. Help can only come before a right first Check,
+  // since a right Check ends the problem.
+  const firstTry = result.rightFirst && !result.helped;
   const recent = [...record.recent, firstTry].slice(-5);
-  const missStreak = missedTwice ? record.missStreak + 2 : firstTry ? 0 : record.missStreak + 1;
+  // A right first Check is not a miss, helped or not, so it ends a run of misses.
+  const missStreak = result.missedTwice ? record.missStreak + 2 : result.rightFirst ? 0 : record.missStreak + 1;
 
   if (missStreak >= 2 && record.level > 1) {
     return { record: { ...record, level: down(record.level), recent: [], missStreak: 0 }, moved: 'down' };

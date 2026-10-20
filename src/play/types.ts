@@ -16,10 +16,13 @@ import type { GrownUpNote } from '../notes/types';
  *   by right or wrong.
  * - Five problems (maths) or three investigations (science), then "Done for
  *   now". Never auto-start another round.
- * - Harder after four of the last five FIRST attempts are right; a step easier
- *   after two misses in a row. The child can also choose Easier or Harder.
- * - Science is predict → Try → before/after side by side → why. A prediction is
- *   compared with the evidence; it is never marked wrong.
+ * - Maths: harder after four of the last five problems are right at the FIRST
+ *   Check with no Help before it; a step easier after two misses in a row.
+ *   Science never changes level on its own. The child (or a parent) can always
+ *   choose Easier or Harder.
+ * - Science is predict → Try → before/after side by side → why. Try waits for a
+ *   prediction. A prediction is compared with the evidence; it is never marked
+ *   wrong, and no comparison is made for a prediction he did not make.
  */
 
 export type Level = 1 | 2 | 3;
@@ -45,6 +48,8 @@ export interface BoardProps<R, A> {
   /**
    * Which stage the round is in. Boards draw extra evidence on 'hint' (the
    * thing the hint sentence points at) and the full solution on 'worked'.
+   * An investigation's board is never drawn at 'worked': the shell shows the
+   * before/after evidence there instead, with the board at 'solved'.
    */
   readonly stage: 'answering' | 'hint' | 'worked' | 'solved';
 }
@@ -62,6 +67,10 @@ interface GameCommon<R, A> {
   readonly generate: (level: Level, index: number) => R;
   /** The prompt over the board, twelve words at most. May depend on the round. */
   readonly prompt: (round: R) => string;
+  /**
+   * The answer before he has done anything. Compared by JSON value: in an
+   * investigation, Try waits until the answer differs from this.
+   */
   readonly emptyAnswer: (round: R) => A;
   readonly Board: ComponentType<BoardProps<R, A>>;
   readonly note: GrownUpNote;
@@ -77,13 +86,18 @@ export interface SolveGame<R, A> extends GameCommon<R, A> {
 }
 
 /**
- * Predict, try, compare. The answer is the prediction; `outcome` is what really
- * happens. The shell shows the setup and the outcome side by side after Try,
- * with `why` underneath, whatever the child predicted.
+ * Predict, try, compare. The answer is the prediction; `Outcome` is what really
+ * happens. Try is muted until there is a prediction. The shell shows the setup
+ * and the outcome side by side after Try, with `why` underneath, whatever the
+ * child predicted; Help ends on the same evidence, with no comparison.
+ * Finishing an investigation never moves the level.
  */
 export interface InvestigateGame<R, A> extends GameCommon<R, A> {
   readonly kind: 'investigate';
-  /** Was the prediction borne out? Only used to word the comparison line. */
+  /**
+   * Was the prediction borne out? Only used to word the comparison line, and
+   * only ever called with a prediction he actually made.
+   */
   readonly matches: (round: R, prediction: A) => boolean;
   /** The evidence, one or two sentences: what changed, and why. */
   readonly why: (round: R) => string;
