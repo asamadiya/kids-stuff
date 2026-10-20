@@ -1,6 +1,6 @@
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
-import { Choice } from '../../play/parts';
+import { Choice, Slot } from '../../play/parts';
 
 /**
  * Where Did the Ice Go? — states of water, then insulation.
@@ -16,6 +16,12 @@ import { Choice } from '../../play/parts';
  * place (counter, freezer, fridge, courtyard, sill, stove) drawn with a room
  * thermometer whose 0° line is marked, and a time tag ("Start" / "1 hour
  * later"), so the after picture carries its own evidence. Static SVG only.
+ *
+ * Every answer is a picture of the outcome, drawn as the after picture would
+ * draw it (the bowl of water, the dry tiles, the wet lid), with its word small
+ * underneath. Tapping one puts the same picture, bigger, in the guess slot
+ * under the scene. Amounts are objects: cubes are counted out as cubes under
+ * each bowl, and a roti stack's warmth is a red column on its thermometer.
  *
  * Levels:
  *  1. Warm or cold: one bowl or cup on the counter, in the freezer or in the
@@ -257,7 +263,7 @@ const WRAP: Record<WrapScene, WrapSpec> = {
     look: 'Both stacks start equally hot, in the same kitchen. Only one is wrapped.',
     rule: WRAP_RULE,
     why: 'The cloth made no heat. It slowed the rotis\' warmth getting out into the room. A wrapping slows heat moving both ways: into cold ice, and out of hot rotis.',
-    ring: [14, 86, 312, 148],
+    ring: [14, 78, 312, 156],
   },
   'thin-thick': {
     place: 'counter', temp: 25, vessel: 'bowl', left: 'hanky', right: 'thick', after: '2 hours later',
@@ -447,6 +453,7 @@ function Thermometer({ t }: { readonly t: number }) {
         {reading}
       </text>
       <rect x="380" y="44" width="14" height="200" rx="7" fill="#ffffff" stroke={INK} strokeWidth="2.5" />
+      <rect x="381.5" y={y(0)} width="11" height={243 - y(0)} fill="#cfe6f7" />
       <rect x="383.5" y={y(t)} width="7" height={246 - y(t)} fill={MERCURY} />
       <circle cx="387" cy="250" r="12" fill={MERCURY} stroke={INK} strokeWidth="2.5" />
       {[40, 20, -20].map((v) => (
@@ -461,6 +468,8 @@ function Thermometer({ t }: { readonly t: number }) {
       <text x="356" y={y(0) - 6} textAnchor="middle" fontSize="15" fontWeight="700" fill={INK}>
         0
       </text>
+      <Drop x={352} y={136} r={5} />
+      <rect x="345" y="184" width="15" height="15" rx="3" fill={ICE} stroke={ICE_EDGE} strokeWidth="2" />
     </g>
   );
 }
@@ -581,14 +590,23 @@ function Drop({ x, y, r = 4 }: { readonly x: number; readonly y: number; readonl
   return <path d={`M${x} ${y - r * 1.7} Q${x + r} ${y - r * 0.2} ${x} ${y + r} Q${x - r} ${y - r * 0.2} ${x} ${y - r * 1.7} Z`} fill={WATER} stroke={WATER_D} strokeWidth="1.5" />;
 }
 
-/** A screw-top glass jar. Closed, the water level stays; the vapour meets the lid and makes drops. */
-function Jar({ drops }: { readonly drops: boolean }) {
+/**
+ * A screw-top glass jar. Closed, the water level stays; the vapour meets the lid and makes drops.
+ * Empty (only ever a guess): a dashed line where the water was.
+ */
+function Jar({ drops, empty }: { readonly drops: boolean; readonly empty?: boolean }) {
   const x = ONE;
   return (
     <g>
       <rect x={x - 40} y="118" width="80" height={FLOOR - 118} rx="12" fill="#eef6fb" />
-      <path d={`M${x - 37} 172 H${x + 37} V${FLOOR - 10} Q${x + 37} ${FLOOR - 3} ${x + 30} ${FLOOR - 3} H${x - 30} Q${x - 37} ${FLOOR - 3} ${x - 37} ${FLOOR - 10} Z`} fill={WATER} />
-      <line x1={x - 37} y1="172" x2={x + 37} y2="172" stroke={WATER_D} strokeWidth="2.5" />
+      {empty ? (
+        <line x1={x - 37} y1="172" x2={x + 37} y2="172" stroke={SOFT} strokeWidth="2.5" strokeDasharray="6 4" />
+      ) : (
+        <g>
+          <path d={`M${x - 37} 172 H${x + 37} V${FLOOR - 10} Q${x + 37} ${FLOOR - 3} ${x + 30} ${FLOOR - 3} H${x - 30} Q${x - 37} ${FLOOR - 3} ${x - 37} ${FLOOR - 10} Z`} fill={WATER} />
+          <line x1={x - 37} y1="172" x2={x + 37} y2="172" stroke={WATER_D} strokeWidth="2.5" />
+        </g>
+      )}
       {drops ? [-28, -16, -4, 8, 20, 30].map((d, i) => <Drop key={d} x={x + d} y={128 + (i % 2) * 5} r={3.2} />) : null}
       {drops ? [[-33, 146], [32, 152], [-30, 160]].map(([d, y]) => <Drop key={y} x={x + d} y={y} r={2.6} />) : null}
       <rect x={x - 40} y="118" width="80" height={FLOOR - 118} rx="12" fill="none" stroke="#4f7286" strokeWidth="3.5" />
@@ -623,6 +641,18 @@ function Puddle({ wet }: { readonly wet: boolean }) {
   return wet ? <path d={d} fill={WATER} stroke={WATER_D} strokeWidth="2.5" /> : <path d={d} fill="none" stroke="#5a3a22" strokeWidth="2.5" strokeDasharray="7 5" />;
 }
 
+/** The steamer lid, dome up. Wet: drops of radius r hang under its rim. */
+function Lid({ wet, r = 3.4 }: { readonly wet: boolean; readonly r?: number }) {
+  const x = ONE;
+  return (
+    <g>
+      <path d={`M${x - 66} 142 Q${x} 112 ${x + 66} 142 Z`} fill={STEEL} stroke={INK} strokeWidth="3" />
+      <rect x={x - 10} y="114" width="20" height="10" rx="4" fill="#3a3a3a" stroke={INK} strokeWidth="2" />
+      {wet ? [-50, -34, -18, -2, 14, 30, 46].map((d, i) => <Drop key={d} x={x + d} y={142 + r * 1.2 + (i % 2) * r} r={r} />) : null}
+    </g>
+  );
+}
+
 /**
  * The idli steamer on the burner. Closed: only the outside shows. Opened: the
  * lid is held up, drops hang under it, and a white cloud of tiny drops sits
@@ -654,9 +684,7 @@ function Steamer({ open }: { readonly open: boolean }) {
         </g>
       ) : null}
       <g transform={`translate(0 ${open ? -60 : 0})`}>
-        <path d={`M${x - 66} 142 Q${x} 112 ${x + 66} 142 Z`} fill={STEEL} stroke={INK} strokeWidth="3" />
-        <rect x={x - 10} y="114" width="20" height="10" rx="4" fill="#3a3a3a" stroke={INK} strokeWidth="2" />
-        {open ? [-50, -34, -18, -2, 14, 30, 46].map((d, i) => <Drop key={d} x={x + d} y={146 + (i % 2) * 4} r={3.4} />) : null}
+        <Lid wet={open} />
       </g>
       {open ? (
         <g>
@@ -759,14 +787,26 @@ function OpenedCloth({ cx, wrap }: { readonly cx: number; readonly wrap: Exclude
   );
 }
 
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-
-function CountTag({ cx, text }: { readonly cx: number; readonly text: string }) {
+/**
+ * The ice in a bowl counted out as cubes under it, one drawn cube per cube:
+ * a melted cube leaves a dashed outline where it was. The digit repeats the
+ * count for a grown-up; the cubes are the amount.
+ */
+function CubeCount({ cx, n, of }: { readonly cx: number; readonly n: number; readonly of: number }) {
+  const s = 20;
+  const x0 = cx - 64;
   return (
     <g>
-      <rect x={cx - 72} y="244" width="144" height="28" rx="8" fill="#ffffff" stroke={INK} strokeWidth="2" />
-      <text x={cx} y="263" textAnchor="middle" fontSize="15" fontWeight="700" fill={INK}>
-        {text}
+      <rect x={cx - 72} y="244" width="144" height="30" rx="8" fill="#ffffff" stroke={INK} strokeWidth="2" />
+      {Array.from({ length: of }, (_, i) =>
+        i < n ? (
+          <Cube key={i} x={x0 + i * (s + 7)} y={249} s={s} />
+        ) : (
+          <rect key={i} x={x0 + i * (s + 7)} y={249} width={s} height={s} rx="3" fill="none" stroke={SOFT} strokeWidth="2" strokeDasharray="4 3" />
+        ),
+      )}
+      <text x={cx + 54} y="266" textAnchor="middle" fontSize="18" fontWeight="700" fill={INK}>
+        {n}
       </text>
     </g>
   );
@@ -806,30 +846,45 @@ function RotiCloth({ cx }: { readonly cx: number }) {
   );
 }
 
-/** A food-thermometer reading pushed into a roti stack. */
-function Probe({ cx, deg }: { readonly cx: number; readonly deg: number }) {
-  const hot = deg >= 45;
+/**
+ * A food thermometer pushed into a roti stack. The red column is how hot, on
+ * one scale for both stacks, so the warmer stack is the taller column; the
+ * number in the box beside it says the same. `plain` drops the number.
+ */
+function Probe({ cx, deg, plain }: { readonly cx: number; readonly deg: number; readonly plain?: boolean }) {
+  const top = 186 - deg * 1.3;
   return (
     <g>
-      <line x1={cx} y1="128" x2={cx} y2={FLOOR - 26} stroke="#6b6f76" strokeWidth="4" strokeLinecap="round" />
-      <rect x={cx - 34} y="96" width="68" height="34" rx="10" fill="#ffffff" stroke={hot ? MERCURY : ICE_EDGE} strokeWidth="3" />
-      <text x={cx} y="120" textAnchor="middle" fontSize="20" fontWeight="700" fill={INK}>
-        {`${deg}°`}
-      </text>
+      <rect x={cx - 7} y="86" width="14" height="110" rx="7" fill="#ffffff" stroke={INK} strokeWidth="2.5" />
+      <rect x={cx - 3.5} y={top} width="7" height={196 - top} fill={MERCURY} />
+      <circle cx={cx} cy="198" r="9" fill={MERCURY} stroke={INK} strokeWidth="2.5" />
+      {plain ? null : (
+        <g>
+          <rect x={cx + 12} y="86" width="56" height="30" rx="8" fill="#ffffff" stroke={deg >= 45 ? MERCURY : ICE_EDGE} strokeWidth="3" />
+          <text x={cx + 40} y="108" textAnchor="middle" fontSize="19" fontWeight="700" fill={INK}>
+            {`${deg}°`}
+          </text>
+        </g>
+      )}
     </g>
   );
 }
 
-function PairSide({ s, side, phase }: { readonly s: WrapSpec; readonly side: 'left' | 'right'; readonly phase: 'before' | 'after' }) {
+/**
+ * One side of the pair. `guess` replaces the spec's after amount (cubes left,
+ * or degrees) when an answer picture draws what the child predicts; a guessed
+ * temperature is shown only as the height of the red column.
+ */
+function PairSide({ s, side, phase, guess }: { readonly s: WrapSpec; readonly side: 'left' | 'right'; readonly phase: 'before' | 'after'; readonly guess?: number }) {
   const cx = PAIR[side === 'left' ? 0 : 1];
   const wrap = side === 'left' ? s.left : s.right;
-  const n = phase === 'before' ? s.startAmount : side === 'left' ? s.leftAfter : s.rightAfter;
+  const n = guess ?? (phase === 'before' ? s.startAmount : side === 'left' ? s.leftAfter : s.rightAfter);
   if (s.vessel === 'roti') {
     return (
       <g>
         <Rotis cx={cx} />
         {wrap !== 'none' ? <RotiCloth cx={cx} /> : null}
-        <Probe cx={cx} deg={n} />
+        <Probe cx={cx} deg={n} plain={guess !== undefined} />
       </g>
     );
   }
@@ -848,38 +903,43 @@ function PairSide({ s, side, phase }: { readonly s: WrapSpec; readonly side: 'le
           </g>
         </g>
       )}
-      <CountTag
-        cx={cx}
-        text={before ? (wrap !== 'none' ? '4 cubes inside' : '4 cubes') : n === 0 ? 'No ice left' : plural(n, 'cube left', 'cubes left')}
-      />
+      <CubeCount cx={cx} n={n} of={s.startAmount} />
     </g>
   );
 }
 
 /* ------------------------------------------------------------ the scene -- */
 
-/** One thing in one place, before or after. The state drawn is the spec's start or its result. */
-function Single({ s, phase }: { readonly s: StateSpec; readonly phase: 'before' | 'after' }) {
-  const state = phase === 'before' ? s.start : s.result;
+/**
+ * One thing in one state. `after` opens the steamer and lets drops form under
+ * the jar lid. The board draws the spec's start or result; an answer picture
+ * draws the state that answer predicts.
+ */
+function Thing({ vessel, state, after }: { readonly vessel: Vessel; readonly state: State; readonly after: boolean }) {
   const wet = state === 'water';
-  switch (s.vessel) {
+  switch (vessel) {
     case 'bowl':
       return state === 'ice' ? <GlassBowl cx={ONE} cubes={4} depth={0} /> : <GlassBowl cx={ONE} cubes={0} depth={32} />;
     case 'cup':
       return <Cup state={state} />;
     case 'jar':
-      return <Jar drops={phase === 'after'} />;
+      return <Jar drops={after && wet} empty={!wet} />;
     case 'plate':
       return <Plate wet={wet} />;
     case 'puddle':
       return <Puddle wet={wet} />;
     case 'steamer':
-      return <Steamer open={phase === 'after'} />;
+      return <Steamer open={after} />;
     case 'tumbler':
       return <Tumbler wet={wet} />;
     case 'line':
       return <Dupatta wet={wet} />;
   }
+}
+
+/** One thing in one place, before or after. */
+function Single({ s, phase }: { readonly s: StateSpec; readonly phase: 'before' | 'after' }) {
+  return <Thing vessel={s.vessel} state={phase === 'before' ? s.start : s.result} after={phase === 'after'} />;
 }
 
 /**
@@ -908,63 +968,155 @@ function Scene({ round, phase, help }: { readonly round: Round; readonly phase: 
   );
 }
 
+/* ------------------------------------------------------ answer pictures -- */
+
+type Box = readonly [number, number, number, number];
+
+/** The crop of the 420 x 280 scene round each single thing, as x, y, width, height. */
+const CROP: Record<Exclude<Vessel, 'steamer'>, Box> = {
+  bowl: [95, 136, 140, 92],
+  cup: [113, 126, 104, 102],
+  jar: [113, 96, 104, 132],
+  plate: [71, 150, 188, 86],
+  puddle: [58, 196, 214, 80],
+  tumbler: [113, 104, 104, 124],
+  line: [72, 54, 188, 206],
+};
+const LID_CROP: Box = [90, 68, 150, 82];
+const ROTI_CROP: Box = [24, 80, 290, 150];
+const MINI: Box = [0, 0, 120, 70];
+
+/** The steamer as Mummy lifts the lid: the pot's top, the lid held over it, wet or dry underneath. */
+function LiftedLid({ wet }: { readonly wet: boolean }) {
+  return (
+    <g transform="translate(0 -10)">
+      <rect x={ONE - 62} y="140" width="124" height="64" rx="8" fill={STEEL} stroke={INK} strokeWidth="3" />
+      <g transform="translate(0 -28)">
+        <Lid wet={wet} r={5} />
+      </g>
+    </g>
+  );
+}
+
 /**
- * A picture on every choice, so a child who cannot read the label can still
- * choose: a cube is ice, a blue drop is water there, a dashed drop is no water
- * left, a small wrapped or bare bowl (or roti stack) is that side, = is "both
- * the same". The choices sit left, right, same, in the order of the board.
+ * Two small glass bowls after the wait, the wrapped one standing on its
+ * opened cloth as in the after picture. The bowl the answer says keeps more
+ * holds more cubes and less meltwater; "same" is equal bowls. In the freezer
+ * the picture of keeping all the ice is four hard cubes and no water.
  */
-function ChoiceIcon({ round, value }: { readonly round: Round; readonly value: Exclude<Answer, null> }) {
-  const drop = 'M20 5 Q31 20 29 26 Q27 35 20 35 Q13 35 11 26 Q9 20 20 5 Z';
+function IcePair({ s, value }: { readonly s: WrapSpec; readonly value: Side }) {
+  const floor = 64;
+  const cold = s.temp !== null && s.temp < 0;
+  return (
+    <g>
+      <rect x="0" y="0" width="120" height="70" fill={cold ? '#d4e8f6' : '#fffaf0'} />
+      <line x1="0" y1={floor} x2="120" y2={floor} stroke={INK} strokeWidth="2" />
+      {(['left', 'right'] as const).map((side, i) => {
+        const cx = 30 + i * 60;
+        const wrap = side === 'left' ? s.left : s.right;
+        const keeps = value === 'same' || value === side;
+        const n = cold ? (keeps ? 4 : 2) : value === 'same' ? 2 : keeps ? 3 : 1;
+        const lift = wrap === 'none' ? 0 : Math.max(3, Math.round(CLOTH[wrap].t * 0.4));
+        const base = floor - lift;
+        const c = 10;
+        const yw = n === 4 ? base : base - 2 - (6 + (4 - n) * 5);
+        const hw = 15 + ((base - yw) * 9) / 36;
+        const row = n * c + (n - 1) * 2;
+        const at: ReadonlyArray<readonly [number, number]> =
+          n === 4
+            ? [[cx - 11, base - 1.5 - c], [cx + 1, base - 1.5 - c], [cx - 13, base - 2 * c - 2.5], [cx + 3, base - 2 * c - 2.5]]
+            : Array.from({ length: n }, (_, j) => [cx - row / 2 + j * (c + 2), yw - 1.5] as const);
+        return (
+          <g key={side}>
+            {wrap === 'none' ? null : <rect x={cx - 28} y={base} width="56" height={lift} fill={CLOTH[wrap].fill} stroke={INK} strokeWidth="1.5" />}
+            {n === 4 ? null : <path d={`M${cx - hw} ${yw} H${cx + hw} L${cx + 15} ${base - 1.5} H${cx - 15} Z`} fill={WATER} />}
+            {at.map(([x, y], j) => (
+              <rect key={j} x={x} y={y} width={c} height={c} rx={n < 4 ? 3 : 1.5} fill={ICE} stroke={ICE_EDGE} strokeWidth="1.8" />
+            ))}
+            <path d={`M${cx - 25} ${base - 36} L${cx - 16} ${base} H${cx + 16} L${cx + 25} ${base - 36}`} fill="none" stroke="#4f7286" strokeWidth="2.5" strokeLinejoin="round" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+const PIC: CSSProperties = { display: 'block', background: '#fffaf0', borderRadius: 6, border: '2px solid #d8cbb5' };
+
+/**
+ * An answer drawn as the outcome it predicts, with the board's own pieces in
+ * the board's own place: the bowl of water, the dry tiles, the lid with drops
+ * under it, the warmer roti stack's taller red column. `fit` is the largest
+ * width and height it may take.
+ */
+function OutcomePic({ round, value, fit }: { readonly round: Round; readonly value: Exclude<Answer, null>; readonly fit: readonly [number, number] }) {
+  let vb: Box;
   let body: ReactElement;
-  if (value === 'ice') {
+  if (round.kind === 'state') {
+    const s = STATE[round.scene];
+    vb = s.vessel === 'steamer' ? LID_CROP : CROP[s.vessel];
     body = (
       <g>
-        <rect x="8" y="8" width="24" height="24" rx="4" fill={ICE} stroke={ICE_EDGE} strokeWidth="2.5" />
-        <line x1="13" y1="14" x2="21" y2="14" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-      </g>
-    );
-  } else if (value === 'water') {
-    body = <path d={drop} fill={WATER} stroke={WATER_D} strokeWidth="2.5" />;
-  } else if (value === 'dry') {
-    body = <path d={drop} fill="none" stroke={SOFT} strokeWidth="2.5" strokeDasharray="4 3" />;
-  } else if (value === 'same') {
-    body = (
-      <g fill={INK}>
-        <rect x="8" y="12" width="24" height="5" rx="2" />
-        <rect x="8" y="23" width="24" height="5" rx="2" />
+        <Backdrop place={s.place} />
+        {s.vessel === 'steamer' ? <LiftedLid wet={value === 'water'} /> : <Thing vessel={s.vessel} state={value as State} after={false} />}
       </g>
     );
   } else {
-    const s = round.kind === 'wrap' ? WRAP[round.scene] : null;
-    const wrap = s ? (value === 'left' ? s.left : s.right) : 'none';
-    if (s?.vessel === 'roti') {
-      body =
-        wrap === 'none' ? (
-          <g fill="#e9c27a" stroke="#8a5a2b" strokeWidth="2">
-            {[30, 24, 18].map((y) => (
-              <ellipse key={y} cx="20" cy={y} rx="15" ry="5" />
-            ))}
-          </g>
-        ) : (
-          <path d="M4 34 Q4 10 20 10 Q36 10 36 34 Z" fill={CLOTH[wrap].fill} stroke={INK} strokeWidth="2.5" />
-        );
+    const s = WRAP[round.scene];
+    if (s.vessel === 'roti') {
+      const deg = (side: 'left' | 'right') => (value === 'same' ? 48 : value === side ? 60 : 35);
+      vb = ROTI_CROP;
+      body = (
+        <g>
+          <Backdrop place={s.place} />
+          <PairSide s={s} side="left" phase="after" guess={deg('left')} />
+          <PairSide s={s} side="right" phase="after" guess={deg('right')} />
+        </g>
+      );
     } else {
-      body =
-        wrap === 'none' ? (
-          <g>
-            <path d="M8 22 H32 L29 33 H11 Z" fill={WATER} opacity="0.8" />
-            <path d="M5 13 L11 33 H29 L35 13" fill="none" stroke="#4f7286" strokeWidth="2.5" strokeLinejoin="round" />
-          </g>
-        ) : (
-          <path d="M11 34 L4 16 Q6 6 20 6 Q34 6 36 16 L29 34 Z" fill={CLOTH[wrap].fill} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
-        );
+      vb = MINI;
+      body = <IcePair s={s} value={value as Side} />;
     }
   }
+  const k = Math.min(fit[0] / vb[2], fit[1] / vb[3]);
   return (
-    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+    <svg width={Math.round(vb[2] * k)} height={Math.round(vb[3] * k)} viewBox={vb.join(' ')} style={PIC} aria-hidden="true">
       {body}
     </svg>
+  );
+}
+
+const FACE: CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s1)' };
+const WORD: CSSProperties = { fontSize: 'var(--t-xs)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 };
+
+/** An answer button's face: the outcome picture first, its word small underneath. */
+function Face({ round, value, word }: { readonly round: Round; readonly value: Exclude<Answer, null>; readonly word: string }) {
+  return (
+    <span style={FACE}>
+      <OutcomePic round={round} value={value} fit={[112, 96]} />
+      <span style={WORD}>{word}</span>
+    </span>
+  );
+}
+
+const GUESS: CSSProperties = { display: 'grid', placeItems: 'center', width: 168, height: 140, fontSize: 'var(--t-xxl)', color: 'var(--ink-soft)' };
+
+/**
+ * Under the scene, an arrow down to the guess: empty until an answer is
+ * tapped, then the same picture as that answer, bigger, so the tap shows on
+ * the board at once.
+ */
+function GuessSlot({ round, answer }: { readonly round: Round; readonly answer: Answer }) {
+  const word = answer === null ? null : options(round).find(([v]) => v === answer)?.[1];
+  return (
+    <div className="board-row">
+      <svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true">
+        <path d="M14 3 V32 M5 23 L14 34 L23 23" fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <Slot ariaLabel={word ? `Your guess: ${word}` : 'Your guess: tap a picture below'} filled={answer !== null}>
+        <span style={GUESS}>{answer === null ? '?' : <OutcomePic round={round} value={answer} fit={[164, 136]} />}</span>
+      </Slot>
+    </div>
   );
 }
 
@@ -995,6 +1147,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       ) : (
         <Scene round={round} phase="before" help={help} />
       )}
+      {worked ? null : <GuessSlot round={round} answer={answer} />}
       <div className="choices" role="group" aria-label="Your guess">
         {options(round).map(([value, label]) => (
           <Choice
@@ -1002,10 +1155,10 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             selected={answer === value}
             onTap={() => setAnswer(value)}
             disabled={locked}
+            ariaLabel={label}
             mark={worked && value === round.result ? 'right' : null}
           >
-            <ChoiceIcon round={round} value={value} />
-            {label}
+            <Face round={round} value={value} word={label} />
           </Choice>
         ))}
       </div>
