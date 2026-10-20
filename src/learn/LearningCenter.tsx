@@ -14,7 +14,7 @@ import { Home, LibraryPage, MakeHub, MathsHub, ScienceHub, ShelfPage, Stories, S
 import { ActivityPage } from './ActivityPage';
 import { Page } from './Page';
 import { Reader } from '../components/Reader';
-import { LIBRARY_NOTE } from './library';
+import { LIBRARY_NOTE, archiveEntry, archiveLabel } from './library';
 
 /**
  * Rikki's Learning Center: the whole app is a function of the hash.
@@ -157,7 +157,8 @@ function render(route: Route, go: (r: Route) => void) {
               window.location.hash = back.href;
             }}
             onComplete={(slug) => markRead(`read/${slug}`)}
-            note={LIBRARY_NOTE}
+            note={archiveEntry(story.slug)?.note ?? LIBRARY_NOTE}
+            kindLabel={archiveLabel(story.slug)}
           />
         </div>
       );

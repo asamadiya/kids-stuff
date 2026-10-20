@@ -32,6 +32,8 @@ export interface ReaderProps {
   readonly announce?: (message: string) => void;
   /** The grown-up note for this read-aloud; renders the same top-right button as every other screen. */
   readonly note?: GrownUpNote;
+  /** What kind of read-aloud this is ("True story", "Old tale", ...), shown over the title. */
+  readonly kindLabel?: string;
 }
 
 const noop = () => {};
@@ -77,6 +79,7 @@ export function Reader({
   onComplete = noop,
   announce = noop,
   note,
+  kindLabel,
 }: ReaderProps) {
   const pageCount = story.pages.length;
   const current = Math.min(Math.max(0, Math.trunc(page)), pageCount);
@@ -225,9 +228,10 @@ export function Reader({
             <div className="reader__panel">
               <div className="reader__head">
                 <h1 id="reader-story-title" className="reader__title">
+                  {kindLabel ? <span className="reader__kind">{kindLabel}</span> : null}
                   {story.title}
                 </h1>
-                {note ? <GrownUps note={{ ...note, what: `${story.subtitle} ${note.what}` }} title={story.title} /> : null}
+                {note ? <GrownUps note={note} title={story.title} /> : null}
               </div>
               <p className="reader__text">{story.pages[current].text}</p>
               {story.pages[current].cue ? (

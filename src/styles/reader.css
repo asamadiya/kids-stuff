@@ -407,3 +407,5 @@
   font-size: var(--step--1);
   line-height: 1.5;
 }
+
+.reader__kind { display: block; font-family: var(--font-ui, system-ui); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.75; margin-bottom: 4px; }

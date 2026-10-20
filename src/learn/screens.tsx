@@ -7,7 +7,7 @@ import { BOOKS, SHELVES, booksOn, getShelf } from '../books/registry';
 import { artSrc } from '../books/BookReader';
 import type { ShelfId } from '../books/types';
 import { SITUATIONS } from './situations';
-import { ARCHIVE, CURATED_ARCHIVE, LIBRARY_NOTE, SUBJECTS, archiveStory, storiesIn } from './library';
+import { ARCHIVE, CURATED_ARCHIVE, LIBRARY_NOTE, SUBJECTS, archiveLabel, archiveStory, storiesIn } from './library';
 import { MATHS_GAMES, MATHS_GROUPS } from '../maths/registry';
 import { SCIENCE_GAMES, SCIENCE_GROUPS } from '../science/registry';
 import { ACTIVITIES } from '../make/activities';
@@ -87,7 +87,7 @@ const SHELF_ART: Record<string, string> = {
 export function Stories({ page }: { readonly page: number }) {
   const shelves: ReadonlyArray<{ id: string; title: string; line: string; href: string }> = [
     ...SHELVES.map((s) => ({ id: s.id, title: s.title, line: s.line, href: `#/stories/${s.id}` })),
-    { id: 'library', title: 'The Big Library', line: `${ARCHIVE.length} longer true read-alouds, by subject.`, href: '#/library' },
+    { id: 'library', title: 'The Big Library', line: `${ARCHIVE.length} longer read-alouds, by subject.`, href: '#/library' },
   ];
   const shown = page === 2 ? shelves.slice(4) : shelves.slice(0, 4);
   return (
@@ -187,7 +187,7 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
                 hook={st!.subtitle}
                 art={`${BASE}art/${st!.slug}/cover-560.webp`}
                 tone="stories"
-                tag="Longer read-aloud"
+                tag={archiveLabel(st.slug)}
                 tick={read(`read/${st!.slug}`) ? 'Read before' : null}
               />
             ))}
@@ -200,7 +200,7 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
 
 export function LibraryPage() {
   return (
-    <Page title="The Big Library" back={{ href: '#/stories', label: 'Stories' }} note={LIBRARY_NOTE} band="stories" expect="Longer true stories to read aloud, one or two a night.">
+    <Page title="The Big Library" back={{ href: '#/stories', label: 'Stories' }} note={LIBRARY_NOTE} band="stories" expect="Longer read-alouds, one or two a night.">
       <FourUp
         label="Subjects"
         items={SUBJECTS.map((s) => {
@@ -236,7 +236,7 @@ export function SubjectPage({ subject }: { readonly subject: string }) {
             hook={st.subtitle}
             art={`${BASE}art/${st.slug}/cover-560.webp`}
             tone="stories"
-            tag="Longer read-aloud"
+            tag={archiveLabel(st.slug)}
             tick={read(`read/${st.slug}`) ? 'Read before' : null}
           />
         ))}

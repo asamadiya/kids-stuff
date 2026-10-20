@@ -1,9 +1,11 @@
 import type { GrownUpNote } from '../notes/types';
 import type { Story, StoryDomain } from '../types';
 import { STORIES } from '../stories';
+import { ARCHIVE_ENTRIES, ARCHIVE_KIND_LABEL } from './archive-notes';
+import type { ArchiveEntry } from './archive-notes';
 
 /**
- * The Big Library: the 195 real-history read-alouds, organised by subject.
+ * The Big Library: the older long read-alouds, organised by subject.
  *
  * Advisor ruling (RULINGS-3): keep them, label them "Longer read-aloud", and
  * organise the archive by subject before showing titles — the old shelf put
@@ -34,7 +36,27 @@ const DOMAIN_TO_SUBJECT = new Map<StoryDomain, string>(
   SUBJECTS.flatMap((s) => s.domains.map((d) => [d, s.id] as const)),
 );
 
-export const ARCHIVE: readonly Story[] = STORIES.filter((s) => s.collection === 'historical');
+/**
+ * Every historical read-aloud the child may be offered. A story with a
+ * `withhold` reason in its archive entry stays in the repo but is not
+ * offered: the final review found one that shows fish harvested as food,
+ * which this family does not eat, and that history cannot honestly be
+ * repainted.
+ */
+export const ARCHIVE: readonly Story[] = STORIES.filter(
+  (s) => s.collection === 'historical' && !ARCHIVE_ENTRIES[s.slug]?.withhold,
+);
+
+/** This story's kind and grown-ups note. Every offered slug has one (library.test). */
+export function archiveEntry(slug: string): ArchiveEntry | undefined {
+  return ARCHIVE_ENTRIES[slug];
+}
+
+/** The plain label for a card or reader: "True story", "Old tale", ... */
+export function archiveLabel(slug: string): string {
+  const e = ARCHIVE_ENTRIES[slug];
+  return e ? ARCHIVE_KIND_LABEL[e.kind] : 'Longer read-aloud';
+}
 
 export function archiveStory(slug: string): Story | undefined {
   return ARCHIVE.find((s) => s.slug === slug);
@@ -76,7 +98,7 @@ export const CURATED_ARCHIVE: readonly string[] = [
 ];
 
 export const LIBRARY_NOTE: GrownUpNote = {
-  what: 'The original collection: 195 true stories about people who worked something out — who measured, counted, built or navigated — from every part of the world.',
+  what: 'The original collection of longer read-alouds about people who worked something out — who measured, counted, built or navigated — from every part of the world. Each card says what kind it is: a true story, a real idea in an imagined scene, or an old tale.',
   expect: 'These are longer than the picture books, 6 to 16 pages with more words a page. Most five-year-olds need them read aloud and will listen best to one or two a night.',
   practising: 'Listening to longer explanations; the idea that real people found things out by watching, measuring and testing.',
   ask: '"What problem was this person trying to solve?"',
