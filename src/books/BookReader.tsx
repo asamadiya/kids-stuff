@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { Book, BookPage } from './types';
 import { GrownUps } from '../learn/GrownUps';
 import { StoryFigure } from '../components/StoryFigure';
+import '../styles/lc/book-figure.css';
 
 /**
  * The picture-book reader: words set inside the picture.

@@ -1,0 +1,8 @@
+/*
+ * A diagram page in a picture book (BookPage.figureId): the drawn figure sits
+ * in the art's place and leaves the words zone clear, with its caption small
+ * under it. Kept apart from book.css so the spread rules stay about art.
+ */
+.spread__figure .story-figure { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; }
+.spread__figure .story-figure__svg { display: block; width: 100%; max-height: 58%; }
+.spread__figure .story-figure__caption { font-family: var(--font-ui); font-size: clamp(0.8rem, 1.6cqi, 1rem); color: var(--ink-soft); margin: 0; text-align: center; }

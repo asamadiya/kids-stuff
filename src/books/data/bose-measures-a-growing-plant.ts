@@ -75,7 +75,8 @@ export const book: Book = {
     },
     {
       text: 'As the plant grew, the point crept down, so each dot landed lower. The gap between two dots showed how much it grew. Cooling a plant made the gaps shrink. Warming it made them widen.',
-      zone: 'left',
+      zone: 'bottom',
+      figureId: 'bose-three-traces',
       art: 'Close view over Bose’s right shoulder, which fills the lower right foreground: he holds a smoke-black glass plate up toward the tall window in both hands, studying three columns of tiny pale dots side by side on it, each running down from the top: in the first column the dots sit a medium distance apart, in the second they sit close together, in the third they sit far apart. His eyebrows are raised with interest. The left third is the bright, plain window glass behind the plate, calm and empty.',
       alt: 'Bose holds a smoked glass plate up to the window and studies three columns of dots: medium, close and wide.',
     },
