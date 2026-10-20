@@ -1,3 +1,230 @@
 import type { ArchiveEntry } from './types';
 
-export const ENTRIES: Readonly<Record<string, ArchiveEntry>> = {};
+export const ENTRIES: Readonly<Record<string, ArchiveEntry>> = {
+  'archimedes-water-screw': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Archimedes winds a strip round a pole, fits it inside a tilted tube and turns a handle until water pours out of the top, and the screw is then shared with farmers. Each turn carries a pocket of water into the next low spot, and each low spot is a little higher than the last.',
+      expect: '12 pages, about 9 minutes. Most five-year-olds will take in “turn it and the water climbs” but not why; page 7, where water falling into a low spot ends up higher, is the hard page and worth reading twice.',
+      practising: 'A screw is a ramp wrapped round a pole: water always settles in the lowest place it can reach, and turning the spiral keeps lifting that lowest place.',
+      ask: 'On page 7: “If water always runs downhill, how did it get to the top of the tube?”',
+      next: 'If you have a metre of clear aquarium tubing, wind it round a plastic bottle, tape it, rest the low end in a bowl of water at a slant and turn the bottle: pockets of water climb and spill out at the top. The straight straw on page 9 only shows water resting low; the wound tube shows the climb.',
+      honest: 'Archimedes and his book On Spirals are real, and ancient writers credit him with the screw, but the Egypt trip rests on a writer more than 150 years later and similar screws may be older, so the invention is disputed; the farmers are imagined. Page 3 calls the wound strip a spiral, but a strip wound round a pole is a helix, and his book is about flat spirals like a coiled rope on the floor, so the step from book to screw is the story’s own.',
+    },
+  },
+  'points-lines-and-bedtime': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Euclid shows a watching child how to build a triangle with three equal sides from one line and two circles drawn with a compass, makes a small slip and mends it, then lets the child try. It is the first construction in Euclid’s Elements.',
+      expect: '12 pages, about 9 minutes. He will enjoy the circles crossing and the triangle appearing; why the sides must be equal (page 6, each side is the width of one circle) is the hard step, and many five-year-olds will simply accept it.',
+      practising: 'Every point on a circle is the same distance from its centre, so two equal circles drawn on the ends of a line meet at a point that makes an equal-sided triangle.',
+      ask: 'On page 6: “How do the two circles promise that all three sides are the same length?”',
+      next: 'Make a string compass: hold one end of a string on a dot and draw round with a pencil tied to the other end, then draw Euclid’s two circles and join the crossing to both ends of the line. Check the three sides against a strip of paper.',
+      honest: 'Euclid, Alexandria around 300 BCE, the Elements and its first proposition are on record, but almost nothing is known of his life, and the child, the wax tablet and the mended slip are imagined. The quick run from triangle to square to six-pointed star on page 9 is a flourish, not the order of the book.',
+    },
+  },
+  'the-beads-that-fly-on-the-frame': {
+    kind: 'reconstructed',
+    note: {
+      what: 'In a Han dynasty market town a grandmother teaches a child to count with bamboo rods laid in columns for ones, tens and hundreds, with an empty column for zero. The idea is place value: the same rod is worth one, ten or a hundred depending on its column.',
+      expect: '13 pages, about 9 minutes; the title promises beads, but the story is about rods, and beads appear only as a later invention on page 12. Thirteen as one ten and three ones will land, and page 5, where an empty column turns eleven into one hundred and one, is the page to lay out with real objects.',
+      practising: 'Place value: a mark’s worth depends on which column it sits in, and an empty column still counts, as zero.',
+      ask: 'On page 5: “If the middle column is empty, why is it one hundred and one and not eleven?”',
+      next: 'Draw three columns on paper and use cotton buds to make 13, then 103, then 130, reading each one aloud. Then play Ten Loose, One Bundle.',
+      honest: 'Counting rods, place-value columns, the empty column for zero, rods alternating upright and sideways, and red and black rods are documented; the grandmother, child and merchant are imagined. Two slips: real rod numerals used one rod laid crosswise to stand for five, so page 7’s column of ten loose rods is simplified, and a number is read from its biggest column, left to right, not right to left as page 10 says.',
+    },
+  },
+  'the-breath-you-can-count': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Under a banyan tree a teacher shows a restless child how to breathe in for a small count and out for the same count, gently, until the body settles. It is pranayama, guiding the breath, reduced to its simplest part.',
+      expect: '12 pages, about 9 minutes, best read slowly as a wind-down. Most five-year-olds can manage two or three counts in and out; expect him to push big breaths at first, which page 6 deals with.',
+      practising: 'Equal counted breathing: the same small number in and out, never forced, as a way to steady the body.',
+      ask: 'On page 6: “Did the big pushed breath feel calm, or tight?”',
+      next: 'At bedtime, lay him down with a soft toy on his tummy and count two in, two out, watching the toy rise and fall. Stop after a few breaths, or as soon as he wants to.',
+      honest: 'Pranayama is real and old, and slow even breathing does calm the heart rate; the teacher and the child under the banyan are imagined. The Yoga Sutras speak of regulating the out-breath, in-breath and pause by place, time and number, while the names puraka, kumbhaka and recaka, and the matra as a beat, come mainly from commentaries and later yoga texts.',
+      safety: 'Do not ask him to hold his breath or to breathe hard and fast; stop if he says he feels dizzy.',
+    },
+  },
+  'the-circles-that-make-their-own-weather': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Sumaq and her grandmother walk down the stepped rings of Moray in Peru, stopping on each ring to feel whether the air is warmer, and checking twice when she loses her place. The idea is that low, walled ground out of the wind holds the sun’s warmth, so each ring has its own small climate.',
+      expect: '12 pages, about 9 minutes. He will follow “down one ring, warmer air” easily; why the bottom is warmer (walls block the wind and stone holds the sun’s heat, page 4) needs saying slowly, and the quipu on page 9 is a side road he may ask about.',
+      practising: 'Fair comparison: change one thing (which ring you stand on), keep the rest the same, and check twice before you believe it.',
+      ask: 'On page 6: “Why did Sumaq go back up and check again instead of guessing?”',
+      next: 'On a sunny afternoon, have him put one hand flat on a sunny wall in a sheltered corner and the other out in an open, breezy spot, then swap hands and check again. Ask which place a plant that hates the cold would like.',
+      honest: 'Moray, its rings and its warmer sheltered floor are real, though the bowls are usually described as natural hollows the Inca terraced rather than dug out by hand (page 2); the often-quoted 15°C gap varies with season, and crop-testing is a likely idea with no record, which page 8 says well. Sumaq and her grandmother are imagined, and page 7 states which crop grew on which ring as fact, although nothing records it.',
+    },
+  },
+  'the-cup-that-kept-a-bubble': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Aristotle pushes an upside-down clay cup straight down into a basin and shows a neighbour’s child the silver pocket of air that stays inside, then tips it to let the bubble out. The idea is that air is something: it takes up space, so water cannot get in while it is trapped.',
+      expect: '12 pages, about 9 minutes. Five-year-olds grasp “straight down keeps the air, a tilt lets it out” quickly, especially with a real cup; that an empty-looking cup is full (page 2) is the surprise to slow down for.',
+      practising: 'Air takes up space: two things cannot fill the same place, so trapped air keeps water out of a cup.',
+      ask: 'On page 6: “Why did the water rush in as soon as the bubble got out?”',
+      next: 'Push a dry tissue into the bottom of a clear glass, turn it upside down and press it straight down into a bowl of water, then lift it straight out and feel the tissue: it is dry. Do it again with a tilt and it gets wet.',
+      honest: 'The observation that a lowered upside-down vessel keeps its air, and that divers let down such a cauldron, is in the Problemata, a collection of about 900 questions credited to Aristotle but largely compiled by his followers, so it is tradition rather than his own record; the courtyard, the child and the wax tablet are imagined. Page 10 is an error: the legend of Alexander in a glass barrel arose centuries after both men died, so Aristotle could not have told it.',
+    },
+  },
+  'the-fast-horse-post': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A young rider, Temur, waits at a station of the Mongol horse-post while a message comes towards him rider by rider, and learns from a dropped tablet that a careful handoff matters more than a fast throw. The idea is a relay: a long journey split into short stretches, each run by a fresh horse and rider.',
+      expect: '12 pages, about 9 minutes. He will get the pattern, one stretch then hand it on, and enjoy the bells on page 4; distances and the size of the empire will mean little at five.',
+      practising: 'A relay: many short fresh runs add up to a distance no one runner could manage, and the handoff is where it can go wrong.',
+      ask: 'On page 7: “Why did throwing the tablet fast make the whole relay slower?”',
+      next: 'Spread the family round the house and pass a spoon as the “paiza” from room to room, first walking it all the way yourself, then as a relay; use the look, wait, let go handoff from page 8.',
+      honest: 'The Yam relay, its stations, the paiza tablets and Marco Polo’s description are documented, and Ogedei organised it in the 1230s; Temur, the station keeper and the dropped tablet are imagined. The Mongols did not invent the idea: horse relays ran in ancient Persia and in China long before them.',
+    },
+  },
+  'the-grass-bridge-over-the-canyon': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Rumi watches four Quechua villages rebuild the Q’eswachaka grass bridge over the Apurímac river, twists her first cord, and sees a cable come loose when one helper pulls alone. The idea is that one grass blade snaps but many twisted together share the pull.',
+      expect: '13 pages, about 9 minutes. The snapping blade on page 3 and the cord that holds on page 4 will land well; the stages from cord to braid to six cables (pages 5 and 6) are a lot to follow, so a picture of rope helps.',
+      practising: 'Many weak fibres twisted the same way share the load and make a strong rope: strength from numbers, not from any one strand.',
+      ask: 'On page 11: “One blade of grass snapped with a tiny tug. How can grass hold a whole family over the river?”',
+      next: 'Pull one strand of wool until it snaps, then twist six strands together the same way and try again; then plait three of those twisted cords. Look at a real rope to find the strands inside it.',
+      honest: 'The bridge, the four communities of Quehue, the June rebuilding, the bridge master, the six main cables and the 2013 UNESCO listing are documented; Rumi, her grandmother and the helper who pulls too soon are imagined. Page 9 has the first line carried across on the old bridge after it has been lowered into the river, which cannot both happen, and “about five hundred years” is an estimate from the bridge’s Inca origins, not a record.',
+    },
+  },
+  'the-knot-rope-corner': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Egyptian rope-stretchers re-mark a field after the Nile flood, pulling a knotted loop into sides of three, four and five equal spaces to make a square corner, and learn to pull evenly after one helper tugs too hard. The idea is that a triangle with sides 3, 4 and 5 always has a square corner.',
+      expect: '12 pages, about 9 minutes. He can count three, four, five and see a corner appear, but why those numbers work is beyond a five-year-old and the story does not try to explain it; a real string makes this land far better than the pages do.',
+      practising: 'A triangle with sides of 3, 4 and 5 equal units always has one square corner (a right angle), so a loop of 12 equal spaces can make one without a set square.',
+      ask: 'On page 4: “Two, two and two did not make a square corner. What was different about three, four and five?”',
+      next: 'Mark a loop of string every 10 centimetres to make 12 equal spaces, have three people hold it at marks 0, 3 and 7 and pull it snug, then check the corner against the corner of a book. Try four, four and four as well.',
+      honest: 'Herodotus does describe Egyptian fields being re-measured after the flood, though the name rope-stretchers comes from Democritus, not from him (page 9), and Babylonian tablets show such number triples were known. No Egyptian source records a 3-4-5 knotted rope: that is a guess first made in the late nineteenth century, so the method shown is imagined, and page 4’s “only three, four and five” overstates it, since 6-8-10 or 5-12-13 also give a square corner.',
+    },
+  },
+  'the-long-necked-giants': {
+    kind: 'documented',
+    note: {
+      what: 'There is no plot: the story describes sauropods such as Brachiosaurus and Diplodocus, then shows how fossil teeth, bones, eggs and footprints tell us what they ate, how big they grew and how they moved. The idea is that each claim about an animal nobody has seen rests on evidence left in rock.',
+      expect: '13 pages, about 9 minutes. Most five-year-olds will hold on to “peg teeth mean plants” and “footprints side by side mean a herd”; 150 million years means nothing at five, so let it stand as “very, very long ago”.',
+      practising: 'Reasoning from evidence: tooth shape tells diet, fossil eggs tell egg-laying, and lines of footprints tell how animals walked together.',
+      ask: 'On page 5: “How can a tooth tell us what an animal ate, when nobody ever watched it eat?”',
+      next: 'In a park, pace out about 25 metres, roughly a Diplodocus from nose to tail, with big steps and count them. Then play How Long Is That Dinosaur?',
+      honest: 'Nothing is invented, but a few claims are stretched: growing to full size took a decade or more by most estimates, not “a few years” (page 3), and the famous Argentine nesting ground is Cretaceous, since sauropods lived on until 66 million years ago, not only in the Jurassic (pages 8 and 11). Some trackway sites show young and adults walking apart, so family herds keeping the young in the middle (page 10) is a guess.',
+    },
+  },
+  'the-nine-little-rooms-of-number': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A market reckoner in ninth-century India rules columns, or “rooms”, in a dust board and shows her helper that a pebble means one, ten or a hundred depending on its room, and that a small circle must mark an empty room. The idea is place value, with zero holding an empty place.',
+      expect: '12 pages, about 9 minutes; “same pebble, different room, different amount” will land with objects in front of him, and page 6, where 103 could be misread as 13, is the key page to build with real things. Brahmagupta and Gwalior are names for you rather than for him.',
+      practising: 'Place value and zero as a placeholder: each room to the left is worth ten times the one before, and 0 keeps an empty room open so 103 is not read as 13.',
+      ask: 'On page 6: “If the tens room is empty and we don’t mark it, how could one hundred and three turn into thirteen?”',
+      next: 'Draw three boxes on paper for hundreds, tens and ones, and use dried chana as pebbles to make 13, 103 and 130, writing a 0 in any empty box. Then play What Is Zero Doing There?',
+      honest: 'Place value with zero grew in India over centuries, and Brahmagupta’s rules for zero (628 CE) and the Gwalior temple zero (876 CE) are documented; the reckoner and her helper are imagined. Indian reckoners mostly wrote figures in dust and rubbed them out, so pebbles slid between ruled columns are a picture of the idea rather than a recorded method.',
+      safety: 'Dried chana are a choking hazard for the two-year-old; count them back into a closed jar.',
+    },
+  },
+  'the-potato-that-froze-and-kept': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Andean families high on the altiplano leave small bitter potatoes out to freeze at night, let them thaw in the sun, tread the water out and repeat until the potatoes are light and dry; this is chuño. The idea is that taking the water out of food lets it keep for years.',
+      expect: '12 pages, about 9 minutes. The rhythm of “cold night, bright day” and the treading on page 5 are easy to follow; why freezing helps the water leave (ice breaks the potato up from inside) is not said outright and is worth adding.',
+      practising: 'Preserving by drying: freezing and thawing breaks up the inside of the potato so its water can be pressed out, and food with little water spoils slowly.',
+      ask: 'On page 10: “Why do dry potatoes keep for years when fresh ones go bad?”',
+      next: 'Put one thin potato slice in the freezer overnight and another in the fridge; next morning let the frozen one thaw, press each in a paper towel and compare the wet patches. Then play Where Did the Ice Go?',
+      honest: 'Chuño and tunta, the freezing, treading and drying, the Andes as the potato’s first home and Inca storehouses holding chuño are all documented; the families and the child keen to pack early are imagined. “No water, no spoiling” (page 10) is too strong, since dry food spoils far more slowly but must still be kept dry, and the Inca stores supplied soldiers and state travellers rather than anyone on the road (page 11).',
+    },
+  },
+  'the-round-felt-house': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A Mongolian grandmother and her grandchild raise a ger: lattice wall, roof poles leaning up to a crown ring, felt cover, and last a rope band wrapped round the wall, which keeps the round shape when the wind blows. The idea is that a round wall held by one snug band stays firm against pushes from any side.',
+      expect: '12 pages, about 9 minutes. The parts are easy to picture, but three Mongolian names (khana, uni, toono) arrive close together; he will see that the band helped on pages 7 and 8 without knowing why, which is fine at five.',
+      practising: 'A band in tension: one snug rope round a round wall holds every part at once, so it cannot spread or fold.',
+      ask: 'On page 7: “Why couldn’t two hands keep the wall round, when one rope could?”',
+      next: 'Fold a long strip of card into a zigzag, stand it in a ring and tape the ends, then press a shallow paper cone (a paper plate cut to the centre and overlapped) down on top and watch the wall spread. Tie wool snugly round the top of the wall and press again.',
+      honest: 'The ger, the names of its parts, the south-facing door, felt pressed from sheep’s wool, moving with the seasons and the 2013 UNESCO listing are documented; a grandmother and small child raising one alone is imagined, as it is usually a job for several adults. The ropes and bands round a real ger also hold the wall against the outward push of the roof poles, which the story leaves out.',
+    },
+  },
+  'the-south-pointing-spoon': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A workshop keeper spins a lodestone spoon on a bronze plate and shows travellers that it settles pointing south every time; later Shen Kuo magnetises a needle, hangs it on silk and sees it points slightly off true south, and sailors take the needle to sea. The idea is that a magnet free to turn lines itself up with the Earth’s own magnetism.',
+      expect: '12 pages, about 9 minutes. The spoon settling the same way each time is the part he can hold; that the whole Earth acts like a magnet is abstract, and pages 7 to 11 jump a thousand years from spoon to needle to Zheng He’s fleet.',
+      practising: 'A magnet that can turn freely settles in the same direction every time, because it lines up with the Earth’s magnetism; checking more than once is how you learn to trust it.',
+      ask: 'On page 5: “Why did the keeper spin the spoon a third and a fourth time?”',
+      next: 'A grown-up strokes a steel sewing needle twenty times in one direction with a strong magnet and lays it on a bottle cap floating in a bowl of water; he nudges it round and watches where it settles each time. Then play Will the Magnet Pick It Up?',
+      honest: 'The south-pointing spoon rests on a short line in Wang Chong’s Lunheng (about 80 CE) whose meaning is disputed, and the familiar spoon on a bronze plate is a twentieth-century reconstruction; the keeper and travellers are imagined. Shen Kuo’s Dream Pool Essays (1088), with its four mountings and the needle pointing slightly off south, are documented, but page 7 makes him the inventor: he recorded rubbing needles on lodestone as something others already did.',
+      safety: 'The grown-up handles the needle. Keep the needle and the magnet out of the two-year-old’s reach, and do not use small neodymium magnets.',
+    },
+  },
+  'the-star-wheel-that-matched-the-sky': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A boy, Nikos, watches Ptolemy in Alexandria match a paper star chart to the night sky by finding one bright star first and turning the chart until its neighbours agree, then marking what he saw. The idea is matching a map to the real thing from one sure landmark.',
+      expect: '12 pages, about 9 minutes. “Find one, then its neighbour” is a method a five-year-old can use on a real night; the two numbers for each star (page 2) and the turning sky (page 8) are hard and can be passed over lightly.',
+      practising: 'Matching a map to the world: fix one known point first, then turn the map until the points around it line up.',
+      ask: 'On page 3: “Why does Ptolemy tell Nikos to find just one star first, and not all of them?”',
+      next: 'On a clear evening, choose one bright star from a window and find its nearest neighbour, noting where the pair sits against a rooftop or tree; look again an hour later from the same spot: the pair has moved, but kept its shape. Then play Who’s in the Sunlight?',
+      honest: 'Ptolemy in Alexandria around 150 CE, the Almagest’s 1,022 stars in 48 constellations and his Earth-centred model are documented, though whether he measured the stars himself or reworked Hipparchus’s older catalogue is long disputed; Nikos, the rooftop and the paper wheel are imagined. Two stretches: his two numbers fix a star against the Sun’s yearly path, not its height above the horizon, which changes all night (page 2), and sailors steered by stars they knew by eye, not by reading his book (page 11).',
+    },
+  },
+  'the-sunstone-that-found-the-sun': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Norse sailors under a grey sky turn a clear crystal slowly and watch two faint glows swap brightness, which hints where the hidden sun is; a young sailor spins it too fast, loses the change, and learns to go slowly. The idea is that a small, slow change is easy to miss if you hurry.',
+      expect: '12 pages, about 9 minutes. He will follow “turn slowly, look softly” and the hurried sailor on page 7; how a crystal reads a hidden pattern in skylight (page 5) is beyond five, and the story only gestures at it.',
+      practising: 'Patient observation of a small change; and the fact that light from the sky carries a pattern, set by where the sun is, which a crystal can show.',
+      ask: 'On page 7: “Why did spinning the stone fast make the change disappear?”',
+      next: 'If you have polarised sunglasses, look through them at clear blue sky well away from the sun and slowly tilt your head to one side; the sky darkens and brightens as you turn, the same hidden pattern the crystal reads.',
+      honest: 'The sunstone is named in Icelandic writings of the 1200s and 1300s, and tests since 2011 show Iceland spar can locate the sun under cloud, but its use at sea is a modern suggestion (the saga shows it used on land), so these sailors are imagined. Two slips: maps are far older than the Vikings, who simply sailed without charts (page 1), and the brightest glow alone does not point at the sun (page 6); the method turns the crystal until the two glows match and reckons the sun’s direction from that angle.',
+      safety: 'Never let him look at the sun, with or without sunglasses or a crystal.',
+    },
+  },
+  'the-three-sisters': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A Haudenosaunee family plants corn, beans and squash in one mound; the corn holds up the bean, the bean feeds the soil, the squash shades it, and on page 8 a bean vine left alone flops until children guide it back. The idea is that three different plants do better together than apart.',
+      expect: '12 pages, about 9 minutes. The three jobs (stand tall, feed the soil, shade the ground) are easy to act out with the cues; helpers on bean roots catching food from the air (page 5) is hard and can stay a mystery for now.',
+      practising: 'Plants working together: each of the three supplies something the others lack, a pole to climb, nitrogen for the soil, or shade that keeps the ground damp.',
+      ask: 'On page 8: “Why did the bean vine flop when it was far away from the corn?”',
+      next: 'Plant three soaked rajma beans in a pot beside a tall stick and keep the soil damp; rajma is the same kind of bean the Haudenosaunee grew, and if a long shoot appears, watch it wind round the stick. Then try the Make & Do activity Does Moong Need the Light to Sprout?',
+      honest: 'Three Sisters planting is a real Haudenosaunee practice, and the three plants’ roles are well supported; the family, the child and the windy day are imagined. The Haudenosaunee also tell of the sisters in a sacred story, which this book leaves out, and the beans’ gift to the soil mostly reaches later crops as the roots rot, as page 11 says, rather than feeding the corn beside them that summer.',
+    },
+  },
+  'the-underground-rivers': {
+    kind: 'reconstructed',
+    note: {
+      what: 'Diggers in old Persia sink a mother well in the foothills and lead its water to a dry town through a gently sloping tunnel, with shafts above for air and cleaning, then mend a bump that stops the flow; the town shares the water by turns. The idea is that water runs a long way on a very gentle slope.',
+      expect: '12 pages, about 9 minutes. The bump on page 7 that stops the water is the clearest page for a five-year-old; the balance on page 4 between too steep and too flat is harder, and pages 9 and 10 move from the tunnel to sharing water fairly.',
+      practising: 'Water flows downhill even on a slope too gentle to see, and any rise in the channel, however small, stops it.',
+      ask: 'On page 7: “The bump was only small. Why did it stop all the water?”',
+      next: 'Fold a long strip of kitchen foil into a channel on a tray, put a thin book under one end and pour a little water in at the top; then press a small hump of dough into the middle and pour again.',
+      honest: 'Qanats, the mother well, the shafts, timed shares of water and the eleven qanats on the UNESCO list are documented, and Persian origin is the usual view; this crew and its repair are imagined, and diggers usually worked uphill from the town end so seeping water drained out behind them. Page 4 misuses “displacement of water”: displacement is water pushed aside by something put into it, as by a boat, while here water simply runs downhill.',
+    },
+  },
+  'the-wheel-that-did-the-work': {
+    kind: 'reconstructed',
+    note: {
+      what: 'A day at an English watermill around 1086: the stream turns the wheel, the shaft and gears turn the millstones, grain trickles in from the hopper and comes out as flour, and a board across the channel stops and starts the wheel. The idea is a chain of parts, each handing its turning to the next.',
+      expect: '12 pages, about 9 minutes. The chain on page 5 (water, paddle, wheel, shaft, gear, stone) is the core and worth tracing with a finger; undershot and overshot wheels (page 4) and the hopper’s shaking shoe (page 7) are detail he can skip.',
+      practising: 'Moving water can do work, and a machine passes that motion along a chain of parts; take the water away and the whole chain stops.',
+      ask: 'On page 8: “The wheel stopped, but the mill was not tired. What changed?”',
+      next: 'Cut six small blades from a yoghurt pot, push them into slits round a cork, run a skewer through the middle as the axle and hold it under a slow tap so the water hits the blades; slide a hand under the tap like the miller’s board and the wheel stops.',
+      honest: 'The Domesday Book (1086) and its count of roughly 6,000 mills, the parts of the mill and Vitruvius’s older geared wheel are documented; the Book does not say what drove the mills, though nearly all are taken to be watermills, and the miller is imagined. Page 1 stretches it: mills were spread unevenly and often several stood on one stream, so “most villages” and “six thousand streams” overstate it, and the far north was not surveyed.',
+      safety: 'A grown-up cuts the slits and handles the skewer.',
+    },
+  },
+  'when-the-moon-hid-the-sun': {
+    kind: 'reconstructed',
+    note: {
+      what: 'After the noon light dims, Anaxagoras uses a lamp, a clay ball and a child’s hand to show Thea that a solar eclipse is the Moon’s shadow crossing the land, and that the Moon shines by reflected sunlight. The idea is that a shadow is a place the light cannot reach, and an eclipse is one such place moving over us.',
+      expect: '12 pages, about 9 minutes. Page 5, where the ball’s shadow glides over the hand without touching it, is the page that makes it click; a five-year-old will not follow why only a narrow strip goes dark (pages 7 and 8).',
+      practising: 'A shadow forms where an object blocks the light; when light, object and surface line up, the shadow falls on the surface and moves as the object moves.',
+      ask: 'On page 5: “The ball never touched her hand. So what made her hand go dark?”',
+      next: 'In a dark room, shine a torch at a wall, hold an orange between them and slide it slowly across while he holds his open hand near the wall. Then play Where Will the Light Go?',
+      honest: 'Anaxagoras’s explanation of solar eclipses, his view that the Moon shines by sunlight and has plains and ravines, and his trial in Athens are reported by later ancient writers; Thea, the eclipse and the clay-ball lesson are imagined. Page 7’s shadow sizes are wrong: with a small lamp a ball near the wall casts a shadow about its own size, not a tiny one, and the Moon’s full shadow is narrow on Earth because the far larger Sun makes it taper almost to a point.',
+      safety: 'Never look at the sun, even during an eclipse, without proper eclipse glasses.',
+    },
+  },
+};
