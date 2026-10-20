@@ -10,8 +10,8 @@
  * social exercises are kept: each marks a line that should have a recorded clip,
  * and when clips exist they plug in here without touching those twelve files.
  */
-export function say(_text: string): void {
-  /* intentionally silent — see above */
+export function say(text: string): void {
+  void text; // intentionally silent — see above
 }
 
 export function stopSaying(): void {
