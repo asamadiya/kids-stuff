@@ -30,6 +30,15 @@ import { Stepper } from '../../play/parts';
  *     number. Mixing the three is what stops "copy the long hand, move the
  *     short hand one" from solving every round. Minutes step in 15s here.
  *
+ * The goal is on the board, not only in the prompt, so a child who cannot read
+ * yet still knows it. Every round draws the place, and beside it the clock to
+ * aim at: a fixed clock in a dashed card, under a door-with-an-arrow icon (we
+ * leave), with a plain rim. Setting, that card is the leaving time and his own
+ * gold-rimmed clock is to be made to match it. Reading, the card is the clock
+ * he reads. Later than now, the leaving time is what he works out, so the card
+ * is the Now clock (a house icon: we are still at home) and his own clock
+ * carries the door icon. Only his clock has the gold rim and the steppers.
+ *
  * Control: the Stepper only. Two steppers, one per hand: the hour stepper moves
  * the clock 60 minutes, the minute stepper 30 (levels 1-2) or 15 (level 3).
  * Both wrap round the face like real hands, so 12 + 1 is 1.
@@ -43,11 +52,14 @@ import { Stepper } from '../../play/parts';
  * Now appears beneath it in the same faces.
  *
  * Hint: what his answer does. Set: his clock gets an orange slice for the hour
- * it is in and a blue sweep for the minutes gone. Read: the same marks on the
+ * it is in and a blue sweep for the minutes gone, and the leaving clock gets
+ * the same marks, so the two compare slice for slice. Read: the same marks on the
  * fixed clock, with his reading drawn as dashed hands over it. Later: the Now
  * hands are drawn dashed on his clock, and both times appear in numbers.
  * The fixed clocks' screen-reader labels give hand positions, never the time,
- * so the label does not read the clock for him.
+ * so the label does not read the clock for him. The one exception is the
+ * leaving clock when he sets: there the time is the question, already in the
+ * prompt, and the hand positions would be the answer.
  * Worked: the target hands, the marks, and the time in numbers and words.
  *
  * Every answer starts at 12:00 and no target is 12:00, so the empty answer is
@@ -234,7 +246,9 @@ function explain(round: Round): string {
 const INK = '#24170F';
 const SOFT = '#5A4636';
 const FACE = '#FFFDF7';
+/** His clock's rim. Fixed clocks get a plain one, so only the clock he turns is gold. */
 const RIM = '#C9962B';
+const FIXED_RIM = '#D8CCB6';
 /** The short hand: hours. Dark enough to be text on the board tint as well. */
 const SHORT = '#B83A0B';
 /** The long hand: minutes. */
@@ -289,16 +303,18 @@ interface ClockProps {
   readonly ghost?: number | null;
   /** Dashed hands over the solid ones (his reading) or under them (where Now was). */
   readonly ghostOnTop?: boolean;
+  /** A clock to look at, not to set: plain rim. */
+  readonly fixed?: boolean;
 }
 
 /** A wall clock with all sixty minute ticks and the twelve hour numerals. */
-function Clock({ cx, cy, r, t, marks = false, ghost = null, ghostOnTop = false }: ClockProps) {
+function Clock({ cx, cy, r, t, marks = false, ghost = null, ghostOnTop = false, fixed = false }: ClockProps) {
   const h = hourOf(t) % 12;
   const m = minuteOf(t);
   const ghostHands = ghost === null ? null : <Hands cx={cx} cy={cy} r={r} t={ghost} dashed />;
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r + 9} fill={RIM} stroke={INK} strokeWidth="4" />
+      <circle cx={cx} cy={cy} r={r + 9} fill={fixed ? FIXED_RIM : RIM} stroke={INK} strokeWidth="4" />
       <circle cx={cx} cy={cy} r={r} fill={FACE} stroke={INK} strokeWidth="3" />
       {marks && m > 0 ? <path d={sector(cx, cy, r * 0.95, 0, m * 6)} fill={SWEEP} opacity="0.26" /> : null}
       {marks ? <path d={sector(cx, cy, r * 0.66, h * 30, h * 30 + 30)} fill={SLICE} opacity="0.42" /> : null}
@@ -527,6 +543,63 @@ function Destination({ place, x, y, s }: { place: Place; x: number; y: number; s
   );
 }
 
+/** Which time a clock stands for: the time we go out of the door, or Now, still at home. */
+type Moment = 'leave' | 'now';
+
+const MOMENT_WORD: Record<Moment, string> = { leave: 'We leave', now: 'Now' };
+/** The word's drawn width at 26px, so icon and word centre as one row. */
+const MOMENT_W: Record<Moment, number> = { leave: 106, now: 50 };
+
+/** A door with an arrow coming out of it (we leave), or a house (Now, at home), in a 44 x 44 box. */
+function MomentIcon({ moment }: { moment: Moment }) {
+  if (moment === 'leave') {
+    return (
+      <g>
+        <rect x="2" y="2" width="26" height="40" rx="2" fill="#7A4A21" stroke={INK} strokeWidth="3" />
+        <circle cx="22" cy="23" r="2.5" fill={RIM} />
+        <line x1="12" y1="22" x2="36" y2="22" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+        <path d="M33 13 L44 22 L33 31 Z" fill={INK} />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <path d="M2 20 L22 3 L42 20 V42 H2 Z" fill="#FBEFD9" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <rect x="16" y="26" width="12" height="16" fill="#7A4A21" stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** Icon and word as one row centred on (cx, cy). */
+function MomentTag({ cx, cy, moment }: { cx: number; cy: number; moment: Moment }) {
+  const x0 = r2(cx - (44 + 10 + MOMENT_W[moment]) / 2);
+  return (
+    <g>
+      <g transform={`translate(${x0} ${cy - 22})`}>
+        <MomentIcon moment={moment} />
+      </g>
+      <text x={x0 + 54} y={cy + 9} fontSize="26" fill={SOFT} style={font}>
+        {MOMENT_WORD[moment]}
+      </text>
+    </g>
+  );
+}
+
+/**
+ * A clock to look at, never to set: a dashed card with its tag on top. Dashed
+ * and plain-rimmed, it reads as a picture, not as the gold clock the steppers
+ * turn.
+ */
+function FixedClock({ x, y, w, h, moment, clock }: { x: number; y: number; w: number; h: number; moment: Moment; clock: Omit<ClockProps, 'fixed'> }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="18" fill="#F7F2E8" stroke={SOFT} strokeWidth="3" strokeDasharray="12 8" />
+      <MomentTag cx={x + w / 2} cy={y + 36} moment={moment} />
+      <Clock {...clock} fixed />
+    </g>
+  );
+}
+
 /* ------------------------------------------------------------- board ---- */
 
 const W = 960;
@@ -580,12 +653,11 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     const his = norm(norm(answer) - now);
     const hisPies = stage === 'hint' && his <= 180;
     // Hand positions, not the time: the label must not read the Now clock for him.
-    label = `Now clock: ${hands(now)}. On the arrow, ${GAP_TURNS[gap]} of the long hand. Your clock says ${spoken(shown)}.`;
+    label = `Now clock, at home: ${hands(now)}. On the arrow, ${GAP_TURNS[gap]} of the long hand. Your We-leave clock says ${spoken(shown)}.`;
     picture = (
       <>
         <Destination place={round.place} x={12} y={70} s={0.8} />
-        <text x="380" y="58" textAnchor="middle" fontSize="30" fill={SOFT} style={font}>Now</text>
-        <Clock cx={380} cy={215} r={125} t={now} />
+        <FixedClock x={256} y={8} w={248} h={335} moment="now" clock={{ cx: 380, cy: 205, r: 105, t: now }} />
         <PieRow cx={570} cy={112} r={22} mins={gap} step={round.step} />
         {gapLines.map((line, i) => (
           <text key={line} x="570" y={160 + i * 20} textAnchor="middle" fontSize="18" fill={SOFT} style={font}>
@@ -600,25 +672,37 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             <text x="570" y="306" textAnchor="middle" fontSize="18" fill={SOFT} style={font}>your clock</text>
           </>
         ) : null}
-        <text x="760" y="58" textAnchor="middle" fontSize="30" fill={SOFT} style={font}>We leave</text>
-        <Clock cx={760} cy={215} r={125} t={shown} marks={evidence} ghost={evidence ? now : null} />
+        <MomentTag cx={790} cy={44} moment="leave" />
+        <Clock cx={790} cy={215} r={130} t={shown} marks={evidence} ghost={evidence ? now : null} />
       </>
     );
   } else if (round.task === 'read') {
     const his = norm(answer);
-    label = `A clock: ${hands(round.target)}.${stage === 'hint' ? ` Dashed hands show your ${digital(his)}.` : ''}`;
+    label = `We-leave clock: ${hands(round.target)}.${stage === 'hint' ? ` Dashed hands show your ${digital(his)}.` : ''}`;
     picture = (
       <>
         <Destination place={round.place} x={60} y={64} s={0.95} />
-        <Clock cx={620} cy={200} r={150} t={round.target} marks={evidence} ghost={stage === 'hint' ? his : null} ghostOnTop />
+        <FixedClock
+          x={430}
+          y={8}
+          w={380}
+          h={357}
+          moment="leave"
+          clock={{ cx: 620, cy: 212, r: 130, t: round.target, marks: evidence, ghost: stage === 'hint' ? his : null, ghostOnTop: true }}
+        />
       </>
     );
   } else {
-    label = `Your clock says ${spoken(shown)}.`;
+    // The leaving time drawn, not only said: a smaller fixed clock beside the
+    // place, so a child who cannot read the prompt still sees what to make.
+    // The prompt already says this time in words, so the label may too; it
+    // gives the time, not the hand positions, which would be the answer.
+    label = `We-leave clock: ${spoken(round.target)}. Your clock says ${spoken(shown)}.`;
     picture = (
       <>
-        <Destination place={round.place} x={60} y={64} s={0.95} />
-        <Clock cx={620} cy={200} r={150} t={shown} marks={evidence} />
+        <Destination place={round.place} x={12} y={70} s={0.8} />
+        <FixedClock x={250} y={8} w={250} h={322} moment="leave" clock={{ cx: 375, cy: 200, r: 105, t: round.target, marks: evidence }} />
+        <Clock cx={725} cy={200} r={150} t={shown} marks={evidence} />
       </>
     );
   }
