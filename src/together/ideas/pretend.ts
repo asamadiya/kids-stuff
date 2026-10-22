@@ -117,7 +117,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 30,
     setup: 'No setup',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'paper and crayons',
       'a few props from the house: a dupatta, steel plates, a toy phone, a cardboard box',
@@ -285,7 +285,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'If he wants an audience, Mia is it: on the rug, clapping and shouting answers when a puppet asks her a question. If she wants a puppet of her own, give her a plain sock to wave from her seat.',
     },
     picture:
-      'Seen from one side, Arjun and Mummy kneel behind the back of the sofa in the California living room, so only their heads and raised arms show above it. Arjun wears a green sock on his hand as a puppet with felt-pen eyes and raises it over the top of the sofa back. Mummy wears a striped sock puppet on her hand beside his. In front of the sofa, a little way off on the rug, Mia sits alone as the audience, clapping with both hands.',
+      'Seen from one side, Arjun and Mummy kneel behind the back of the sofa in the California living room, so only their heads and raised arms show above it. Arjun’s right hand is pushed all the way inside a long green sock, worn like a glove up his forearm so none of his fingers show; the toe end of the sock is the puppet’s head, with two felt-pen eyes drawn on it, and his hand inside opens it into a talking mouth over the top of the sofa back. Mummy’s right hand is inside a red-and-blue striped sock, worn the same way up her forearm, its toe end a talking head beside Arjun’s. Their other hands rest on the top of the sofa back. In front of the sofa, a little way off on the rug, Mia sits alone as the audience, clapping with both hands.',
     cast: ['Arjun', 'Mummy', 'Mia'],
     sources: [
       { label: 'UNICEF Parenting: Screen-free activities for children (sock puppets)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },

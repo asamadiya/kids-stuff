@@ -34,7 +34,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Eyes shut again. Five in a jumble, then five like the dots on a dice. Flash each. Which was quicker to see?',
-        art: 'Papa lifts the upturned steel bowl off five lemons lying in an untidy jumble on the steel thali, while Arjun leans in close with one finger out, jabbing from lemon to lemon as he tries to count them before the bowl comes down.',
+        art: 'Papa lifts the upturned steel bowl off a steel thali with both hands to show the lemons scattered untidily on it, not in rows: two lemons touching near the left rim, one lemon on its own in the middle, and two lemons touching near the right rim, one of them turned sideways; five lemons in all. Arjun leans in close with one pointing finger out, jabbing from lemon to lemon as he tries to count them before the bowl comes down, his other hand on the table edge.',
       },
       {
         text: 'Swap jobs: the grown-up shuts their eyes while you hide some lemons. Then you flash them.',
@@ -85,7 +85,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Fold a paper circle so the edges meet all the way round. Open it. Are those halves?',
-        art: 'At the dining table, Arjun folds a white paper circle in half and presses along the fold with both thumbs so the curved edges meet all round, while Mummy holds the second paper circle flat in both hands, watching the edges line up.',
+        art: 'At the dining table, Arjun presses down on a white paper circle folded in half into a half-moon shape, its two curved edges lying exactly on top of each other, running both thumbs along the straight folded edge. Mummy, sitting beside him, holds a second white paper circle, whole, round and unfolded with no lines on it, flat in both hands, watching his half-moon.',
       },
       {
         text: 'The grown-up folds the other circle off the middle, cuts it, and keeps the big piece. Fair?',
@@ -164,7 +164,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Pour out the rest. Count everything into heaps of ten. Count the heaps: ten, twenty, thirty. Add the loose ones.',
-        art: 'Arjun touches each of a row of small heaps of dried rajma on a steel tray in turn, counting in tens, with a few loose beans to one side, while Mummy runs her pencil under the guesses on the notepad, ready to compare.',
+        art: 'Arjun touches the small heaps of dried rajma lined up in neat rows on a rectangular steel tray, one heap at a time with the pointing finger of one hand, counting in tens, while his other hand pushes a few loose beans to one side. Mummy, sitting beside him, holds a small notepad closed against her chest in one hand, showing only its plain brown cardboard cover, and a pencil in the other hand, watching the heaps, ready to compare. Nothing is written anywhere in the picture.',
       },
       {
         text: 'Whose guess was closer? Then pour every bean back into the tin and put the lid on.',
@@ -230,7 +230,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Say the days along the top in order. What day is the big day? What month?',
-        art: 'Arjun runs his finger along the narrow header strip across the top of the fridge calendar, saying the days of the week aloud, while Papa lifts the bottom corner of the page to show the next month’s grid of squares underneath.',
+        art: 'Arjun, both feet on the kitchen floor, runs one pointing finger along the top band of a paper calendar taped low on the fridge door. The top band is a row of seven small plain coloured blocks, one for each day of the week, above a grid of plain blank squares; one square has a crayon ring round it, and a square further along has a small crayon star-shaped lantern in it. Papa, standing beside him, lifts the bottom corner of the page with one hand to show a second page of plain blank squares underneath. The calendar has no letters and no numbers anywhere, only coloured blocks, empty squares, the ring and the lantern.',
       },
     ],
     notice: 'Every morning the number of sleeps goes down by one. The days come in the same order every week, and after the last one the first comes round again.',

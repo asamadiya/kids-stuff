@@ -159,7 +159,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Fold the square corner to corner and crease it hard. Cut along the fold: this first cut can be yours.',
-        art: 'Arjun, at the dining table, presses a hard crease with both thumbs along the folded edge of a square of blue card folded corner to corner into one big triangle, while Mummy holds out a small pair of children’s scissors with rounded plastic tips, gripping them by the closed blades so the handles point towards Arjun and the tips point back at her.',
+        art: 'At the dining table, Arjun presses a hard crease with both thumbs along the folded edge of a square of blue card folded corner to corner into a triangle, concentrating, while Mummy sits beside him with her hands resting flat on the table, watching. There are no scissors in the picture.',
       },
       {
         text: 'Watch the grown-up fold and cut the rest. Count the pieces: five triangles, a square and one slanted piece.',
@@ -257,7 +257,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Swap. You hide the toy and draw the X. Can the grown-up find it from your map?',
-        art: 'Arjun kneels beside a laundry basket in the corner of the bedroom and pencils a big X onto the map on the clipboard resting on his knee; a small brown soft-toy elephant, no bigger than his hand, is hidden on the floor behind the basket with only the tip of its trunk peeking out past one side. Papa waits in the hallway outside the half-open door with both hands over his eyes.',
+        art: 'Arjun kneels on the bare wooden bedroom floor beside a tall laundry basket heaped with clothes and pencils a big X onto the map on a clipboard resting on his knee. The map is the same plain pencil room plan as before: a big rectangle for the walls, a long rectangle for the bed and a small square for the basket in one corner. Only the brown trunk and one ear of a small soft-toy elephant poke up from between the clothes at the top of the basket; the rest of the toy is buried in the clothes. Papa stands in the hallway outside the half-open bedroom door with both hands over his eyes.',
       },
     ],
     notice: 'On a map, everything is drawn as if you were looking down from the ceiling, so the bed becomes a box. The X sits next to the same things on the map as the toy does in the room.',

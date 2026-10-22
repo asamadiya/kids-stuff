@@ -34,11 +34,11 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Fit the top in upside down as a funnel, and tape it. Tape the ruler on, 0 level with the clay.',
-        art: 'Arjun holds a clear plastic ruler flat against the side of the bottle, lining its first mark up with the flat top of the grey clay inside, while Papa wraps strips of tape round ruler and bottle; the cut-off top sits upside down in the bottle like a funnel, taped round its rim.',
+        art: 'At the patio table, Papa holds a straight-sided clear plastic cylinder steady with one hand and wraps a strip of clear tape round it with the other; the cylinder is the cut-off bottom of a 2-litre bottle, open at the top, with no neck or shoulders. Inside, a thin flat layer of grey modelling clay covers only the very bottom. Arjun holds a clear plastic ruler upright against the outside of the cylinder with both hands, its bottom end lifted off the table so it lines up with the top of the clay. The bottle’s cut-off top sits upside down in the cylinder’s open mouth like a funnel, its narrow spout pointing down into the empty space above the clay.',
       },
       {
         text: 'Stand it in the open, away from the roof, trees and sprinklers. Box it in with four bricks.',
-        art: 'In the middle of the back lawn, far from the house and the trees, Arjun pushes a brick snugly against the bottle rain gauge, which stands in a square of bricks, while Papa kneels on the grass pressing the last brick against the other side.',
+        art: 'In the middle of the open back lawn, the bottle rain gauge, a clear plastic cylinder with an upside-down funnel in its open top and a clear ruler taped up its side, stands upright on the grass. Papa kneels on the grass and slides the last of four bricks flat against the bottle with both hands, closing a tight square of bricks that all touch the bottle’s base. Arjun crouches on the opposite side with both palms on another of the bricks, already lying on the grass, nudging it snug against the bottle.',
       },
       {
         text: 'Each morning at the same time, crouch down and read where the water reaches. Write it in the diary.',
@@ -46,7 +46,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Tip the water out onto the grass and stand the gauge back. Which day had the most rain?',
-        art: 'Arjun tips the bottle rain gauge sideways and a stream of rainwater splashes onto the lawn, while Papa kneels beside him holding the rain diary open at a page with a short pencilled line for each morning, ready for the next one.',
+        art: 'Arjun holds the bottle rain gauge, a clear plastic cylinder with a clear ruler taped up its side, in both hands and tips it sideways so a stream of rainwater splashes onto the lawn, while Papa kneels beside him on the grass, the closed rain diary resting on his knee under one hand and a pencil in the other, ready for the next morning’s reading.',
       },
     ],
     notice: 'After a rainy night the water has climbed up the ruler; after a dry one it sits at zero, however grey the sky looked.',
@@ -103,7 +103,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Tape one bag high on a sunny window and the other high on a shady window.',
-        art: 'Mummy, standing on the floor, presses strips of tape over the top corners of a zip-lock bag of blue water high on a sunlit kitchen window, while Arjun stands on the kitchen floor beside her holding up a second zip-lock bag of blue water in both hands, ready for the shady window across the room; both of Arjun’s feet are on the floor.',
+        art: 'Mummy, standing on the kitchen floor, reaches up with both hands and presses strips of tape over the two top corners of a zip-lock bag of blue water high on a sunlit kitchen window. Arjun stands on the kitchen floor beside her, both feet on the floor, holding the second zip-lock bag of blue water against his chest with both hands, waiting to tape it up next. The view shows only this one sunny window and the plain wall beside it, so the bag on the glass and the bag in Arjun’s hands are the only two bags in the picture.',
       },
       {
         text: 'Look at lunch, before dinner and next morning. Where are drops growing?',
@@ -111,7 +111,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Watch a big drop slide down into the sea. Which bag made more drops?',
-        art: 'Arjun stands on the floor below the sunny kitchen window, head tipped back, tracing in the air with one finger a fat drop sliding down the inside of the zip-lock bag toward the blue water, while Mummy beside him turns and points with one arm across the room at the second zip-lock bag taped to a shady window on the far wall.',
+        art: 'Arjun stands on the kitchen floor below the sunny window, head tipped back, tracing with his right index finger a fat drop that slides down the inside of the zip-lock bag taped high on the glass toward the blue water at its bottom. Mummy stands beside him, turned the other way to face a dim, shadowed window on the far wall of the kitchen; her left hand rests on Arjun’s shoulder and her right index finger points at the second zip-lock bag of blue water taped high on that shady window.',
       },
     ],
     notice: 'Drops appear inside the top of the bag, where there were none before, usually sooner in the sunny bag; they grow, join and run down. Nothing got in through the seal.',
@@ -155,7 +155,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'On a sunny morning, find two puddles on the paving: one in the sun, one in the shade.',
-        art: 'On a bright morning after rain, Arjun in a straw sun hat walks along the paved garden path pointing at a shallow puddle shining in full sun, while Papa, holding a plain unmarked box of thick pavement chalk, points to a second puddle further along the path in the dark shadow of the wooden fence; both puddles are clearly visible.',
+        art: 'On a bright morning after rain, Arjun in a straw sun hat walks along a paved garden path and points down at a shallow puddle sparkling in full sunshine. A few steps further on, the path runs into the deep blue-grey shadow of a tall wooden fence, and there Papa, holding a plain brown cardboard box of thick chalk sticks in one hand, points with the other at a second shallow puddle lying dark and dull inside that shadow, with no sunlight on it.',
       },
       {
         text: 'Chalk a line all the way round the edge of each puddle.',
@@ -163,11 +163,11 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Guess together: which puddle will shrink faster, the sunny one or the shady one?',
-        art: 'Arjun stands on the paved path between two puddles ringed in yellow chalk, his left arm pointing at the puddle in bright sun and his right arm pointing at the puddle in the fence’s dark shadow, while Papa kneels beside him holding the chalk box and waits for his guess.',
+        art: 'Arjun stands on the paved path between two puddles ringed in yellow chalk, his left arm pointing at the puddle in bright sun and his right arm pointing at the puddle in the fence’s dark shadow, while Papa kneels beside him holding an open, plain brown cardboard tray of coloured chalk sticks in both hands, waiting for his guess.',
       },
       {
         text: 'While you wait, put a drop on your palm and one on a shady step. Spread both thin. Which dries first?',
-        art: 'Arjun spreads a drop of water thin across his open palm with one fingertip, beside a second thin wet patch on a shaded stone step, while Papa sits on the step beside him with a small cup of water in one hand, both watching the two wet patches closely.',
+        art: 'Arjun crouches on a shaded pale grey stone step and spreads a drop of clear water thin across his open left palm with one fingertip of his right hand; beside his feet, a thin damp smear no bigger than his hand darkens the grey stone. Papa sits on the step beside him holding a small clear plastic cup of clear water in one hand, his other hand resting on his knee, both watching the two wet patches closely.',
       },
       {
         text: 'Every hour, chalk round each puddle’s new edge in a new colour.',
@@ -175,7 +175,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Look at the rings. Which puddle shrank faster? Feel the dry paving: where did the water go?',
-        art: 'Arjun presses his palm flat on dry paving inside rings of yellow, pink and blue chalk where the sunny puddle used to be, with no water left inside the rings, while across the path Papa kneels by the shady puddle in the fence’s shadow, still wet inside its yellow chalk ring, and points at it.',
+        art: 'The paved path is split by light: the left half is in bright sunshine, the right half in the deep blue-grey shadow of a tall wooden fence. In the sunny half, Arjun crouches and presses one palm flat on dry, pale paving inside three nested chalk rings, yellow outermost, then pink, then blue, with no water inside any ring. A few steps away in the fence’s shadow, Papa kneels and points at a dark, dull puddle sitting inside its own yellow chalk ring, a thin gap of dry paving between the water’s edge and the chalk all the way round.',
       },
     ],
     notice: 'The sunny puddle shrinks ring by ring and is often gone before the shady one has changed much. Nobody carried the water away: most of it went into the air as invisible water vapour, and a little soaked into the cracks.',
@@ -227,15 +227,15 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Watch closely while the grown-up pours one tumbler into the tall, narrow cup.',
-        art: 'Mummy tips one clear plastic tumbler of orange water into a tall, thin clear plastic cup on a tray at the kitchen table, the cup twice as tall as the tumbler and only half as wide, the orange water climbing high up it, while Arjun watches wide-eyed beside the other full tumbler of orange water, both hands flat on the table.',
+        art: 'Mummy tips a short, wide clear plastic tumbler of orange water into a tall, skinny, tube-shaped clear plastic cup standing on a tray on the kitchen table; the skinny cup is only as wide as Arjun’s wrist and twice as tall as the tumbler, and the orange water climbs high up it. Arjun stands on the kitchen floor beside the table, both hands flat on the table, watching wide-eyed next to the second short, wide tumbler of orange water with its strip of masking tape.',
       },
       {
         text: 'Now: same water, or does one have more? Say what you think, and why.',
-        art: 'Arjun points one finger at a tall, thin clear plastic cup on the tray, twice as tall as the short tumbler beside it and half as wide, where orange water stands high, then at the full short tumbler of orange water beside it, talking, while Mummy sits across the kitchen table with her hands in her lap, listening.',
+        art: 'Arjun, standing on the kitchen floor at the table, points with his right index finger at a tall, skinny, tube-shaped clear plastic cup on the tray, only as wide as his wrist, where orange water stands high; his left hand lies flat on the table beside a short, wide clear plastic tumbler of orange water whose water stands low. His mouth is open as he talks. Mummy sits across the kitchen table with both hands folded in her lap, listening.',
       },
       {
         text: 'Prove it: pour the tall cup back into its own tumbler. Does it reach the tape again?',
-        art: 'Arjun holds a tall, thin clear plastic cup of orange water in both hands and tips it into a short clear plastic tumbler on the tray, where the orange water has risen to just below a strip of masking tape on the tumbler’s side, while Mummy holds the tumbler steady with both hands and both of them watch the water rise toward the tape.',
+        art: 'At the kitchen table, Arjun, standing on the floor, holds a tall, skinny, tube-shaped clear plastic cup, as wide as his wrist, in both hands and tips the last of its orange water into a short, wide clear plastic tumbler on the tray. A strip of masking tape runs round the tumbler high up, near its rim, and the orange water inside has risen to just under the tape’s lower edge, with a thin band of clear empty plastic still showing between the water and the tape. Mummy holds the tumbler steady with both hands, and both of them watch the water creep up toward the tape.',
       },
       {
         text: 'Your turn to trick the grown-up: pour one tumbler into the wide bowl, and ask the question.',
@@ -290,7 +290,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'The grown-up soaks the cloth and wrings it out. You wrap it snugly round one bottle. Leave the other bare.',
-        art: 'At the patio table, Arjun wraps a damp cotton cloth snugly round one of two identical steel bottles and tucks in its end, while Mummy, who has just wrung the cloth out, shakes the last drips from her hands over a bowl of water; the second steel bottle stands bare beside them.',
+        art: 'At the patio table, Arjun wraps a damp white cotton cloth snugly round one of two identical steel bottles and tucks its end in with both hands. Mummy stands across the table, her face and long plait in view, holding the rim of a steel bowl of water with both hands; the second steel bottle stands bare beside the bowl. Arjun’s cloth is the only cloth in the picture.',
       },
       {
         text: 'Stand both side by side in a shady, breezy spot. Guess: which will be colder in an hour?',

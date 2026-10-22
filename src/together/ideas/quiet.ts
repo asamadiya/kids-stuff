@@ -15,7 +15,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'No setup',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'a kitchen timer (or the oven timer, so your phone can stay put away)',
       'whatever he chooses: blocks, cars, steel pots, a cardboard box',
@@ -241,7 +241,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia sits in her high chair beside the table with her own bowl and drops in the quartered grapes you pass her, one at a time. She can eat as they land, while he deals out the other bowls himself.',
     },
     picture:
-      'Arjun slices a peeled banana into rounds on a wooden chopping board at the kitchen table of the California home, holding a small blunt butter knife with a wide rounded end in his right hand and steadying the banana with his left. Beside him, Mummy cuts an apple on her own wooden board with a kitchen knife, her other hand holding the apple. Mia sits in her high chair beside the table and drops one soft round slice of banana from her fingers into a small steel bowl that already holds a few banana slices; her other hand rests empty on the high-chair tray.',
+      'At the kitchen table, Arjun peels a ripe banana with both hands and drops pieces he has broken off with his fingers into a steel bowl, while Mummy, beside him, holds a small steel bowl of washed grapes and smiles; Mia sits on Mummy’s other side holding a spoon. There is no knife anywhere in the picture.',
     cast: ['Arjun', 'Mummy', 'Mia'],
     sources: [
       { label: 'Stanford DREME Family Math: Math Talk While Cooking Together', url: 'https://familymath.stanford.edu/activity/tips-for-cooking-with-math-2/' },

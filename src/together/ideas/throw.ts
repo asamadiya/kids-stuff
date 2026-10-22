@@ -69,7 +69,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'Two minutes to clear a space and stack the tower',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'seven light things of different sizes that stack: plastic stacking cups, plastic tubs with lids, or small cardboard boxes',
       'a soft ball (a sponge ball, or a pair of rolled-up socks)',

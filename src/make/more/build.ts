@@ -31,11 +31,13 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Fold the second sheet back and forth into a zigzag, folds about 3 cm wide, running the long way.',
-        art: 'Arjun folds a sheet of white printer paper back and forth into a long narrow pleated strip, every crease running the whole length of the sheet from one short end to the other, so the strip looks like long straight parallel ridges from above and shows a zigzag edge at the end nearest the viewer; Arjun presses the newest long crease flat with both thumbs while Papa holds the far short end of the strip still on the kitchen table, beside two piles of books with plain blank spines.',
+        art: 'A sheet of paper seen from above with its fold lines running the long way, from one short end to the other, and below it the end of the folded sheet seen side-on as a zigzag.',
+        figure: 'bridge-3',
       },
       {
         text: 'Lay the zigzag across the gap. Guess first, then put coins on its middle one at a time, counting out loud.',
-        art: 'Arjun sets a copper penny on top of a long pleated paper strip that lies straight and level across the gap between two piles of books with plain blank spines, its long creases running from one book pile to the other and its zigzag edge facing the viewer, a small heap of pennies already resting on the ridges in the middle; Papa holds the open plastic jar of pennies in one hand and holds a pencil over a notepad on the kitchen table with the other.',
+        art: 'The zigzag-folded sheet lying across the gap between two piles of books, with a stack of coins in the middle of it, and a circle showing the zigzag folds seen from the end.',
+        figure: 'bridge-4',
       },
       {
         text: 'Stop when it folds into the gap or slides off. Write the number, then count every coin back into the jar.',

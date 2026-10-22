@@ -22,7 +22,8 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Hold your arms out. Rest the ruler across your two pointing fingers, one near each end.',
-        art: 'Beside the dining table, Arjun stands with both arms stretched straight out in front of him at chest height, each hand curled with only the pointing finger stretched out flat and level, and a 30 cm wooden ruler lies flat on top of those two pointing fingers, his left finger under the ruler’s left end and his right finger under its right end; Papa kneels beside him holding a roll of masking tape in both hands, watching the level ruler.',
+        art: 'A long ruler resting across two pointing fingers, one under each end.',
+        figure: 'balance-1',
       },
       {
         text: 'Slide your fingers slowly towards each other. Watch which finger moves, then which.',
@@ -30,19 +31,23 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'When your fingers meet, the ruler balances just above them. The grown-up tapes that spot. Can one finger hold it there?',
-        art: 'Arjun holds the wooden ruler balanced on one pointing finger placed under its middle, his other hand open beside it, while Papa presses a short strip of masking tape across the top of the ruler just above that finger.',
+        art: 'The two pointing fingers have met under the middle of the ruler, which balances on them; a small strip of tape marks the middle.',
+        figure: 'balance-3',
       },
       {
         text: 'The grown-up presses play-dough on one end. Stick a strip of tape where you think your fingers will meet.',
-        art: 'At the dining table, a 30 cm wooden ruler lies flat with one strip of masking tape across its middle; Papa, with both hands, squeezes a single walnut-sized lump of red play-dough onto the right-hand end of the ruler, while Arjun presses a second strip of masking tape onto the ruler with his thumb, halfway between the middle strip and the play-dough. There is only one lump of play-dough in the picture.',
+        art: 'A lump of red play-dough on the right end of the ruler, the white tape at the middle, a gold strip of tape a little to the right where he guesses the fingers will meet, and a finger under each end.',
+        figure: 'balance-4',
       },
       {
         text: 'Slide your fingers in again. Did they meet at your tape, or somewhere else?',
-        art: 'Arjun holds a 30 cm wooden ruler level on his two pointing fingers, which touch side by side under the ruler about a quarter of its length in from the end that has a lump of red play-dough stuck on it, so the long bare end sticks far out on the other side; a strip of masking tape marks the ruler’s middle, and Papa’s pointing finger runs along the ruler from that middle strip towards where Arjun’s fingers have met, nearer the play-dough.',
+        art: 'The fingers have met under the ruler, past the gold guess and close to the play-dough end; a dashed line shows how far the balancing point moved from the middle tape.',
+        figure: 'balance-5',
       },
       {
         text: 'Now the broom. One finger just above its head, the other far up the handle. Guess, then slide.',
-        art: 'In a clear patch of the living-room floor, Arjun stands holding a long-handled broom level at his waist, the broom resting only on top of his two stretched-out pointing fingers, his other fingers curled into his palms and not gripping: one finger under the handle just above the bristly head, the other under the handle far up towards its end; Papa kneels beside him with one open palm held a little below the middle of the handle, ready to catch it.',
+        art: 'A broom lying across two pointing fingers: one finger near the end of the handle, the other just in from the bristle head.',
+        figure: 'balance-6',
       },
     ],
     notice: 'The fingers take turns sliding and always meet under the spot where the ruler balances. Play-dough on one end moves that spot towards the play-dough, and the broom balances near its heavy head.',
@@ -90,7 +95,8 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'The grown-up hangs the socks, rice 70 cm and 25 cm below. Pull both back a hand’s width; let go together.',
-        art: 'Under a broom handle taped across the backs of two dining chairs hang two old socks filled with rice, one on a long string and one on a much shorter string, both strings tied to the handle; Arjun holds the long-string sock in one hand and Mummy holds the short-string sock in one hand, each pulling their sock a little to the side so both strings slant, both just opening their fingers to let go together.',
+        art: 'A broom handle across the top with two socks hanging from it on strings, one string 70 centimetres long and one 25 centimetres long, both socks pulled back the same distance, ready to let go together.',
+        figure: 'pendulum-2',
       },
       {
         text: 'Swing only the long sock. The grown-up times ten seconds; count each time it comes back to you.',
@@ -154,19 +160,23 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Tape a pencil flat on the table. Lay the ruler across it, with the pencil under the middle.',
-        art: 'Arjun lays a 30 cm wooden ruler, with a wrapped bar of soap taped on one end and a flat round tub lid taped rim-up on the other end, on top of a pencil that is taped flat to the kitchen table, so the pencil lies under the middle of the ruler like the pivot of a see-saw; the soap end rests down on the table and the lid end tilts up just off the table, while Papa smooths a strip of masking tape over one end of the pencil with his thumb.',
+        art: 'Side view: a ruler lies across a pencil taped flat on the table, the pencil under the ruler’s middle. A bar of soap is taped on the left end and an empty tub lid on the right end; the soap end rests down on the table.',
+        figure: 'lever-2',
       },
       {
         text: 'Put pennies in the lid one at a time, counting out loud. Stop when the lid end tips down.',
-        art: 'Arjun drops one more copper penny into a flat round tub lid taped to one end of a wooden ruler; the lid holds a big heap of pennies and its end of the ruler has tipped down onto the kitchen table, while the wrapped bar of soap taped on the other end has lifted just off the table, the ruler resting across a pencil taped flat under its middle; Papa sits beside him making pencil tally marks on a notepad. The soap wrapper is plain white with no writing.',
+        art: 'Side view: the same ruler on the pencil, with a pile of pennies now in the lid. The lid end has tipped down to the table and the soap end has lifted.',
+        figure: 'lever-3',
       },
       {
         text: 'Tip the pennies back. Slide the ruler till the pencil sits close to the soap. More pennies now, or fewer?',
-        art: 'Arjun slides a wooden ruler along over a pencil taped flat to the kitchen table until the pencil lies under the ruler right next to the wrapped bar of soap taped on its near end; the empty flat round tub lid taped on the ruler’s far end now reaches a long way out, while Papa sets down a small steel bowl heaped with pennies beside them.',
+        art: 'Side view: the ruler has been slid along so the pencil now sits close under the soap end, with a dotted circle where the pencil used to be and an arrow showing the slide. The lid is empty.',
+        figure: 'lever-4',
       },
       {
         text: 'Count pennies into the lid again until it tips down. Which time needed fewer?',
-        art: 'Arjun drops a few copper pennies into a flat round tub lid taped to the far end of a long wooden ruler, and that long lid end has tipped down to the kitchen table, lifting the wrapped bar of soap taped on the short near end a little off the table; a pencil taped flat to the table lies under the ruler right beside the soap; Arjun’s other hand rests on the table, not touching the ruler; Papa holds up a notepad beside him showing a long row of tally marks above a much shorter row.',
+        art: 'Two side views, one above the other. Top: pencil under the middle, a big pile of pennies needed to tip the lid end down. Bottom: pencil close to the soap, only a few pennies tip the lid end down.',
+        figure: 'lever-5',
       },
       {
         text: 'Count every penny back into the jar. Are all sixty there? Then screw the lid on.',

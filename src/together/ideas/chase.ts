@@ -121,7 +121,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'Two minutes to agree the rooms',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [],
     steps: [
       'Agree the hiding rooms together, and the places that are out: inside appliances, anything that latches or locks, chests, curtains with cords, the car, the stairs, and outdoors.',
@@ -276,7 +276,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: true,
     minutes: 5,
     setup: 'Two minutes to clear a space',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [],
     steps: [
       'Ask if he wants a chase. Agree "Freeze!" as the stop word: either of you says it and the game stops at once. Try it once now, mid-chase.',
@@ -291,7 +291,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Best while Mummy or another grown-up has Mia in another room, so this short chase is his alone. If she wants a turn, give her a slow chase of her own afterwards.',
     },
     picture:
-      'Arjun, laughing, darts past Papa across the living-room rug and is already a big step beyond him, both hands swinging free. Papa, on his knees, lunges forward with both arms stretched out to the spot where Arjun was a moment ago, his hands clutching empty air with a wide gap between them and Arjun, his eyebrows high and his mouth open in a baffled, comic face. A floor cushion lies knocked over beside Papa’s knee. California living room.',
+      'Papa, on his knees on the right side of the living-room rug, has just made a big comic grab and caught only a floor cushion. He hugs the cushion to his chest with both arms and looks down at it, eyebrows high and mouth open in a baffled, comic face. Arjun, laughing, runs away on the far left side of the rug, a long way from Papa with a wide stretch of empty rug between them. He looks back over his shoulder at Papa, and both his hands are empty and swinging free. Nobody touches anybody. The furniture is pushed back in the sunny California living room.',
     cast: ['Arjun', 'Papa'],
     sources: [
       {

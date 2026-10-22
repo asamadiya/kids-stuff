@@ -35,7 +35,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'From the back, push the straw’s short end through the middle hole. Curl each holed tip in gently and thread it on.',
-        art: 'At the kitchen table, Arjun bends one corner flap of an orange paper square up and over towards its middle and slides the small hole in that flap onto a bendy drinking straw sticking straight up through the centre of the paper. The square has deep cuts running from each corner towards the middle, and two flaps are already curled over and threaded on the straw, so it looks like a half-made pinwheel. Mummy sits beside him and holds the straw’s long bent end below the paper with one hand. With her other hand she steadies the paper’s edge just above the tabletop.',
+        art: 'At the kitchen table, Mummy holds one bendy drinking straw upright in her fist, with its long end in her hand and its short end pointing straight up. An orange paper square is pushed onto the straw, so the short end pokes up through the middle of the paper, and she holds it level just above the tabletop. Her other hand rests flat on the table. The square has four deep cuts that run from its corners towards the middle, which make four triangle flaps. The tip of one flap is already curled over and slid onto the top of the straw. Arjun sits beside her and uses both hands to curl the tip of a second flap over towards the middle and push the small hole in that tip down onto the top of the same straw. The straw in Mummy’s fist is the only straw in the picture.',
       },
       {
         text: 'The grown-up tapes the straw’s tip. Dot one blade black. Blow on the front: which way did it go round?',
@@ -96,7 +96,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Bend one blade towards you and the other away, like a T. Draw a dot on one blade.',
-        art: 'Arjun stands on the floor beside the dining table. He holds a black felt pen in one hand and draws a round black dot on one paper blade of the single white paper helicopter that Papa holds up in front of him, steadying that blade with his other fingertips. Papa sits at the table and holds the helicopter upright by its narrow folded paper stem, which has a silver paper clip on its bottom end. The helicopter’s two blades at the top are bent apart, one forward and one back, so it makes a T.',
+        art: 'Arjun stands on the floor beside the dining table and holds a black felt pen in one hand. He draws a round black dot on one of the two blades at the top of a white paper helicopter, and steadies that blade with the fingertips of his other hand. Papa sits at the table and holds the helicopter upright, at Arjun’s chest height, by the silver paper clip at the bottom of its stem. The helicopter is shaped like a letter Y: a narrow folded paper stem as long as a hand, with the paper clip on its bottom end, and at its top just two paper blades that spread apart, one bent towards Arjun and one bent away. Nothing hangs below the paper clip.',
       },
       {
         text: 'The grown-up stands on the floor, holds it high and lets go. Watch the dot: which way does it go round?',
@@ -104,11 +104,11 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Bend each blade the other way. Guess which way it will spin now. Then take turns letting go.',
-        art: 'In the living room, Arjun stands on the floor with one arm stretched straight up and has just opened his fingers to let go of a white paper helicopter hanging just above his hand. The helicopter is a narrow folded paper stem with a silver paper clip at its bottom and two paper blades bent apart in a T at its top, and one blade has a black dot. Papa crouches on the floor a step away with his hands on his knees and looks up at the black dot.',
+        art: 'In the living room, Arjun stands on the floor with one arm stretched straight up and his fingers just opened. He is letting go of a white paper helicopter that hangs in the air a little above his hand. The helicopter is shaped like a letter Y: a narrow folded paper stem with a silver paper clip on its bottom end, and at its top just two paper blades that spread apart, one bent forward and one bent back. One of the two blades has a round black dot. Papa crouches on the floor a step away, with his hands on his knees, and looks up at the black dot.',
       },
       {
         text: 'Press both blades together so they point straight up. Drop it again. Does it still spin?',
-        art: 'In the living room, Papa stands on the floor with one arm stretched straight up above his head. Between finger and thumb he holds the narrow folded paper stem of a white paper helicopter, which has a silver paper clip on its bottom end. The helicopter’s two paper blades are pressed flat against each other and point straight up, so the whole helicopter is one thin upright strip of paper. Arjun stands on the floor a step to the side with his hands at his sides and looks up at it.',
+        art: 'In the living room, Papa stands on the floor with one arm stretched straight up above his head. His thumb and first finger pinch the middle of the narrow folded paper stem of a white paper helicopter, with his fingertips directly on the paper. A silver paper clip is on the bottom end of the stem. The helicopter’s two paper blades are pressed flat against each other and point straight up, so the whole helicopter is one thin upright strip of white paper, a little longer than Papa’s hand, with nothing else attached to it. Arjun stands on the floor a step to Papa’s side, with his hands at his sides, and looks up at it.',
       },
     ],
     notice: 'Nobody blows, yet after a moment’s drop it spins on the way down. Bending the blades the other way makes it spin the other way, and with both blades pressed together it usually drops fast and hardly spins.',

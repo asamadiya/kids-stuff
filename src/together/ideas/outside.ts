@@ -16,7 +16,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'No setup at the park; two minutes to chalk a few arrows at home',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'pavement chalk (or sticks and leaves laid down as arrows)',
       'shoes with some grip, not sandals or flip-flops',
@@ -188,7 +188,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'No setup',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'a magnifying glass, plastic if you have the choice (or a phone camera zoomed right in)',
       'a crumb of bread for the ants',
@@ -296,7 +296,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'No setup on a sunny day; hats on first',
-    players: 'You and him',
+    players: 'You and him; Mia with another grown-up',
     need: [
       'pavement chalk (or a stick, if you are drawing in dirt or sand)',
       'sun hats',
@@ -314,7 +314,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia is best in the shade with the other grown-up while you two chase. Afterwards, only if he wants to, he can chalk round her shadow on the patio; she will not stand still for long, and a wobbly outline is fine.',
     },
     picture:
-      'Papa, in a sun hat, presses his right foot down onto the head of Arjun’s long shadow on the grass, while Arjun, in a sun hat, jumps sideways, laughing, well clear of Papa’s foot. It is morning on the sunny lawn of the California back garden. The low sun is at the far left of the picture, so both their long shadows stretch straight to the right across the grass, side by side. Arjun is on the left, and his shadow runs right along the grass to where Papa, standing further right, has his foot on it. Papa’s arms are out to his sides with his hands open.',
+      'On a sunny lawn in the late afternoon, Papa and Arjun each cast a long dark shadow stretching out across the grass. Arjun is mid-leap, both feet landing squarely on the dark head of Papa’s shadow, laughing, while Papa, standing well away from him, turns and points down at his own shadow with mock alarm.',
     cast: ['Arjun', 'Papa'],
     sources: [
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk (shadows and the path of the sun)', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },

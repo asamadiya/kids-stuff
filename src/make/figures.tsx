@@ -12,6 +12,7 @@ import type { ReactElement, ReactNode } from 'react';
  */
 
 const W = 1152;
+const INK = '#24170f';
 const H = 896;
 type Pt = readonly [number, number];
 
@@ -315,7 +316,259 @@ const TANGRAM: Record<string, (label: string) => ReactElement> = {
   },
 };
 
-export const MAKE_FIGURES: Record<string, (label: string) => ReactElement> = { ...KOLAM, ...TANGRAM };
+
+/* -------------------------------------------------------------- lever ---- */
+
+const TABLE = '#c99a62';
+const TABLE_EDGE = '#8a6416';
+const WOOD = '#e9c88a';
+const WOOD_EDGE = '#8a6416';
+const SOAP = '#f3ead7';
+const STEEL = '#b8c2cc';
+const STEEL_EDGE = '#5b6470';
+const COPPER = '#c0723a';
+const COPPER_EDGE = '#7a3f17';
+
+/**
+ * Side view of the ruler lever: the table, a pencil seen end-on as the pivot,
+ * the ruler, soap taped to one end and a lid taped to the other, with `coins`
+ * pennies in the lid. `at` is where the pivot sits along the ruler (0 = soap
+ * end, 1 = lid end); `tilt` is the angle in degrees, positive = lid end down.
+ */
+function Lever({ cx, at, coins, tilt, scale = 1 }: { readonly cx: number; readonly at: number; readonly coins: number; readonly tilt: number; readonly scale?: number }) {
+  const L = 640 * scale;
+  const tableY = TABLE_Y;
+  const r = 16 * scale;
+  const py = tableY - r;
+  const left = -at * L;
+  const right = (1 - at) * L;
+  const thick = 16 * scale;
+  return (
+    <g>
+      <g transform={`translate(${cx} ${py}) rotate(${tilt})`}>
+        <rect x={left} y={-r - thick} width={L} height={thick} rx={3} fill={WOOD} stroke={WOOD_EDGE} strokeWidth={4} />
+        {Array.from({ length: 21 }, (_, i) => (
+          <line key={i} x1={left + (i * L) / 20} y1={-r - thick} x2={left + (i * L) / 20} y2={-r - thick + (i % 5 ? 6 : 11) * scale} stroke={WOOD_EDGE} strokeWidth={2} />
+        ))}
+        <rect x={left + 6 * scale} y={-r - thick - 70 * scale} width={120 * scale} height={70 * scale} rx={10} fill={SOAP} stroke={GUIDE} strokeWidth={4} />
+        <g transform={`translate(${right - 75 * scale} ${-r - thick})`}>
+          <path d={`M ${-70 * scale} 0 L ${-60 * scale} ${-36 * scale} L ${60 * scale} ${-36 * scale} L ${70 * scale} 0 Z`} fill={STEEL} stroke={STEEL_EDGE} strokeWidth={4} transform={`scale(1 1)`} />
+          {Array.from({ length: coins }, (_, i) => {
+            const col = i % 5;
+            const row = Math.floor(i / 5);
+            return <ellipse key={i} cx={(col - 2) * 22 * scale} cy={(-44 - row * 10) * scale} rx={12 * scale} ry={6 * scale} fill={COPPER} stroke={COPPER_EDGE} strokeWidth={2} />;
+          })}
+        </g>
+      </g>
+      <circle cx={cx} cy={py} r={r} fill="#e9b949" stroke={SLANT_EDGE} strokeWidth={4} />
+      <circle cx={cx} cy={py} r={r * 0.35} fill={SLANT_EDGE} />
+    </g>
+  );
+}
+
+const TABLE_Y = 600;
+const TableTop = () => <rect x={0} y={TABLE_Y} width={W} height={H - TABLE_Y} fill={TABLE} stroke={TABLE_EDGE} strokeWidth={4} />;
+
+const LEVER: Record<string, (label: string) => ReactElement> = {
+  // Pivot in the middle, lid empty: the soap end is down.
+  'lever-2': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <TableTop />
+      <Lever cx={W / 2} at={0.5} coins={0} tilt={-6} scale={1.4} />
+    </Frame>
+  ),
+  // Enough pennies in the lid and the lid end goes down.
+  'lever-3': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <TableTop />
+      <Lever cx={W / 2} at={0.5} coins={15} tilt={6} scale={1.4} />
+    </Frame>
+  ),
+  // The ruler slid along so the pencil sits close to the soap: where it was, and where it is now.
+  'lever-4': (label) => {
+    // Same ruler as before, slid right so the pencil now sits near the soap end.
+    const L = 640 * 1.4;
+    const cx = W / 2 - 0.32 * L;
+    const was = cx + 0.32 * L;
+    return (
+      <Frame label={label} ground={PAPER}>
+        <TableTop />
+        <circle cx={was} cy={TABLE_Y - 16} r={18} fill="none" stroke={GUIDE} strokeWidth={4} strokeDasharray="8 6" />
+        <path d={`M ${was - 20} ${TABLE_Y + 60} L ${cx + 26} ${TABLE_Y + 60}`} stroke={INK} strokeWidth={6} />
+        <path d={`M ${cx + 50} ${TABLE_Y + 42} L ${cx + 22} ${TABLE_Y + 60} L ${cx + 50} ${TABLE_Y + 78}`} fill="none" stroke={INK} strokeWidth={6} strokeLinejoin="round" />
+        <Lever cx={cx} at={0.18} coins={0} tilt={0} scale={1.4} />
+      </Frame>
+    );
+  },
+  // The two tries side by side: pencil in the middle needs a pile; pencil near the soap needs a few.
+  'lever-5': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <rect x={0} y={330} width={W} height={18} fill={TABLE} stroke={TABLE_EDGE} strokeWidth={3} />
+      <g transform="translate(0 -270)">
+        <Lever cx={W / 2} at={0.5} coins={15} tilt={6} scale={1.15} />
+      </g>
+      <TableTop />
+      <Lever cx={W / 2 - 230} at={0.18} coins={4} tilt={5} scale={1.15} />
+    </Frame>
+  ),
+};
+
+/* --------------------------------------------------- finger balance ----- */
+
+const SKIN = '#b9784a';
+const SKIN_EDGE = '#6e3a1e';
+const DOUGH = '#d9473a';
+
+/** A pointing finger from below, its tip at (x, y). */
+const Finger = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g>
+    <path d={`M ${x - 22} ${y + 200} L ${x - 22} ${y + 18} Q ${x - 22} ${y} ${x} ${y} Q ${x + 22} ${y} ${x + 22} ${y + 18} L ${x + 22} ${y + 200} Z`} fill={SKIN} stroke={SKIN_EDGE} strokeWidth={4} />
+    <path d={`M ${x - 12} ${y + 10} Q ${x} ${y + 4} ${x + 12} ${y + 10}`} fill="none" stroke={SKIN_EDGE} strokeWidth={3} />
+  </g>
+);
+
+/** A ruler resting on fingers at `fingers` (x positions), with optional dough at the right end and tape marks. */
+function RulerOnFingers({ fingers, dough, mid, guess }: { readonly fingers: readonly number[]; readonly dough?: boolean; readonly mid?: number; readonly guess?: number }) {
+  const y = 440;
+  const x0 = 156;
+  const len = 840;
+  return (
+    <g>
+      <rect x={x0} y={y - 24} width={len} height={24} rx={3} fill={WOOD} stroke={WOOD_EDGE} strokeWidth={4} />
+      {Array.from({ length: 31 }, (_, i) => (
+        <line key={i} x1={x0 + (i * len) / 30} y1={y - 24} x2={x0 + (i * len) / 30} y2={y - 24 + (i % 5 ? 7 : 13)} stroke={WOOD_EDGE} strokeWidth={2} />
+      ))}
+      {mid !== undefined ? <rect x={mid - 9} y={y - 26} width={18} height={28} fill="#f3ead7" stroke={GUIDE} strokeWidth={2} /> : null}
+      {guess !== undefined ? <rect x={guess - 9} y={y - 26} width={18} height={28} fill="#e9b949" stroke={SLANT_EDGE} strokeWidth={2} /> : null}
+      {dough ? <path d={`M ${x0 + len - 120} ${y - 24} C ${x0 + len - 120} ${y - 110}, ${x0 + len + 10} ${y - 120}, ${x0 + len + 6} ${y - 24} Z`} fill={DOUGH} stroke="#8f2c05" strokeWidth={4} /> : null}
+      {fingers.map((fx) => (
+        <Finger key={fx} x={fx} y={y} />
+      ))}
+    </g>
+  );
+}
+
+/** A broom lying on two fingers: handle to the left, bristle head to the right. */
+function BroomOnFingers({ fingers }: { readonly fingers: readonly number[] }) {
+  const y = 440;
+  return (
+    <g>
+      <rect x={80} y={y - 22} width={760} height={22} rx={11} fill={WOOD} stroke={WOOD_EDGE} strokeWidth={4} />
+      <rect x={836} y={y - 40} width={40} height={58} rx={6} fill="#5b6470" stroke={INK} strokeWidth={4} />
+      <path d={`M 876 ${y - 52} L 1080 ${y - 110} L 1080 ${y + 80} L 876 ${y + 26} Z`} fill="#c99a62" stroke={TABLE_EDGE} strokeWidth={4} />
+      {Array.from({ length: 9 }, (_, i) => (
+        <line key={i} x1={880} y1={y - 44 + i * 8} x2={1078} y2={y - 100 + i * 21} stroke={TABLE_EDGE} strokeWidth={2} />
+      ))}
+      {fingers.map((fx) => (
+        <Finger key={fx} x={fx} y={y} />
+      ))}
+    </g>
+  );
+}
+
+const BALANCE: Record<string, (label: string) => ReactElement> = {
+  'balance-6': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <BroomOnFingers fingers={[150, 800]} />
+    </Frame>
+  ),
+  'balance-1': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <RulerOnFingers fingers={[230, 922]} />
+    </Frame>
+  ),
+  'balance-3': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <RulerOnFingers fingers={[556, 596]} mid={576} />
+    </Frame>
+  ),
+  'balance-4': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <RulerOnFingers fingers={[230, 922]} dough mid={576} guess={700} />
+    </Frame>
+  ),
+  'balance-5': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <RulerOnFingers fingers={[790, 830]} dough mid={576} guess={700} />
+      <path d="M 576 470 L 576 520 M 810 470 L 810 520 M 576 500 L 810 500" stroke={GUIDE} strokeWidth={4} strokeDasharray="12 9" fill="none" />
+    </Frame>
+  ),
+};
+
+/* --------------------------------------------------------- paper bridge -- */
+
+const BOOKS = ['#c9420d', '#1c6dd0', '#0d8063', '#75465e'];
+const Books = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g>
+    {BOOKS.map((c, i) => (
+      <rect key={c} x={x + (i % 2) * 8} y={y + i * 46} width={250} height={46} rx={4} fill={c} stroke={INK} strokeWidth={4} />
+    ))}
+  </g>
+);
+
+const BRIDGE: Record<string, (label: string) => ReactElement> = {
+  // Top view of the sheet with its folds running the long way, and its end seen as a zigzag.
+  'bridge-3': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <rect x={176} y={150} width={800} height={300} fill="#ffffff" stroke={GUIDE} strokeWidth={4} />
+      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <line key={i} x1={176} y1={150 + i * 37.5} x2={976} y2={150 + i * 37.5} stroke={i % 2 ? CARD : SLANT_EDGE} strokeWidth={4} strokeDasharray={i % 2 ? undefined : '14 10'} />
+      ))}
+      <polyline points={Array.from({ length: 9 }, (_, i) => `${426 + i * 37.5},${i % 2 ? 720 : 640}`).join(' ')} fill="none" stroke={INK} strokeWidth={8} strokeLinejoin="round" />
+      <path d="M 576 470 L 576 600" stroke={GUIDE} strokeWidth={4} strokeDasharray="12 9" />
+      <path d="M 560 585 L 576 610 L 592 585" fill="none" stroke={GUIDE} strokeWidth={4} />
+    </Frame>
+  ),
+  // The zigzag across the gap between two book piles, coins stacked in the middle, and an end-on inset of the folds.
+  'bridge-4': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <TableTop />
+      <Books x={140} y={456} />
+      <Books x={762} y={456} />
+      <rect x={260} y={440} width={632} height={16} fill="#ffffff" stroke={GUIDE} strokeWidth={4} />
+      {Array.from({ length: 11 }, (_, i) => (
+        <line key={i} x1={260 + 20} y1={444 + (i % 2) * 8} x2={892 - 20} y2={444 + (i % 2) * 8} stroke={CARD} strokeWidth={1.5} opacity={0.5} />
+      ))}
+      {Array.from({ length: 9 }, (_, i) => (
+        <ellipse key={i} cx={576} cy={432 - i * 10} rx={30} ry={8} fill={COPPER} stroke={COPPER_EDGE} strokeWidth={2} />
+      ))}
+      <circle cx={960} cy={190} r={130} fill="#ffffff" stroke={GUIDE} strokeWidth={4} />
+      <polyline points={Array.from({ length: 9 }, (_, i) => `${880 + i * 20},${i % 2 ? 220 : 170}`).join(' ')} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" />
+      <path d="M 860 300 L 640 400" stroke={GUIDE} strokeWidth={4} strokeDasharray="12 9" />
+    </Frame>
+  ),
+};
+
+/* ---------------------------------------------------------- pendulum ---- */
+
+const SOCK = '#f3ead7';
+/** A sock with a rice bag in it, hanging from (x, top) on a string `len` px long, pulled back by `pull` px. */
+function Swing({ x, top, len, pull, label }: { readonly x: number; readonly top: number; readonly len: number; readonly pull: number; readonly label: string }) {
+  const bx = x - pull;
+  const by = top + Math.sqrt(len * len - pull * pull);
+  return (
+    <g>
+      <line x1={x} y1={top} x2={x} y2={top + len} stroke={GUIDE} strokeWidth={3} strokeDasharray="10 8" />
+      <line x1={x} y1={top} x2={bx} y2={by} stroke={INK} strokeWidth={4} />
+      <path d={`M ${bx - 26} ${by} Q ${bx - 30} ${by + 70} ${bx} ${by + 76} Q ${bx + 34} ${by + 80} ${bx + 32} ${by + 52} L ${bx + 26} ${by} Z`} fill={SOCK} stroke={INK} strokeWidth={4} />
+      <text x={x + 24} y={top + len / 2} fontFamily="Andika, sans-serif" fontSize={44} fill={INK}>
+        {label}
+      </text>
+    </g>
+  );
+}
+
+const PENDULUM: Record<string, (label: string) => ReactElement> = {
+  'pendulum-2': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <rect x={120} y={96} width={912} height={26} rx={13} fill={WOOD} stroke={WOOD_EDGE} strokeWidth={4} />
+      <Swing x={420} top={122} len={560} pull={130} label="70 cm" />
+      <Swing x={820} top={122} len={200} pull={130} label="25 cm" />
+    </Frame>
+  ),
+};
+
+export const MAKE_FIGURES: Record<string, (label: string) => ReactElement> = { ...KOLAM, ...TANGRAM, ...LEVER, ...BALANCE, ...BRIDGE, ...PENDULUM };
 
 export function MakeFigure({ id, label }: { readonly id: string; readonly label: string }) {
   const f = MAKE_FIGURES[id];
