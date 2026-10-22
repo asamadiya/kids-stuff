@@ -1,50 +1,26 @@
-import type { GrownUpNote } from '../notes/types';
+import type { Activity } from './types';
+import { MAKE_AREAS } from './types';
+
+export type { Activity, MakeArea, Place } from './types';
+export { MAKE_AREAS } from './types';
 
 /**
- * Make & Do: things a grown-up and the child do together off the screen, in
- * the kitchen, at the table, in the garden or outdoors. The screen is only the
- * card: what you need, four to six picture steps, what to notice and one
- * question. These replace the Workshop instruments, which nobody could start.
+ * Safety follows the advisor's charter, section 3, and the toddler review in
+ * q7 ruling 17: large materials, small parts kept from the two-year-old, low
+ * drops made by the grown-up standing on the floor, water supervised
+ * throughout, and no loose powerful magnets, button batteries, balloons,
+ * flames, hot water or mains power. Food is vegetarian; eggs are fine.
+ * Anything eaten afterwards must have stayed fresh, sprouts are cooked
+ * through, and a batch that went off is thrown away, never rinsed and eaten.
  *
- * Step text is addressed to the pair doing it. The pictures show Arjun from
- * the family cast sheet with Mummy or Papa, never a character called Rikki.
- * Each `art` string leads with the action, because an edit-from-reference
- * prompt that does not copies the sheet's standing poses; it is also the
- * picture's alt text, so it shows exactly what the step says.
- *
- * Safety follows the advisor's charter, section 3: large materials, small parts
- * kept from the two-year-old, low drops, water supervised throughout, and no
- * loose powerful magnets, button batteries, flames, hot water or mains power.
- * Food is vegetarian; eggs are fine. Anything eaten afterwards must have stayed
- * fresh, sprouts are cooked through, and a batch that went off is thrown away,
- * never rinsed and eaten.
+ * The first twelve live here; the later ones live one file per idea area in
+ * src/make/more/*.ts, each exporting `MORE`, and are merged below.
  */
-export interface Activity {
-  readonly id: string;
-  readonly title: string;
-  readonly hook: string;
-  readonly where: 'kitchen' | 'garden' | 'outdoors' | 'table';
-  /** Hands-on minutes: the whole activity in one sitting, or its setup when `span` is set. */
-  readonly minutes: number;
-  /**
-   * For an activity that is not done in one sitting, the whole commitment as a
-   * short phrase shown instead of the minutes on the card and the page: a
-   * five-day experiment is not a fifteen-minute one. Keep it to a few words; it
-   * sits in a pill on a quarter-width card. The note's `expect` spells out each
-   * sitting. Absent when the whole thing is done in one sitting.
-   */
-  readonly span?: string;
-  readonly need: readonly string[];
-  readonly steps: readonly { readonly text: string; readonly art: string }[];
-  readonly notice: string;
-  readonly ask: string;
-  readonly pairsWith?: string;
-  readonly note: GrownUpNote;
-}
 
-export const ACTIVITIES: readonly Activity[] = [
+const FIRST: readonly Activity[] = [
   {
     id: 'how-many-pennies-sink-a-boat',
+    area: 'water',
     title: 'How Many Pennies Sink a Paper Boat?',
     hook: 'Same paper, two shapes, a pile of pennies.',
     where: 'garden',
@@ -95,6 +71,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'what-time-is-it-stick',
+    area: 'sound-light',
     title: 'What Time Is It, Stick?',
     hook: 'Chalk the shadow every hour and watch it turn.',
     where: 'outdoors',
@@ -150,6 +127,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'moong-in-the-cupboard',
+    area: 'kitchen',
     title: 'Does Moong Need the Light to Sprout?',
     hook: 'Two jars of moong. One goes in the dark.',
     where: 'kitchen',
@@ -205,6 +183,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'ramp-race-two-heights',
+    area: 'forces',
     title: 'Does the Car Go Farther From Higher Up?',
     hook: 'One car, one board, two piles of books.',
     where: 'kitchen',
@@ -259,6 +238,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'why-is-a-ruler-called-a-foot',
+    area: 'numbers',
     title: 'Why Is a Ruler Called a Foot?',
     hook: 'Your feet say one number. Papa’s say another.',
     where: 'table',
@@ -312,6 +292,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'can-an-egg-survive-the-chair',
+    area: 'forces',
     title: 'Can a Boiled Egg Survive the Drop?',
     hook: 'One bare egg, one packed egg, same drop.',
     where: 'kitchen',
@@ -365,6 +346,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'coat-hanger-balance',
+    area: 'forces',
     title: 'Can a Coat Hanger Do Sums?',
     hook: 'Two cups, one hanger. Make it hang level.',
     where: 'table',
@@ -419,6 +401,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'does-the-magnet-want-it',
+    area: 'forces',
     title: 'Does the Fridge Magnet Want It?',
     hook: 'Sort the kitchen into two piles: sticks, or not.',
     where: 'kitchen',
@@ -469,6 +452,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'does-a-towel-keep-ice-cold',
+    area: 'water',
     title: 'Does a Towel Keep Ice Cold?',
     hook: 'Two ice cubes. One gets a blanket.',
     where: 'kitchen',
@@ -518,6 +502,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'rangoli-other-half',
+    area: 'shapes',
     title: 'Finish the Other Half of the Rangoli',
     hook: 'The grown-up makes one half. You make the other.',
     where: 'table',
@@ -567,6 +552,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'what-did-everyone-eat-for-breakfast',
+    area: 'numbers',
     title: 'Who Ate What for Breakfast?',
     hook: 'Ask the family. Draw the answers in columns.',
     where: 'table',
@@ -617,6 +603,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'bundle-the-leaves-in-tens',
+    area: 'numbers',
     title: 'How Many Leaves Did We Pick Up?',
     hook: 'Too many leaves to count? Bundle them in tens.',
     where: 'outdoors',
@@ -669,6 +656,21 @@ export const ACTIVITIES: readonly Activity[] = [
     },
   },
 ];
+
+const modules = import.meta.glob<{ MORE: readonly Activity[] }>(['./more/*.ts', '!./more/_*.ts'], { eager: true });
+const MORE: readonly Activity[] = Object.keys(modules).sort().flatMap((k) => modules[k].MORE);
+
+const areaRank = (a: Activity) => MAKE_AREAS.findIndex((x) => x.id === a.area);
+
+/** Every activity, grouped by idea area in MAKE_AREAS order; inside an area, the first twelve first. */
+export const ACTIVITIES: readonly Activity[] = [...FIRST, ...MORE]
+  .map((a, i) => ({ a, i }))
+  .sort((x, y) => areaRank(x.a) - areaRank(y.a) || x.i - y.i)
+  .map((x) => x.a);
+
+export function activitiesIn(area: Activity['area']): readonly Activity[] {
+  return ACTIVITIES.filter((a) => a.area === area);
+}
 
 export function getActivity(id: string): Activity | undefined {
   return ACTIVITIES.find((a) => a.id === id);
