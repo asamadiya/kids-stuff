@@ -74,7 +74,7 @@ export const ENTRIES: Readonly<Record<string, ArchiveEntry>> = {
       expect: '13 pages, about nine minutes. Halves and quarters by folding are right at a five-year-old’s level, and the crooked fold on page 6 is the clearest lesson; adding a quarter and an eighth on page 8 will be beyond most, so let it go by.',
       practising: 'Equal parts: a half folded in half gives four equal quarters, a fair share needs equal pieces, and an amount can be made from several one-part pieces.',
       ask: 'On page 6, ask “Which piece is wider, and would that be fair to the worker who gets the thin one?”',
-      next: 'Fold a roti, or a paper circle, in half and then in half again and check that the four pieces match edge to edge; then play Share the Roti in Maths.',
+      next: 'Fold a dosa, or a paper circle, in half and then in half again and check that the four pieces match edge to edge; then play Share the Dosa in Maths.',
       honest: 'Ahmes, his copying from an older text, the bread-sharing problems, wages of bread and beer (page 2) and unit fractions are real; his evening and the eye frame are invented. Page 3 is wrong that one-half was written with the open-mouth sign: it had a sign of its own, and the mouth sign was used for parts like a quarter; and on page 10 the papyrus is usually named after Alexander Rhind, the Scot who bought it in 1858, though it is sometimes also called the Ahmes Papyrus. The halving series 1/2 to 1/64 was ancient, written with its own signs for grain measures; what is modern, and now rejected, is the idea that those signs are pieces of the Eye of Horus.',
     },
   },

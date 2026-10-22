@@ -277,7 +277,7 @@ function GameHub({
 }
 
 const MATHS_NOTE: GrownUpNote = {
-  what: 'Maths games he does with his hands: building numbers from tens and ones, loading a balance, filling nests with equal groups, cutting a roti fairly, measuring a dinosaur in blocks. Each has three levels.',
+  what: 'Maths games he does with his hands: building numbers from tens and ones, loading a balance, filling nests with equal groups, cutting a dosa fairly, measuring a dinosaur in blocks. Each has three levels.',
   expect: 'A set is five problems, about five minutes, then the game stops and says "Done for now". If he gets four of the last five right first time, without pressing Help, the next set starts a level higher; two misses in a row and it steps down. He can also press a level himself.',
   practising: 'Place value, equality as balance, part-whole thinking, equal groups and sharing, fractions as equal parts, measuring, shapes, patterns, chance and charts — the ideas that later maths is built on.',
   ask: '"How did you know?" after a right answer — the strategy matters more than the number.',
