@@ -4,9 +4,10 @@ import type { Book } from '../types';
  * Ugadi, the Telugu new year, at home in the Bay Area (advisor a8 ruling C):
  * an adult makes the pachadi, the six tastes are given as what Nanna's family
  * says they stand for, and tasting is invited, never required: Arjun tries
- * one spoonful, does not like the bitter, and is not asked to eat more. Amma
- * names her own new year, Puthandu, as a different day in April, and calls
- * the doorstep pattern a kolam where Nanna says muggu.
+ * one spoonful when asked if he wants to, does not like the bitter, and is
+ * not asked to eat more. Amma names her own new year, Puthandu, as a
+ * different day in April, and calls the doorstep pattern a kolam where Nanna
+ * says muggu.
  *
  * Taste-to-ingredient follows en.wikipedia "Ugadi": tamarind is the sour, raw
  * mango the astringent (a tight, dry mouth), neem flowers the bitter, added
@@ -73,14 +74,14 @@ export const book: Book = {
       alt: 'Nanna stirs the pachadi and explains while Arjun leans on the counter, frowning and thinking.',
     },
     {
-      text: 'Nanna gave Arjun a tiny spoonful. Arjun tasted it. Sweet, then sour, then tight. Then came the bitter. Arjun screwed up his whole face.',
+      text: '“Want to try a tiny taste?” asked Nanna. “You can say no.” Arjun thought, then nodded. He tasted it. Sweet, then sour, then tight. Then came the bitter. Arjun screwed up his whole face.',
       zone: 'right',
-      art: 'Close view of Arjun’s face and shoulders, in the left two-thirds of the picture: a small steel spoon is still at his lips and his whole face is screwed up tight at the bitter taste, eyes squeezed shut, tongue half out, shoulders up by his ears. Nanna’s hand is just visible at the left edge holding the steel bowl. The right third is plain white cupboard doors, kept clear for words.',
+      art: 'Close view of Arjun’s face and shoulders, in the left two-thirds of the picture: he has just taken a small steel spoon from Nanna and it is still at his lips and his whole face is screwed up tight at the bitter taste, eyes squeezed shut, tongue half out, shoulders up by his ears. Nanna’s hand is just visible at the left edge holding the steel bowl. The right third is plain white cupboard doors, kept clear for words.',
       characters: ['Arjun'],
       alt: 'Arjun screws up his whole face at the bitter taste, the spoon still at his lips.',
     },
     {
-      text: '“You don’t have to eat more,” said Nanna. “One taste is plenty.” Arjun thought about it. “Can I have just the sweet bit?” Nanna laughed and gave him a crumb of jaggery.',
+      text: '“That’s plenty,” said Nanna. “You don’t have to have more.” Arjun thought about it. “Can I have just the sweet bit?” Nanna laughed and gave him a crumb of jaggery.',
       zone: 'top',
       art: 'Medium view at the counter: Nanna laughs, holding out a small crumb of dark brown jaggery on his open palm; Arjun, on the step stool, reaches for it with a sheepish grin, the bowl of pachadi pushed a little away from him on the counter. The top third is plain white cupboards and wall, kept clear for words.',
       characters: ['Nanna', 'Arjun'],
@@ -112,7 +113,8 @@ export const book: Book = {
     title: 'Taste one at a time',
     steps: [
       'A grown-up sets out a little of each: jaggery or brown sugar, tamarind or lemon, a pinch of salt.',
-      'Taste one at a time and find a word for each: sweet, sour, salty.',
+      'Ask before each one: "Want to taste this one?" No is a fine answer, and so is just smelling it.',
+      'Taste the ones he chooses and find a word for each: sweet, sour, salty.',
       'Ask: "Which one do you want again? Which one is not for you?" Both answers are fine.',
       'If you are making Ugadi pachadi, let your child crumble the jaggery and stir.',
       'Talk about one sweet day and one hard day from this week.',
@@ -121,9 +123,9 @@ export const book: Book = {
       'Raw mango is cut by a grown-up. Neem flowers go in only in small amounts, as in the usual recipe. Give a two-year-old a soft crumb of jaggery, not a hard lump.',
   },
   note: {
-    what: 'Ugadi, the Telugu new year, at home: Arjun helps hang the mango leaves and make Ugadi pachadi with Nanna, who names the six tastes and what his family says they stand for. Arjun tastes one spoonful, dislikes the bitter, and is not asked to eat more.',
-    expect: 'He will probably side with Arjun’s face on page 8 and may ask why anyone would put bitter in on purpose. That is the conversation the book is for. If he wants to try pachadi, a quarter of a teaspoon is a real taste.',
-    practising: 'Naming tastes (sweet, sour, salty, hot, bitter, and the tight, dry taste of raw mango), and the idea that a year, like a bowl, has more than one kind of day in it. Also that trying something is enough: tasting is never a test of belonging.',
+    what: 'Ugadi, the Telugu new year, at home: Arjun helps hang the mango leaves and make Ugadi pachadi with Nanna, who names the six tastes and what his family says they stand for. Nanna asks whether he wants a taste; Arjun chooses one spoonful, dislikes the bitter, and is not asked to eat more.',
+    expect: 'He will probably side with Arjun’s face on page 8 and may ask why anyone would put bitter in on purpose. That is the conversation the book is for. Nanna asks before the first taste and Arjun could have said no; if he wants to try pachadi, a quarter of a teaspoon is a real taste, and if he does not, smelling it or stirring it is enough.',
+    practising: 'Naming tastes (sweet, sour, salty, hot, bitter, and the tight, dry taste of raw mango), and the idea that a year, like a bowl, has more than one kind of day in it. Also that tasting is his choice, and trying something once is enough: tasting is never a test of belonging.',
     ask: 'At page 7: “What would a sweet day be for you? What would a bitter one be?”',
     next: 'If your family keeps Ugadi, give him the jaggery job and let him choose whether to taste. Many families also hear the new year’s panchangam read by an elder that evening; if a grandparent does this on a video call, let him sit in for the start.',
     honest: 'The six tastes standing for the kinds of days a year brings is a traditional association, not a fact about food or feelings. Recipes vary from family to family; this is one family’s bowl, in the Bay Area, with neem flowers from the Indian store. Amma’s Tamil new year, Puthandu, falls on or about 14 April, set by a different calendar, so it comes a few days to a few weeks after Ugadi.',
