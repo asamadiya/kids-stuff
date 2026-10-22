@@ -8,6 +8,7 @@ import { LANG_NAME, LANG_PARENT } from './types';
 import { LANG_BOOKS, MOMENTS, RHYMES, WHEN_LABEL, WORDS, getLangBook, getMoment, getRhyme } from './index';
 import { Voice } from './Voice';
 import { Recorder } from './Recorder';
+import { pickRound } from './deck';
 import { GUIDE } from './guide';
 import { allKeys, clearAll, clipKey, commitImport, exportAll, onVoicesChange, readImport, voicesChanged } from './voices';
 import { altText } from '../learn/alt';
@@ -231,7 +232,12 @@ export function WordsPage() {
     load();
     return onVoicesChange(load);
   }, []);
-  const recorded = WORDS.filter((w) => have.has(clipKey(w.id, lang)));
+  const recorded = useMemo(() => WORDS.filter((w) => have.has(clipKey(w.id, lang))), [have, lang]);
+  const deckKey = recorded.map((w) => w.id).join(',') + lang;
+  useEffect(() => {
+    setRound(0);
+    setPicked(null);
+  }, [deckKey]);
   const game = recorded.length >= 3 ? pickRound(recorded, round) : null;
   return (
     <Page title="Words" back={{ href: '#/langs', label: 'Telugu & Tamil' }} note={WORDS_NOTE} expect="Picture words and a listening game.">
@@ -265,7 +271,7 @@ export function WordsPage() {
             ) : null}
           </>
         ) : (
-          <p className="lc-lede">
+          <p className="listen__empty">
             The listening game uses your voices. Record at least three words in {LANG_NAME[lang]} under <a href="#/langs/record">Record voices</a>, or play it by saying the word yourself and letting him point.
           </p>
         )}
@@ -280,17 +286,6 @@ export function WordsPage() {
       </div>
     </Page>
   );
-}
-
-function pickRound(pool: readonly Pair[], n: number) {
-  const target = pool[(n * 7) % pool.length];
-  const others = pool.filter((w) => w.id !== target.id);
-  const a = others[(n * 3) % others.length];
-  const b = others[(n * 5 + 1) % others.length] === a ? others[(n * 5 + 2) % others.length] : others[(n * 5 + 1) % others.length];
-  const choices = [target, a, b].filter(Boolean);
-  // a stable shuffle by round number, so the right answer is not always first
-  const rot = n % choices.length;
-  return { target, choices: [...choices.slice(rot), ...choices.slice(0, rot)] };
 }
 
 /* -------------------------------------------------------------- guide --- */
