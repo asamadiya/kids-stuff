@@ -57,6 +57,7 @@ function tickFor(e: Entry): string | null {
       return playedBefore(e.key.split('/')[1]) ? 'Played before' : null;
     case 'Make & Do':
     case 'Play together':
+    case 'Telugu & Tamil':
       return read(e.key) ? 'Done before' : null;
   }
 }
@@ -71,8 +72,8 @@ function EntryCard({ e, tone }: { readonly e: Entry; readonly tone?: Part }) {
 /* ------------------------------------------------------------------ home --- */
 
 const HOME_NOTE: GrownUpNote = {
-  what: "Rikki's Learning Center has five parts: picture books and read-alouds (Stories), maths games, science games that ask him to predict before he looks, Make & Do (things to make together away from the screen), and Play with Dad & Mom (fifty games for the two of you with things already in the house).",
-  expect: 'He can choose by picture alone from the five doors. Everything in the centre is listed under them, by part and group, so you can see it all on one page; Everything (top right) searches it, including the 193 longer read-alouds. Every item has a note like this one.',
+  what: "Rikki's Learning Center has six parts: picture books and read-alouds (Stories), maths games, science games that ask him to predict before he looks, Make & Do (things to make together away from the screen), Play with Dad & Mom (fifty games for the two of you with things already in the house), and Telugu & Tamil (things to say, sing and read with Nanna and Amma).",
+  expect: 'He can choose by picture alone from the six doors. Everything in the centre is listed under them, by part and group, so you can see it all on one page; Everything (top right) searches it, including the 193 longer read-alouds. Every item has a note like this one.',
   practising: 'Reading together, mathematical and scientific reasoning, making and testing things, and playing together: the everyday life of a five-year-old with a two-year-old sister.',
   ask: '"Which one do you want to show me?" — let him lead you to something he has done before.',
   next: 'Make & Do and Play with Dad & Mom are meant to end a session: something real, with your hands, after the screen.',
@@ -102,7 +103,7 @@ export function Home() {
             <span className="door__label">
               <span className="door__name">{p.name}</span>
               <span className="door__meta">
-                {n[p.id]} {p.id === 'stories' ? 'things to read' : p.id === 'together' ? 'ways to play' : p.id === 'make' ? 'things to make' : 'games'}
+                {p.id === 'langs' ? 'Say, sing and read' : `${n[p.id]} ${p.id === 'stories' ? 'things to read' : p.id === 'together' ? 'ways to play' : p.id === 'make' ? 'things to make' : 'games'}`}
                 {p.badge ? <span className="door__badge">{p.badge}</span> : null}
               </span>
             </span>

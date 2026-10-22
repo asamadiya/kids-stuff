@@ -27,12 +27,19 @@ export type Route =
   | { readonly kind: 'activity'; readonly id: string }
   | { readonly kind: 'together' }
   | { readonly kind: 'idea'; readonly id: string }
-  | { readonly kind: 'all' };
+  | { readonly kind: 'all' }
+  | { readonly kind: 'langs' }
+  | { readonly kind: 'langMoment'; readonly id: string }
+  | { readonly kind: 'langRhyme'; readonly id: string }
+  | { readonly kind: 'langBook'; readonly id: string; readonly page: number }
+  | { readonly kind: 'langWords' }
+  | { readonly kind: 'langGuide' }
+  | { readonly kind: 'langRecord' };
 
 export type RouteKind = Route['kind'];
 
 /** Which part of the centre a route belongs to; `null` for home and the Everything index. */
-export type Quadrant = 'stories' | 'maths' | 'science' | 'make' | 'together';
+export type Quadrant = 'stories' | 'maths' | 'science' | 'make' | 'together' | 'langs';
 
 export const QUADRANT: Record<RouteKind, Quadrant | null> = {
   home: null,
@@ -52,6 +59,13 @@ export const QUADRANT: Record<RouteKind, Quadrant | null> = {
   together: 'together',
   idea: 'together',
   all: null,
+  langs: 'langs',
+  langMoment: 'langs',
+  langRhyme: 'langs',
+  langBook: 'langs',
+  langWords: 'langs',
+  langGuide: 'langs',
+  langRecord: 'langs',
 };
 
 /** Distance from home. Descending pushes a history entry; anything else replaces. */
@@ -63,12 +77,19 @@ export const DEPTH: Record<RouteKind, number> = {
   make: 1,
   together: 1,
   all: 1,
+  langs: 1,
   shelf: 2,
   library: 2,
   mathsGame: 2,
   scienceGame: 2,
   activity: 2,
   idea: 2,
+  langMoment: 2,
+  langRhyme: 2,
+  langBook: 2,
+  langWords: 2,
+  langGuide: 2,
+  langRecord: 2,
   subject: 3,
   book: 3,
   situation: 3,
@@ -111,6 +132,20 @@ export function toHash(route: Route): string {
       return `#/together/${route.id}`;
     case 'all':
       return '#/all';
+    case 'langs':
+      return '#/langs';
+    case 'langMoment':
+      return `#/langs/say/${route.id}`;
+    case 'langRhyme':
+      return `#/langs/rhyme/${route.id}`;
+    case 'langBook':
+      return `#/langs/book/${route.id}/${route.page + 1}`;
+    case 'langWords':
+      return '#/langs/words';
+    case 'langGuide':
+      return '#/langs/guide';
+    case 'langRecord':
+      return '#/langs/record';
   }
 }
 
@@ -134,6 +169,9 @@ export interface Known {
   readonly science: ReadonlySet<string>;
   readonly activities: ReadonlySet<string>;
   readonly ideas: ReadonlySet<string>;
+  readonly moments: ReadonlySet<string>;
+  readonly rhymes: ReadonlySet<string>;
+  readonly langBooks: ReadonlyMap<string, number>; // id -> page count
 }
 
 function decode(raw: string | undefined): string | undefined {
@@ -161,7 +199,7 @@ export function parseHash(rawHash: string, known: Known): Route {
   const [pathPart] = rawHash.replace(/^#/, '').split('?');
   const clean = pathPart.replace(/^\/+/, '').replace(/\/+$/, '');
   if (clean === '') return { kind: 'home' };
-  const [head, a, b] = clean.split('/').map(decode);
+  const [head, a, b, c] = clean.split('/').map(decode);
 
   switch (head) {
     case 'stories': {
@@ -198,6 +236,16 @@ export function parseHash(rawHash: string, known: Known): Route {
       return { kind: 'together' };
     case 'all':
       return { kind: 'all' };
+    case 'langs':
+      if (a === 'say' && b && known.moments.has(b)) return { kind: 'langMoment', id: b };
+      if (a === 'rhyme' && b && known.rhymes.has(b)) return { kind: 'langRhyme', id: b };
+      if (a === 'book' && b && known.langBooks.has(b)) {
+        return { kind: 'langBook', id: b, page: pageOf(c, known.langBooks.get(b)!) };
+      }
+      if (a === 'words') return { kind: 'langWords' };
+      if (a === 'guide') return { kind: 'langGuide' };
+      if (a === 'record') return { kind: 'langRecord' };
+      return { kind: 'langs' };
     default:
       return legacy(head, a, known);
   }
@@ -239,6 +287,7 @@ export function parentOf(route: Route, shelfOf: ShelfOf, subjectOf: (slug: strin
     case 'make':
     case 'together':
     case 'all':
+    case 'langs':
       return { href: '#/', label: 'Home' };
     case 'shelf':
     case 'library':
@@ -263,5 +312,12 @@ export function parentOf(route: Route, shelfOf: ShelfOf, subjectOf: (slug: strin
       return { href: '#/make', label: 'Make & Do' };
     case 'idea':
       return { href: '#/together', label: 'Play Together' };
+    case 'langMoment':
+    case 'langRhyme':
+    case 'langBook':
+    case 'langWords':
+    case 'langGuide':
+    case 'langRecord':
+      return { href: '#/langs', label: 'Telugu & Tamil' };
   }
 }

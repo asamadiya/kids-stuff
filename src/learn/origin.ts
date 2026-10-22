@@ -29,6 +29,8 @@ const LABEL: Partial<Record<Route['kind'], string>> = {
   science: 'Science',
   make: 'Make & Do',
   together: 'Play Together',
+  langs: 'Telugu & Tamil',
+  langWords: 'Words',
 };
 
 /** The identity of the item a route shows, independent of the page it is on. */
@@ -48,6 +50,12 @@ export function itemKey(r: Route): string | null {
       return `make/${r.id}`;
     case 'idea':
       return `together/${r.id}`;
+    case 'langMoment':
+      return `langs/say/${r.id}`;
+    case 'langRhyme':
+      return `langs/rhyme/${r.id}`;
+    case 'langBook':
+      return `langs/book/${r.id}`;
     default:
       return null;
   }
