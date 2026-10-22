@@ -159,7 +159,8 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Take your fingers away and bump it once more. Which way sounds like a bell?',
-        art: 'Arjun stands beside a wooden dining chair with his hands apart at chest height, well away from his ears, the end of one string wound round each pointing finger. The two strings run straight down from his fingers to the two bottom corners of a thin metal wire coat hanger hanging upside down, hook pointing at the floor, and its bar bumps the front edge of the chair seat. His eyebrows are raised in surprise. Amma kneels beside him with both hands resting on her knees and watches his face, waiting for his answer. She does not touch the strings or the hanger.',
+        art: 'Two pictures side by side. Left: fingertips pressed to the flaps in front of the ears, the strings running down to a coat hanger that taps a chair edge, with big sound marks reaching the ear. Right: the same tap with the fingers held away from the ears, and only a small sound mark.',
+        figure: 'hanger-5',
       },
       {
         text: 'Put your fingertips back on the flaps. The grown-up taps the hanger with a spoon, then a fork.',
