@@ -1,117 +1,33 @@
 import type { ReactNode } from 'react';
-import { Card, Page } from './Page';
-import { FourUp } from './FourUp';
+import { useStored } from './scroll';
+import { FilterPanel } from './Filters';
+import { Card, CardGroup, EverythingLink, GroupJumps, Page, jump } from './Page';
 import { GrownUps } from './GrownUps';
 import type { GrownUpNote } from '../notes/types';
-import { BOOKS, SHELVES, booksOn, getShelf } from '../books/registry';
-import { artSrc } from '../books/BookReader';
+import { booksOn, getShelf } from '../books/registry';
 import type { ShelfId } from '../books/types';
 import { SITUATIONS } from './situations';
 import type { Story } from '../types';
 import { ARCHIVE, CURATED_ARCHIVE, LIBRARY_NOTE, SUBJECTS, archiveLabel, archiveStory, storiesIn } from './library';
 import { MATHS_GAMES, MATHS_GROUPS } from '../maths/registry';
 import { SCIENCE_GAMES, SCIENCE_GROUPS } from '../science/registry';
-import { ACTIVITIES } from '../make/activities';
+import { ACTIVITIES, MAKE_AREAS } from '../make/activities';
 import { playedBefore } from '../play/progress';
 import type { AnyGame } from '../play/types';
+import { ENTRIES, PARTS, cardSrc, counts, directory, thumbSrc } from './catalog';
+import type { Entry, Part } from './catalog';
 
-const BASE = import.meta.env.BASE_URL;
-
-/* ------------------------------------------------------------------ home --- */
-
-const HOME_NOTE: GrownUpNote = {
-  what: "Rikki's Learning Center has four parts: picture books and read-alouds (Stories), maths games, science games that ask him to predict before he looks, and things to make and do together away from the screen.",
-  expect: 'He can choose by picture alone. Every game and book has a "For grown-ups" note like this one, in the same top-right place, saying what it is for and what to watch for.',
-  practising: 'Reading together, mathematical and scientific reasoning, and the everyday social situations of a five-year-old with a two-year-old sister.',
-  ask: '"Which one do you want to show me?" — let him lead you to something he has done before.',
-  next: 'Make & Do is designed to be the end of a session: something real, with your hands, after the screen.',
-  honest: 'Nothing here is scored and nothing claims mastery. Games stop after five problems on purpose. The best of it happens when you are sitting next to him.',
-};
-
-const QUADS: ReadonlyArray<{ id: 'stories' | 'maths' | 'science' | 'make'; name: string; href: string; art: string; badge?: string }> = [
-  { id: 'stories', name: 'Stories', href: '#/stories', art: 'art/hubs/stories.webp' },
-  { id: 'maths', name: 'Maths', href: '#/maths', art: 'art/hubs/maths.webp' },
-  { id: 'science', name: 'Science', href: '#/science', art: 'art/hubs/science.webp' },
-  { id: 'make', name: 'Make & Do', href: '#/make', art: 'art/hubs/make.webp', badge: 'With a grown-up' },
-];
-
-export function Home() {
-  return (
-    <main id="main-content" className="lc-page" tabIndex={-1}>
-      <header className="lc-top">
-        <span className="lc-top__spacer" />
-        <GrownUps note={HOME_NOTE} title="Rikki's Learning Center" />
-      </header>
-      <div className="home__hello">
-        <div>
-          <h1 className="home__name">
-            Rikki&rsquo;s <span>Learning Center</span>
-          </h1>
-          <p className="home__sub">Books, maths, science, and things to make. Pick one.</p>
-        </div>
-      </div>
-      <nav className="quad" aria-label="Choose">
-        {QUADS.map((q) => (
-          <a key={q.id} className={`quad__card quad__card--${q.id}`} href={q.href}>
-            <span className="quad__art" style={{ backgroundImage: `url(${BASE}${q.art})` }} aria-hidden="true" />
-            <span className="quad__label">
-              <span className="quad__name">{q.name}</span>
-              {q.badge ? <span className="quad__badge">{q.badge}</span> : null}
-            </span>
-          </a>
-        ))}
-      </nav>
-    </main>
-  );
-}
-
-/* --------------------------------------------------------------- stories --- */
-
-const STORIES_NOTE: GrownUpNote = {
-  what: 'Six shelves: picture books about Arjun and his family and friends, tales from India, festivals at home, how things work, people and discoveries, and the Big Library of longer true read-alouds.',
-  expect: 'The picture books are for reading aloud together in about five minutes each. He can follow the story from the pictures; you read the words.',
-  practising: 'Listening to a story with a problem and a turn; talking about what a character felt and chose.',
-  ask: '"What do you think happens next?" — once, at the turning point, not on every page.',
-  next: 'Every family and science book ends with an optional Try-this card for later.',
-  honest: 'Reading levels follow a developmental advisor\'s guidance (15 to 35 words a page for reading aloud). They are written to be read TO him, not BY him.',
-};
-
-const SHELF_ART: Record<string, string> = {
-  family: 'art/hubs/shelf-family.webp',
-  tales: 'art/hubs/shelf-tales.webp',
-  festivals: 'art/hubs/shelf-festivals.webp',
-  how: 'art/hubs/shelf-how.webp',
-  people: 'art/hubs/shelf-people.webp',
-  library: 'art/hubs/shelf-library.webp',
-};
-
-export function Stories({ page }: { readonly page: number }) {
-  const shelves: ReadonlyArray<{ id: string; title: string; line: string; href: string }> = [
-    ...SHELVES.map((s) => ({ id: s.id, title: s.title, line: s.line, href: `#/stories/${s.id}` })),
-    { id: 'library', title: 'The Big Library', line: `${ARCHIVE.length} longer read-alouds, by subject.`, href: '#/library' },
-  ];
-  const shown = page === 2 ? shelves.slice(4) : shelves.slice(0, 4);
-  return (
-    <Page title="Stories" back={{ href: '#/', label: 'Home' }} note={STORIES_NOTE} band="stories" expect="Picture books for reading aloud together, about five minutes each.">
-      <div className="cards cards--four">
-        {shown.map((s) => (
-          <Card key={s.id} href={s.href} title={s.title} hook={s.line} art={`${BASE}${SHELF_ART[s.id]}`} tone="stories" />
-        ))}
-      </div>
-      <nav className="pager" aria-label="More shelves">
-        {page === 2 ? (
-          <a className="btn btn--big" href="#/stories">
-            <span aria-hidden="true">←</span> First shelves
-          </a>
-        ) : (
-          <a className="btn btn--big btn--primary" href="#/stories?p=2">
-            More shelves <span aria-hidden="true">→</span>
-          </a>
-        )}
-      </nav>
-    </Page>
-  );
-}
+/**
+ * The listing screens: home, the five part hubs, the shelves and the library.
+ *
+ * The parent, after living with the first version: "Hard to navigate. Too many
+ * clicks to get a view of what the site contains." Every listing showed four
+ * cards and a More button (an earlier advisor ruling), Stories was split over
+ * two pages, and the library sat three levels down. Now (advisor q7 rulings
+ * 1-3): home shows five picture doors and, under them, the whole contents as
+ * linked titles; every hub shows all of its groups and all of their items;
+ * the part navigation sits on every listing.
+ */
 
 const read = (key: string) => {
   try {
@@ -128,72 +44,169 @@ export const markRead = (key: string) => {
   }
 };
 
+/** "Read before" / "Played before" / "Done before", by the kind of thing. */
+function tickFor(e: Entry): string | null {
+  switch (e.kind) {
+    case 'Picture book':
+    case 'Longer read-aloud':
+      return read(e.key) ? 'Read before' : null;
+    case 'Situation':
+      return playedBefore(e.key) || read(e.key) ? 'Played before' : null;
+    case 'Maths game':
+    case 'Science game':
+      return playedBefore(e.key.split('/')[1]) ? 'Played before' : null;
+    case 'Make & Do':
+    case 'Play together':
+      return read(e.key) ? 'Done before' : null;
+  }
+}
+
+const tagFor = (e: Entry) =>
+  e.kind === 'Longer read-aloud' ? archiveLabel(e.key.split('/')[1]) : e.where ? `${e.time} · ${e.where}` : e.time;
+
+function EntryCard({ e, tone }: { readonly e: Entry; readonly tone?: Part }) {
+  return <Card href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} tone={tone ?? e.part} tag={tagFor(e)} tick={tickFor(e)} itemKey={e.key} />;
+}
+
+/* ------------------------------------------------------------------ home --- */
+
+const HOME_NOTE: GrownUpNote = {
+  what: "Rikki's Learning Center has five parts: picture books and read-alouds (Stories), maths games, science games that ask him to predict before he looks, Make & Do (things to make together away from the screen), and Play with Dad & Mom (fifty games for the two of you with things already in the house).",
+  expect: 'He can choose by picture alone from the five doors. Everything in the centre is listed under them, by part and group, so you can see it all on one page; Everything (top right) searches it, including the 193 longer read-alouds. Every item has a note like this one.',
+  practising: 'Reading together, mathematical and scientific reasoning, making and testing things, and playing together: the everyday life of a five-year-old with a two-year-old sister.',
+  ask: '"Which one do you want to show me?" — let him lead you to something he has done before.',
+  next: 'Make & Do and Play with Dad & Mom are meant to end a session: something real, with your hands, after the screen.',
+  honest: 'Nothing here is scored and nothing claims mastery. Games stop after five problems on purpose. The best of it happens when you are sitting next to him.',
+};
+
+export function Home() {
+  const dir = directory();
+  const n = counts();
+  return (
+    <main id="main-content" className="lc-page lc-page--home" tabIndex={-1}>
+      <header className="lc-top lc-top--home">
+        <h1 className="home__name">
+          Rikki&rsquo;s <span>Learning Center</span>
+        </h1>
+        <div className="lc-top__tools">
+          <EverythingLink />
+          <GrownUps note={HOME_NOTE} title="Rikki's Learning Center" />
+        </div>
+      </header>
+      <nav className="doors" aria-label="Choose">
+        {PARTS.map((p) => (
+          <a key={p.id} className={`door door--${p.id}`} href={p.href}>
+            <span className="door__art" aria-hidden="true">
+              <img src={cardSrc(`hub/${p.id}`)} alt="" width={560} height={436} decoding="async" />
+            </span>
+            <span className="door__label">
+              <span className="door__name">{p.name}</span>
+              <span className="door__meta">
+                {n[p.id]} {p.id === 'stories' ? 'things to read' : p.id === 'together' ? 'ways to play' : p.id === 'make' ? 'things to make' : 'games'}
+                {p.badge ? <span className="door__badge">{p.badge}</span> : null}
+              </span>
+            </span>
+          </a>
+        ))}
+      </nav>
+
+      <section className="dir" aria-labelledby="dir-title">
+        <div className="dir__head">
+          <h2 id="dir-title" className="dir__title">Everything here</h2>
+          <nav className="dir__jumps" aria-label="Jump to a part">
+            {PARTS.map((p) => (
+              <a key={p.id} href={`#d-${p.id}`} className={`dir__jump dir__jump--${p.id}`} onClick={(e) => jump(e, `d-${p.id}`)}>
+                {p.name}
+              </a>
+            ))}
+          </nav>
+        </div>
+        {dir.map(({ part, groups }) => (
+          <section key={part.id} id={`d-${part.id}`} className={`dir__part dir__part--${part.id}`} aria-labelledby={`dh-${part.id}`}>
+            <h3 id={`dh-${part.id}`} className="dir__part-title">
+              <a href={part.href}>{part.name}</a>
+              <span className="dir__part-n">{n[part.id]}</span>
+            </h3>
+            <div className="dir__groups">
+              {groups.map((g) => (
+                <section key={g.id} className="dir__group" aria-label={g.title}>
+                  <h4 className="dir__group-title">{g.title}</h4>
+                  <ul className="dir__list">
+                    {g.entries.map((e) => (
+                      <li key={e.key}>
+                        <a className="dir__item" href={e.href} data-key={e.key}>
+                          {e.art ? <img className="dir__thumb" src={thumbSrc(e.key)} alt="" width={64} height={50} loading="lazy" decoding="async" /> : <span className="dir__thumb" />}
+                          <span className="dir__item-title">{e.title}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </section>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+
+/* --------------------------------------------------------------- stories --- */
+
+const STORIES_NOTE: GrownUpNote = {
+  what: 'Every story in one place: picture books about Arjun and his family and friends, tales from India, festivals at home, how things work, and people and discoveries; the Try a Situation exercises; and the Big Library of longer true read-alouds, by subject.',
+  expect: 'The picture books are for reading aloud together in about five minutes each. He can follow the story from the pictures; you read the words.',
+  practising: 'Listening to a story with a problem and a turn; talking about what a character felt and chose.',
+  ask: '"What do you think happens next?" — once, at the turning point, not on every page.',
+  next: 'Every family and science book ends with an optional Try-this card for later.',
+  honest: "Reading levels follow a developmental advisor's guidance (15 to 35 words a page for reading aloud). They are written to be read TO him, not BY him.",
+};
+
+export function Stories() {
+  const groups = directory().find((d) => d.part.id === 'stories')!.groups;
+  return (
+    <Page title="Stories" back={null} part="stories" note={STORIES_NOTE} expect="Picture books for reading aloud together, about five minutes each.">
+      <GroupJumps groups={groups.map((g) => ({ id: g.id, title: g.title, n: g.id === 'library' ? ARCHIVE.length : g.entries.length }))} />
+      {groups.map((g) => (
+        <CardGroup key={g.id} id={g.id} title={g.title} line={g.line}>
+          {g.entries.map((e) => (g.id === 'library' ? <Card key={e.key} href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} tone="stories" /> : <EntryCard key={e.key} e={e} />))}
+        </CardGroup>
+      ))}
+      <p className="hub__more">
+        <a className="btn" href="#/library">
+          Open the Big Library <span aria-hidden="true">→</span>
+        </a>
+      </p>
+    </Page>
+  );
+}
+
 export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
   const s = getShelf(shelf)!;
   const books = booksOn(shelf);
   return (
-    <Page title={s.title} back={{ href: '#/stories', label: 'Stories' }} note={s.note} band="stories" expect={s.line}>
-      <section className="hub__group" aria-label="Books">
-        <FourUp
-          label="Books"
-          items={books.map((b) => (
-            <Card
-              key={b.slug}
-              href={`#/book/${b.slug}/1`}
-              title={b.title}
-              hook={b.hook}
-              art={artSrc(b.slug, 'cover')}
-              tone="stories"
-              tick={read(`book/${b.slug}`) ? 'Read before' : null}
-            />
-          ))}
-        />
-      </section>
+    <Page title={s.title} back={{ href: '#/stories', label: 'Stories' }} part="stories" note={s.note} expect={s.line}>
+      <CardGroup id="books" title="Books">
+        {books.map((b) => (
+          <EntryCard key={b.slug} e={entryFor(`book/${b.slug}`)} />
+        ))}
+      </CardGroup>
       {shelf === 'family' ? (
-        <section className="hub__group" aria-labelledby="situations">
-          <div className="hub__group-head">
-            <h2 id="situations" className="hub__group-title">Try a situation</h2>
-            <p className="hub__group-line">Short exercises built from the same moments as the books.</p>
-          </div>
-          <FourUp
-            label="Try a situation"
-            items={SITUATIONS.map((x) => (
-              <Card
-                key={x.id}
-                href={`#/situation/${x.id}`}
-                title={x.title}
-                hook={x.hook}
-                art={`${BASE}games/covers/${x.id}.png`}
-                tone="stories"
-                tag="Try a situation"
-                tick={playedBefore(`sel/${x.id}`) || read(`sel/${x.id}`) ? 'Played before' : null}
-              />
-            ))}
-          />
-        </section>
+        <CardGroup id="situations" title="Try a Situation" line="Short exercises built from the same moments as the books.">
+          {SITUATIONS.map((x) => (
+            <EntryCard key={x.id} e={entryFor(`sel/${x.id}`)} />
+          ))}
+        </CardGroup>
       ) : null}
       {shelf === 'people' ? (
-        <section className="hub__group" aria-labelledby="longer">
-          <div className="hub__group-head">
-            <h2 id="longer" className="hub__group-title">Longer read-alouds</h2>
-            <p className="hub__group-line">True stories from the Big Library about thinkers in India and around the world.</p>
-          </div>
-          <FourUp
-            label="Longer read-alouds"
-            items={CURATED_ARCHIVE.map((slug) => archiveStory(slug)).filter((st): st is Story => st !== undefined).map((st) => (
-              <Card
-                key={st.slug}
-                href={`#/read/${st.slug}/1`}
-                title={st.title}
-                hook={st.subtitle}
-                art={`${BASE}art/${st.slug}/cover-560.webp`}
-                tone="stories"
-                tag={archiveLabel(st.slug)}
-                tick={read(`read/${st.slug}`) ? 'Read before' : null}
-              />
+        <CardGroup id="longer" title="Longer read-alouds" line="True stories from the Big Library about thinkers in India and around the world.">
+          {CURATED_ARCHIVE.map((slug) => archiveStory(slug))
+            .filter((st): st is Story => st !== undefined)
+            .map((st) => (
+              <EntryCard key={st.slug} e={entryFor(`read/${st.slug}`)} />
             ))}
-          />
-        </section>
+        </CardGroup>
       ) : null}
     </Page>
   );
@@ -201,47 +214,28 @@ export function ShelfPage({ shelf }: { readonly shelf: ShelfId }) {
 
 export function LibraryPage() {
   return (
-    <Page title="The Big Library" back={{ href: '#/stories', label: 'Stories' }} note={LIBRARY_NOTE} band="stories" expect="Longer read-alouds, one or two a night.">
-      <FourUp
-        label="Subjects"
-        items={SUBJECTS.map((s) => {
-          const first = storiesIn(s.id)[0];
-          return (
-            <Card
-              key={s.id}
-              href={`#/library/${s.id}`}
-              title={s.title}
-              hook={`${storiesIn(s.id).length} stories. ${s.line}`}
-              art={first ? `${BASE}art/${first.slug}/cover-560.webp` : undefined}
-              tone="stories"
-            />
-          );
-        })}
-      />
+    <Page title="The Big Library" back={{ href: '#/stories', label: 'Stories' }} part="stories" note={LIBRARY_NOTE} expect="Longer read-alouds, one or two a night." lede={`${ARCHIVE.length} longer read-alouds about people who measured, counted, built and found the way. Every story is listed below by subject.`}>
+      <GroupJumps groups={SUBJECTS.map((s) => ({ id: s.id, title: s.title, n: storiesIn(s.id).length }))} />
+      {SUBJECTS.map((s) => (
+        <CardGroup key={s.id} id={s.id} title={s.title} line={s.line}>
+          {storiesIn(s.id).map((st) => (
+            <EntryCard key={st.slug} e={entryFor(`read/${st.slug}`)} />
+          ))}
+        </CardGroup>
+      ))}
     </Page>
   );
 }
 
 export function SubjectPage({ subject }: { readonly subject: string }) {
   const s = SUBJECTS.find((x) => x.id === subject)!;
-  const list = storiesIn(subject);
   return (
-    <Page title={s.title} back={{ href: '#/library', label: 'The Big Library' }} note={LIBRARY_NOTE} band="stories" expect={s.line}>
-      <FourUp
-        label={s.title}
-        items={list.map((st) => (
-          <Card
-            key={st.slug}
-            href={`#/read/${st.slug}/1`}
-            title={st.title}
-            hook={st.subtitle}
-            art={`${BASE}art/${st.slug}/cover-560.webp`}
-            tone="stories"
-            tag={archiveLabel(st.slug)}
-            tick={read(`read/${st.slug}`) ? 'Read before' : null}
-          />
+    <Page title={s.title} back={{ href: '#/library', label: 'The Big Library' }} part="stories" note={LIBRARY_NOTE} expect={s.line}>
+      <CardGroup id={s.id} title={`${storiesIn(subject).length} stories`} line={s.line}>
+        {storiesIn(subject).map((st) => (
+          <EntryCard key={st.slug} e={entryFor(`read/${st.slug}`)} />
         ))}
-      />
+      </CardGroup>
     </Page>
   );
 }
@@ -253,7 +247,6 @@ function GameHub({
   games,
   groups,
   tone,
-  base,
   note,
   expect,
   glyph,
@@ -262,40 +255,22 @@ function GameHub({
   readonly games: readonly AnyGame[];
   readonly groups: ReadonlyArray<{ id: string; title: string; line: string }>;
   readonly tone: 'maths' | 'science';
-  readonly base: string;
   readonly note: GrownUpNote;
   readonly expect: string;
-  readonly glyph: (g: AnyGame) => ReactNode;
+  readonly glyph: () => ReactNode;
 }) {
+  const live = groups.map((g) => ({ ...g, list: games.filter((x) => x.group === g.id) })).filter((g) => g.list.length > 0);
   return (
-    <Page title={title} back={{ href: '#/', label: 'Home' }} note={note} band={tone} expect={expect}>
-      {groups.map((grp) => {
-        const list = games.filter((g) => g.group === grp.id);
-        if (list.length === 0) return null;
-        return (
-          <section key={grp.id} className="hub__group" aria-labelledby={`grp-${grp.id}`}>
-            <div className="hub__group-head">
-              <h2 id={`grp-${grp.id}`} className="hub__group-title">{grp.title}</h2>
-              <p className="hub__group-line">{grp.line}</p>
-            </div>
-            <FourUp
-              label={grp.title}
-              items={list.map((g) => (
-                <Card
-                  key={g.id}
-                  href={`#/${base}/${g.id}`}
-                  title={g.title}
-                  hook={g.hook}
-                  art={g.cover ? `${BASE}${g.cover.replace(/\.png$/, '.webp')}` : undefined}
-                  glyph={glyph(g)}
-                  tone={tone}
-                  tick={playedBefore(g.id) ? 'Played before' : null}
-                />
-              ))}
-            />
-          </section>
-        );
-      })}
+    <Page title={title} back={null} part={tone} note={note} expect={expect}>
+      <GroupJumps groups={live.map((g) => ({ id: g.id, title: g.title, n: g.list.length }))} />
+      {live.map((grp) => (
+        <CardGroup key={grp.id} id={grp.id} title={grp.title} line={grp.line}>
+          {grp.list.map((g) => {
+            const e = entryFor(`${tone}/${g.id}`);
+            return <Card key={g.id} href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} glyph={glyph()} tone={tone} tick={tickFor(e)} itemKey={e.key} />;
+          })}
+        </CardGroup>
+      ))}
     </Page>
   );
 }
@@ -325,7 +300,6 @@ export function MathsHub() {
       games={MATHS_GAMES}
       groups={MATHS_GROUPS}
       tone="maths"
-      base="maths"
       note={MATHS_NOTE}
       expect="Five problems a set, three levels, no scores. He can start anywhere."
       glyph={() => <GlyphNumber />}
@@ -340,7 +314,6 @@ export function ScienceHub() {
       games={SCIENCE_GAMES}
       groups={SCIENCE_GROUPS}
       tone="science"
-      base="science"
       note={SCIENCE_NOTE}
       expect="Guess first, then Try, then see why. Three investigations a set."
       glyph={() => <GlyphFlask />}
@@ -351,37 +324,51 @@ export function ScienceHub() {
 /* --------------------------------------------------------------- make ----- */
 
 const MAKE_NOTE: GrownUpNote = {
-  what: 'Things to do together off the screen: in the kitchen, at the table, in the garden and outdoors. Each card lists what you need, the steps with pictures, what to notice and one question.',
-  expect: 'Most take 10 to 30 minutes with household things. He will want to do the "fun" step (the drop, the float) over and over — let him, and count.',
-  practising: 'The same ideas as the maths and science games, with real materials: floating, shadows, seeds, ramps, balance, magnets, measuring, symmetry, sorting and charts.',
+  what: 'Things to do together off the screen, grouped by the idea they are about: counting and measuring, shapes and patterns, forces, building, air, sound and light, water and weather, and kitchen changes. Each card lists what you need, the steps with pictures, what to notice, one question, and where it came from.',
+  expect: 'Most take 10 to 30 minutes with household things; a few run over days. Try the tricky step yourself first: each card says what to check. He will want to repeat the "fun" step (the drop, the float, the note) over and over — let him, and count.',
+  practising: 'The same ideas as the maths and science games, with real materials: floating, sound and vibration, air pushing back, light, evaporation, changes in materials, structures, balance and levers, measuring, sharing, patterns and maps.',
   ask: 'Each card has its own question.',
   next: 'Write down or draw what happened, and try again tomorrow with one thing changed.',
-  honest: 'These need you. Each card has a safety line; follow it, and keep small parts away from the two-year-old.',
+  honest: 'These need you, and household materials vary: steel that will not ring, cream that will not thicken, a puddle that dries before lunch. When a result surprises you both, that is the experiment working. Each card has a safety line; keep small parts, cords and water away from the two-year-old.',
 };
 
+const PLACES = ['kitchen', 'table', 'garden', 'outdoors'] as const;
+const PLACE_LABEL: Record<(typeof PLACES)[number], string> = { kitchen: 'Kitchen', table: 'Table or floor', garden: 'Garden', outdoors: 'Outdoors' };
+
 export function MakeHub() {
+  const [place, onPlace] = useStored<string>('make/place', 'any');
+  const fits = (a: (typeof ACTIVITIES)[number]) => place === 'any' || a.where === place || (a.places ?? []).includes(place as (typeof PLACES)[number]);
+  const live = MAKE_AREAS.map((ar) => ({ ...ar, list: ACTIVITIES.filter((a) => a.area === ar.id && fits(a)) })).filter((g) => g.list.length > 0);
   return (
-    <Page title="Make & Do" back={{ href: '#/', label: 'Home' }} note={MAKE_NOTE} band="make" expect="Real things to make together, away from the screen.">
-      <FourUp
-        label="Make & Do"
-        items={ACTIVITIES.map((a) => (
-          <Card
-            key={a.id}
-            href={`#/make/${a.id}`}
-            title={a.title}
-            hook={a.hook}
-            art={`${BASE}art/make/${a.id}/step-1.webp`}
-            tone="make"
-            tag={`${a.span ?? `${a.minutes} min`} · ${WHERE[a.where]}`}
-            tick={read(`make/${a.id}`) ? 'Done before' : null}
-          />
-        ))}
-      />
+    <Page title="Make & Do" back={null} part="make" note={MAKE_NOTE} expect="Real things to make together, away from the screen." lede={`${ACTIVITIES.length} things to make and find out together, with what you already have at home.`}>
+      <div className="hubbar">
+        <FilterPanel id="make" active={place === 'any' ? 0 : 1}>
+          <div className="filters" role="group" aria-label="Where">
+            {(['any', ...PLACES] as const).map((p) => (
+              <button key={p} type="button" className={`chip${place === p ? ' is-on' : ''}`} aria-pressed={place === p} onClick={() => onPlace(p)}>
+                {p === 'any' ? 'Anywhere' : PLACE_LABEL[p]}
+              </button>
+            ))}
+          </div>
+        </FilterPanel>
+        <span className="filters__count hubbar__count">{place === 'any' ? `All ${ACTIVITIES.length}` : `${live.reduce((n, g) => n + g.list.length, 0)} of ${ACTIVITIES.length}`}</span>
+      </div>
+      <GroupJumps groups={live.map((g) => ({ id: g.id, title: g.title, n: g.list.length }))} />
+      {live.map((g) => (
+        <CardGroup key={g.id} id={g.id} title={g.title} line={g.line}>
+          {g.list.map((a) => (
+            <EntryCard key={a.id} e={entryFor(`make/${a.id}`)} />
+          ))}
+        </CardGroup>
+      ))}
     </Page>
   );
 }
 
-const WHERE: Record<string, string> = { kitchen: 'Kitchen', garden: 'Garden', outdoors: 'Outdoors', table: 'At the table' };
+/* --------------------------------------------------------------- shared --- */
+
+const BY_KEY: ReadonlyMap<string, Entry> = new Map(ENTRIES.map((e) => [e.key, e]));
+const entryFor = (key: string): Entry => BY_KEY.get(key)!;
 
 /* ------------------------------------------------------------ glyphs ------ */
 
@@ -404,4 +391,4 @@ function GlyphFlask() {
   );
 }
 
-export { BOOKS };
+

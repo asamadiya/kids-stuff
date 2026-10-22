@@ -1,50 +1,26 @@
-import type { GrownUpNote } from '../notes/types';
+import type { Activity } from './types';
+import { MAKE_AREAS } from './types';
+
+export type { Activity, MakeArea, Place } from './types';
+export { MAKE_AREAS } from './types';
 
 /**
- * Make & Do: things a grown-up and the child do together off the screen, in
- * the kitchen, at the table, in the garden or outdoors. The screen is only the
- * card: what you need, four to six picture steps, what to notice and one
- * question. These replace the Workshop instruments, which nobody could start.
+ * Safety follows the advisor's charter, section 3, and the toddler review in
+ * q7 ruling 17: large materials, small parts kept from the two-year-old, low
+ * drops made by the grown-up standing on the floor, water supervised
+ * throughout, and no loose powerful magnets, button batteries, balloons,
+ * flames, hot water or mains power. Food is vegetarian; eggs are fine.
+ * Anything eaten afterwards must have stayed fresh, sprouts are cooked
+ * through, and a batch that went off is thrown away, never rinsed and eaten.
  *
- * Step text is addressed to the pair doing it. The pictures show Arjun from
- * the family cast sheet with Mummy or Papa, never a character called Rikki.
- * Each `art` string leads with the action, because an edit-from-reference
- * prompt that does not copies the sheet's standing poses; it is also the
- * picture's alt text, so it shows exactly what the step says.
- *
- * Safety follows the advisor's charter, section 3: large materials, small parts
- * kept from the two-year-old, low drops, water supervised throughout, and no
- * loose powerful magnets, button batteries, flames, hot water or mains power.
- * Food is vegetarian; eggs are fine. Anything eaten afterwards must have stayed
- * fresh, sprouts are cooked through, and a batch that went off is thrown away,
- * never rinsed and eaten.
+ * The first twelve live here; the later ones live one file per idea area in
+ * src/make/more/*.ts, each exporting `MORE`, and are merged below.
  */
-export interface Activity {
-  readonly id: string;
-  readonly title: string;
-  readonly hook: string;
-  readonly where: 'kitchen' | 'garden' | 'outdoors' | 'table';
-  /** Hands-on minutes: the whole activity in one sitting, or its setup when `span` is set. */
-  readonly minutes: number;
-  /**
-   * For an activity that is not done in one sitting, the whole commitment as a
-   * short phrase shown instead of the minutes on the card and the page: a
-   * five-day experiment is not a fifteen-minute one. Keep it to a few words; it
-   * sits in a pill on a quarter-width card. The note's `expect` spells out each
-   * sitting. Absent when the whole thing is done in one sitting.
-   */
-  readonly span?: string;
-  readonly need: readonly string[];
-  readonly steps: readonly { readonly text: string; readonly art: string }[];
-  readonly notice: string;
-  readonly ask: string;
-  readonly pairsWith?: string;
-  readonly note: GrownUpNote;
-}
 
-export const ACTIVITIES: readonly Activity[] = [
+const FIRST: readonly Activity[] = [
   {
     id: 'how-many-pennies-sink-a-boat',
+    area: 'water',
     title: 'How Many Pennies Sink a Paper Boat?',
     hook: 'Same paper, two shapes, a pile of pennies.',
     where: 'garden',
@@ -81,6 +57,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'Each penny pushes the boat a little lower, and the wide flat tray sinks much more slowly than the pointed boat.',
     ask: 'It was the same paper. Why did the flat tray carry more pennies?',
     pairsWith: 'will-this-clay-boat-float',
+    trial: 'Fold a boat and a tray from your paper and load each one yourself first. Check that the boat floats upright rather than tipping at the first penny, roughly how many each takes before water comes in, and how long your paper lasts before it goes limp: if it soaks through within a couple of minutes, use slightly heavier paper, the same for both.',
+    sources: [
+      { label: 'Exploratorium Science Snacks: Condiment Diver, on a floating thing sinking once it pushes aside less water (the buoyancy idea; the boat-and-tray test is not from this page)', url: 'https://www.exploratorium.edu/snacks/condiment-diver' },
+      { label: 'AAP HealthyChildren: Water Safety and Young Children (the safety line: a young child can drown in a few centimetres of water)', url: 'https://www.healthychildren.org/English/safety-prevention/at-play/Pages/Water-Safety-And-Young-Children.aspx' },
+    ],
     note: {
       what: 'He folds the same size of paper into a flat tray while you fold a pointed boat. Each floats in a tub and is loaded one penny at a time until water comes over the edge.',
       expect: 'He will probably back the pointed boat because it looks like a real boat. The flat tray usually carries several times as many pennies; if the jar runs out first, that is an answer too. Paper soaks through within a few minutes, so load steadily and use fresh paper for any repeat.',
@@ -95,6 +76,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'what-time-is-it-stick',
+    area: 'sound-light',
     title: 'What Time Is It, Stick?',
     hook: 'Chalk the shadow every hour and watch it turn.',
     where: 'outdoors',
@@ -136,6 +118,10 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'The shadow is long in the morning, shortest around the middle of the day, and long again in the afternoon, pointing the other way.',
     ask: 'The shadow moved, but the stick did not. What moved?',
     pairsWith: 'a-tiny-dinosaur-a-huge-shadow',
+    trial: 'The day before, look at your spot at about 9, at midday and at about 3: a wall, a tree or the balcony railing can shade it for part of the day and leave gaps in the fan. Push the stick into the clay and check it stands straight and stays put when nudged, and that the chalk shows on your floor and washes off it.',
+    sources: [
+      { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk, on making shadows and tracking the sun’s path from morning to bedtime', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
+    ],
     note: {
       what: 'He stands a stick upright on a sunny balcony or patio and, once an hour through the day, draws its shadow in chalk and writes the hour at the tip.',
       expect: 'Plan it for a sunny day at home: about ten minutes to set up before 9, then a few minutes every hour until about 4, and one look at 9 the next morning. He may expect the shadow to stay put, or to grow all day. It is long in the morning, shortest around the middle of the day and long again in the afternoon, and its tip swings round the stick the same way clock hands turn. While the clocks are on daylight saving time, the shortest shadow comes nearer 1 pm than noon.',
@@ -150,6 +136,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'moong-in-the-cupboard',
+    area: 'kitchen',
     title: 'Does Moong Need the Light to Sprout?',
     hook: 'Two jars of moong. One goes in the dark.',
     where: 'kitchen',
@@ -191,6 +178,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'Both jars sprout, but the sprouts from the dark grow pale yellow and long, while the ones in the light turn green at the top.',
     ask: 'Both jars sprouted. So what is the light for?',
     pairsWith: 'what-does-this-seed-need',
+    trial: 'A week ahead, soak and sprout a small handful of the same moong in one jar on your own. Moong that has sat in the cupboard a long time may sprout poorly, so check most of yours show root tips within two days, and learn how much water keeps the cloth damp without leaving a puddle in the bottom. Check, too, that the windowsill does not get hot sun at any time of day.',
+    sources: [
+      { label: 'Wikipedia: Germination, on water, air and warmth for sprouting, and light once the seed’s own food runs out', url: 'https://en.wikipedia.org/wiki/Germination' },
+      { label: 'Wikipedia: Mung bean, including mung bean sprouts and how they are cooked in India', url: 'https://en.wikipedia.org/wiki/Mung_bean' },
+    ],
     note: {
       what: 'He soaks two equal handfuls of moong, sets one jar in a dark cupboard and one on a bright windowsill, waters both the same twice a day, and draws them side by side for about five days.',
       expect: 'Start the evening before with the soak. Setting up the jars takes about fifteen minutes the next morning; after that it is a minute or two each morning and evening for five days to water, sniff and draw, and the rest is waiting. He will probably predict that the dark jar will not sprout at all. Both usually sprout within a day or two, because a seed carries its own food. Over the next days the dark sprouts grow pale yellow and lanky while the light ones open small green leaves. In warm weather a jar can spoil; the safety line says what to do if one does.',
@@ -205,6 +197,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'ramp-race-two-heights',
+    area: 'forces',
     title: 'Does the Car Go Farther From Higher Up?',
     hook: 'One car, one board, two piles of books.',
     where: 'kitchen',
@@ -245,6 +238,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'From the higher start the car is going faster at the bottom and rolls farther along the floor, though no one pushed it harder.',
     ask: 'Nobody pushed harder. Where did the extra roll come from?',
     pairsWith: 'start-higher-roll-farther',
+    trial: 'Let the car go yourself from both heights first. Check it rolls straight off the board onto the floor rather than catching on the lower edge, and that the four-book run still stops well short of a wall or cupboard; if it does not, move the ramp back to give it more room. A car that veers every time usually has a bent axle or a stiff wheel: swap it for another.',
+    sources: [
+      { label: 'NAEYC for Families: Nurturing the Scientist in Your Child, on rolling balls down a ramp to see which goes farthest, predicting first', url: 'https://www.naeyc.org/our-work/families/nurturing-scientist-your-child' },
+      { label: 'PBS KIDS for Parents: At-Home Olympic Math Activities, an ice-cube race down a tray propped on books, asking what happens when the ramp is steeper', url: 'https://www.pbs.org/parents/thrive/at-home-olympic-math-activities-for-preschoolers' },
+    ],
     note: {
       what: 'He lets the same car go, without pushing, from the same start line on a ramp propped on two books and then on four, and marks where it stops on the floor with tape.',
       expect: 'He will probably want to push the car, and a push spoils the comparison, so say “let go, no push” before every run. The stops will scatter a little from run to run; three runs at each height show a pattern that one run cannot. Very steep ramps make the car bounce off the end, so stop at four or five books.',
@@ -259,6 +257,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'why-is-a-ruler-called-a-foot',
+    area: 'numbers',
     title: 'Why Is a Ruler Called a Foot?',
     hook: 'Your feet say one number. Papa’s say another.',
     where: 'table',
@@ -298,6 +297,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'Your feet give a bigger number than Papa’s because each of your feet is shorter, but the ruler gives you both the same number.',
     ask: 'Why did the ruler give you and Papa the same number?',
     pairsWith: 'how-long-is-that-dinosaur',
+    trial: 'Walk the table heel to toe and lay the ruler along it yourself first, so you know roughly what both counts should be and can spot a skipped step. Choose a side with no chair legs in the way. Check whether your ruler is exactly a foot from end to end: many are a little longer, with a blank strip before the 0, so the count is in rulers, not quite in feet.',
+    sources: [
+      { label: 'NRICH (University of Cambridge) Early Years: How Long Are You?, measuring with different things laid end to end and comparing the counts', url: 'https://nrich.maths.org/eyfs-activities/how-long-are-you' },
+      { label: 'Erikson Institute Early Math Collaborative: Big Ideas of Measurement (all measurement involves a fair comparison)', url: 'https://www.erikson.edu/early-math-collaborative/big-ideas/measurement/' },
+    ],
     note: {
       what: 'He measures the length of the table in his own feet, then in yours, then in 12-inch rulers laid end to end, and compares the three counts.',
       expect: 'Expect gaps between steps and overlaps between rulers; both make the count wrong. He may at first say the table is longer for him because his number is bigger. The surprise is that the bigger number comes from the smaller foot. The table will rarely be a whole number of rulers; “six and a bit” is a correct answer.',
@@ -311,7 +315,9 @@ export const ACTIVITIES: readonly Activity[] = [
     },
   },
   {
+    // No pairsWith: no maths or science game or picture book is about cushioning a fall.
     id: 'can-an-egg-survive-the-chair',
+    area: 'forces',
     title: 'Can a Boiled Egg Survive the Drop?',
     hook: 'One bare egg, one packed egg, same drop.',
     where: 'kitchen',
@@ -351,6 +357,11 @@ export const ACTIVITIES: readonly Activity[] = [
     ],
     notice: 'The bare egg cracks on the tray, and the packed egg falling from the same height usually comes out whole.',
     ask: 'Both eggs fell from the same height. What did the packing do?',
+    trial: 'Drop a spare boiled egg bare onto the tray yourself first, standing on the floor and letting go level with the top of the chair back. It should crack clearly; if it comes through whole, take away any mat so the tray sits on the hard floor. Then pack the box, put a small potato in the nest, close the lid and drop it once: check the lid stays shut and the potato does not touch a side. Bin the spare egg.',
+    sources: [
+      { label: 'NAEYC for Families: Nurturing the Scientist in Your Child, on asking a child to predict before a simple investigation (support for the guess-first step only; the egg drop is not from this page)', url: 'https://www.naeyc.org/our-work/families/nurturing-scientist-your-child' },
+    ],
+    noPair: 'None yet: no game here is about cushioning a fall. Which One Lands First? is about falling, not landing.',
     note: {
       what: 'He packs a shoebox with crumpled paper or socks. You drop one bare boiled egg onto a tray, then drop a second egg packed in his box from the same height, and he checks both shells.',
       expect: 'He may expect both to crack, or think the box works because it is heavier. Packing that is too thin, or an egg that touches the side of the box, can still crack, which is useful: ask him where the egg hit. He will want to drop it again; let him repack and try.',
@@ -365,6 +376,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'coat-hanger-balance',
+    area: 'forces',
     title: 'Can a Coat Hanger Do Sums?',
     hook: 'Two cups, one hanger. Make it hang level.',
     where: 'table',
@@ -405,6 +417,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'The hanger hangs level only when both cups hold the same number of pennies, however you split them up.',
     ask: 'Two and three on one side, four and one on the other. Why is it level?',
     pairsWith: 'make-both-sides-match',
+    trial: 'Hang the hanger with both empty cups yourself first and check it settles level and swings freely; a strip of tape on the high end fixes a lean. Then drop in one penny and tap the hanger gently: if the bar still barely moves, the hook may be sticking on the broom handle, so try a smoother handle or a different hanger. The activity works best when a one-penny difference shows.',
+    sources: [
+      { label: 'Erikson Institute Early Math Collaborative: Big Ideas of Operations (a whole splits into equal or unequal parts; sets compare as more than, less than or equal to)', url: 'https://www.erikson.edu/early-math-collaborative/big-ideas/operations/' },
+      { label: 'Stanford DREME Family Math: What’s the Secret Number?, working back from a total to the missing number (support for the missing-number follow-up)', url: 'https://familymath.stanford.edu/activity/secret-number/' },
+    ],
     note: {
       what: 'He hangs a paper cup from each end of a coat hanger and adds pennies until the hanger hangs level, then makes level sides from different splits, such as 2 and 3 against 4 and 1.',
       expect: 'The empty hanger may not hang level; a strip of tape on the high end can fix that before you start. He will probably add pennies to the low side at first. When 2 + 3 balances 4 + 1, he may expect the side with more handfuls to win.',
@@ -419,6 +436,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'does-the-magnet-want-it',
+    area: 'forces',
     title: 'Does the Fridge Magnet Want It?',
     hook: 'Sort the kitchen into two piles: sticks, or not.',
     where: 'kitchen',
@@ -455,6 +473,10 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'The magnet holds the tin and some steel things, but not the foil, the wood, the plastic or the mug, and not every steel thing either.',
     ask: 'The foil is metal too. Why did the magnet not want it?',
     pairsWith: 'will-the-magnet-pick-it-up',
+    trial: 'Test every object with your magnet before he does, and swap things until the trays will hold both kinds of surprise: at least one steel thing the magnet holds and one it does not, as well as the foil. Fridge magnets vary a lot, and a weak one slides off even a tin, so check yours holds the tin firmly with nothing else touching it.',
+    sources: [
+      { label: 'NAEYC for Families: Toys as Tools, Everyday Science Experiences, the magnets section (which things in the house a magnet attracts, and magnets too large to swallow)', url: 'https://www.naeyc.org/our-work/families/toys-as-tools-everyday-science' },
+    ],
     note: {
       what: 'He guesses whether a fridge magnet will hold each kitchen object, tests it, and sorts everything onto two trays: held, or not held.',
       expect: 'Most children think a magnet holds all metal. Foil (aluminium) does not stick, and many stainless-steel sinks, pans and spoons do not either, while a food tin and a painted fridge door usually do. The surprises are the point; do not explain them away before he tests.',
@@ -469,6 +491,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'does-a-towel-keep-ice-cold',
+    area: 'water',
     title: 'Does a Towel Keep Ice Cold?',
     hook: 'Two ice cubes. One gets a blanket.',
     where: 'kitchen',
@@ -504,6 +527,10 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'The wrapped ice cube melts more slowly, and the inside of the towel feels cool, not warm.',
     ask: 'We wrap up to stay warm. So why did the towel keep the ice cold?',
     pairsWith: 'where-did-the-ice-go',
+    trial: 'Run it once yourself the day before, with two cubes from the same tray on the same counter, out of the sun and away from the cooker. After half an hour the bare cube should be clearly smaller than the wrapped one. If both have gone, check at twenty minutes instead; if neither has changed much, wait longer or choose a warmer spot.',
+    sources: [
+      { label: 'American Chemical Society, Adventures in Chemistry: Condensation Station, a cold cup sealed in a bag against a bare one (support only for a cover keeping the room’s air off something cold; the page tests dampness, not melting)', url: 'https://www.acs.org/education/whatischemistry/adventures-in-chemistry/experiments/condenstation-station.html' },
+    ],
     note: {
       what: 'He puts two equal ice cubes in two matching bowls, wraps one bowl in a thick towel, and after half an hour compares how much of each cube is left.',
       expect: 'Most children expect the towel to melt the ice faster, because blankets “make you warm”. The wrapped cube usually lasts much longer. He may then decide the towel is “cold”, so ask him to feel it.',
@@ -518,6 +545,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'rangoli-other-half',
+    area: 'shapes',
     title: 'Finish the Other Half of the Rangoli',
     hook: 'The grown-up makes one half. You make the other.',
     where: 'table',
@@ -553,6 +581,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'Each shape on your side is the same size and the same distance from the line as its partner, but it faces the other way.',
     ask: 'Your petal points the other way. Is it still the same petal?',
     pairsWith: 'make-the-other-half',
+    trial: 'Lay one petal of dal yourself on each side of the ruler first. Check that the thali sits flat and does not rock, that a pinch of each dal holds its shape rather than rolling about on the steel, and that the colours show clearly against your thali; if one disappears, swap it for another dal or for rice.',
+    sources: [
+      { label: 'Wikipedia: Kolam, on the symmetrical rice-flour floor drawings of South India and how rangoli relates to them', url: 'https://en.wikipedia.org/wiki/Kolam' },
+      { label: 'Erikson Institute Early Math Collaborative: Big Ideas of Spatial Relationships, on concrete experience with flips and turns', url: 'https://www.erikson.edu/early-math-collaborative/big-ideas/spatial-relationships/' },
+    ],
     note: {
       what: 'You lay rice and dal in a pattern on one half of a thali, on one side of a ruler, and he copies each shape onto the other half, flipped as in a mirror.',
       expect: 'His first copy will probably repeat your shape facing the same way, slid across instead of flipped, or drift away from the line. Point to the ruler and ask how far your shape is from it. Mirror reversal of a curved petal is the hardest part.',
@@ -567,6 +600,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'what-did-everyone-eat-for-breakfast',
+    area: 'numbers',
     title: 'Who Ate What for Breakfast?',
     hook: 'Ask the family. Draw the answers in columns.',
     where: 'table',
@@ -603,6 +637,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'The tallest column is the food the most people ate, and you can see it at a glance without counting.',
     ask: 'If Dadi and Dada came and both ate paratha, what would change?',
     pairsWith: 'what-did-our-class-choose',
+    trial: 'Rule the four columns yourself first and stick two test squares in one of them: check that a square fits the column’s width, and that the columns are tall enough for everyone in the house plus visitors. Cut all the squares from one strip of paper so they really are the same size; a short column made of bigger squares looks tall.',
+    sources: [
+      { label: 'NRICH (University of Cambridge) Early Years: Voting Station, one brick per person stacked into towers and compared', url: 'https://nrich.maths.org/eyfs-activities/voting-station' },
+      { label: 'Erikson Institute Early Math Collaborative: Shoe Graph, making a real graph and then a pictorial one', url: 'https://www.erikson.edu/early-math-collaborative/idea/shoe-graph-3-5-year-old-childrens-education-programs-and-activities/' },
+    ],
     note: {
       what: 'He asks each person in the family what they ate for breakfast — eggs, fruit, poha or paratha — keeps a tally, and builds a pictograph with one paper square per person, stacked in columns.',
       expect: 'Unequal square sizes and gaps between squares are the usual mistakes, and they make a short column look tall. Someone will have eaten two things; decide together whether they get one square or two, and stick to it. With only four or five family members the columns will be short; ask visiting grandparents or count a whole week.',
@@ -617,6 +656,7 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'bundle-the-leaves-in-tens',
+    area: 'numbers',
     title: 'How Many Leaves Did We Pick Up?',
     hook: 'Too many leaves to count? Bundle them in tens.',
     where: 'outdoors',
@@ -656,6 +696,11 @@ export const ACTIVITIES: readonly Activity[] = [
     notice: 'Counting the bundles in tens and then the loose ones is quicker than counting every leaf, and gives the same number.',
     ask: 'Undoing a bundle spreads the leaves out. Are there more leaves now?',
     pairsWith: 'ten-loose-one-bundle',
+    trial: 'Bundle ten leaves yourself first, with the bands or string you plan to bring. Dry leaves crumble and tiny ones slip out, so check a band holds ten big leaves by their stems without tearing them; if not, use string or pegs. Walk the route beforehand if you can and check there are enough fallen leaves for three or four bundles, and nothing to avoid underfoot.',
+    sources: [
+      { label: 'NRICH (University of Cambridge) Early Years: Estimation Station, guessing how many, counting to check and asking whether there is a quicker way to count', url: 'https://nrich.maths.org/eyfs-activities/estimation-station' },
+      { label: 'Simply Psychology: Conservation in Piaget’s Theory, on children thinking a spread-out row has more (the undo-a-bundle question)', url: 'https://www.simplypsychology.org/conservation-in-psychology.html' },
+    ],
     note: {
       what: 'He collects fallen leaves on a walk, guesses how many he has, bundles them in tens with rubber bands, and counts the bundles in tens and then the loose leaves.',
       expect: 'He may count a bundle as “one” and forget that it stands for ten, or count every leaf again from one. Expect a miscount inside a bundle; recount it together rather than correcting him. Undoing a bundle often makes young children think there are now more leaves because they cover more ground.',
@@ -669,6 +714,21 @@ export const ACTIVITIES: readonly Activity[] = [
     },
   },
 ];
+
+const modules = import.meta.glob<{ MORE: readonly Activity[] }>(['./more/*.ts', '!./more/_*.ts'], { eager: true });
+const MORE: readonly Activity[] = Object.keys(modules).sort().flatMap((k) => modules[k].MORE);
+
+const areaRank = (a: Activity) => MAKE_AREAS.findIndex((x) => x.id === a.area);
+
+/** Every activity, grouped by idea area in MAKE_AREAS order; inside an area, the first twelve first. */
+export const ACTIVITIES: readonly Activity[] = [...FIRST, ...MORE]
+  .map((a, i) => ({ a, i }))
+  .sort((x, y) => areaRank(x.a) - areaRank(y.a) || x.i - y.i)
+  .map((x) => x.a);
+
+export function activitiesIn(area: Activity['area']): readonly Activity[] {
+  return ACTIVITIES.filter((a) => a.area === area);
+}
 
 export function getActivity(id: string): Activity | undefined {
   return ACTIVITIES.find((a) => a.id === id);

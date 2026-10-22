@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { Book, BookPage } from './types';
 import { GrownUps } from '../learn/GrownUps';
+import { HomeLink } from '../learn/PartNav';
 import { StoryFigure } from '../components/StoryFigure';
 import '../styles/lc/book-figure.css';
 
@@ -98,6 +99,7 @@ export function BookReader({ book, page, onPage, backHref, backLabel, onFinished
   return (
     <main id="main-content" className="book" aria-label={`Reading ${book.title}`}>
       <header className="book__bar">
+        <HomeLink />
         <a className="lc-top__back" href={backHref}>
           <span aria-hidden="true">←</span> {backLabel}
         </a>

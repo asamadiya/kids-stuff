@@ -5,6 +5,7 @@ import { ROUNDS } from './types';
 import type { ProblemResult } from './progress';
 import { finishSet, loadRecord, recordProblem, saveRecord, setLevel } from './progress';
 import { GrownUps } from '../learn/GrownUps';
+import { HomeLink } from '../learn/PartNav';
 
 /**
  * The frame every game sits in. A board draws and answers; this owns the rest:
@@ -194,6 +195,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
   return (
     <main id="main-content" className={`shell shell--${isInvestigate ? 'science' : 'maths'}`}>
       <header className="shell__bar">
+        <HomeLink />
         <a className="shell__back" href={backHref}>
           <span aria-hidden="true">←</span> {backLabel}
         </a>

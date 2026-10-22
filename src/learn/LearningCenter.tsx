@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Known, Route } from './routes';
-import { isDescent, parentOf, parseHash, toHash } from './routes';
+import { DEPTH, isDescent, parentOf, parseHash, toHash } from './routes';
 import { BOOKS, getBook, getShelf } from '../books/registry';
 import { BookReader } from '../books/BookReader';
 import { SHELVES } from '../books/registry';
@@ -9,10 +9,15 @@ import { SITUATIONS, getSituation } from './situations';
 import { MATHS_GAMES, mathsGame } from '../maths/registry';
 import { SCIENCE_GAMES, scienceGame } from '../science/registry';
 import { ACTIVITIES } from '../make/activities';
+import { IDEAS } from '../together';
 import { GameShell } from '../play/GameShell';
 import { Home, LibraryPage, MakeHub, MathsHub, ScienceHub, ShelfPage, Stories, SubjectPage, markRead } from './screens';
 import { ActivityPage } from './ActivityPage';
+import { Everything } from './Everything';
+import { IdeaPage, TogetherHub } from '../together/screens';
 import { Page } from './Page';
+import { savedScroll, saveScroll } from './scroll';
+import { itemKey, originOf, recordOrigin } from './origin';
 import { Reader } from '../components/Reader';
 import { LIBRARY_NOTE, archiveEntry, archiveLabel } from './library';
 
@@ -36,10 +41,14 @@ export function knownRoutes(): Known {
     maths: new Set(MATHS_GAMES.map((g) => g.id)),
     science: new Set(SCIENCE_GAMES.map((g) => g.id)),
     activities: new Set(ACTIVITIES.map((a) => a.id)),
+    ideas: new Set(IDEAS.map((x) => x.id)),
   };
 }
 
 const shelfOf = (slug: string) => getBook(slug)?.shelf;
+
+/** Screens that are lists of things to open: these remember their scroll position. */
+const LISTINGS: ReadonlySet<Route['kind']> = new Set(['home', 'stories', 'shelf', 'library', 'subject', 'maths', 'science', 'make', 'together', 'all']);
 
 export function LearningCenter() {
   const known = useMemo(knownRoutes, []);
@@ -47,10 +56,16 @@ export function LearningCenter() {
   const routeRef = useRef(route);
   routeRef.current = route;
 
+  useEffect(() => {
+    // The app restores listing positions itself; the browser's own attempt fights it.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+  }, []);
+
   const go = useCallback((next: Route) => {
     const from = routeRef.current;
     const hash = toHash(next);
     if (toHash(from) === hash) return;
+    if (LISTINGS.has(from.kind)) recordOrigin(from, next);
     if (isDescent(from, next)) window.history.pushState(null, '', hash);
     else window.history.replaceState(null, '', hash);
     routeRef.current = next;
@@ -91,21 +106,46 @@ export function LearningCenter() {
     if (window.location.hash !== canonical) window.history.replaceState(null, '', canonical);
   }, [route]);
 
-  // A new screen starts at the top, with focus on its heading.
+  // A new screen starts at the top with focus on its heading — except a
+  // listing you are coming back to, which returns to where you left it, with
+  // focus on the card you opened (advisor q7 ruling 5).
   const screen = route.kind === 'book' || route.kind === 'read' ? `${route.kind}:${route.slug}` : toHash(route);
+  const listing = LISTINGS.has(route.kind);
   const first = useRef(true);
-  useEffect(() => {
+  const cameFrom = useRef<Route | null>(null);
+  useLayoutEffect(() => {
+    const from = cameFrom.current;
+    cameFrom.current = route;
+    // Only coming back UP to a listing returns focus to the card you opened;
+    // moving sideways between parts starts at the heading.
+    const returning = listing && from !== null && DEPTH[from.kind] > DEPTH[route.kind];
     if (first.current) {
       first.current = false;
+      if (listing) window.scrollTo(0, savedScroll(screen));
       return;
     }
-    window.scrollTo(0, 0);
-    const h = document.querySelector<HTMLElement>('#main-content h1');
-    if (h) {
-      h.setAttribute('tabindex', '-1');
-      h.focus({ preventScroll: true });
+    window.scrollTo(0, listing ? savedScroll(screen) : 0);
+    // Match the card by the item it opens, not its address: a book left on
+    // page 3 must find the card that links to page 1.
+    const key = returning ? itemKey(from!) : null;
+    const back = key ? document.querySelector<HTMLElement>(`#main-content a[data-key="${CSS.escape(key)}"]`) : null;
+    const target = back ?? document.querySelector<HTMLElement>('#main-content h1');
+    if (target) {
+      if (!back) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
     }
+    // `route` changes with every page turn inside a book; only a new screen matters here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen]);
+
+  // Kept on every scroll, not on leaving: by the time a leaving screen's
+  // cleanup runs, the next screen has already set the window's scroll.
+  useEffect(() => {
+    if (!listing) return;
+    const keep = () => saveScroll(screen, window.scrollY);
+    window.addEventListener('scroll', keep, { passive: true });
+    return () => window.removeEventListener('scroll', keep);
+  }, [screen, listing]);
 
   return (
     <>
@@ -117,17 +157,22 @@ export function LearningCenter() {
   );
 }
 
+/** Back for an item: the listing it was opened from, else its parent in the route table. */
+function backFor(route: Route): { href: string; label: string } {
+  return originOf(route) ?? parentOf(route, shelfOf, subjectOfStory)!;
+}
+
 function render(route: Route, go: (r: Route) => void) {
   switch (route.kind) {
     case 'home':
       return <Home />;
     case 'stories':
-      return <Stories page={route.page} />;
+      return <Stories />;
     case 'shelf':
-      return getShelf(route.shelf) ? <ShelfPage shelf={route.shelf} /> : <Stories page={1} />;
+      return getShelf(route.shelf) ? <ShelfPage shelf={route.shelf} /> : <Stories />;
     case 'book': {
       const book = getBook(route.slug)!;
-      const back = parentOf(route, shelfOf, subjectOfStory)!;
+      const back = backFor(route);
       return (
         <BookReader
           key={book.slug}
@@ -146,7 +191,7 @@ function render(route: Route, go: (r: Route) => void) {
       return <SubjectPage subject={route.subject} />;
     case 'read': {
       const story = archiveStory(route.slug)!;
-      const back = parentOf(route, shelfOf, subjectOfStory)!;
+      const back = backFor(route);
       return (
         <div className="archive-reader">
           <Reader
@@ -156,6 +201,7 @@ function render(route: Route, go: (r: Route) => void) {
             onExit={() => {
               window.location.hash = back.href;
             }}
+            exitLabel={back.label.startsWith('Back') ? back.label : `Back to ${back.label}`}
             onComplete={(slug) => markRead(`read/${slug}`)}
             note={archiveEntry(story.slug)?.note ?? LIBRARY_NOTE}
             kindLabel={archiveLabel(story.slug)}
@@ -167,7 +213,7 @@ function render(route: Route, go: (r: Route) => void) {
       const s = getSituation(route.id)!;
       markRead(`sel/${s.id}`);
       return (
-        <Page title={s.title} back={{ href: '#/stories/family', label: 'Family & Friends' }} note={s.note} band="stories" expect={s.note.expect}>
+        <Page title={s.title} back={backFor(route)} note={s.note} expect={s.note.expect}>
           <div className="situation">
             <s.Component />
           </div>
@@ -177,15 +223,21 @@ function render(route: Route, go: (r: Route) => void) {
     case 'maths':
       return <MathsHub />;
     case 'mathsGame':
-      return <GameShell key={route.id} game={mathsGame(route.id)!} backHref="#/maths" backLabel="Maths" />;
+      return <GameShell key={route.id} game={mathsGame(route.id)!} backHref={backFor(route).href} backLabel={backFor(route).label} />;
     case 'science':
       return <ScienceHub />;
     case 'scienceGame':
-      return <GameShell key={route.id} game={scienceGame(route.id)!} backHref="#/science" backLabel="Science" />;
+      return <GameShell key={route.id} game={scienceGame(route.id)!} backHref={backFor(route).href} backLabel={backFor(route).label} />;
     case 'make':
       return <MakeHub />;
     case 'activity':
-      return <ActivityPage id={route.id} />;
+      return <ActivityPage id={route.id} back={backFor(route)} />;
+    case 'together':
+      return <TogetherHub />;
+    case 'idea':
+      return <IdeaPage id={route.id} back={backFor(route)} />;
+    case 'all':
+      return <Everything />;
   }
 }
 

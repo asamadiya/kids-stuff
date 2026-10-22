@@ -80,6 +80,10 @@
   --make: #75465e;
   --make-tint: #f3e6ec;
   --make-deep: #4f2c3e;
+  /* Play with Dad & Mom: a warm saffron-brown, distinct from Stories' vermilion */
+  --together: #a85a00;
+  --together-tint: #fdebd0;
+  --together-deep: #6e3a00;
 
   --gold: #f2a900;
   --gold-tint: #fff1c9;

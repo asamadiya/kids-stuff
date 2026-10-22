@@ -6,6 +6,7 @@ import { StoryComplete } from './StoryComplete';
 import type { Story } from '../types';
 import type { GrownUpNote } from '../notes/types';
 import { GrownUps } from '../learn/GrownUps';
+import { HomeLink } from '../learn/PartNav';
 import '../styles/reader.css';
 
 export interface ReaderProps {
@@ -17,8 +18,10 @@ export interface ReaderProps {
   readonly page: number;
   /** Request a page change (parent owns the route/history). */
   readonly onNavigate: (page: number) => void;
-  /** Leave the reader and return to the library. */
+  /** Leave the reader and return to where it was opened from. */
   readonly onExit: () => void;
+  /** The words on the leave button; defaults to "Back to library". */
+  readonly exitLabel?: string;
   /**
    * Fired when the completion view is reached. Task 5 records completion;
    * defaults to a no-op so the reader works standalone.
@@ -76,6 +79,7 @@ export function Reader({
   page,
   onNavigate,
   onExit,
+  exitLabel,
   onComplete = noop,
   announce = noop,
   note,
@@ -227,6 +231,7 @@ export function Reader({
 
             <div className="reader__panel">
               <div className="reader__head">
+                <HomeLink />
                 <h1 id="reader-story-title" className="reader__title">
                   {kindLabel ? <span className="reader__kind">{kindLabel}</span> : null}
                   {story.title}
@@ -260,6 +265,7 @@ export function Reader({
         onNext={goNext}
         onRestart={restart}
         onLibrary={onExit}
+        exitLabel={exitLabel}
       />
     </main>
   );
