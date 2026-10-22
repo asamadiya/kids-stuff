@@ -143,6 +143,7 @@ export function jump(e: { preventDefault: () => void }, id: string) {
   e.preventDefault();
   const el = document.getElementById(id);
   if (!el) return;
+  if (el instanceof HTMLDetailsElement) el.open = true;
   el.scrollIntoView({ block: 'start' });
   const h = el.querySelector<HTMLElement>('h2, h3');
   if (h) {

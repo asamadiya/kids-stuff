@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Card, CardGroup, GroupJumps, Page } from '../learn/Page';
 import { useStored } from '../learn/scroll';
 import { cardSrc } from '../learn/catalog';
@@ -76,6 +76,14 @@ export function LangsHub() {
   return (
     <Page title="Telugu & Tamil" back={null} part="langs" note={LANGS_NOTE} expect="Things to say and sing with Amma and Nanna.">
       <LangToggle lang={lang} onLang={setLang} />
+      <nav className="langs__adult" aria-label="For Amma and Nanna">
+        <a className="btn btn--quiet" href="#/langs/guide">
+          How to keep two languages going
+        </a>
+        <a className="btn btn--quiet" href="#/langs/record">
+          Record your voices
+        </a>
+      </nav>
       <GroupJumps
         groups={[
           { id: 'say', title: 'Say it together', n: MOMENTS.length },
@@ -104,19 +112,6 @@ export function LangsHub() {
       <CardGroup id="words" title="Words" line="Picture words from the moments and books, and a listening game.">
         <Card href="#/langs/words" title="Words and listening" hook={`${WORDS.length} picture words in ${LANG_NAME[lang]}`} art={cardSrc('langs/words')} tone="langs" itemKey="langs/words" />
       </CardGroup>
-      <section className="hub__group" aria-labelledby="for-grown-ups">
-        <div className="hub__group-head">
-          <h2 id="for-grown-ups" className="hub__group-title">For Amma and Nanna</h2>
-        </div>
-        <div className="langs__adult">
-          <a className="btn" href="#/langs/guide">
-            How to keep two languages going
-          </a>
-          <a className="btn" href="#/langs/record">
-            Record voices
-          </a>
-        </div>
-      </section>
     </Page>
   );
 }
@@ -138,10 +133,17 @@ export function MomentPage({ id, back }: { readonly id: string; readonly back: {
           {m.grownUp.map((p, i) => (
             <Line key={i} id={`${m.id}.g${i}`} lang={lang} said={p[lang]} big={i === 0} />
           ))}
-          <h2 className="moment__who">He can say</h2>
-          {m.child.map((p, i) => (
-            <Line key={i} id={`${m.id}.c${i}`} lang={lang} said={p[lang]} />
-          ))}
+          {m.child.map((p, i) => {
+            // Each child line is labelled by its own speaker: Mia's "Anna!" is
+            // not something Arjun can say. One heading per run of speakers.
+            const first = i === 0 || (p.by ?? '') !== (m.child[i - 1].by ?? '');
+            return (
+              <Fragment key={i}>
+                {first ? <h2 className="moment__who">{p.by ? `${p.by} can say` : 'He can say'}</h2> : null}
+                <Line id={`${m.id}.c${i}`} lang={lang} said={p[lang]} />
+              </Fragment>
+            );
+          })}
         </div>
       </div>
       <Sources sources={m.sources} />
@@ -293,9 +295,10 @@ export function WordsPage() {
 export function LangGuide() {
   return (
     <Page title="Keeping two languages going" back={{ href: '#/langs', label: 'Telugu & Tamil' }} note={GUIDE.note} expect="A guide for Amma and Nanna.">
+      <GroupJumps groups={GUIDE.sections.map((s, i) => ({ id: `guide-${i}`, title: s.title }))} />
       <article className="guide">
-        {GUIDE.sections.map((s) => (
-          <section key={s.title} className="guide__section">
+        {GUIDE.sections.map((s, i) => (
+          <section key={s.title} id={`g-guide-${i}`} className="guide__section">
             <h2>{s.title}</h2>
             {s.body.map((p, i) => (
               <p key={i}>{p}</p>
@@ -324,12 +327,31 @@ export function RecordPage() {
   const [who, setWho] = useStored<string>('langs/who', '');
   const [unlocked, setUnlocked] = useState(false);
   const [msg, setMsg] = useState('');
-  const items = useMemo(
+  /** Words first: the listening game needs three of them recorded, and they are quickest to do. */
+  const sections = useMemo(
     () => [
-      ...MOMENTS.flatMap((m) => [...m.grownUp.map((p, i) => ({ id: `${m.id}.g${i}`, group: m.title, said: p })), ...m.child.map((p, i) => ({ id: `${m.id}.c${i}`, group: m.title, said: p }))]),
-      ...RHYMES.filter((r) => r.lang === lang).flatMap((r) => [{ id: `${r.id}.title`, group: r.title.means, said: { te: r.title, ta: r.title } as Pair }, ...r.lines.map((l, i) => ({ id: `${r.id}.l${i}`, group: r.title.means, said: { te: l, ta: l } as Pair }))]),
-      ...LANG_BOOKS.flatMap((b) => b.pages.map((p, i) => ({ id: `${b.id}.p${i}`, group: b.title[lang].means, said: { te: p.te, ta: p.ta } as Pair }))),
-      ...WORDS.map((w) => ({ id: w.id, group: 'Words', said: w as Pair })),
+      { id: 'words', title: 'Words', items: WORDS.map((w) => ({ id: w.id, group: '', said: w as Pair })) },
+      {
+        id: 'say',
+        title: 'Say it together',
+        items: MOMENTS.flatMap((m) => [
+          ...m.grownUp.map((p, i) => ({ id: `${m.id}.g${i}`, group: m.title, said: p })),
+          ...m.child.map((p, i) => ({ id: `${m.id}.c${i}`, group: m.title, said: p })),
+        ]),
+      },
+      {
+        id: 'sing',
+        title: 'Sing',
+        items: RHYMES.filter((r) => r.lang === lang).flatMap((r) => [
+          { id: `${r.id}.title`, group: r.title.means, said: { te: r.title, ta: r.title } as Pair },
+          ...r.lines.map((l, i) => ({ id: `${r.id}.l${i}`, group: r.title.means, said: { te: l, ta: l } as Pair })),
+        ]),
+      },
+      {
+        id: 'read',
+        title: 'Read together',
+        items: LANG_BOOKS.flatMap((b) => b.pages.map((p, i) => ({ id: `${b.id}.p${i}`, group: b.title[lang].means, said: { te: p.te, ta: p.ta } as Pair }))),
+      },
     ],
     [lang],
   );
@@ -412,20 +434,28 @@ export function RecordPage() {
         </button>
         <span className="record__msg" role="status">{msg}</span>
       </div>
-      <ul className="record__list">
-        {items.map((it) => (
-          <li key={it.id + lang} className="record__item">
-            <div>
-              <span className="record__group">{it.group}</span>
-              <p className="line__script" lang={lang}>
-                {it.said[lang].script}
-              </p>
-              <p className="line__roman">{it.said[lang].roman}</p>
-            </div>
-            <Recorder id={it.id} lang={lang} who={who || LANG_PARENT[lang]} text={it.said[lang].roman} />
-          </li>
-        ))}
-      </ul>
+      <GroupJumps groups={sections.map((x) => ({ id: `rec-${x.id}`, title: x.title, n: x.items.length }))} />
+      {sections.map((x) => (
+        <details key={x.id + lang} id={`g-rec-${x.id}`} className="record__section" open={x.id === 'words'}>
+          <summary>
+            <h2>{x.title}</h2> <span className="record__count">{x.items.length} lines</span>
+          </summary>
+          <ul className="record__list">
+            {x.items.map((it) => (
+              <li key={it.id + lang} className="record__item">
+                <div>
+                  {it.group ? <span className="record__group">{it.group}</span> : null}
+                  <p className="line__script" lang={lang}>
+                    {it.said[lang].script}
+                  </p>
+                  <p className="line__roman">{it.said[lang].roman}</p>
+                </div>
+                <Recorder id={it.id} lang={lang} who={who || LANG_PARENT[lang]} text={it.said[lang].roman} />
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))}
     </Page>
   );
 }

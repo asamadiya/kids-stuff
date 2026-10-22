@@ -352,3 +352,7 @@
   .recorder { justify-content: flex-start; }
 }
 .listen__empty { font-family: var(--font-read); color: var(--ink-soft); margin: 0; max-width: 70ch; }
+.record__section { border-top: 1px solid var(--rule); padding-top: var(--s3); margin-top: var(--s3); }
+.record__section > summary { display: flex; align-items: baseline; gap: var(--s3); cursor: pointer; min-height: 48px; list-style-position: outside; }
+.record__section > summary h2 { display: inline; font-size: var(--t-lg); margin: 0; }
+.record__count { color: var(--ink-soft); font-size: var(--t-sm); }
