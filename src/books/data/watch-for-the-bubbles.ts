@@ -51,8 +51,8 @@ export const book: Book = {
     },
     {
       text: '“What can I do?” asked Arjun. “You have the most important job,” said Amma. “Stand at the edge of the kolam. Watch for the bubbles, and tell us when they come.”',
-      zone: 'left',
-      art: 'Close view at Arjun’s height, the figures in the right two-thirds of the picture: Amma kneels beside Arjun on the outer edge of the kolam, smiling, and points across the kolam at the clay pot; Arjun stands tall on that edge, hands at his sides, watching the pot, proud and serious. The clay pot sits on the stove in the middle of the kolam, a long stride away from them, a few long turmeric leaves tied flat around its neck and hanging down its side; nothing stands up out of the open pot. Between Arjun and the stove there is a clear stretch of bare paving at least as long as Arjun is tall; he is nowhere near the pot or the burner. The left third is plain grey paving stones, kept clear for words.',
+      zone: 'top',
+      art: 'Medium view at Arjun’s height, the figures below the top third. The clay pot on its stove stands at the LEFT side of the picture, in the middle of the kolam; Arjun and Amma are at the RIGHT side, with the whole width of the kolam, empty paving, between them and the stove. Amma kneels beside Arjun on the outer edge of the kolam, smiling, and points across the kolam at the clay pot; Arjun stands tall on that edge, hands at his sides, watching the pot, proud and serious. The clay pot sits on the stove in the middle of the kolam, a long stride away from them, a few long turmeric leaves tied flat around its neck and hanging down its side; nothing stands up out of the open pot. Between Arjun and the stove there is a clear stretch of bare paving at least as long as Arjun is tall; he is nowhere near the pot or the burner. The top third is the plain cream stucco wall, kept clear for words.',
       characters: ['Amma', 'Arjun'],
       alt: 'Amma kneels beside Arjun and points at the pot, and he stands tall on the edge of the kolam, watching it.',
     },
@@ -95,7 +95,7 @@ export const book: Book = {
     {
       text: 'Then Paati stirred in the new rice. Later she added jaggery, ghee, cashews and raisins. The whole patio smelled sweet. Arjun watched for the bubbles again.',
       zone: 'bottom',
-      art: 'Medium view on the patio: Paati, beside the clay pot, stirs it with a long-handled steel ladle, a small steel bowl of cashews and raisins and a lump of dark brown jaggery on a steel plate beside her on the stand. Gentle steam rises from the pot. Arjun stands on the outer edge of the kolam again, a long stride from the pot, sniffing the air with his eyes closed, smiling. The figures are in the upper two-thirds; the bottom third is plain grey paving stones, kept clear for words.',
+      art: 'Medium view on the patio. Paati and the clay pot on its stove are at the RIGHT side of the picture; Arjun is at the LEFT side, with a wide stretch of empty paving between him and the stove. Paati, beside the clay pot, stirs it with a long-handled steel ladle, a small steel bowl of cashews and raisins and a lump of dark brown jaggery on a steel plate beside her on the stand. Gentle steam rises from the pot. Arjun stands on the outer edge of the kolam again, a long stride from the pot, sniffing the air with his eyes closed, smiling. The figures are in the upper two-thirds; the bottom third is plain grey paving stones, kept clear for words.',
       characters: ['Paati', 'Arjun'],
       alt: 'Paati stirs the pot with a long ladle as steam rises and Arjun sniffs the sweet smell.',
     },
@@ -132,6 +132,6 @@ export const book: Book = {
     ask: 'At page 6: “Why did Paati pick Mia up? Where did Arjun stay?”',
     next: 'If your family keeps Pongal, mark a line for him to stand behind and give him the job of calling the boil-over. If you keep Sankranti, read The Kite Needs Some Wind the same week.',
     honest: 'This is one family’s Thai Pongal, kept on one day; Tamil families outside India usually keep one or two days, while in Tamil Nadu it runs three or four days (Bhogi, Thai Pongal, Mattu Pongal for the cattle, and Kaanum Pongal for visiting). Nanna’s Telugu family keeps the same days as Bhogi, Sankranti and Kanuma; Telugu Kanuma, the cattle day, is not the same day as Tamil Kaanum Pongal, though the names sound alike. Recipes and customs differ between families.',
-    safety: 'The stove, the hot pot and the boiling milk are grown-up jobs, and so is keeping a toddler away from them. A clear line about a metre from the pot (three feet), which the child stays behind, does more than reminders. Whole cashews and raisins can choke a child under four: give Mia her pongal without them, or with the cashews finely chopped.',
+    safety: 'The stove, the hot pot and the boiling milk are grown-up jobs, and so is keeping a toddler away from them. A clear line about a metre from the pot (three feet), which the child stays behind, does more than reminders. Whole cashews and raisins can choke a child under four: give Mia her pongal without them, or with the cashews and raisins finely chopped.',
   },
 };
