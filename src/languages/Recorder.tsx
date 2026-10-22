@@ -16,8 +16,12 @@ import { clipKey, deleteClip, getClip, onVoicesChange, recordingType, saveClip, 
  * another finishes this one.
  */
 
-/** Finishes whichever recorder on the page is live. */
-let stopActive: (() => void) | null = null;
+/**
+ * The one line on the page that is recording or waiting for the microphone,
+ * and how to stop it. Owned by a per-recorder token, not a function, because
+ * a recorder's functions are recreated on every render.
+ */
+let active: { readonly owner: object; readonly stop: () => void } | null = null;
 
 export function Recorder({ id, lang, who, text }: { readonly id: string; readonly lang: Lang; readonly who: string; readonly text: string }) {
   const key = clipKey(id, lang);
@@ -31,6 +35,13 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
   /** Bumped on every start and on teardown, so a late permission answer knows it is stale. */
   const attempt = useRef(0);
   const mounted = useRef(true);
+  const me = useRef({}).current;
+  const claim = (stop: () => void) => {
+    active = { owner: me, stop };
+  };
+  const unclaim = () => {
+    if (active?.owner === me) active = null;
+  };
 
   const release = () => {
     stream.current?.getTracks().forEach((t) => t.stop());
@@ -53,7 +64,7 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
       if (r.state !== 'inactive') r.stop();
     }
     release();
-    if (stopActive === stopThis) stopActive = null;
+    unclaim();
   };
 
   useEffect(() => {
@@ -81,17 +92,28 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
 
   useEffect(() => () => (take ? URL.revokeObjectURL(take.url) : undefined), [take]);
 
+  /** Another line started while this one was still waiting for the microphone: drop the wait. */
+  const cancelAsk = () => {
+    attempt.current += 1;
+    unclaim();
+    if (mounted.current) setState('idle');
+  };
+
   const start = async () => {
     if (state === 'asking' || state === 'recording') return;
-    stopActive?.();
+    active?.stop();
     setError('');
     setState('asking');
     const mine = ++attempt.current;
+    // Claim the one live slot now, not when permission arrives, so two lines
+    // waiting on the same prompt cannot both start recording.
+    claim(cancelAsk);
     let s: MediaStream;
     try {
       s = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (e) {
       if (!mounted.current || mine !== attempt.current) return;
+      unclaim();
       setError(e instanceof Error && e.name === 'NotAllowedError' ? 'The microphone was not allowed. Allow it in the browser settings and try again.' : 'This browser could not record.');
       setState('error');
       return;
@@ -111,7 +133,7 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
       r.onstop = () => {
         release();
         rec.current = null;
-        if (stopActive === stopThis) stopActive = null;
+        unclaim();
         if (!mounted.current) return;
         const blob = new Blob(chunks.current, { type: r.mimeType || type || 'audio/webm' });
         setTake({ blob, url: URL.createObjectURL(blob) });
@@ -124,7 +146,7 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
         setState('error');
       };
       rec.current = r;
-      stopActive = stopThis;
+      claim(stopThis);
       r.start();
       setState('recording');
     } catch {

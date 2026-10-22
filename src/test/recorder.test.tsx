@@ -104,6 +104,31 @@ describe('recorder releases the microphone', () => {
     expect(live()).toBe(1);
   });
 
+  it('starts only the later line when two are waiting for the microphone at once', async () => {
+    const answers: Array<(s: MediaStream) => void> = [];
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: () => new Promise<MediaStream>((res) => answers.push(res)) },
+    });
+    render(
+      <>
+        <Recorder id="a" lang="te" who="Nanna" text="raa" />
+        <Recorder id="b" lang="te" who="Nanna" text="po" />
+      </>,
+    );
+    const [first, second] = screen.getAllByRole('button', { name: /record/i });
+    fireEvent.click(first);
+    fireEvent.click(second);
+    await act(async () => {
+      answers[0](stream());
+      answers[1](stream());
+    });
+    expect(recorders).toHaveLength(1);
+    expect(tracks[0].stopped).toBe(true);
+    expect(live()).toBe(1);
+    expect(screen.getAllByRole('button', { name: /stop/i })).toHaveLength(1);
+  });
+
   it('stops the tracks when Stop is pressed and offers the take for review', async () => {
     render(<Recorder id="a" lang="te" who="Nanna" text="raa" />);
     fireEvent.click(screen.getByRole('button', { name: /record/i }));
