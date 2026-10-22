@@ -9,6 +9,8 @@ import { SITUATIONS } from '../learn/situations';
 import { MATHS_GAMES } from '../maths/registry';
 import { SCIENCE_GAMES } from '../science/registry';
 import { ACTIVITIES } from '../make/activities';
+import { IDEAS } from '../together';
+import { ENTRIES } from '../learn/catalog';
 
 /**
  * The parent's rule, as a test: every screen "always has notes for parents on
@@ -28,8 +30,7 @@ function at(route: Route) {
 
 const ROUTES: Route[] = [
   { kind: 'home' },
-  { kind: 'stories', page: 1 },
-  { kind: 'stories', page: 2 },
+  { kind: 'stories' },
   ...SHELVES.map((s): Route => ({ kind: 'shelf', shelf: s.id })),
   ...BOOKS.slice(0, 6).map((b): Route => ({ kind: 'book', slug: b.slug, page: 0 })),
   ...BOOKS.slice(0, 3).map((b): Route => ({ kind: 'book', slug: b.slug, page: b.pages.length })),
@@ -43,6 +44,9 @@ const ROUTES: Route[] = [
   ...SCIENCE_GAMES.map((g): Route => ({ kind: 'scienceGame', id: g.id })),
   { kind: 'make' },
   ...ACTIVITIES.map((a): Route => ({ kind: 'activity', id: a.id })),
+  { kind: 'together' },
+  ...IDEAS.map((x): Route => ({ kind: 'idea', id: x.id })),
+  { kind: 'all' },
 ];
 
 describe('every screen of the Learning Center', () => {
@@ -69,9 +73,36 @@ describe('every screen of the Learning Center', () => {
     expect(document.querySelector('dialog[open]')).toBeNull();
   });
 
-  it('home offers exactly the four ways in', () => {
+  it('home offers five doors and, under them, a link to every item but the library stories', () => {
     at({ kind: 'home' });
     const nav = screen.getByRole('navigation', { name: 'Choose' });
-    expect(nav.querySelectorAll('a').length).toBe(4);
+    expect(nav.querySelectorAll('a').length).toBe(5);
+    const hrefs = new Set([...document.querySelectorAll('.dir a')].map((a) => a.getAttribute('href')));
+    const missing = ENTRIES.filter((e) => e.kind !== 'Longer read-aloud' && !hrefs.has(e.href)).map((e) => e.href);
+    expect(missing).toEqual([]);
+    for (const s of SUBJECTS) expect(hrefs.has(`#/library/${s.id}`), s.id).toBe(true);
+  });
+
+  it('every listing carries the part navigation, and every item a Home link', () => {
+    at({ kind: 'make' });
+    expect(screen.getByRole('navigation', { name: 'Parts of the Learning Center' })).toBeTruthy();
+    cleanup();
+    at({ kind: 'mathsGame', id: MATHS_GAMES[0].id });
+    expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('lists the whole centre on the Everything page, the library included', () => {
+    at({ kind: 'all' });
+    expect(document.querySelectorAll('.index a').length).toBe(ENTRIES.length);
+    expect(ENTRIES.filter((e) => e.kind === 'Longer read-aloud').length).toBe(ARCHIVE.length);
+  });
+
+  it('shows every activity on the Make & Do hub and every idea on the Play hub, with no paging', () => {
+    at({ kind: 'make' });
+    expect(document.querySelectorAll('.cards a').length).toBe(ACTIVITIES.length);
+    cleanup();
+    window.sessionStorage.clear();
+    at({ kind: 'together' });
+    expect(document.querySelectorAll('.cards a').length).toBe(IDEAS.length);
   });
 });

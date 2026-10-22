@@ -6,6 +6,7 @@ import { StoryComplete } from './StoryComplete';
 import type { Story } from '../types';
 import type { GrownUpNote } from '../notes/types';
 import { GrownUps } from '../learn/GrownUps';
+import { HomeLink } from '../learn/PartNav';
 import '../styles/reader.css';
 
 export interface ReaderProps {
@@ -227,6 +228,7 @@ export function Reader({
 
             <div className="reader__panel">
               <div className="reader__head">
+                <HomeLink />
                 <h1 id="reader-story-title" className="reader__title">
                   {kindLabel ? <span className="reader__kind">{kindLabel}</span> : null}
                   {story.title}
