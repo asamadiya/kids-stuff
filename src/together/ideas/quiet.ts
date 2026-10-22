@@ -158,7 +158,7 @@ export const IDEAS: readonly PlayIdea[] = [
     },
   },
   {
-    id: 'packing-for-jaipur',
+    id: 'packing-for-chennai',
     group: 'quiet',
     title: 'Packing for Chennai',
     hook: '"I\'m packing my bag for Chennai and I\'m taking..." Each adds one.',
