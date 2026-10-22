@@ -12,13 +12,20 @@ const PROMPT_ONLY: readonly RegExp[] = [
   /,? and the open book shows only a picture/g,
 ];
 
+/** A first sentence that opens by placing the camera; the action may only begin in the next one. */
+const FRAMING = /^(?:Seen from|Viewed from)\b/i;
+
 /**
  * The description for a screen reader: the prompt's first sentence, which by
  * the house rule (ACTION FIRST) says who does what; the rest is setting and
  * composition for the generator (design review, round 3: concise, not the
- * whole prompt).
+ * whole prompt). A first sentence that opens by placing the camera keeps the
+ * next sentence too, where the action is.
  */
 export function altText(picture: string): string {
   const clean = PROMPT_ONLY.reduce((s, re) => s.replace(re, ''), picture).replace(/\s{2,}/g, ' ').trim();
-  return clean.split(/(?<=[.!?])\s+(?=[A-Z“"])/)[0] ?? clean;
+  const parts = clean.split(/(?<=[.!?])\s+(?=[A-Z“"])/);
+  if (!FRAMING.test(parts[0]) || !parts[1]) return parts[0];
+  const both = `${parts[0]} ${parts[1]}`;
+  return both.split(/\s+/).length <= 90 ? both : parts[1];
 }

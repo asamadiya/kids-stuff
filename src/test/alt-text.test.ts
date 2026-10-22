@@ -37,4 +37,9 @@ describe('alt text', () => {
   it('keeps only the first sentence: who does what', () => {
     expect(altText('Arjun rolls the ball to Mia. Wooden fence and lemon tree behind, afternoon sun. The top third is plain sky.')).toBe('Arjun rolls the ball to Mia.');
   });
+
+  it('keeps the action when the first sentence only places the camera', () => {
+    const step4 = ACTIVITIES.find((a) => a.id === 'solid-or-liquid')!.steps[3].art!;
+    expect(altText(step4)).toMatch(/melts into a runny drip between his fingers/);
+  });
 });
