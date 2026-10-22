@@ -12,7 +12,7 @@ import type { ShelfId } from '../books/types';
 
 export type Route =
   | { readonly kind: 'home' }
-  | { readonly kind: 'stories'; readonly page: number }
+  | { readonly kind: 'stories' }
   | { readonly kind: 'shelf'; readonly shelf: ShelfId }
   | { readonly kind: 'book'; readonly slug: string; readonly page: number }
   | { readonly kind: 'library' }
@@ -24,12 +24,15 @@ export type Route =
   | { readonly kind: 'science' }
   | { readonly kind: 'scienceGame'; readonly id: string }
   | { readonly kind: 'make' }
-  | { readonly kind: 'activity'; readonly id: string };
+  | { readonly kind: 'activity'; readonly id: string }
+  | { readonly kind: 'together' }
+  | { readonly kind: 'idea'; readonly id: string }
+  | { readonly kind: 'all' };
 
 export type RouteKind = Route['kind'];
 
-/** Which home quadrant a route belongs to; `null` only for home. */
-export type Quadrant = 'stories' | 'maths' | 'science' | 'make';
+/** Which part of the centre a route belongs to; `null` for home and the Everything index. */
+export type Quadrant = 'stories' | 'maths' | 'science' | 'make' | 'together';
 
 export const QUADRANT: Record<RouteKind, Quadrant | null> = {
   home: null,
@@ -46,6 +49,9 @@ export const QUADRANT: Record<RouteKind, Quadrant | null> = {
   scienceGame: 'science',
   make: 'make',
   activity: 'make',
+  together: 'together',
+  idea: 'together',
+  all: null,
 };
 
 /** Distance from home. Descending pushes a history entry; anything else replaces. */
@@ -55,11 +61,14 @@ export const DEPTH: Record<RouteKind, number> = {
   maths: 1,
   science: 1,
   make: 1,
+  together: 1,
+  all: 1,
   shelf: 2,
   library: 2,
   mathsGame: 2,
   scienceGame: 2,
   activity: 2,
+  idea: 2,
   subject: 3,
   book: 3,
   situation: 3,
@@ -71,7 +80,7 @@ export function toHash(route: Route): string {
     case 'home':
       return '#/';
     case 'stories':
-      return route.page > 1 ? `#/stories?p=${route.page}` : '#/stories';
+      return '#/stories';
     case 'shelf':
       return `#/stories/${route.shelf}`;
     case 'book':
@@ -96,10 +105,19 @@ export function toHash(route: Route): string {
       return '#/make';
     case 'activity':
       return `#/make/${route.id}`;
+    case 'together':
+      return '#/together';
+    case 'idea':
+      return `#/together/${route.id}`;
+    case 'all':
+      return '#/all';
   }
 }
 
-/** Push on descent within one quadrant (or out of home); replace otherwise. */
+/**
+ * Push on descent within one part of the centre, or out of home or the
+ * Everything index (both open onto every part); replace otherwise.
+ */
 export function isDescent(from: Route, to: Route): boolean {
   if (DEPTH[to.kind] <= DEPTH[from.kind]) return false;
   const a = QUADRANT[from.kind];
@@ -115,6 +133,7 @@ export interface Known {
   readonly maths: ReadonlySet<string>;
   readonly science: ReadonlySet<string>;
   readonly activities: ReadonlySet<string>;
+  readonly ideas: ReadonlySet<string>;
 }
 
 function decode(raw: string | undefined): string | undefined {
@@ -138,7 +157,8 @@ function pageOf(raw: string | undefined, count: number): number {
  * falls back to the nearest real ancestor, never to a blank page.
  */
 export function parseHash(rawHash: string, known: Known): Route {
-  const [pathPart, query = ''] = rawHash.replace(/^#/, '').split('?');
+  // A query (the old `?p=2` second page of shelves) is ignored: every listing is one page now.
+  const [pathPart] = rawHash.replace(/^#/, '').split('?');
   const clean = pathPart.replace(/^\/+/, '').replace(/\/+$/, '');
   if (clean === '') return { kind: 'home' };
   const [head, a, b] = clean.split('/').map(decode);
@@ -146,13 +166,12 @@ export function parseHash(rawHash: string, known: Known): Route {
   switch (head) {
     case 'stories': {
       if (a && known.shelves.has(a)) return { kind: 'shelf', shelf: a as ShelfId };
-      const p = Number.parseInt(new URLSearchParams(query).get('p') ?? '1', 10);
-      return { kind: 'stories', page: p === 2 ? 2 : 1 };
+      return { kind: 'stories' };
     }
     case 'book': {
       const count = a ? known.books.get(a) : undefined;
       if (a && count !== undefined) return { kind: 'book', slug: a, page: pageOf(b, count) };
-      return { kind: 'stories', page: 1 };
+      return { kind: 'stories' };
     }
     case 'library':
       if (a && known.subjects.has(a)) return { kind: 'subject', subject: a };
@@ -174,6 +193,11 @@ export function parseHash(rawHash: string, known: Known): Route {
     case 'make':
       if (a && known.activities.has(a)) return { kind: 'activity', id: a };
       return { kind: 'make' };
+    case 'together':
+      if (a && known.ideas.has(a)) return { kind: 'idea', id: a };
+      return { kind: 'together' };
+    case 'all':
+      return { kind: 'all' };
     default:
       return legacy(head, a, known);
   }
@@ -213,6 +237,8 @@ export function parentOf(route: Route, shelfOf: ShelfOf, subjectOf: (slug: strin
     case 'maths':
     case 'science':
     case 'make':
+    case 'together':
+    case 'all':
       return { href: '#/', label: 'Home' };
     case 'shelf':
     case 'library':
@@ -235,5 +261,7 @@ export function parentOf(route: Route, shelfOf: ShelfOf, subjectOf: (slug: strin
       return { href: '#/science', label: 'Science' };
     case 'activity':
       return { href: '#/make', label: 'Make & Do' };
+    case 'idea':
+      return { href: '#/together', label: 'Play Together' };
   }
 }

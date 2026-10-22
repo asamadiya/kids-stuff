@@ -17,12 +17,12 @@ const known: Known = {
   maths: new Set(['make-both-sides-match']),
   science: new Set(['will-this-clay-boat-float']),
   activities: new Set(['paper-boat']),
+  ideas: new Set(['sock-wrestle']),
 };
 
 const EVERY: readonly Route[] = [
   { kind: 'home' },
-  { kind: 'stories', page: 1 },
-  { kind: 'stories', page: 2 },
+  { kind: 'stories' },
   { kind: 'shelf', shelf: 'tales' },
   { kind: 'book', slug: 'this-dinosaur-is-mine', page: 0 },
   { kind: 'book', slug: 'this-dinosaur-is-mine', page: 12 },
@@ -36,6 +36,9 @@ const EVERY: readonly Route[] = [
   { kind: 'scienceGame', id: 'will-this-clay-boat-float' },
   { kind: 'make' },
   { kind: 'activity', id: 'paper-boat' },
+  { kind: 'together' },
+  { kind: 'idea', id: 'sock-wrestle' },
+  { kind: 'all' },
 ];
 
 describe('routes', () => {
@@ -50,14 +53,17 @@ describe('routes', () => {
 
   it.each([
     ['#/maths/no-such-game', { kind: 'maths' }],
-    ['#/book/no-such-book/3', { kind: 'stories', page: 1 }],
+    ['#/book/no-such-book/3', { kind: 'stories' }],
     ['#/read/no-such-story', { kind: 'library' }],
-    ['#/stories/no-such-shelf', { kind: 'stories', page: 1 }],
+    ['#/stories/no-such-shelf', { kind: 'stories' }],
     ['#/situation/nope', { kind: 'shelf', shelf: 'family' }],
     ['#/nonsense', { kind: 'home' }],
+    ['#/together/no-such-idea', { kind: 'together' }],
+    ['#/all/anything', { kind: 'all' }],
     ['#/book/this-dinosaur-is-mine/999', { kind: 'book', slug: 'this-dinosaur-is-mine', page: 12 }],
     ['#/book/this-dinosaur-is-mine/-4', { kind: 'book', slug: 'this-dinosaur-is-mine', page: 0 }],
-    ['#/book/%E0%A4', { kind: 'stories', page: 1 }],
+    ['#/book/%E0%A4', { kind: 'stories' }],
+    ['#/stories?p=2', { kind: 'stories' }],
   ])('%s canonicalises to a real ancestor', (hash, route) => {
     expect(parseHash(hash, known)).toEqual(route);
   });
@@ -89,9 +95,16 @@ describe('routes', () => {
     expect(isDescent(game, { kind: 'shelf', shelf: 'tales' })).toBe(false);
   });
 
-  it('puts every route in exactly one quadrant, except home', () => {
+  it('puts every route in exactly one part, except home and the Everything index', () => {
     for (const r of EVERY) {
-      expect(QUADRANT[r.kind] === null).toBe(r.kind === 'home');
+      expect(QUADRANT[r.kind] === null).toBe(r.kind === 'home' || r.kind === 'all');
     }
+  });
+
+  it('pushes history when opening anything from the Everything index', () => {
+    const all: Route = { kind: 'all' };
+    expect(isDescent(all, { kind: 'mathsGame', id: 'make-both-sides-match' })).toBe(true);
+    expect(isDescent(all, { kind: 'idea', id: 'sock-wrestle' })).toBe(true);
+    expect(isDescent({ kind: 'home' }, all)).toBe(true);
   });
 });
