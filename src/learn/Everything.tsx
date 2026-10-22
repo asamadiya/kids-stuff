@@ -47,6 +47,7 @@ export function Everything() {
   const [kind, setKind] = useStored<EntryKind | 'any'>('all/kind', 'any');
   const [time, setTime] = useStored<Time>('all/time', 'any');
   const [adult, setAdult] = useStored<Adult>('all/adult', 'any');
+  const [group, setGroup] = useStored<string>('all/group', 'any');
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   const list = useMemo(
     () =>
@@ -54,15 +55,18 @@ export function Everything() {
         (e) =>
           (part === 'any' || e.part === part) &&
           (kind === 'any' || e.kind === kind) &&
+          (group === 'any' || e.groupTitle === group) &&
           fitsTime(e, time) &&
           fitsAdult(e, adult) &&
           terms.every((t) => e.search.includes(t) || e.title.toLowerCase().includes(t)),
       ),
     // terms is derived from q
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [q, part, kind, time, adult],
+    [q, part, kind, time, adult, group],
   );
-  const active = (part !== 'any' ? 1 : 0) + (kind !== 'any' ? 1 : 0) + (time !== 'any' ? 1 : 0) + (adult !== 'any' ? 1 : 0);
+  const active = (part !== 'any' ? 1 : 0) + (kind !== 'any' ? 1 : 0) + (group !== 'any' ? 1 : 0) + (time !== 'any' ? 1 : 0) + (adult !== 'any' ? 1 : 0);
+  // Subjects and groups inside the chosen part (shelves, game groups, idea areas, library subjects).
+  const groupsHere = part === 'any' ? [] : [...new Set(ENTRIES.filter((e) => e.part === part).map((e) => e.groupTitle))];
   const kindsHere = KINDS.filter((k) => ENTRIES.some((e) => e.kind === k && (part === 'any' || e.part === part)));
   return (
     <Page title="Everything" back={{ href: '#/', label: 'Home' }} part={null} note={NOTE} expect="A searchable list of the whole centre, for grown-ups.">
@@ -74,7 +78,7 @@ export function Everything() {
         <p className="index__count" aria-live="polite">
           {list.length === ENTRIES.length ? `All ${list.length}` : `${list.length} of ${ENTRIES.length}`}
           {active ? (
-            <button type="button" className="filters__clear" onClick={() => { setPart('any'); setKind('any'); setTime('any'); setAdult('any'); }}>
+            <button type="button" className="filters__clear" onClick={() => { setPart('any'); setKind('any'); setGroup('any'); setTime('any'); setAdult('any'); }}>
               Clear filters
             </button>
           ) : null}
@@ -82,11 +86,11 @@ export function Everything() {
       </div>
       <FilterPanel id="all" active={active}>
         <div className="filters" role="group" aria-label="Part">
-          <button type="button" className={`chip${part === 'any' ? ' is-on' : ''}`} aria-pressed={part === 'any'} onClick={() => { setPart('any'); setKind('any'); }}>
+          <button type="button" className={`chip${part === 'any' ? ' is-on' : ''}`} aria-pressed={part === 'any'} onClick={() => { setPart('any'); setKind('any'); setGroup('any'); }}>
             All parts
           </button>
           {PARTS.map((p) => (
-            <button key={p.id} type="button" className={`chip chip--${p.id}${part === p.id ? ' is-on' : ''}`} aria-pressed={part === p.id} onClick={() => { setPart(p.id); setKind('any'); }}>
+            <button key={p.id} type="button" className={`chip chip--${p.id}${part === p.id ? ' is-on' : ''}`} aria-pressed={part === p.id} onClick={() => { setPart(p.id); setKind('any'); setGroup('any'); }}>
               {p.name}
             </button>
           ))}
@@ -103,6 +107,20 @@ export function Everything() {
             ))}
           </div>
         ) : null}
+        {groupsHere.length > 1 ? (
+          <div className="filters" role="group" aria-label="Subject">
+            <button type="button" className={`chip${group === 'any' ? ' is-on' : ''}`} aria-pressed={group === 'any'} onClick={() => setGroup('any')}>
+              Every subject
+            </button>
+            {groupsHere.map((g) => (
+              <button key={g} type="button" className={`chip${group === g ? ' is-on' : ''}`} aria-pressed={group === g} onClick={() => setGroup(g)}>
+                {g}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="filters__hint">Choose a part to filter by subject.</p>
+        )}
         <div className="filters" role="group" aria-label="Time">
           {TIMES.map(([v, label]) => (
             <button key={v} type="button" className={`chip${time === v ? ' is-on' : ''}`} aria-pressed={time === v} onClick={() => setTime(v)}>

@@ -90,7 +90,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia is with Papa or another grown-up in the kitchen or the garden while the two of you wrestle, outside the play area. If she wants a turn afterwards, she can pull a sock off that grown-up slowly on the sofa.',
     },
     picture:
-      "Side view on the living-room rug: Arjun and Mummy kneel facing each other, an arm’s length apart, both laughing. Mummy’s right foot is stretched out behind her on the rug wearing one long striped sock, and Arjun leans round her side, both hands gripping the loose toe of that sock and pulling it halfway off her foot. Arjun’s own right foot, tucked under him, wears a plain red sock. Cushions are piled round the edge of the rug, and the coffee table is pushed back against the wall.",
+      "On the living-room rug, Arjun and Mummy kneel upright facing each other, an arm’s length apart, about to start: each has one long red-and-white striped sock pulled up over one shin. Mummy holds up one flat open hand like a policeman’s stop sign and Arjun copies her, both shouting the stop word together and grinning. Cushions are piled round the edge of the rug and the coffee table is pushed back against the wall.",
     cast: ['Arjun', 'Mummy'],
     sources: [
       {

@@ -18,8 +18,10 @@ export interface ReaderProps {
   readonly page: number;
   /** Request a page change (parent owns the route/history). */
   readonly onNavigate: (page: number) => void;
-  /** Leave the reader and return to the library. */
+  /** Leave the reader and return to where it was opened from. */
   readonly onExit: () => void;
+  /** The words on the leave button; defaults to "Back to library". */
+  readonly exitLabel?: string;
   /**
    * Fired when the completion view is reached. Task 5 records completion;
    * defaults to a no-op so the reader works standalone.
@@ -77,6 +79,7 @@ export function Reader({
   page,
   onNavigate,
   onExit,
+  exitLabel,
   onComplete = noop,
   announce = noop,
   note,
@@ -262,6 +265,7 @@ export function Reader({
         onNext={goNext}
         onRestart={restart}
         onLibrary={onExit}
+        exitLabel={exitLabel}
       />
     </main>
   );

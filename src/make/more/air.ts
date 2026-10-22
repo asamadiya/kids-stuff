@@ -58,6 +58,7 @@ export const MORE: readonly Activity[] = [
       { label: 'American Chemical Society, Inquiry in Action (kindergarten): What Is Wind?', url: 'https://www.acs.org/education/resources/k-8/inquiryinaction/kindergarten/chapter-1/what-is-wind.html' },
     ],
     tags: ['phirki', 'pinwheel', 'wind', 'breezy day', 'paper craft', 'mela', 'mirror image'],
+    pairsWith: 'the-kite-needs-some-wind',
     note: {
       what: 'He cuts and curls a paper phirki, a pinwheel, and spins it by blowing. Then he makes a second one with the other four tips curled in, guesses which way it will turn, and tests both side by side.',
       expect: 'The first phirki often sticks, because a hole grips the straw, the paper rubs on a tape stopper, or the tips were creased flat. He will probably guess the second one turns the same way, since it looks the same. Fanned from the front, the two turn opposite ways. Let him take a normal breath between blows: blowing hard again and again can leave him light-headed.',
@@ -238,6 +239,7 @@ export const MORE: readonly Activity[] = [
       { label: 'UCAR Center for Science Education: Air on the Go (paper wad and bottle)', url: 'https://scied.ucar.edu/activity/air-go-magic-trick' },
     ],
     tags: ['air', 'rainy day', 'no mess', 'quick', 'plastic bottle', 'straw', 'trick'],
+    noPair: 'None yet: no game here is about air taking up space.',
     note: {
       what: 'He rests a small paper ball just inside the mouth of an empty plastic bottle lying on its side and blows hard into the mouth: the ball pops out at him. Then he tries one short puff through a straw, aimed right at the ball.',
       expect: 'Nearly everyone, grown-ups included, expects the ball to shoot into the bottle, and he will want to try again and again. A short puff through the straw aimed right at the ball usually sends it in, but not every time.',

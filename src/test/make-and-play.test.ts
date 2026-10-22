@@ -35,6 +35,10 @@ describe('Make & Do', () => {
     for (const ar of MAKE_AREAS) expect(ACTIVITIES.filter((a) => a.area === ar.id).length, ar.id).toBeGreaterThanOrEqual(3);
   });
 
+  it('links every activity to something on screen, or says why not', () => {
+    for (const a of ACTIVITIES) expect(Boolean(a.pairsWith) || Boolean(a.noPair), a.id).toBe(true);
+  });
+
   it('has unique ids', () => {
     expect(new Set(ACTIVITIES.map((a) => a.id)).size).toBe(ACTIVITIES.length);
   });

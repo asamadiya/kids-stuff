@@ -201,6 +201,7 @@ function render(route: Route, go: (r: Route) => void) {
             onExit={() => {
               window.location.hash = back.href;
             }}
+            exitLabel={back.label.startsWith('Back') ? back.label : `Back to ${back.label}`}
             onComplete={(slug) => markRead(`read/${slug}`)}
             note={archiveEntry(story.slug)?.note ?? LIBRARY_NOTE}
             kindLabel={archiveLabel(story.slug)}

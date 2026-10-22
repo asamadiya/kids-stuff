@@ -24,6 +24,8 @@ export interface ReaderControlsProps {
   readonly onRestart: () => void;
   /** Leave the reader and return to the library. */
   readonly onLibrary: () => void;
+  /** Where Back goes, in words: the listing the story was opened from. */
+  readonly exitLabel?: string;
 }
 
 export function ReaderControls({
@@ -39,6 +41,7 @@ export function ReaderControls({
   onNext,
   onRestart,
   onLibrary,
+  exitLabel = 'Back to library',
 }: ReaderControlsProps) {
   return (
     <nav
@@ -92,7 +95,7 @@ export function ReaderControls({
           <span aria-hidden="true" className="reader-controls__glyph">
             &#8249;
           </span>
-          Back to library
+          {exitLabel}
         </button>
 
         <button

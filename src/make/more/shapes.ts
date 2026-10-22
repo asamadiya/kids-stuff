@@ -64,6 +64,7 @@ export const MORE: readonly Activity[] = [
       },
     ],
     tags: ['chalk', 'kolam', 'Pongal', 'Tamil Nadu', 'rangoli', 'dot grid', 'driveway', 'no mess'],
+    noPair: 'None yet: no game here draws one line round dots. Make the Other Half is the closest, about the other kolam idea, symmetry.',
     note: {
       what: 'He draws a kolam, the South Indian line drawing made around a grid of dots: one line that goes round every dot without touching it and comes back to where it began. You warm up on one, two and three dots, then try a square of nine.',
       expect: 'His first nine-dot line will probably wander, touch a dot, or close up early with some dots left outside. That is the puzzle, not a failure: rub out with the damp cloth and go again. What works is treating the nine dots as one long row that snakes back and forth, weaving between each dot and the next, as in the row of three.',
@@ -275,6 +276,7 @@ export const MORE: readonly Activity[] = [
       },
     ],
     tags: ['map', 'treasure hunt', 'hide and seek', 'position words', 'bedroom', 'drawing', 'rainy day', 'indoors', 'no mess'],
+    pairsWith: 'turn-it-does-it-fit',
     note: {
       what: 'You draw his bedroom together as it looks from the ceiling, with boxes for the bed and the cupboard. You hide a soft toy and mark it with an X; he finds it using the map. Then he hides it and draws the X for you.',
       expect: 'He will probably draw the bed and cupboard from the front, with legs and doors, because that is how he sees them; the toy car seen from above helps. He may hold the map at an angle that does not match the room, or run to his favourite hiding place and ignore the map. His own map will likely have an X and few other clues, which you will find out together when you search.',

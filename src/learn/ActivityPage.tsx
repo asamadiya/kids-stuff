@@ -101,6 +101,10 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
           </a>{' '}
           <span className="activity__pair-kind">({pair.kind.toLowerCase()} on the same idea)</span>
         </p>
+      ) : a.noPair ? (
+        <p className="activity__pair">
+          <b>On screen</b> <span className="activity__pair-kind">{a.noPair}</span>
+        </p>
       ) : null}
       {a.sources?.length ? (
         <p className="sources">

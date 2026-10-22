@@ -361,6 +361,7 @@ const FIRST: readonly Activity[] = [
     sources: [
       { label: 'NAEYC for Families: Nurturing the Scientist in Your Child, on asking a child to predict before a simple investigation (support for the guess-first step only; the egg drop is not from this page)', url: 'https://www.naeyc.org/our-work/families/nurturing-scientist-your-child' },
     ],
+    noPair: 'None yet: no game here is about cushioning a fall. Which One Lands First? is about falling, not landing.',
     note: {
       what: 'He packs a shoebox with crumpled paper or socks. You drop one bare boiled egg onto a tray, then drop a second egg packed in his box from the same height, and he checks both shells.',
       expect: 'He may expect both to crack, or think the box works because it is heavier. Packing that is too thin, or an egg that touches the side of the box, can still crack, which is useful: ask him where the egg hit. He will want to drop it again; let him repack and try.',

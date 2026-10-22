@@ -56,6 +56,7 @@ export const MORE: readonly Activity[] = [
       { label: 'American Academy of Pediatrics, HealthyChildren.org: Choking Prevention', url: 'https://www.healthychildren.org/English/health-issues/injuries-emergencies/Pages/Choking-Prevention.aspx' },
     ],
     tags: ['rainy day', 'paper', 'coins', 'bridges', 'engineering', 'counting', 'no mess', 'indoors'],
+    noPair: 'None yet: no game here is about how a shape makes paper strong.',
     note: {
       what: 'He lays a flat sheet of paper across a gap between two piles of books and sees it sag under one coin. Then he folds the same kind of paper into a zigzag and counts how many coins it holds before it gives way.',
       expect: 'He will probably expect the flat sheet to hold a few coins; it usually bends into the gap under the first. The zigzag can hold dozens, but the count varies a lot with how sharp the folds are and where the coins sit. When it fails, the folds spread flat or one end slides off a pile, and both are worth looking at together.',

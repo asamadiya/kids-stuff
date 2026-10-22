@@ -64,6 +64,8 @@ export interface Activity {
   readonly ask: string;
   /** A maths or science game, or a picture book, about the same idea. */
   readonly pairsWith?: string;
+  /** When nothing on screen matches, why — shown on the page so its absence is not a gap. */
+  readonly noPair?: string;
   /**
    * What the grown-up should try alone first, and what to look for: household
    * materials vary (steel tumblers that barely ring, cream that will not

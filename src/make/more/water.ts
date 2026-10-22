@@ -313,6 +313,7 @@ export const MORE: readonly Activity[] = [
       { label: 'Practical Action: Zeer Pots, a Fridge Made of Two Clay Pots', url: 'https://practicalaction.org/zeer-pot-fridge' },
     ],
     tags: ['matka', 'surahi', 'ghara', 'clay pot', 'summer', 'hot day', 'evaporation', 'cooling', 'Jaipur', 'India', 'no fridge'],
+    pairsWith: 'where-did-the-ice-go',
     note: {
       what: 'In Indian summers many homes keep drinking water in an unglazed clay matka or a long-necked surahi; water seeps through the clay and dries off the outside, which is why the pot feels damp. Here he tests the same idea with two steel bottles of the same water, one wrapped in a wet cotton cloth, left an hour in a shady, breezy spot.',
       expect: 'He may guess either way: that the bare bottle stays colder, that the wet cloth makes no difference, or that the wet one wins because wet cloth feels cold. The wrapped water is usually only a little cooler, so fingers may disagree; a thermometer settles it. He may call the cloth “cold”, as if coldness were in it.',

@@ -135,6 +135,7 @@
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); margin-bottom: var(--s3); }
 .filters__set { display: inline-flex; flex-wrap: wrap; gap: var(--s2); padding-right: var(--s3); margin-right: var(--s1); border-right: 2px solid var(--rule); }
 .filters__count { display: inline-flex; align-items: center; gap: var(--s3); font-family: var(--font-ui); font-size: var(--t-xs); color: var(--ink-soft); margin-left: auto; }
+.filters__hint { font-family: var(--font-read); font-size: var(--t-xs); color: var(--ink-soft); margin: 0 0 var(--s3); }
 .filters__clear { min-height: 40px; padding: 0 var(--s3); border-radius: var(--pill); border: 2px solid var(--ink); background: var(--gold); font-family: var(--font-ui); font-weight: 600; font-size: var(--t-xs); }
 .chip {
   min-height: 44px; padding: 0 var(--s4); border-radius: var(--pill);
@@ -248,7 +249,6 @@
   .index__row { grid-template-columns: 64px minmax(0, 1fr); }
   .index__thumb { width: 64px; height: 50px; }
   .index__meta { grid-column: 2; flex-direction: row; flex-wrap: wrap; gap: 0 var(--s2); }
-  .index__meta span:nth-child(2) { display: none; }
   .filters__set { border-right: none; padding-right: 0; }
   .chip { min-height: 40px; padding: 0 var(--s3); }
   /* One scrolling row of group jumps, so the first pictures are in the first screen. */
