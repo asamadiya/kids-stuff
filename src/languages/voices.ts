@@ -75,13 +75,69 @@ export async function exportAll(): Promise<Blob> {
   return new Blob([JSON.stringify({ kind: 'rlc-voices', version: 1, clips: enc })], { type: 'application/json' });
 }
 
-/** Read a file made by `exportAll`. Returns how many recordings were added or replaced. */
-export async function importAll(file: File): Promise<number> {
-  const parsed = JSON.parse(await file.text()) as { kind?: string; clips?: Array<{ key: string; type: string; who: string; at: number; data: string }> };
-  if (parsed.kind !== 'rlc-voices' || !Array.isArray(parsed.clips)) throw new Error('That file is not a saved set of recordings.');
-  for (const c of parsed.clips) await saveClip({ key: c.key, type: c.type, who: c.who, at: c.at, blob: base64ToBlob(c.data, c.type) });
+/** A file made by `exportAll`, read and checked in full but not yet written. */
+export interface PendingImport {
+  readonly clips: readonly Clip[];
+  /** Keys in the file that already have a recording on this device. */
+  readonly replaces: readonly string[];
+}
+
+const KEY = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*:(te|ta)$/;
+
+/**
+ * Read and check every entry of an exported file before anything is written,
+ * so a bad entry anywhere rejects the whole file and nothing half-imports.
+ */
+export async function readImport(file: File): Promise<PendingImport> {
+  const clips = parseImport(await file.text());
+  const have = await allKeys();
+  return { clips, replaces: clips.map((c) => c.key).filter((k) => have.has(k)) };
+}
+
+/** Check every entry of an export file's text; throws on the first bad one. */
+export function parseImport(text: string): Clip[] {
+  const bad = new Error('That file is not a saved set of recordings from this app.');
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw bad;
+  }
+  const p = parsed as { kind?: unknown; clips?: unknown };
+  if (p.kind !== 'rlc-voices' || !Array.isArray(p.clips)) throw bad;
+  const seen = new Set<string>();
+  return p.clips.map((raw, i): Clip => {
+    const c = raw as Record<string, unknown>;
+    const ok =
+      typeof c.key === 'string' && KEY.test(c.key) && !seen.has(c.key) &&
+      typeof c.type === 'string' && c.type.startsWith('audio/') &&
+      typeof c.who === 'string' && typeof c.at === 'number' && Number.isFinite(c.at) &&
+      typeof c.data === 'string' && c.data.length > 0;
+    if (!ok) throw new Error(`Recording ${i + 1} in that file is damaged, so nothing was loaded.`);
+    seen.add(c.key as string);
+    let blob: Blob;
+    try {
+      blob = base64ToBlob(c.data as string, c.type as string);
+    } catch {
+      throw new Error(`Recording ${i + 1} in that file is damaged, so nothing was loaded.`);
+    }
+    return { key: c.key as string, type: c.type as string, who: (c.who as string).slice(0, 40), at: c.at as number, blob };
+  });
+}
+
+/** Write a checked import in one transaction: all of it, or none of it. */
+export async function commitImport(pending: PendingImport): Promise<number> {
+  const db = await open();
+  await new Promise<void>((resolve, reject) => {
+    const t = db.transaction(STORE, 'readwrite');
+    const s = t.objectStore(STORE);
+    for (const c of pending.clips) s.put(c);
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+    t.onabort = () => reject(t.error ?? new Error('The recordings could not be saved.'));
+  });
   voicesChanged();
-  return parsed.clips.length;
+  return pending.clips.length;
 }
 
 function blobToBase64(b: Blob): Promise<string> {

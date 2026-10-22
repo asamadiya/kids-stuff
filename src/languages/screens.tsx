@@ -9,7 +9,7 @@ import { LANG_BOOKS, MOMENTS, RHYMES, WHEN_LABEL, WORDS, getLangBook, getMoment,
 import { Voice } from './Voice';
 import { Recorder } from './Recorder';
 import { GUIDE } from './guide';
-import { allKeys, clearAll, clipKey, exportAll, importAll, onVoicesChange, voicesChanged } from './voices';
+import { allKeys, clearAll, clipKey, commitImport, exportAll, onVoicesChange, readImport, voicesChanged } from './voices';
 import { altText } from '../learn/alt';
 
 const BASE = import.meta.env.BASE_URL;
@@ -360,12 +360,16 @@ export function RecordPage() {
           type="button"
           className="btn"
           onClick={async () => {
-            const blob = await exportAll();
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'learning-center-voices.json';
-            a.click();
-            URL.revokeObjectURL(a.href);
+            try {
+              const blob = await exportAll();
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = 'learning-center-voices.json';
+              a.click();
+              window.setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            } catch {
+              setMsg('The recordings could not be read from this browser, so no file was made.');
+            }
           }}
         >
           Save all to a file
@@ -378,11 +382,19 @@ export function RecordPage() {
             hidden
             onChange={async (e) => {
               const f = e.target.files?.[0];
+              e.target.value = '';
               if (!f) return;
               try {
-                setMsg(`Loaded ${await importAll(f)} recordings.`);
+                const pending = await readImport(f);
+                const n = pending.clips.length;
+                const r = pending.replaces.length;
+                const ask = r
+                  ? `Load ${n} recordings? ${r} of them will replace recordings already on this device.`
+                  : `Load ${n} recordings?`;
+                if (!window.confirm(ask)) return setMsg('Nothing was loaded.');
+                setMsg(`Loaded ${await commitImport(pending)} recordings.`);
               } catch (err) {
-                setMsg(err instanceof Error ? err.message : 'That file could not be read.');
+                setMsg(err instanceof Error ? err.message : 'That file could not be read, so nothing was loaded.');
               }
             }}
           />
@@ -392,14 +404,18 @@ export function RecordPage() {
           className="btn btn--quiet"
           onClick={async () => {
             if (!window.confirm('Delete every recording on this device?')) return;
-            await clearAll();
+            try {
+              await clearAll();
+            } catch {
+              return setMsg('The recordings could not be deleted. Try again.');
+            }
             voicesChanged();
             setMsg('All recordings deleted.');
           }}
         >
           Delete all
         </button>
-        {msg ? <span className="record__msg">{msg}</span> : null}
+        <span className="record__msg" role="status">{msg}</span>
       </div>
       <ul className="record__list">
         {items.map((it) => (
