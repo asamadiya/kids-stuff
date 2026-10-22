@@ -17,6 +17,7 @@ import { Everything } from './Everything';
 import { IdeaPage, TogetherHub } from '../together/screens';
 import { Page } from './Page';
 import { savedScroll, saveScroll } from './scroll';
+import { itemKey, originOf, recordOrigin } from './origin';
 import { Reader } from '../components/Reader';
 import { LIBRARY_NOTE, archiveEntry, archiveLabel } from './library';
 
@@ -64,6 +65,7 @@ export function LearningCenter() {
     const from = routeRef.current;
     const hash = toHash(next);
     if (toHash(from) === hash) return;
+    if (LISTINGS.has(from.kind)) recordOrigin(from, next);
     if (isDescent(from, next)) window.history.pushState(null, '', hash);
     else window.history.replaceState(null, '', hash);
     routeRef.current = next;
@@ -123,7 +125,10 @@ export function LearningCenter() {
       return;
     }
     window.scrollTo(0, listing ? savedScroll(screen) : 0);
-    const back = returning ? document.querySelector<HTMLElement>(`#main-content :is(.cards, .dir, .index) a[href="${CSS.escape(toHash(from!))}"]`) : null;
+    // Match the card by the item it opens, not its address: a book left on
+    // page 3 must find the card that links to page 1.
+    const key = returning ? itemKey(from!) : null;
+    const back = key ? document.querySelector<HTMLElement>(`#main-content a[data-key="${CSS.escape(key)}"]`) : null;
     const target = back ?? document.querySelector<HTMLElement>('#main-content h1');
     if (target) {
       if (!back) target.setAttribute('tabindex', '-1');
@@ -152,6 +157,11 @@ export function LearningCenter() {
   );
 }
 
+/** Back for an item: the listing it was opened from, else its parent in the route table. */
+function backFor(route: Route): { href: string; label: string } {
+  return originOf(route) ?? parentOf(route, shelfOf, subjectOfStory)!;
+}
+
 function render(route: Route, go: (r: Route) => void) {
   switch (route.kind) {
     case 'home':
@@ -162,7 +172,7 @@ function render(route: Route, go: (r: Route) => void) {
       return getShelf(route.shelf) ? <ShelfPage shelf={route.shelf} /> : <Stories />;
     case 'book': {
       const book = getBook(route.slug)!;
-      const back = parentOf(route, shelfOf, subjectOfStory)!;
+      const back = backFor(route);
       return (
         <BookReader
           key={book.slug}
@@ -181,7 +191,7 @@ function render(route: Route, go: (r: Route) => void) {
       return <SubjectPage subject={route.subject} />;
     case 'read': {
       const story = archiveStory(route.slug)!;
-      const back = parentOf(route, shelfOf, subjectOfStory)!;
+      const back = backFor(route);
       return (
         <div className="archive-reader">
           <Reader
@@ -202,7 +212,7 @@ function render(route: Route, go: (r: Route) => void) {
       const s = getSituation(route.id)!;
       markRead(`sel/${s.id}`);
       return (
-        <Page title={s.title} back={{ href: '#/stories/family', label: 'Family & Friends' }} note={s.note} expect={s.note.expect}>
+        <Page title={s.title} back={backFor(route)} note={s.note} expect={s.note.expect}>
           <div className="situation">
             <s.Component />
           </div>
@@ -212,19 +222,19 @@ function render(route: Route, go: (r: Route) => void) {
     case 'maths':
       return <MathsHub />;
     case 'mathsGame':
-      return <GameShell key={route.id} game={mathsGame(route.id)!} backHref="#/maths" backLabel="Maths" />;
+      return <GameShell key={route.id} game={mathsGame(route.id)!} backHref={backFor(route).href} backLabel={backFor(route).label} />;
     case 'science':
       return <ScienceHub />;
     case 'scienceGame':
-      return <GameShell key={route.id} game={scienceGame(route.id)!} backHref="#/science" backLabel="Science" />;
+      return <GameShell key={route.id} game={scienceGame(route.id)!} backHref={backFor(route).href} backLabel={backFor(route).label} />;
     case 'make':
       return <MakeHub />;
     case 'activity':
-      return <ActivityPage id={route.id} />;
+      return <ActivityPage id={route.id} back={backFor(route)} />;
     case 'together':
       return <TogetherHub />;
     case 'idea':
-      return <IdeaPage id={route.id} />;
+      return <IdeaPage id={route.id} back={backFor(route)} />;
     case 'all':
       return <Everything />;
   }

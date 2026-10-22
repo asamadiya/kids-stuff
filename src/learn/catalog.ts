@@ -66,6 +66,10 @@ export interface Group {
   readonly href?: string;
 }
 
+/** About how long a story takes to read aloud, at a calm 120 words a minute. */
+const readAloudMinutes = (st: { readonly pages: ReadonlyArray<{ readonly text: string }> }) =>
+  Math.max(1, Math.round(st.pages.reduce((n, p) => n + p.text.split(/\s+/).length, 0) / 120));
+
 const words = (...xs: ReadonlyArray<string | readonly string[] | undefined>) =>
   xs.flat().filter(Boolean).join(' ').toLowerCase();
 
@@ -117,7 +121,7 @@ function libraryEntries(): Entry[] {
       hook: st.subtitle,
       href: `#/read/${st.slug}/1`,
       art: `art/${st.slug}/cover.png`,
-      time: `${st.pages.length} pages`,
+      time: `${readAloudMinutes(st)} min read`,
       adult: `Read aloud together · ${archiveLabel(st.slug)}`,
       search: words(st.title, st.subtitle, sub.title, archiveLabel(st.slug), 'history true story library'),
     })),
@@ -183,7 +187,7 @@ function ideaEntries(): Entry[] {
       href: `#/together/${x.id}`,
       art: `art/together/${x.id}.png`,
       time: `${x.minutes} min`,
-      adult: 'You and him',
+      adult: x.players,
       where: WHERE_LABEL[x.where],
       search: words(x.title, x.hook, g.title, x.need, x.tags, x.tradition, WHERE_LABEL[x.where], x.energy, x.contact ? 'rough contact wrestling' : '', 'play dad mom papa mummy together game'),
     })),

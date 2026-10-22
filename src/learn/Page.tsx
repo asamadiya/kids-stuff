@@ -52,7 +52,7 @@ export function Page({ title, back, note, expect, part, lede, children }: PagePr
 
 export function EverythingLink() {
   return (
-    <a className="everything-link" href="#/all">
+    <a className="everything-link" href="#/all" aria-label="Everything: search the whole centre">
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
         <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.6" />
         <path d="m15 15 5 5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
@@ -72,11 +72,13 @@ export interface CardProps {
   readonly tone: Part;
   readonly tag?: string;
   readonly tick?: string | null;
+  /** The catalogue key of the item it opens, so Back can return focus to it. */
+  readonly itemKey?: string;
 }
 
-export function Card({ href, title, hook, art, glyph, tone, tag, tick }: CardProps) {
+export function Card({ href, title, hook, art, glyph, tone, tag, tick, itemKey }: CardProps) {
   return (
-    <a className={`card card--${tone}`} href={href}>
+    <a className={`card card--${tone}`} href={href} data-key={itemKey}>
       <span className="card__art" aria-hidden="true">
         {art ? (
           <img

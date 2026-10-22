@@ -234,8 +234,9 @@ a { color: inherit; }
 .activity__safety b { font-family: var(--font-display); color: var(--stories-deep); margin-right: var(--s2); }
 .activity__need { background: var(--raised); border: var(--line) solid var(--ink); border-radius: var(--radius); padding: var(--s4) var(--s5); margin-bottom: var(--s5); }
 .activity__need h2 { font-size: var(--t-md); margin-bottom: var(--s2); }
-.activity__need ul { display: flex; flex-wrap: wrap; gap: var(--s2); }
-.activity__need li { font-family: var(--font-read); background: var(--make-tint); color: var(--make-deep); border-radius: var(--pill); padding: var(--s1) var(--s3); }
+.activity__need ul { columns: 2 280px; column-gap: var(--s6); list-style: disc; padding-left: 1.2em; }
+.activity__need li { font-family: var(--font-read); break-inside: avoid; margin-bottom: var(--s2); line-height: 1.35; }
+.activity__need li::marker { color: var(--make); }
 .activity__steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--s5); margin-bottom: var(--s5); }
 .activity__step { background: var(--raised); border: var(--line) solid var(--ink); border-radius: var(--radius); overflow: hidden; }
 .activity__step img { width: 100%; height: auto; aspect-ratio: 1152 / 896; object-fit: cover; border-bottom: var(--line) solid var(--ink); background: var(--make-tint); }

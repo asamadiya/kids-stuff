@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { Page } from './Page';
 import { useStored } from './scroll';
 import { ENTRIES, PARTS, thumbSrc } from './catalog';
-import type { EntryKind, Part } from './catalog';
+import type { Entry, EntryKind, Part } from './catalog';
+import { FilterPanel } from './Filters';
 import type { GrownUpNote } from '../notes/types';
 
 /**
@@ -22,22 +23,46 @@ const NOTE: GrownUpNote = {
   honest: 'Search matches words, not meaning. If nothing comes up, try a simpler word.',
 };
 
+type Time = 'any' | 'short' | 'medium' | 'long';
+type Adult = 'any' | 'alone' | 'together';
+const TIMES: ReadonlyArray<readonly [Time, string]> = [['any', 'Any length'], ['short', 'Up to 10 min'], ['medium', '10 to 20 min'], ['long', 'Longer']];
+const ADULTS: ReadonlyArray<readonly [Adult, string]> = [['any', 'Anyone'], ['alone', 'He can do it alone'], ['together', 'With you']];
+
+/** Minutes from an entry's time line ("5 min", "7 min read", "Hourly, one sunny day" has none). */
+const minutesOf = (e: Entry) => Number(/^(\d+) min/.exec(e.time ?? '')?.[1] ?? NaN);
+const fitsTime = (e: Entry, t: Time) => {
+  if (t === 'any') return true;
+  const m = minutesOf(e);
+  if (Number.isNaN(m)) return t === 'long';
+  return t === 'short' ? m <= 10 : t === 'medium' ? m > 10 && m <= 20 : m > 20;
+};
+/** Games and situations he can start alone; books, Make & Do and play need you. */
+const fitsAdult = (e: Entry, a: Adult) => a === 'any' || (a === 'alone') === (e.kind === 'Maths game' || e.kind === 'Science game');
+
 const KINDS: readonly EntryKind[] = ['Picture book', 'Longer read-aloud', 'Situation', 'Maths game', 'Science game', 'Make & Do', 'Play together'];
 
 export function Everything() {
   const [q, setQ] = useStored<string>('all/q', '');
   const [part, setPart] = useStored<Part | 'any'>('all/part', 'any');
   const [kind, setKind] = useStored<EntryKind | 'any'>('all/kind', 'any');
+  const [time, setTime] = useStored<Time>('all/time', 'any');
+  const [adult, setAdult] = useStored<Adult>('all/adult', 'any');
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   const list = useMemo(
     () =>
       ENTRIES.filter(
-        (e) => (part === 'any' || e.part === part) && (kind === 'any' || e.kind === kind) && terms.every((t) => e.search.includes(t) || e.title.toLowerCase().includes(t)),
+        (e) =>
+          (part === 'any' || e.part === part) &&
+          (kind === 'any' || e.kind === kind) &&
+          fitsTime(e, time) &&
+          fitsAdult(e, adult) &&
+          terms.every((t) => e.search.includes(t) || e.title.toLowerCase().includes(t)),
       ),
     // terms is derived from q
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [q, part, kind],
+    [q, part, kind, time, adult],
   );
+  const active = (part !== 'any' ? 1 : 0) + (kind !== 'any' ? 1 : 0) + (time !== 'any' ? 1 : 0) + (adult !== 'any' ? 1 : 0);
   const kindsHere = KINDS.filter((k) => ENTRIES.some((e) => e.kind === k && (part === 'any' || e.part === part)));
   return (
     <Page title="Everything" back={{ href: '#/', label: 'Home' }} part={null} note={NOTE} expect="A searchable list of the whole centre, for grown-ups.">
@@ -46,6 +71,16 @@ export function Everything() {
           <span className="visually-hidden">Search everything</span>
           <input type="search" value={q} placeholder="Search: water, socks, Diwali, rainy day…" onChange={(e) => setQ(e.target.value)} autoComplete="off" enterKeyHint="search" />
         </label>
+        <p className="index__count" aria-live="polite">
+          {list.length === ENTRIES.length ? `All ${list.length}` : `${list.length} of ${ENTRIES.length}`}
+          {active ? (
+            <button type="button" className="filters__clear" onClick={() => { setPart('any'); setKind('any'); setTime('any'); setAdult('any'); }}>
+              Clear filters
+            </button>
+          ) : null}
+        </p>
+      </div>
+      <FilterPanel id="all" active={active}>
         <div className="filters" role="group" aria-label="Part">
           <button type="button" className={`chip${part === 'any' ? ' is-on' : ''}`} aria-pressed={part === 'any'} onClick={() => { setPart('any'); setKind('any'); }}>
             All parts
@@ -68,14 +103,25 @@ export function Everything() {
             ))}
           </div>
         ) : null}
-        <p className="index__count" aria-live="polite">
-          {list.length === ENTRIES.length ? `All ${list.length}` : `${list.length} of ${ENTRIES.length}`}
-        </p>
-      </div>
+        <div className="filters" role="group" aria-label="Time">
+          {TIMES.map(([v, label]) => (
+            <button key={v} type="button" className={`chip${time === v ? ' is-on' : ''}`} aria-pressed={time === v} onClick={() => setTime(v)}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="filters" role="group" aria-label="Who">
+          {ADULTS.map(([v, label]) => (
+            <button key={v} type="button" className={`chip${adult === v ? ' is-on' : ''}`} aria-pressed={adult === v} onClick={() => setAdult(v)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </FilterPanel>
       <ul className="index">
         {list.map((e) => (
           <li key={e.key}>
-            <a className={`index__row index__row--${e.part}`} href={e.href}>
+            <a className={`index__row index__row--${e.part}`} href={e.href} data-key={e.key}>
               {e.art ? <img className="index__thumb" src={thumbSrc(e.key)} alt="" width={80} height={62} loading="lazy" decoding="async" /> : <span className="index__thumb" />}
               <span className="index__main">
                 <span className="index__title">{e.title}</span>

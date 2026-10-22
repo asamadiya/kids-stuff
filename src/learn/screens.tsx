@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useStored } from './scroll';
-import { Card, CardGroup, GroupJumps, Page, jump } from './Page';
+import { FilterPanel } from './Filters';
+import { Card, CardGroup, EverythingLink, GroupJumps, Page, jump } from './Page';
 import { GrownUps } from './GrownUps';
 import type { GrownUpNote } from '../notes/types';
 import { booksOn, getShelf } from '../books/registry';
@@ -64,7 +65,7 @@ const tagFor = (e: Entry) =>
   e.kind === 'Longer read-aloud' ? archiveLabel(e.key.split('/')[1]) : e.where ? `${e.time} · ${e.where}` : e.time;
 
 function EntryCard({ e, tone }: { readonly e: Entry; readonly tone?: Part }) {
-  return <Card href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} tone={tone ?? e.part} tag={tagFor(e)} tick={tickFor(e)} />;
+  return <Card href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} tone={tone ?? e.part} tag={tagFor(e)} tick={tickFor(e)} itemKey={e.key} />;
 }
 
 /* ------------------------------------------------------------------ home --- */
@@ -88,10 +89,7 @@ export function Home() {
           Rikki&rsquo;s <span>Learning Center</span>
         </h1>
         <div className="lc-top__tools">
-          <a className="everything-link" href="#/all">
-            <SearchGlyph />
-            <span className="everything-link__label">Everything</span>
-          </a>
+          <EverythingLink />
           <GrownUps note={HOME_NOTE} title="Rikki's Learning Center" />
         </div>
       </header>
@@ -136,7 +134,7 @@ export function Home() {
                   <ul className="dir__list">
                     {g.entries.map((e) => (
                       <li key={e.key}>
-                        <a className="dir__item" href={e.href}>
+                        <a className="dir__item" href={e.href} data-key={e.key}>
                           {e.art ? <img className="dir__thumb" src={thumbSrc(e.key)} alt="" width={64} height={50} loading="lazy" decoding="async" /> : <span className="dir__thumb" />}
                           <span className="dir__item-title">{e.title}</span>
                         </a>
@@ -153,14 +151,6 @@ export function Home() {
   );
 }
 
-function SearchGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.6" />
-      <path d="m15 15 5 5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 /* --------------------------------------------------------------- stories --- */
 
@@ -277,7 +267,7 @@ function GameHub({
         <CardGroup key={grp.id} id={grp.id} title={grp.title} line={grp.line}>
           {grp.list.map((g) => {
             const e = entryFor(`${tone}/${g.id}`);
-            return <Card key={g.id} href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} glyph={glyph()} tone={tone} tick={tickFor(e)} />;
+            return <Card key={g.id} href={e.href} title={e.title} hook={e.hook} art={e.art ? cardSrc(e.key) : undefined} glyph={glyph()} tone={tone} tick={tickFor(e)} itemKey={e.key} />;
           })}
         </CardGroup>
       ))}
@@ -351,12 +341,17 @@ export function MakeHub() {
   const live = MAKE_AREAS.map((ar) => ({ ...ar, list: ACTIVITIES.filter((a) => a.area === ar.id && fits(a)) })).filter((g) => g.list.length > 0);
   return (
     <Page title="Make & Do" back={null} part="make" note={MAKE_NOTE} expect="Real things to make together, away from the screen." lede={`${ACTIVITIES.length} things to make and find out together, with what you already have at home.`}>
-      <div className="filters" role="group" aria-label="Where">
-        {(['any', ...PLACES] as const).map((p) => (
-          <button key={p} type="button" className={`chip${place === p ? ' is-on' : ''}`} aria-pressed={place === p} onClick={() => onPlace(p)}>
-            {p === 'any' ? 'Anywhere' : PLACE_LABEL[p]}
-          </button>
-        ))}
+      <div className="hubbar">
+        <FilterPanel id="make" active={place === 'any' ? 0 : 1}>
+          <div className="filters" role="group" aria-label="Where">
+            {(['any', ...PLACES] as const).map((p) => (
+              <button key={p} type="button" className={`chip${place === p ? ' is-on' : ''}`} aria-pressed={place === p} onClick={() => onPlace(p)}>
+                {p === 'any' ? 'Anywhere' : PLACE_LABEL[p]}
+              </button>
+            ))}
+          </div>
+        </FilterPanel>
+        <span className="filters__count hubbar__count">{place === 'any' ? `All ${ACTIVITIES.length}` : `${live.reduce((n, g) => n + g.list.length, 0)} of ${ACTIVITIES.length}`}</span>
       </div>
       <GroupJumps groups={live.map((g) => ({ id: g.id, title: g.title, n: g.list.length }))} />
       {live.map((g) => (

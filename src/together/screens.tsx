@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Card, CardGroup, GroupJumps, Page } from '../learn/Page';
 import { useStored } from '../learn/scroll';
+import { FilterPanel } from '../learn/Filters';
 import { cardSrc } from '../learn/catalog';
 import type { GrownUpNote } from '../notes/types';
 import { IDEAS, MIA_LABEL, PLAY_GROUPS, WHERE_LABEL, getIdea } from './index';
@@ -53,7 +54,7 @@ const fits = (x: PlayIdea, f: Filter) =>
   (f.energy === 'any' || x.energy === f.energy) &&
   (f.contact === 'any' || x.contact === (f.contact === 'only')) &&
   (f.time === 0 || x.minutes <= f.time) &&
-  (!f.mia || x.mia.way !== 'apart') &&
+  (!f.mia || x.mia.way === 'joins') &&
   (!f.nothing || x.need.length === 0);
 
 export function TogetherHub() {
@@ -61,6 +62,7 @@ export function TogetherHub() {
   const f = { ...NO_FILTER, ...stored };
   const live = PLAY_GROUPS.map((g) => ({ ...g, list: IDEAS.filter((x) => x.group === g.id && fits(x, f)) })).filter((g) => g.list.length > 0);
   const shown = live.reduce((n, g) => n + g.list.length, 0);
+  const active = (f.where !== 'any' ? 1 : 0) + (f.energy !== 'any' ? 1 : 0) + (f.contact !== 'any' ? 1 : 0) + (f.time ? 1 : 0) + (f.mia ? 1 : 0) + (f.nothing ? 1 : 0);
   const chip = <K extends keyof Filter>(k: K, v: Filter[K], label: string) => (
     <button type="button" className={`chip${f[k] === v ? ' is-on' : ''}`} aria-pressed={f[k] === v} onClick={() => setF({ ...f, [k]: v })}>
       {label}
@@ -75,6 +77,8 @@ export function TogetherHub() {
       expect="Games for the two of you, away from the screen."
       lede={`${IDEAS.length} ways to play together, indoors and out, with things you already have.`}
     >
+      <div className="hubbar">
+        <FilterPanel id="together" active={active}>
       <div className="filters" role="group" aria-label="Narrow the list">
         <span className="filters__set" role="group" aria-label="Where">
           {chip('where', 'any', 'Anywhere')}
@@ -104,7 +108,9 @@ export function TogetherHub() {
         <button type="button" className={`chip${f.mia ? ' is-on' : ''}`} aria-pressed={f.mia} onClick={() => setF({ ...f, mia: !f.mia })}>
           Mia can join
         </button>
-        <span className="filters__count" aria-live="polite">
+      </div>
+        </FilterPanel>
+        <span className="filters__count hubbar__count" aria-live="polite">
           {shown === IDEAS.length ? `All ${shown}` : `${shown} of ${IDEAS.length}`}
           {shown !== IDEAS.length ? (
             <button type="button" className="filters__clear" onClick={() => setF(NO_FILTER)}>
@@ -124,8 +130,9 @@ export function TogetherHub() {
               hook={x.hook}
               art={cardSrc(`together/${x.id}`)}
               tone="together"
-              tag={`${x.minutes} min · ${WHERE_LABEL[x.where]}${x.contact ? ' · Contact' : ''}`}
+              tag={`${x.minutes} min · ${WHERE_LABEL[x.where]}${x.contact ? ' · Rough play' : ''}${x.mia.way === 'apart' ? ' · Mia with another grown-up' : ''}`}
               tick={done(x.id) ? 'Played before' : null}
+              itemKey={`together/${x.id}`}
             />
           ))}
         </CardGroup>
@@ -135,12 +142,12 @@ export function TogetherHub() {
   );
 }
 
-export function IdeaPage({ id }: { readonly id: string }) {
+export function IdeaPage({ id, back }: { readonly id: string; readonly back: { readonly href: string; readonly label: string } }) {
   const x = getIdea(id)!;
   const group = PLAY_GROUPS.find((g) => g.id === x.group)!;
   useEffect(() => markDone(x.id), [x.id]);
   return (
-    <Page title={x.title} back={{ href: '#/together', label: 'Play Together' }} note={x.note} expect={`${x.minutes} minutes · ${WHERE_LABEL[x.where]} · ${x.hook}`}>
+    <Page title={x.title} back={back} note={x.note} expect={`${x.minutes} minutes · ${WHERE_LABEL[x.where]} · ${x.hook}`}>
       <div className="idea">
         <figure className="idea__picture">
           <img src={`${BASE}art/together/${x.id}.webp`} alt={x.picture} width={1152} height={896} />
@@ -152,7 +159,7 @@ export function IdeaPage({ id }: { readonly id: string }) {
               <dd>{WHERE_LABEL[x.where]}</dd>
             </div>
             <div>
-              <dt>A round</dt>
+              <dt>Play time</dt>
               <dd>About {x.minutes} minutes</dd>
             </div>
             <div>
@@ -164,6 +171,10 @@ export function IdeaPage({ id }: { readonly id: string }) {
               <dd>{x.players}</dd>
             </div>
             <div>
+              <dt>Mia</dt>
+              <dd>{MIA_LABEL[x.mia.way]}</dd>
+            </div>
+            <div>
               <dt>Kind</dt>
               <dd>
                 {group.title}
@@ -171,7 +182,7 @@ export function IdeaPage({ id }: { readonly id: string }) {
               </dd>
             </div>
           </dl>
-          {x.note.safety && (x.contact || x.energy === 'active') ? (
+          {x.note.safety ? (
             <p className="activity__safety">
               <b>Safety</b> {x.note.safety}
             </p>

@@ -30,7 +30,7 @@ export function ideasIn(group: PlayGroupId): readonly PlayIdea[] {
 export const MIA_LABEL: Record<PlayIdea['mia']['way'], string> = {
   joins: 'Mia joins in',
   alongside: 'Mia plays alongside',
-  apart: 'Just you and him',
+  apart: 'Just you and him: Mia with another grown-up',
 };
 
 export const WHERE_LABEL: Record<PlayIdea['where'], string> = { indoors: 'Indoors', outdoors: 'Outdoors', either: 'Indoors or out' };

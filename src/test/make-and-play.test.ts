@@ -86,6 +86,22 @@ describe('Play with Dad & Mom', () => {
     expect(Math.abs(dad - mum)).toBeLessThanOrEqual(8);
   });
 
+  it('marks every idea that needs another grown-up for Mia as apart, and says so under Who', () => {
+    for (const x of IDEAS) {
+      const another = /another (grown-up|adult)|second (grown-up|adult)|other (grown-up|adult)/i.test(x.mia.text);
+      if (another && x.mia.way !== 'apart') expect.fail(`${x.id}: Mia needs another grown-up but is '${x.mia.way}'`);
+      if (x.mia.way === 'apart') expect(x.players, x.id).toMatch(/another grown-up|Mia/i);
+    }
+  });
+
+  it('keeps no scores or points in any game', () => {
+    for (const x of IDEAS) {
+      const body = `${x.steps.join(' ')} ${x.hisWay} ${x.note.harder ?? ''} ${x.note.easier ?? ''}`;
+      // "the point is" is fine; points scored are not.
+      expect(/\b(\d+|score|scores|scoring|keep|earn|win|wins|get|gets|lose|loses)\s+(points?|score)\b|\bkeep(ing)? score\b|\bscore ?sheet\b|\btally of wins\b/i.test(body), x.id).toBe(false);
+    }
+  });
+
   it('includes the eight ideas the advisor required', () => {
     const ids = new Set(IDEAS.map((x) => x.id));
     for (const id of ['can-you-move-my-cushion', 'chidiya-udd', 'red-light-green-light-swap', 'you-run-the-shop', 'build-a-den-for-two', 'sock-ball-bowling', 'stapu-together', 'follow-my-explorer-trail']) {

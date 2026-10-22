@@ -105,4 +105,23 @@ describe('every screen of the Learning Center', () => {
     at({ kind: 'together' });
     expect(document.querySelectorAll('.cards a').length).toBe(IDEAS.length);
   });
+
+  it('Back from an item returns to the listing it was opened from, not its parent', () => {
+    window.sessionStorage.clear();
+    at({ kind: 'all' });
+    const link = document.querySelector<HTMLAnchorElement>(`.index a[data-key="make/${ACTIVITIES[0].id}"]`)!;
+    act(() => link.click());
+    const back = [...document.querySelectorAll<HTMLAnchorElement>('.lc-top__back')][0];
+    expect(back.getAttribute('href')).toBe('#/all');
+    expect(back.textContent).toContain('Everything');
+  });
+
+  it('shows every play idea’s safety note on its page, quiet ones included', () => {
+    for (const x of IDEAS.filter((i) => i.note.safety && i.energy === 'quiet').slice(0, 5)) {
+      cleanup();
+      at({ kind: 'idea', id: x.id });
+      expect(document.querySelector('.activity__safety')?.textContent ?? '').toContain(x.note.safety!.slice(0, 40));
+    }
+  });
 });
+
