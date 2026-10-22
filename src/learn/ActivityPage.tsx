@@ -4,6 +4,7 @@ import { getActivity } from '../make/activities';
 import { markRead } from './screens';
 import { ENTRIES } from './catalog';
 import { MakeFigure } from '../make/figures';
+import { altText } from './alt';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -31,7 +32,7 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
             <MakeFigure id={leadFigure} label={a.steps[lead].art} />
           </div>
         ) : (
-          <img src={`${BASE}art/make/${a.id}/step-${lead + 1}.webp`} alt={a.steps[lead].art} width={1152} height={896} />
+          <img src={`${BASE}art/make/${a.id}/step-${lead + 1}.webp`} alt={altText(a.steps[lead].art)} width={1152} height={896} />
         )}
         <div>
           <p className="activity__invite">{a.hook}</p>
@@ -76,7 +77,7 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
                 <MakeFigure id={s.figure} label={s.art} />
               </div>
             ) : (
-              <img src={`${BASE}art/make/${a.id}/step-${i + 1}.webp`} alt={s.art} loading="lazy" width={1152} height={896} />
+              <img src={`${BASE}art/make/${a.id}/step-${i + 1}.webp`} alt={altText(s.art)} loading="lazy" width={1152} height={896} />
             )}
             <p>
               <span className="activity__n" aria-hidden="true">{i + 1}</span>

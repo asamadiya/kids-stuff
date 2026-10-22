@@ -10,6 +10,7 @@ import { Voice } from './Voice';
 import { Recorder } from './Recorder';
 import { GUIDE } from './guide';
 import { allKeys, clearAll, clipKey, exportAll, importAll, onVoicesChange, voicesChanged } from './voices';
+import { altText } from '../learn/alt';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -129,7 +130,7 @@ export function MomentPage({ id, back }: { readonly id: string; readonly back: {
       <LangToggle lang={lang} onLang={setLang} />
       <div className="moment">
         <figure className="moment__picture">
-          <img src={`${BASE}art/langs/${m.id}.webp`} alt={m.picture} width={1152} height={896} />
+          <img src={`${BASE}art/langs/${m.id}.webp`} alt={altText(m.picture)} width={1152} height={896} />
         </figure>
         <div className="moment__lines">
           <h2 className="moment__who">{LANG_PARENT[lang]} says</h2>
@@ -155,7 +156,7 @@ export function RhymePage({ id, back }: { readonly id: string; readonly back: { 
     <Page title={r.title.script} back={back} note={r.note} expect={`${LANG_NAME[r.lang]} rhyme · ${r.title.means}`}>
       <div className="moment">
         <figure className="moment__picture">
-          <img src={`${BASE}art/langs/${r.id}.webp`} alt={r.picture} width={1152} height={896} />
+          <img src={`${BASE}art/langs/${r.id}.webp`} alt={altText(r.picture)} width={1152} height={896} />
         </figure>
         <div className="moment__lines">
           <Line id={`${r.id}.title`} lang={r.lang} said={r.title} big />
@@ -190,7 +191,7 @@ export function LangBookPage({ id, page, back, onPage }: { readonly id: string; 
       <LangToggle lang={lang} onLang={setLang} />
       <div className="langbook">
         <figure className="langbook__picture">
-          <img src={`${BASE}art/langs/${b.id}/page-${at + 1}.webp`} alt={pg.picture} width={1152} height={896} />
+          <img src={`${BASE}art/langs/${b.id}/page-${at + 1}.webp`} alt={altText(pg.picture)} width={1152} height={896} />
         </figure>
         <Line id={`${b.id}.p${at}`} lang={lang} said={pg[lang]} big />
       </div>
