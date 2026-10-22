@@ -2,8 +2,8 @@
 """WebP derivatives for the new Learning Center art.
 
 The archive stories keep scripts/encode-art.py. This one covers everything
-the redesign added — books, hubs, game covers, Make & Do steps, cast sheets —
-which all live under public/art/{books,hubs,games,make,cast}/.
+the redesign added — books, hubs, game covers, Make & Do steps, Play Together
+pictures, cast sheets — which all live under public/art/{books,hubs,games,make,together,cast}/.
 
 Every PNG master gets a sibling .webp at its own size (the reader shows
 pages at up to ~1280 CSS px on a tablet), plus a 560-wide `.card.webp` for
@@ -20,7 +20,7 @@ from pathlib import Path
 
 from PIL import Image
 
-ROOTS = [Path('public/art') / d for d in ('books', 'hubs', 'games', 'make', 'cast')]
+ROOTS = [Path('public/art') / d for d in ('books', 'hubs', 'games', 'make', 'cast', 'together')]
 QUALITY = 82
 CARD_W = 560
 
@@ -38,7 +38,7 @@ def encode(png: Path) -> tuple[int, int]:
 
 def main() -> int:
     # `.old-*` are pictures superseded by a later text fix; never ship them.
-    pngs = [p for r in ROOTS if r.exists() for p in r.rglob('*.png') if '.old-' not in p.name]
+    pngs = [p for r in ROOTS if r.exists() for p in r.rglob('*.png') if '.old-' not in p.name and '.stale' not in p.name]
     with cf.ThreadPoolExecutor(8) as ex:
         sizes = list(ex.map(encode, pngs))
     a = sum(s[0] for s in sizes)
