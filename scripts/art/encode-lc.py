@@ -20,7 +20,7 @@ from pathlib import Path
 
 from PIL import Image
 
-ROOTS = [Path('public/art') / d for d in ('books', 'hubs', 'games', 'make', 'cast', 'together')]
+ROOTS = [Path('public/art') / d for d in ('books', 'hubs', 'games', 'make', 'cast', 'together', 'langs')]
 QUALITY = 82
 CARD_W = 560
 

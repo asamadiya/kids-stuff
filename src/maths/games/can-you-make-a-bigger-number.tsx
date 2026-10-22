@@ -6,14 +6,15 @@ import { Piece, Slot, Tray } from '../../play/parts';
  *
  * Concept (advisor catalogue, maths 20; content boundary: "Show infinity
  * through the possibility of adding one again, never as a final number to
- * reach"). Dada names "the biggest number". The child beats it with one of
- * two moves, and the board shows the move working, then working again:
+ * reach"). Thatha, Amma's father, visiting from Chennai, names "the biggest
+ * number". The child beats it with one of two moves, and the board shows the
+ * move working, then working again:
  *
  *  - one:   make the number one more. The number line carries a +1 hop to the
  *           next mark, and after the answer two more hops: the next number
  *           has a next number too. The line ends in an arrow, not a wall.
  *  - digit: beat it using only 1 and 0 cards. No number made of 1s and 0s
- *           with Dada's count of places is big enough (111 < 555, 11 = 11),
+ *           with Thatha's count of places is big enough (111 < 555, 11 = 11),
  *           so the only way is one more place. A place chart lines both
  *           numbers up and shows the extra place.
  *
@@ -47,7 +48,7 @@ import { Piece, Slot, Tray } from '../../play/parts';
 export type Move = 'one' | 'digit';
 
 export interface Round {
-  /** Dada's "biggest number". */
+  /** Thatha's "biggest number". */
   readonly start: number;
   /** one: build start + 1 exactly. digit: beat start with only 1 and 0 cards. */
   readonly move: Move;
@@ -81,7 +82,7 @@ export function trailingNines(n: number): number {
   return k;
 }
 
-/** The answer the worked stage draws: start + 1, or a 1 with one 0 per place of Dada's number. */
+/** The answer the worked stage draws: start + 1, or a 1 with one 0 per place of Thatha's number. */
 export function workedDigits(round: Round): number[] {
   const n = round.move === 'one' ? round.start + 1 : 10 ** placesIn(round.start);
   return String(n).split('').map(Number);
@@ -107,13 +108,13 @@ export function generate(level: Level, index: number): Round {
   return TABLE[level][((index % 7) + 7) % 7];
 }
 
-/** Dada's number, the question the game is about, then the move. Twelve words at most. */
+/** Thatha's number, the question the game is about, then the move. Twelve words at most. */
 function prompt(round: Round): string {
   const { start } = round;
   // The task in the title's own words. "Beat it" left him to work out that beat means bigger.
-  if (round.move === 'digit') return `Dada's number: ${start}. Make a bigger one with only 1s and 0s.`;
-  if (start === A_HUNDRED_HUNDREDS) return `Dada's number: ${start}, a hundred hundreds. Build one more than it.`;
-  return `Dada's number: ${start}. Is it the biggest? Build one more than it.`;
+  if (round.move === 'digit') return `Thatha's number: ${start}. Make a bigger one with only 1s and 0s.`;
+  if (start === A_HUNDRED_HUNDREDS) return `Thatha's number: ${start}, a hundred hundreds. Build one more than it.`;
+  return `Thatha's number: ${start}. Is it the biggest? Build one more than it.`;
 }
 
 /**
@@ -141,8 +142,8 @@ function hintOne(round: Round, answer: Answer): string {
   const roll = rollover(start);
   if (v === null) return `No cards yet. One more than ${start} is the next mark on the line.${roll}`;
   const say = leadingZero(answer) ? `Your cards say ${written(answer)}, which is ${v}: a 0 in front adds nothing.` : `Your cards say ${v}.`;
-  if (v === start) return `${say} That is Dada's number.${roll}`;
-  if (v < start) return `${say} That comes before Dada's ${start}.${roll}`;
+  if (v === start) return `${say} That is Thatha's number.${roll}`;
+  if (v < start) return `${say} That comes before Thatha's ${start}.${roll}`;
   return `${say} That is past the next mark after ${start}.${roll}`;
 }
 
@@ -151,17 +152,17 @@ function hintDigit(round: Round, answer: Answer): string {
   const { start } = round;
   const q = placesIn(start);
   const v = valueOf(answer);
-  if (v === null) return `No cards yet. Dada's ${start} has ${placesWord(q)}.`;
+  if (v === null) return `No cards yet. Thatha's ${start} has ${placesWord(q)}.`;
   const front = leadingZero(answer) ? `A 0 in front adds no place: ${written(answer)} is ${v}. ` : '';
-  if (v === start) return `${front}Your ${v} is the same as Dada's ${start}.`;
+  if (v === start) return `${front}Your ${v} is the same as Thatha's ${start}.`;
   const p = placesIn(v);
-  if (p < q) return `${front}Your ${v} has ${placesWord(p)}. Dada's ${start} has ${placesWord(q)}.`;
-  return `${front}Your ${v} and Dada's ${start} both have ${placesWord(q)}. ${start} is bigger.`;
+  if (p < q) return `${front}Your ${v} has ${placesWord(p)}. Thatha's ${start} has ${placesWord(q)}.`;
+  return `${front}Your ${v} and Thatha's ${start} both have ${placesWord(q)}. ${start} is bigger.`;
 }
 
 /**
  * Judged by value, so every correct form passes: any 1-and-0 number past
- * Dada's, in any order of its cards, and a number with a 0 in front (0111 is
+ * Thatha's, in any order of its cards, and a number with a 0 in front (0111 is
  * 111, which is past 99). Rejecting 0111 against 99 while the hint said "it
  * is 111" would have contradicted itself.
  */
@@ -423,7 +424,7 @@ const placeOf = (i: number, len: number) => len - 1 - i;
 const hueOf = (i: number, len: number) => HUES[placeOf(i, len) % 3];
 
 /**
- * One-more rounds: a number line around Dada's number. The marks after it
+ * One-more rounds: a number line around Thatha's number. The marks after it
  * carry no numbers until the worked answer, so the line shows WHERE one more
  * is without writing it. It ends in an arrow, never a wall.
  */
@@ -453,8 +454,8 @@ function NumberLine({ round, answer, stage }: { readonly round: Round; readonly 
     );
   };
   const label =
-    reveal ? `A number line. Dada's ${s}, then ${s + 1}, ${s + 2}, ${s + 3}, and an arrow: it keeps going.`
-    : `A number line with Dada's ${s} marked. The marks after it are not numbered yet.`;
+    reveal ? `A number line. Thatha's ${s}, then ${s + 1}, ${s + 2}, ${s + 3}, and an arrow: it keeps going.`
+    : `A number line with Thatha's ${s} marked. The marks after it are not numbered yet.`;
   return (
     <svg className="board-svg" viewBox="0 0 960 250" role="img" aria-label={label}>
       <line x1="30" y1={Y} x2="900" y2={Y} stroke={INK} strokeWidth="5" strokeLinecap="round" />
@@ -481,7 +482,7 @@ function NumberLine({ round, answer, stage }: { readonly round: Round; readonly 
       {hops.map((n) => arc(n, x(n + 1)))}
       {reveal ? arc(s + 3, 900, true) : null}
       <text x={x(s)} y={Y + 82} textAnchor="middle" fontSize="18" fill={INK_SOFT} style={DISPLAY}>
-        {v === s ? "Dada's and yours" : "Dada's"}
+        {v === s ? "Thatha's and yours" : "Thatha's"}
       </text>
       {v !== null && inView && v !== s ? (
         <g>
@@ -541,7 +542,7 @@ interface ChartRow {
 }
 
 /**
- * A place chart. Columns are places, ones on the right, so Dada's number and
+ * A place chart. Columns are places, ones on the right, so Thatha's number and
  * his line up digit under digit and an extra place stands out as a box with
  * nothing above it. Under every digit sit that many blocks of its place, so
  * 555 against 111 is five flats against one before it is a numeral.
@@ -604,30 +605,30 @@ const digitsOf = (n: number) => String(n).split('').map(Number);
 function chartRows(round: Round, answer: Answer, stage: Stage): { readonly rows: readonly ChartRow[]; readonly cols: number } {
   const s = digitsOf(round.start);
   const q = s.length;
-  const dada: ChartRow = { name: "Dada's", digits: s, count: stage !== 'answering' };
+  const thatha: ChartRow = { name: "Thatha's", digits: s, count: stage !== 'answering' };
   const yours: ChartRow = { name: 'Yours', digits: answer, fadeLead: true, count: stage !== 'answering' };
   const widest = (rows: readonly ChartRow[]) => ({ rows, cols: Math.max(...rows.map((r) => r.digits.length)) });
-  // While he builds, the chart is Dada's blocks over his: every tap shows up as blocks at once.
-  if (stage === 'answering') return widest([dada, yours]);
+  // While he builds, the chart is Thatha's blocks over his: every tap shows up as blocks at once.
+  if (stage === 'answering') return widest([thatha, yours]);
   if (round.move === 'one') {
     // The hint rings the 9s the sentence names; the answer rings every digit one more changed.
     const k = trailingNines(round.start);
-    if (stage === 'hint') return widest([{ ...dada, ring: k }, yours]);
+    if (stage === 'hint') return widest([{ ...thatha, ring: k }, yours]);
     const next = digitsOf(round.start + 1);
     const changed = k === 0 ? 1 : k + 1;
     return widest([
-      { ...dada, ring: Math.min(changed, q) },
+      { ...thatha, ring: Math.min(changed, q) },
       { name: 'One more', digits: next, worked: stage === 'worked', count: true, ring: Math.min(changed, next.length) },
     ]);
   }
   if (stage === 'worked') {
     const w = workedDigits(round);
-    return widest([dada, { name: 'One more place', digits: w, worked: true, count: true }, { name: 'Again', digits: [...w, 0], worked: true, count: true }]);
+    return widest([thatha, { name: 'One more place', digits: w, worked: true, count: true }, { name: 'Again', digits: [...w, 0], worked: true, count: true }]);
   }
   // "Again" is his number with one more place: built from its value, so a 0 he put in front is not drawn as a place.
-  if (stage === 'solved') return widest([dada, yours, { name: 'Again', digits: digitsOf((valueOf(answer) ?? 0) * 10), worked: true, count: true }]);
-  if (stage === 'hint') return widest([dada, { name: 'All 1s', digits: Array<number>(q).fill(1), count: true }, yours]);
-  return widest([dada, yours]);
+  if (stage === 'solved') return widest([thatha, yours, { name: 'Again', digits: digitsOf((valueOf(answer) ?? 0) * 10), worked: true, count: true }]);
+  if (stage === 'hint') return widest([thatha, { name: 'All 1s', digits: Array<number>(q).fill(1), count: true }, yours]);
+  return widest([thatha, yours]);
 }
 
 /** The swaps the key draws: enough to explain every block in the round's answer. */
@@ -680,7 +681,7 @@ export const canYouMakeABiggerNumber: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'can-you-make-a-bigger-number',
   title: 'Can You Make a Bigger Number?',
-  hook: "Beat Dada's biggest number. Again.",
+  hook: "Beat Thatha's biggest number. Again.",
   group: 'numbers',
   levels: ['Up to twenty', 'Up to a thousand', 'A hundred hundreds'],
   generate,
@@ -691,10 +692,10 @@ export const canYouMakeABiggerNumber: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/can-you-make-a-bigger-number.png',
   note: {
-    what: "Dada names a 'biggest number'. He taps digit cards to build one more than it, or beats it using only 1 and 0 cards, which forces an extra place. The board then shows the same move working again.",
+    what: "Thatha, Amma's father, names a 'biggest number', the way a grandfather teases at the table, and the child has to beat it. He taps digit cards to build one more than it, or beats it using only 1 and 0 cards, which forces an extra place. The board then shows the same move working again.",
     expect: "One more than 14 is quick. The roll-over numbers are where it breaks: one more than 99 often comes out as 'ninety-ten' and gets built 910. The hint rings the 9s and says each turns to 0. Against 555 with only 1s and 0s, the first try is usually 111; the all-1s row shows three places are never enough.",
     practising: "The successor idea: every whole number has a next one, so there is no biggest. Also place value at the roll-over (9 to 10, 999 to 1000, 9999 to 10000), and comparing numbers first by how many places they have.",
-    ask: "After a round is solved: 'Is there a number so big that nobody can make one more? What would you do to it?' Listen for the move, not a word like 'infinity'.",
+    ask: "After a round is solved: 'Is there a number so big that nobody can make one more? What would you do to it?' Listen for the move, not a word like 'infinity'. Amma or Thatha can name the move in Tamil: 'Innum onnu' (one more).",
     next: "On scrap paper, let him write the biggest number he can. You write one more beside it, or put a 0 on the end. Swap roles. Then line up dried beans: however long the row, one more bean always fits at the end.",
     honest: "Building one more each time does not show that he understands infinity, or can count past 100 in order. It shows he can make a move that always works. Ask 'is there a biggest number?' on another day, away from the screen, and listen for the reason.",
     easier: "Stay on level 1. Say the number words together before he taps ('fourteen, fifteen') and point to the next mark on the line.",

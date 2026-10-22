@@ -5,8 +5,9 @@ Every picture is an EDIT of one cast reference sheet, so Arjun, Mia and the
 grown-ups look the same in every step and every game (the recipe measured on
 2026-10-19 in build-book-jobs.py): the prompt leads with the action, says not
 to copy the sheet's standing poses, takes only the identities, and names who
-is NOT in the picture. A picture with Dadi or Dada uses the grandparents
-sheet; one with Mummy or Papa uses the family sheet.
+is NOT in the picture. A picture with Nanamma or Tatayya uses the Telugu
+grandparents sheet, one with Paati or Thatha the Tamil one; one with Amma or
+Nanna uses the family sheet.
 
     build-make-play-jobs.py --out jobs.jsonl [--only make|play] [id ...]
 """
@@ -28,15 +29,19 @@ LOOKS, CAST_SHEETS = bbj.LOOKS, bbj.CAST_SHEETS
 STYLE = ('Rich gouache picture-book illustration, saturated warm colour, visible brush texture, expressive faces, '
          'confident ink outlines, natural proportions, detailed real setting, no text, no letters, no numbers, no signature.')
 
-ADULTS = ('Mummy', 'Papa', 'Dadi', 'Dada')
+ADULTS = ('Amma', 'Nanna', 'Nanamma', 'Tatayya', 'Paati', 'Thatha')
 
 
 def named(text: str) -> list[str]:
-    return [n for n in ('Arjun', 'Mia', 'Mummy', 'Papa', 'Dadi', 'Dada') if re.search(rf'\b{n}\b', text)]
+    return [n for n in ('Arjun', 'Mia') + ADULTS if re.search(rf'\b{n}\b', text)]
 
 
 def sheet_for(people: list[str]) -> str:
-    return 'grandparents' if any(p in ('Dadi', 'Dada') for p in people) else 'family'
+    if any(p in ('Nanamma', 'Tatayya') for p in people):
+        return 'telugu-grandparents'
+    if any(p in ('Paati', 'Thatha') for p in people):
+        return 'tamil-grandparents'
+    return 'family'
 
 
 def prompt(action: str, people: list[str], *, how_to: bool) -> tuple[str, str]:
@@ -53,6 +58,8 @@ def prompt(action: str, people: list[str], *, how_to: bool) -> tuple[str, str]:
          # in a dozen step pictures, and nonsense lettering on boxes and book spines.
          + 'Everyone stands, sits or kneels on the floor or on a chair seat; nobody stands or sits on a table, counter or other furniture top. '
          + 'Steel tumblers and bowls are opaque polished steel, never glass. Book spines, boxes and papers carry no lettering. '
+         + (bbj.SIZES + ' ' if 'Arjun' in people and 'Mia' in people else '')
+         + bbj.HOME + ' '
          + 'Fill the whole frame with the scene. ' + STYLE)
     return ' '.join(p.split()), CAST_SHEETS[sheet]
 
@@ -68,11 +75,20 @@ def load(kind: str) -> list[dict]:
     return json.loads(out[out.index('['):])
 
 
+def load_langs() -> dict:
+    tmp = Path('.check-books') / 'load-langs.ts'
+    Path('.check-books').mkdir(exist_ok=True)
+    tmp.write_text("import { MOMENTS, RHYMES, LANG_BOOKS, WORDS } from '../src/languages'; "
+                   "process.stdout.write(JSON.stringify({ moments: MOMENTS, rhymes: RHYMES, books: LANG_BOOKS, words: WORDS }));")
+    out = subprocess.run(['npx', 'vite-node', str(tmp)], check=True, capture_output=True, text=True).stdout
+    return json.loads(out[out.index('{'):])
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('ids', nargs='*')
     ap.add_argument('--out', required=True)
-    ap.add_argument('--only', choices=('make', 'play'))
+    ap.add_argument('--only', choices=('make', 'play', 'langs'))
     ap.add_argument('--stamp', action='store_true', help='record the prompt digest of every existing picture')
     a = ap.parse_args()
     jobs = []
@@ -80,15 +96,31 @@ def main() -> int:
         for act in load('make'):
             if a.ids and act['id'] not in a.ids:
                 continue
-            # The first twelve activities predate this script; their pictures are in git.
-            if not act.get('sources'):
-                continue
             for i, step in enumerate(act['steps'], 1):
                 if step.get('figure'):
                     continue  # a drawn diagram, not a painting (src/make/figures.tsx)
                 people = named(step['art']) or ['Arjun']
                 p, ref = prompt(step['art'], people, how_to=True)
                 jobs.append({'out': f"public/art/make/{act['id']}/step-{i}.png", 'prompt': p, 'ref': ref})
+    if a.only in (None, 'langs'):
+        for kind, items in load_langs().items():
+            for x in items:
+                if a.ids and x['id'] not in a.ids:
+                    continue
+                if kind == 'words':
+                    # A picture word: one object or action, plain ground, no people unless the word is a person.
+                    p = (f"ACTION FIRST: {x['picture']} A single clear subject, centred, on a plain warm cream background, "
+                         'nothing else in the picture. ' + STYLE)
+                    # No reference image: an object on a plain ground has nothing to take from the
+                    # cast sheet, and child-photo-plus-unrelated-object edits trip the input filter.
+                    jobs.append({'out': f"public/art/langs/words/{x['id']}.png", 'prompt': ' '.join(p.replace('expressive faces, ', '').replace('detailed real setting, ', '').split()), 'ref': ''})
+                elif kind == 'books':
+                    for i, pg in enumerate(x['pages'], 1):
+                        p, ref = prompt(pg['picture'], list(pg['cast']), how_to=False)
+                        jobs.append({'out': f"public/art/langs/{x['id']}/page-{i}.png", 'prompt': p, 'ref': ref})
+                else:
+                    p, ref = prompt(x['picture'], list(x['cast']), how_to=False)
+                    jobs.append({'out': f"public/art/langs/{x['id']}.png", 'prompt': p, 'ref': ref})
     if a.only in (None, 'play'):
         for x in load('play'):
             if a.ids and x['id'] not in a.ids:

@@ -16,7 +16,7 @@ export const book: Book = {
   hook: 'Ben is laughing, but he said stop.',
   cast: 'friends',
   setting:
-    'A sunny California park on a Saturday morning: a big oak tree with wide knobbly roots, open green grass, and a sandpit with a low wooden edge.',
+    'A sunny Bay Area neighbourhood park on a Saturday morning: a big oak tree with wide knobbly roots, open green grass, and a sandpit with a low wooden edge.',
   refrain: 'You said stop. I stopped.',
   readMinutes: 4,
   pages: [
@@ -114,14 +114,14 @@ export const book: Book = {
       'Swap. The child chases, and the grown-up says “Stop” while laughing. The child stops and says the same line.',
       'Practise the next move: “I wanted another turn.” Then choose a different game together.',
     ],
-    safety: 'Chase on grass or a clear floor, away from steps, sharp furniture edges and the road. Keep a toddler out of the chase.',
+    safety: 'Chase on the backyard lawn, the park grass or a clear floor, away from steps, sharp furniture edges and the road. Keep Mia out of the chase: a running five-year-old can knock a two-year-old down.',
   },
   note: {
     what: 'Arjun wants one more dinosaur chase, but Ben says stop while laughing hard. Arjun stops at once, steps back and joins Zoe’s fossil game; later Zoe stops when Arjun says stop, and Ben rejoins by asking.',
     expect: 'Many five-year-olds read laughter as a yes, so he may take Arjun’s side (“But Ben was having fun”). Page 4 says that thought out loud on purpose. He may not notice that Arjun asked first and agreed a stop rule on page 1.',
     practising: 'Stopping on the first clear “stop”, even when the other child laughs; agreeing the space and stop signal before a chase; saying “I wanted another turn” and choosing another game instead of asking again; and having his own “stop” respected.',
     ask: 'On a re-read, at page 4: “Ben is laughing. Why did Arjun stop anyway?”',
-    next: 'Before the next chase at the park this week, agree out loud where you will run and that “stop” ends it. When he stops on the first “stop”, name it: “You stopped when he asked.”',
+    next: 'Before the next chase this week, at the park or on the backyard lawn, agree out loud where you will run and that “stop” ends it. When he stops on the first “stop”, name it: “You stopped when he asked.”',
     honest: 'Reading this does not give him the control to stop at full speed; expect to need the short cue “He said stop. Step back.” many times. If a friend keeps going after his own “stop”, an adult steps in; he should not have to keep negotiating.',
     safety: 'Chase games need open ground away from roads, steps and hard edges, and an adult close enough to call a stop.',
   },

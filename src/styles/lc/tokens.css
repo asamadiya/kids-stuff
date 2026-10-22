@@ -54,6 +54,40 @@
   src: url('/kids-stuff/fonts/andika-400-italic-latin.woff2') format('woff2');
 }
 
+/* Telugu and Tamil scripts (Noto, SIL Open Font License), loaded only when a page shows them. */
+@font-face {
+  font-family: 'Noto Sans Telugu';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/noto-sans-telugu-400.woff2') format('woff2');
+  unicode-range: U+0C00-0C7F, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: 'Noto Sans Telugu';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/noto-sans-telugu-700.woff2') format('woff2');
+  unicode-range: U+0C00-0C7F, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/noto-sans-tamil-400.woff2') format('woff2');
+  unicode-range: U+0B80-0BFF, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/kids-stuff/fonts/noto-sans-tamil-700.woff2') format('woff2');
+  unicode-range: U+0B80-0BFF, U+200C-200D, U+25CC;
+}
+
 :root {
   color-scheme: light;
 
@@ -84,6 +118,12 @@
   --together: #a85a00;
   --together-tint: #fdebd0;
   --together-deep: #6e3a00;
+  /* Telugu & Tamil: a deep teal-green, distinct from Science's green */
+  --langs: #1f6f7a;
+  --langs-tint: #dff0f1;
+  --langs-deep: #134a52;
+  --te: #b5501b;
+  --ta: #6b3fa0;
 
   --gold: #f2a900;
   --gold-tint: #fff1c9;
@@ -95,9 +135,12 @@
   --hundreds: #c8372d;
 
   /* type */
-  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
-  --font-read: 'Andika', 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Every stack falls through to the Telugu and Tamil fonts (unicode-range limited, so they load
+     only on a page that shows those scripts); without them a script title in the display face
+     rendered as empty boxes. */
+  --font-display: 'Fredoka', 'Nunito', 'Noto Sans Telugu', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-read: 'Andika', 'Atkinson Hyperlegible', 'Noto Sans Telugu', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-ui: 'Inter', 'Noto Sans Telugu', 'Noto Sans Tamil', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --t-xs: 0.875rem;
   --t-sm: 1rem;

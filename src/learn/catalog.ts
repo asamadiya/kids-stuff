@@ -5,6 +5,7 @@ import { MATHS_GAMES, MATHS_GROUPS } from '../maths/registry';
 import { SCIENCE_GAMES, SCIENCE_GROUPS } from '../science/registry';
 import { ACTIVITIES, MAKE_AREAS } from '../make/activities';
 import { IDEAS, PLAY_GROUPS, WHERE_LABEL } from '../together';
+import { LANG_BOOKS, MOMENTS, RHYMES, WHEN_LABEL, WORDS } from '../languages';
 
 /**
  * The whole contents of the centre as one list, so the home directory, the
@@ -18,7 +19,7 @@ import { IDEAS, PLAY_GROUPS, WHERE_LABEL } from '../together';
  * filters for a grown-up.
  */
 
-export type Part = 'stories' | 'maths' | 'science' | 'make' | 'together';
+export type Part = 'stories' | 'maths' | 'science' | 'make' | 'together' | 'langs';
 
 export const PARTS: ReadonlyArray<{ readonly id: Part; readonly name: string; readonly href: string; readonly art: string; readonly badge?: string }> = [
   { id: 'stories', name: 'Stories', href: '#/stories', art: 'art/hubs/stories.webp' },
@@ -26,10 +27,11 @@ export const PARTS: ReadonlyArray<{ readonly id: Part; readonly name: string; re
   { id: 'science', name: 'Science', href: '#/science', art: 'art/hubs/science.webp' },
   { id: 'make', name: 'Make & Do', href: '#/make', art: 'art/hubs/make.webp', badge: 'With a grown-up' },
   { id: 'together', name: 'Play with Dad & Mom', href: '#/together', art: 'art/hubs/together.webp', badge: 'No screen' },
+  { id: 'langs', name: 'Telugu & Tamil', href: '#/langs', art: 'art/hubs/langs.webp', badge: 'With Amma & Nanna' },
 ];
 
 /** What kind of thing an entry is, as a grown-up would filter it. */
-export type EntryKind = 'Picture book' | 'Longer read-aloud' | 'Situation' | 'Maths game' | 'Science game' | 'Make & Do' | 'Play together';
+export type EntryKind = 'Picture book' | 'Longer read-aloud' | 'Situation' | 'Maths game' | 'Science game' | 'Make & Do' | 'Play together' | 'Telugu & Tamil';
 
 export interface Entry {
   readonly key: string;
@@ -189,7 +191,7 @@ function ideaEntries(): Entry[] {
       time: `${x.minutes} min`,
       adult: x.players,
       where: WHERE_LABEL[x.where],
-      search: words(x.title, x.hook, g.title, x.need, x.tags, x.tradition, WHERE_LABEL[x.where], x.energy, x.contact ? 'rough contact wrestling' : '', 'play dad mom papa mummy together game'),
+      search: words(x.title, x.hook, g.title, x.need, x.tags, x.tradition, WHERE_LABEL[x.where], x.energy, x.contact ? 'rough contact wrestling' : '', 'play dad mom nanna amma together game'),
     })),
   );
 }
@@ -203,6 +205,57 @@ export const cardSrc = (key: string) => `${BASE}cards/${cardId(key)}.webp`;
 /** The 120-wide thumbnail for directory rows and the Everything list. */
 export const thumbSrc = (key: string) => `${BASE}thumbs/${cardId(key)}.webp`;
 
+function langEntries(): Entry[] {
+  const say = MOMENTS.map((m) => ({
+    key: `langs/say/${m.id}`,
+    part: 'langs' as const,
+    kind: 'Telugu & Tamil' as const,
+    group: 'say',
+    groupTitle: 'Say it together',
+    title: m.title,
+    hook: m.hook,
+    href: `#/langs/say/${m.id}`,
+    art: `art/langs/${m.id}.png`,
+    time: '2 min',
+    adult: 'With Amma or Nanna',
+    search: words(m.title, m.hook, WHEN_LABEL[m.when], m.grownUp.flatMap((p) => [p.te.roman, p.ta.roman, p.te.means]), 'telugu tamil language say'),
+  }));
+  const sing = RHYMES.map((r) => ({
+    key: `langs/rhyme/${r.id}`,
+    part: 'langs' as const,
+    kind: 'Telugu & Tamil' as const,
+    group: 'sing',
+    groupTitle: 'Sing',
+    title: `${r.title.roman} (${r.lang === 'te' ? 'Telugu' : 'Tamil'})`,
+    hook: r.title.means,
+    href: `#/langs/rhyme/${r.id}`,
+    art: `art/langs/${r.id}.png`,
+    time: '3 min',
+    adult: r.lang === 'te' ? 'With Nanna' : 'With Amma',
+    search: words(r.title.roman, r.title.means, r.lang === 'te' ? 'telugu' : 'tamil', 'rhyme song sing'),
+  }));
+  const read = LANG_BOOKS.map((b) => ({
+    key: `langs/book/${b.id}`,
+    part: 'langs' as const,
+    kind: 'Telugu & Tamil' as const,
+    group: 'read',
+    groupTitle: 'Read together',
+    title: `${b.title.te.roman} / ${b.title.ta.roman}`,
+    hook: b.hook,
+    href: `#/langs/book/${b.id}/1`,
+    art: `art/langs/${b.id}/page-1.png`,
+    time: '5 min',
+    adult: 'Read aloud together',
+    search: words(b.title.te.roman, b.title.ta.roman, b.title.te.means, b.hook, 'telugu tamil book read'),
+  }));
+  const more = [
+    { key: 'langs/words', title: 'Words and listening', hook: `${WORDS.length} picture words and a listening game`, href: '#/langs/words', art: WORDS[0] ? `art/langs/words/${WORDS[0].id}.png` : undefined },
+    { key: 'langs/guide', title: 'Keeping two languages going', hook: 'A research-based guide for Amma and Nanna', href: '#/langs/guide', art: undefined },
+    { key: 'langs/record', title: 'Record voices', hook: 'Record your Telugu and Tamil for the speaker buttons', href: '#/langs/record', art: undefined },
+  ].map((x) => ({ ...x, part: 'langs' as const, kind: 'Telugu & Tamil' as const, group: 'more', groupTitle: 'Words and grown-ups', time: undefined, adult: 'For grown-ups', search: words(x.title, x.hook, 'telugu tamil') }));
+  return [...say, ...sing, ...read, ...more];
+}
+
 /** Every item in the centre, in the order the hubs show them. */
 export const ENTRIES: readonly Entry[] = [
   ...bookEntries(),
@@ -212,6 +265,7 @@ export const ENTRIES: readonly Entry[] = [
   ...gameEntries('science'),
   ...activityEntries(),
   ...ideaEntries(),
+  ...langEntries(),
 ];
 
 /**
@@ -251,13 +305,19 @@ export function directory(): ReadonlyArray<{ readonly part: (typeof PARTS)[numbe
     science: groupsOf('science', SCIENCE_GROUPS),
     make: groupsOf('make', MAKE_AREAS),
     together: groupsOf('together', PLAY_GROUPS),
+    langs: groupsOf('langs', [
+      { id: 'say', title: 'Say it together', line: 'Routine and play moments in both languages.' },
+      { id: 'sing', title: 'Sing', line: 'Traditional Telugu and Tamil rhymes.' },
+      { id: 'read', title: 'Read together', line: 'Picture books told in Telugu and in Tamil.' },
+      { id: 'more', title: 'Words and grown-ups', line: 'Picture words, the guide, and recording.' },
+    ]),
   };
   return PARTS.map((p) => ({ part: p, groups: groups[p.id] }));
 }
 
 /** How many things each part holds, for the door labels and the grown-ups note. */
 export function counts(): Record<Part, number> {
-  const c = { stories: 0, maths: 0, science: 0, make: 0, together: 0 } as Record<Part, number>;
+  const c = { stories: 0, maths: 0, science: 0, make: 0, together: 0, langs: 0 } as Record<Part, number>;
   for (const e of ENTRIES) c[e.part] += 1;
   return c;
 }

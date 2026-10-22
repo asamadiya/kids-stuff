@@ -5,8 +5,9 @@ import { Piece, Tray } from '../../play/parts';
 /**
  * Can You Pay Exactly? — coin values differ from coin counts.
  *
- * Concept (advisor, maths 17; money starts with US coins, rupees come later
- * in a separate setting): three coins can be 3¢ or 75¢. The misconceptions
+ * Concept (advisor, maths 17; money starts with US coins, the ones this Bay
+ * Area family spends; rupees come later in a separate setting): three coins
+ * can be 3¢ or 75¢. The misconceptions
  * it attacks are counting coins instead of their values, and reading value
  * from size — the dime is the SMALLEST coin and worth more than the bigger
  * nickel and penny. Every coin is drawn at its true relative diameter
@@ -54,8 +55,8 @@ export interface Round {
   readonly coins: readonly Coin[];
   /** count rounds: exactly this many coins. Otherwise 0. */
   readonly exactly: number;
-  /** change rounds: who handed over the dollar. */
-  readonly payer: 'Papa' | 'Mummy';
+  /** change rounds: who handed over the dollar. At a shop the children say Mom and Dad. */
+  readonly payer: 'Dad' | 'Mom';
 }
 
 /** The coins he has put on the counter, in the order he put them there. */
@@ -74,13 +75,13 @@ const MAX_COINS = 20;
 const DOLLAR = 100;
 
 const pay = (item: Item, price: number, coins: readonly Coin[] = SMALL): Round => ({
-  mode: 'pay', item, price, coins, exactly: 0, payer: 'Papa',
+  mode: 'pay', item, price, coins, exactly: 0, payer: 'Dad',
 });
 const count = (item: Item, price: number, exactly: number, coins: readonly Coin[]): Round => ({
-  mode: 'count', item, price, coins, exactly, payer: 'Papa',
+  mode: 'count', item, price, coins, exactly, payer: 'Dad',
 });
 const fewest = (item: Item, price: number): Round => ({
-  mode: 'fewest', item, price, coins: ALL_COINS, exactly: 0, payer: 'Papa',
+  mode: 'fewest', item, price, coins: ALL_COINS, exactly: 0, payer: 'Dad',
 });
 const change = (item: Item, price: number, payer: Round['payer']): Round => ({
   mode: 'change', item, price, coins: ALL_COINS, exactly: 0, payer,
@@ -102,8 +103,8 @@ const TABLE: Record<Level, readonly Round[]> = {
     pay('dinosaur', 55, [25, 10, 5]), count('banana', 26, 2, ALL_COINS), pay('carrot', 37, ALL_COINS), count('egg', 40, 3, [25, 10, 5]),
   ],
   3: [
-    fewest('mango', 41), change('pencil', 65, 'Papa'), fewest('notebook', 68), change('banana', 30, 'Mummy'),
-    fewest('dinosaur', 90), change('eraser', 45, 'Papa'), fewest('carrot', 29), change('notebook', 85, 'Mummy'),
+    fewest('mango', 41), change('pencil', 65, 'Dad'), fewest('notebook', 68), change('banana', 30, 'Mom'),
+    fewest('dinosaur', 90), change('eraser', 45, 'Dad'), fewest('carrot', 29), change('notebook', 85, 'Mom'),
   ],
 };
 
@@ -691,7 +692,7 @@ export const canYouPayExactly: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/can-you-pay-exactly.png',
   note: {
-    what: "A shop counter with one item and its price tag. He taps US coins in the tray to put them on the counter until they make the price, and taps a coin on the counter to take it back. At level 3 he either pays with the fewest coins or gives the change from a dollar.",
+    what: "A shop counter, like the fruit stand at the Saturday farmers market, with one item and its price tag. He taps US coins in the tray to put them on the counter until they make the price, and taps a coin on the counter to take it back. At level 3 he either pays with the fewest coins or gives the change from a dollar.",
     expect: "A common first move is to put down as many coins as the price says: 7 coins for 7¢ works only if all seven are pennies. The second break is size: the dime is the smallest coin, and many children rank it below the nickel. 'Exactly 3 coins' rounds at level 2 are where he must hold the count and the value apart.",
     practising: "Coin values as separate from coin count and coin size: a dime is 10¢ though it is smallest. Adding mixed values (counting on by 25, 10, 5, then 1), making one amount several ways, the fewest-coins (greedy) method, and change as counting up from the price to 100¢.",
     ask: "When the totals appear after a Check, point at the coins: 'How many coins are there? And how many cents? Why are those two numbers different?'",

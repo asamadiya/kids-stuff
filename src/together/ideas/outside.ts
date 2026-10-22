@@ -1,7 +1,7 @@
 import type { PlayIdea } from '../types';
 
 /**
- * Outside and Nature: trails, puddles, hunts, bugs, clouds and shadows, in the garden or the park.
+ * Outside and Nature: trails, puddles, hunts, bugs, clouds and shadows, in the backyard or the park.
  * Advisor rulings 12-13: Follow My Explorer Trail is a must-include; outdoor challenge means he chooses a
  * low log or a route, never an adult-imposed height, speed or bravery test.
  */
@@ -15,16 +15,16 @@ export const IDEAS: readonly PlayIdea[] = [
     energy: 'active',
     contact: false,
     minutes: 15,
-    setup: 'No setup at the park; two minutes to chalk a few arrows at home',
+    setup: 'No setup at the park; two minutes to chalk a few arrows on the patio',
     players: 'You and him; Mia with another grown-up',
     need: [
       'pavement chalk (or sticks and leaves laid down as arrows)',
-      'shoes with some grip, not sandals or flip-flops',
+      'sneakers with some grip, not sandals or flip-flops',
     ],
     exception:
-      'A fallen log is a park thing. In a garden, a row of bricks or paving stones laid flat on the lawn, or the edge of a flower bed, does the same job.',
+      'A fallen log is a park thing. In the backyard, a row of bricks or paving stones laid flat on the lawn, or the low wooden edge of a raised bed, does the same job.',
     steps: [
-      'At the park or in the garden, tell him: "You lead, I follow. You choose the way, and only go where you can get back down by yourself."',
+      'At the park or in the backyard, tell him: "You lead, I follow. You choose the way, and only go where you can get back down by yourself."',
       'Follow his route exactly: along a line, round the tree, over the low log once he is off it. Stay a step or two behind, with your hands off him.',
       'If he stops at a tricky bit, count slowly to thirty in your head before offering help. Offer words, "Where will your foot go next?", rather than a lift.',
       'Swap: you lead a short route and he follows. Keep yours low and easy; he can always choose his own way round.',
@@ -36,8 +36,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'This works best as his time alone with you: Mia stays at ground level with the other grown-up, on the grass or in the sandpit. A two-year-old will try to follow him onto the log, and he should not have to wait for her or watch out for her.',
     },
     picture:
-      'In a California park, Arjun walks along a low fallen log, no higher than his knees, with his arms out for balance, looking back to check that Papa is copying him; Papa waits at the near end of the log with his arms out the same way, ready to step up after him. Bark chips cover the ground round the log.',
-    cast: ['Arjun', 'Papa'],
+      'In a Bay Area park with oak trees, Arjun walks along a low fallen log, no higher than his knees, with his arms out for balance, looking back to check that Nanna is copying him; Nanna waits at the near end of the log with his arms out the same way, ready to step up after him. Bark chips cover the ground round the log.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       {
         label: 'The Conversation (Mariana Brussoni): Why Kids Need Risk, Fear and Excitement in Play',
@@ -49,7 +49,7 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC4483710/',
       },
     ],
-    tags: ['park', 'garden', 'follow the leader', 'balance', 'climbing', 'outdoor challenge', 'logs'],
+    tags: ['park', 'backyard', 'garden', 'follow the leader', 'balance', 'climbing', 'outdoor challenge', 'logs'],
     note: {
       what: 'A follow-the-leader walk outdoors. He chooses a route along lines, round trees and over low things like a log or a row of bricks, and you follow it exactly; then you swap.',
       expect:
@@ -57,7 +57,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Judging his own balance and what he can manage on a given day, and planning a route someone else can follow. Leading an adult, which he does not often get to do.',
       ask: 'At the end, only if he wants to talk about it: "Which bit was the trickiest to get across?"',
-      next: 'Next time, let him draw the route first, on paper or in the dirt with a stick, and then walk it. On a call to Jaipur, he can tell Dadi and Dada about the trail he made.',
+      next: 'Next time, let him draw the route first, on paper or in the dirt with a stick, and then walk it. Early on a weekend morning, which is evening in Hyderabad, he can walk the trail for Tatayya on a video call, with Nanna carrying the phone.',
       honest:
         'Crossing a park log does not mean he can judge a high wall or a kerb by a road; the challenge here is kept low on purpose. Some days he will choose only easy routes, and that is his judgement too.',
       easier:
@@ -98,8 +98,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia holds your hand the whole time and stamps at the edge of the same puddle, or in a small one of her own. He keeps the middle for his jumps and does not have to wait for her or keep her dry.',
     },
     picture:
-      'Arjun, in a yellow raincoat and red rubber boots, lands a two-footed jump in the middle of a shallow puddle on the wet paved path of the California back garden in light rain. Both his arms are out to his sides for balance, his hands empty, and water splashes up round his boots. A step away, Mummy in a raincoat stands at the puddle’s edge holding Mia’s right hand in her left hand. Mia, in small rubber boots, is on Mummy’s far side from Arjun and stamps one foot at the very edge of the puddle, her other hand free. A leaf floats on the water.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'Arjun, in a yellow raincoat and red rubber boots, lands a two-footed jump in the middle of a shallow puddle on the wet paved path beside the backyard lawn of the Bay Area house in light rain, the wooden fence and the dripping lemon tree behind. Both his arms are out to his sides for balance, his hands empty, and water splashes up round his boots. A step away, Amma in a raincoat stands at the puddle’s edge holding Mia’s right hand in her left hand. Mia, in small rubber boots, is on Amma’s far side from Arjun and stamps one foot at the very edge of the puddle, her other hand free. A leaf floats on the water. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       { label: 'NAEYC for Families: Play in a Puddle on a Rainy Day', url: 'https://www.naeyc.org/our-work/families/play-in-puddle' },
       {
@@ -107,7 +107,7 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://www.healthychildren.org/English/safety-prevention/at-play/Pages/Water-Safety-And-Young-Children.aspx',
       },
     ],
-    tags: ['rainy day', 'puddles', 'rain', 'float and sink', 'boots', 'garden', 'winter'],
+    tags: ['rainy day', 'puddles', 'rain', 'float and sink', 'boots', 'backyard', 'garden', 'winter'],
     note: {
       what: 'A walk in the rain or just after: jumping in shallow puddles, testing what floats, and stopping to listen to the rain on different things.',
       expect:
@@ -115,9 +115,9 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Cause and effect: a harder jump makes a bigger splash. Guessing before testing whether something floats, and listening for the difference between rain on a hood, a roof and water.',
       ask: 'If a big stick floats and a small stone sinks: "Why do you think the big one stayed up?" Any answer is fine.',
-      next: 'If the sun comes out, try Where Does a Puddle Go? from Make & Do on the same puddles. On the next call, ask Dadi and Dada about paper boats in the Jaipur monsoon, then fold one together to float on the next rainy day.',
+      next: 'If the sun comes out, try Where Does a Puddle Go? from Make & Do on the same puddles. On the next video call, ask Paati and Thatha about paper boats in the Chennai rains, then fold one together to float on the next rainy day.',
       honest:
-        'One leaf floating does not mean every leaf floats, and he will not work out why things float from this. It is mostly a reason to be out in the rain together. Rain in California comes mostly in winter, so this one waits for the weather.',
+        'One leaf floating does not mean every leaf floats, and he will not work out why things float from this. It is mostly a reason to be out in the rain together. Rain in the Bay Area comes mostly in winter, so this one waits for the weather.',
       easier: 'Stay on the path by the door, one puddle, small jumps only, and leave out the floating.',
       harder:
         'He tests five things he found and sorts them into floaters and sinkers before trying each. Or he makes puddle soup in an old pot, stirring and serving with a big spoon, and tells you the recipe.',
@@ -142,7 +142,7 @@ export const IDEAS: readonly PlayIdea[] = [
     ],
     steps: [
       'Draw a quick picture list together: something rough, something smooth, something that was once alive, something smaller than your fingernail, something the wind moves.',
-      'Walk the garden or the park slowly. He finds one for each, and tells you why it fits.',
+      'Walk the backyard or the park slowly. He finds one for each, and tells you why it fits.',
       'Leaves, bark, twigs and stones too big to pass through a toilet-roll tube go in the bag. Tiny things and anything living stay put; he points instead.',
       'At home, tip the finds out and sort them his way: by colour, by size, rough from smooth, or once-alive from never-alive.',
     ],
@@ -153,14 +153,14 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia gets her own bag and one easy hunt beside you, such as leaves bigger than her hand, so her finds are not his. You check what goes into her bag; a two-year-old picks up pebbles and berries too.',
     },
     picture:
-      'Under a tree in a California park, Arjun crouches and holds up a piece of rough bark to show Mummy, a brown paper bag in his other hand with a pine cone and a big oak leaf poking out. Mummy kneels beside him on the grass, holding a sheet of paper with small crayon drawings on it.',
-    cast: ['Arjun', 'Mummy'],
+      'Under a big oak tree in a Bay Area park, Arjun crouches and holds up a piece of rough bark to show Amma, a brown paper bag in his other hand with a pine cone and a big oak leaf poking out. Amma kneels beside him on the grass, holding a sheet of paper with small crayon drawings on it.',
+    cast: ['Arjun', 'Amma'],
     sources: [
       { label: 'NAEYC for Families: 10 Ideas to Get You and Your Child Exploring Outdoors', url: 'https://www.naeyc.org/our-work/families/ideas-exploring-outdoors' },
       { label: 'UNICEF Parenting: Screen-free Activities for Children (nature walk, ages 5-8)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },
       { label: 'NAEYC for Families: Explore the Great Outdoors with Your Child', url: 'https://www.naeyc.org/our-work/families/explore-great-outdoors' },
     ],
-    tags: ['scavenger hunt', 'park', 'garden', 'nature walk', 'sorting', 'leaves'],
+    tags: ['scavenger hunt', 'park', 'backyard', 'garden', 'nature walk', 'sorting', 'leaves'],
     note: {
       what: 'A nature hunt by property rather than by name. He looks for something rough, something once alive, something smaller than a fingernail, and decides for himself whether a find fits.',
       expect:
@@ -175,7 +175,7 @@ export const IDEAS: readonly PlayIdea[] = [
       harder:
         'Find two things that are the same in one way and different in another, or something in each colour of the rainbow. Or he makes the list for you, and you have to find everything on it.',
       safety:
-        'Nothing found outside goes in a mouth, and he looks without touching mushrooms, berries and plants he does not know. Learn to spot poison oak, common in California, and stay away from it. Feathers, droppings and anything dead: look, do not pick up. Look before reaching into leaves or under things. Wash hands after. Pebbles, seeds and acorns stay on the ground: anything that fits through a toilet-roll tube can choke Mia.',
+        'Nothing found outside goes in a mouth, and he looks without touching mushrooms, berries and plants he does not know. Learn to spot poison oak, common in Bay Area parks and hills, and stay away from it. Feathers, droppings and anything dead: look, do not pick up. Look before reaching into leaves or under things. Wash hands after. Pebbles, seeds and acorns stay on the ground: anything that fits through a toilet-roll tube can choke Mia.',
     },
   },
   {
@@ -197,7 +197,7 @@ export const IDEAS: readonly PlayIdea[] = [
     exception:
       'A magnifying glass is not in every home. A phone camera zoomed in works, and so does lying on your tummies with your noses close to the ground.',
     steps: [
-      'Find a log, a flat stone or an old plank lying in the garden or park. You roll it slowly towards yourself while he watches from the side.',
+      'Find a log, a flat stone or an old plank lying in the backyard or the park. You roll it slowly towards yourself while he watches from the side.',
       'Look together without touching. Count a beetle\'s legs, or try a roly-poly\'s. He shows you how it moves, and you both copy it on the grass.',
       'Lower the log slowly back exactly where it was, so nothing is squashed and the creatures keep their home.',
       'Then find ants on a path. He puts a crumb a hand\'s length from their line. Watch: which ant finds it, and which way do they carry it?',
@@ -209,14 +209,14 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'This is his one-to-one time with you. Mia stays with the other grown-up away from the log: a two-year-old grabs at bugs and stones, and he should not have to guard his roly-poly from her. Later he can show her one from a distance, if he wants to.',
     },
     picture:
-      'In the back garden of the California home, Papa crouches and holds one end of a small log tilted up towards himself with both hands, while Arjun kneels at the side holding a plastic magnifying glass over a grey roly-poly curled up on the damp soil where the log lay.',
-    cast: ['Arjun', 'Papa'],
+      'In the backyard of the Bay Area house, beside a raised vegetable bed and the wooden fence, Nanna crouches and holds one end of a small log tilted up towards himself with both hands, while Arjun kneels at the side holding a plastic magnifying glass over a grey roly-poly curled up on the damp soil where the log lay.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
       { label: 'NAEYC for Families: Explore the Great Outdoors with Your Child (cautions)', url: 'https://www.naeyc.org/our-work/families/explore-great-outdoors' },
       { label: 'NAEYC for Families: 10 Ideas to Get You and Your Child Exploring Outdoors (ant trail)', url: 'https://www.naeyc.org/our-work/families/ideas-exploring-outdoors' },
     ],
-    tags: ['bugs', 'insects', 'ants', 'garden', 'park', 'magnifying glass', 'nature'],
+    tags: ['bugs', 'insects', 'ants', 'backyard', 'garden', 'park', 'magnifying glass', 'nature'],
     note: {
       what: 'You lift a log or a stone, he looks at what lives underneath through a magnifying glass, and the log goes back exactly as it was. Then you watch an ant trail find a crumb.',
       expect:
@@ -229,7 +229,7 @@ export const IDEAS: readonly PlayIdea[] = [
         'One look under a log does not teach him which creatures are safe to touch; that rule stays with you: he looks, and does not touch anything he does not know. Sometimes nothing comes to the crumb, which says more about the ants\' day than about the game.',
       easier: 'Skip the log. Lie on the lawn together and watch whatever walks past, with or without the glass.',
       harder:
-        'Look under three different things, a log, a stone and a pot, and talk about which had the most creatures and why. Or he draws one creature from life while it is still there, and then tells you exactly where to lower the log so it fits back in its own dent.',
+        'Look under three different things, a log, a stone and a flowerpot on the patio, and talk about which had the most creatures and why. Or he draws one creature from life while it is still there, and then tells you exactly where to lower the log so it fits back in its own dent.',
       safety:
         'You lift, he watches: black widow spiders live under logs, stones and pots in California, and in wild or hilly parks rattlesnakes shelter under logs and rocks too, so keep to gardens and mown parkland. Roll the log towards you, so it stays between you both and whatever is under it. Never touch spiders, bees, wasps or anything that might sting; some ants sting too, so hands stay off the trail. Never focus sunlight through the glass; it can burn skin or set dry grass alight. Wash hands after. Keep the glass and the crumbs out of Mia\'s reach.',
     },
@@ -253,22 +253,22 @@ export const IDEAS: readonly PlayIdea[] = [
       'On a day with big, puffy clouds, in the morning or late afternoon, spread a blanket on the grass and lie on your backs with your heads towards the sun.',
       'Take turns: "I see an elephant." The other person has to find it. "Where is its trunk?"',
       'Pick one cloud together and watch it for a minute. Has it changed shape? Which way is it moving: towards the house, or towards the tree?',
-      'Before you get up, he can chalk the best shape he saw on the path, or tell you a short story about it.',
+      'Before you get up, he can chalk the best shape he saw on the patio, or tell you a short story about it.',
     ],
     hisWay:
-      'He calls the shapes and you have to find them. He can turn it into a story, where the elephant cloud is chasing the boat cloud, or set a rule: only animals, or only things you would find in Dadi and Dada\'s kitchen.',
+      'He calls the shapes and you have to find them. He can turn it into a story, where the elephant cloud is chasing the boat cloud, or set a rule: only animals, or only things you would find in your kitchen: an idli, a steel tumbler, the pressure cooker.',
     mia: {
       way: 'joins',
       text: 'Mia lies on the blanket next to you and points at clouds; anything she names counts, even "ball" every time. He does not have to find her shapes, and his turns stay his.',
     },
     picture:
-      'On a blanket spread on the lawn of the California back garden, Arjun lies on his back pointing up at a big white puffy cloud, Mia lies next to him with her arm up copying him, and Mummy lies on Mia\'s other side, her head turned towards Arjun, smiling. Blue sky with fluffy clouds above.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'On a blanket spread on the backyard lawn of the Bay Area house, the top of the lemon tree and the wooden fence at the edge of the picture, Arjun lies on his back pointing up at a big white puffy cloud, Mia lies next to him with her arm up copying him, and Amma lies on Mia\'s other side, her head turned towards Arjun, smiling. Blue sky with fluffy clouds above. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       { label: 'UNICEF Parenting: Screen-free Activities for Children (Cloud shapes, in the ages 1-4 list)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk (chalk the clouds)', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
     ],
-    tags: ['clouds', 'sky', 'quiet', 'garden', 'park', 'weather', 'calm down'],
+    tags: ['clouds', 'sky', 'quiet', 'backyard', 'garden', 'park', 'weather', 'calm down'],
     note: {
       what: 'You lie on the grass together, take turns spotting shapes in the clouds, and watch one cloud long enough to see it change and drift.',
       expect:
@@ -276,7 +276,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Describing what he sees so someone else can find it: "the trunk is on the left". Noticing slow change, and which way the clouds are drifting.',
       ask: 'After he has watched one cloud for a while: "What happened to it?"',
-      next: 'Look at the same patch of sky in the morning and the evening and compare. On the next call, Dadi and Dada can tell him what the sky over Jaipur looks like that day.',
+      next: 'Look at the same patch of sky in the morning and the evening and compare. On an evening video call, Nanamma and Tatayya can tell him what the sky over Hyderabad looks like; there it is already the next morning.',
       honest:
         'Seeing an elephant in a cloud is imagination, not science; the shapes are real only to the person seeing them. He will not learn cloud types or how rain forms from this, and he does not need to.',
       easier: 'Just lie and name what you see, with no turns and no watching for movement.',
@@ -314,13 +314,13 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia is best in the shade with the other grown-up while you two chase. Afterwards, only if he wants to, he can chalk round her shadow on the patio; she will not stand still for long, and a wobbly outline is fine.',
     },
     picture:
-      'On a sunny lawn in the late afternoon, Papa and Arjun each cast a long dark shadow stretching out across the grass. Arjun is mid-leap, both feet landing squarely on the dark head of Papa’s shadow, laughing, while Papa, standing well away from him, turns and points down at his own shadow with mock alarm.',
-    cast: ['Arjun', 'Papa'],
+      'On the sunny backyard lawn of the Bay Area house in the late afternoon, the wooden fence and the lemon tree behind, Nanna and Arjun each cast a long dark shadow stretching out across the grass. Arjun is mid-leap, both feet landing squarely on the dark head of Nanna’s shadow, laughing, while Nanna, standing well away from him, turns and points down at his own shadow with mock alarm.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk (shadows and the path of the sun)', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
       { label: 'Wikipedia: Tag (game), the shadow tag variant', url: 'https://en.wikipedia.org/wiki/Tag_(game)' },
     ],
-    tags: ['shadows', 'sun', 'tag', 'chalk', 'garden', 'patio', 'running'],
+    tags: ['shadows', 'sun', 'tag', 'chalk', 'backyard', 'garden', 'patio', 'running'],
     note: {
       what: 'A chasing game where you tag a shadow instead of a person, then a still part: you chalk round each other\'s shadows and come back later to see where they have moved.',
       expect:

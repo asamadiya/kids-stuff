@@ -71,10 +71,10 @@ export const ENTRIES: Readonly<Record<string, ArchiveEntry>> = {
     kind: 'reconstructed',
     note: {
       what: 'Mahavira shares sesame sweets with children in a courtyard: a careless break makes unequal pieces, a folded leaf finds halves and quarters, and three sweets for five friends become fifteen slices, three each. The idea is that a fair share means equal parts of the same whole.',
-      expect: '12 pages, about 9 minutes. Halves and “that piece is bigger” will be easy; three sweets among five friends (page 8) is a real stretch at five and is worth doing with actual rotis or paper.',
+      expect: '12 pages, about 9 minutes. Halves and “that piece is bigger” will be easy; three sweets among five friends (page 8) is a real stretch at five and is worth doing with actual dosas or paper.',
       practising: 'Equal sharing and unit fractions: halves and quarters must be equal parts, a half of a big thing is bigger than a half of a small thing, and leftovers can be cut smaller so everyone gets the same.',
       ask: 'On page 6: “Both are halves. Why is one bigger than the other?”',
-      next: 'Play Share the Roti in the maths games, then cut three paper rotis into five strips each and deal them out to five toys.',
+      next: 'Play Share the Dosa in the maths games, then cut three paper dosas into five strips each and deal them out to five toys.',
       honest: 'Mahavira (Mahaviracharya), the Rashtrakuta court around 850 CE and his Ganita-sara-sangraha with its fractions and sharing problems are real, but the courtyard, the sweets and his words are imagined; he is the 9th-century mathematician, not Vardhamana Mahavira, the 24th Jain Tirthankara. Fifths cannot be made by folding in half again, so at home mark them by eye or with a ruler.',
     },
   },

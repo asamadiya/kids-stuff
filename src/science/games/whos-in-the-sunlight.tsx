@@ -7,11 +7,11 @@ import { Choice } from '../../play/parts';
  *
  * Concept (advisor, science 9): the Earth spins once in about 24 hours and the
  * half facing the sun has day. India and California sit on nearly opposite
- * sides of the Earth, so when it is night in California it is day in India.
- * Ordinary Moon phases are changing views of the Moon's sunlit half — never
- * the Earth's shadow. Misconceptions it targets: "the sun goes behind the
- * hills / goes to sleep", "it is night everywhere at once", and "the Earth's
- * shadow makes the crescent".
+ * sides of the Earth, so when it is night at home in California it is day
+ * where Nanamma and Tatayya live. Ordinary Moon phases are changing views of
+ * the Moon's sunlit half — never the Earth's shadow. Misconceptions it
+ * targets: "the sun goes behind the hills / goes to sleep", "it is night
+ * everywhere at once", and "the Earth's shadow makes the crescent".
  *
  * Shape: predict (tap-to-choose) → Try → the outcome in the same frame and
  * scale as the setup → why. Every picture is a labelled model seen from above
@@ -30,12 +30,18 @@ import { Choice } from '../../play/parts';
  *  3. The Moon's lit half. The Moon at one of eight places on its orbit, its
  *     sunlit half drawn. Which shape do we see from Earth?
  *
- * Geography: the pins sit at Jaipur (26.9° N, 75.8° E) and central California
- * (about 37° N, 120° W): 196° of longitude apart, about 13 hours by the sun.
- * Clocks differ by 12½ or 13½ hours (time zones, daylight saving); the model
- * uses sun time, and the grown-up note says so. Every round keeps both pins at
- * least 1½ hours of sun time from sunrise or sunset, so no answer sits on the
- * line between day and night.
+ * Geography: the India pin is Hyderabad (17.4° N, 78.5° E), where Nanamma and
+ * Tatayya live; the other is California at 120° W, a round number for home in
+ * the Bay Area (about 37.5° N, 122° W). The pins are 198.5° of longitude
+ * apart, (78.5 + 120) / 15 = 13.23 hours by the sun. Clocks differ by 12½ or
+ * 13½ hours (time zones, daylight saving); the model uses sun time, and the
+ * grown-up note says so. Every round keeps both pins at least 1½ hours of sun
+ * time from sunrise or sunset (the closest is 1.77 h: India at 16.23 sun time
+ * after the level 2 round that spins 6 hours from California 21), so no answer
+ * sits on the line between day and night. Neither the real Bay Area (8
+ * sun-minutes behind the pin) nor Chennai (80.3° E, where Paati and Thatha
+ * live, 7 sun-minutes ahead of Hyderabad) changes any answer; with both at
+ * once the closest round is 1.52 h, still clear.
  */
 
 type Place = 'california' | 'india';
@@ -55,9 +61,13 @@ export type Answer = 'day' | 'night' | Phase | null;
 
 const NAME: Record<Place, string> = { california: 'California', india: 'India' };
 const OTHER: Record<Place, Place> = { california: 'india', india: 'california' };
-/** Hours India is ahead of California by the sun: 196° of longitude at 15° an hour. */
-const INDIA_AHEAD = 196 / 15;
-/** Distance from the pole, as a share of the equator's radius, seen from above: cos(latitude). */
+/** Hours Hyderabad is ahead of central California by the sun: 78.5° E to 120° W is 198.5° of longitude, at 15° an hour, 13.23 h. */
+const INDIA_AHEAD = (78.5 + 120) / 15;
+/**
+ * Distance from the pole, as a share of the equator's radius, seen from above. California is cos 37° = 0.8.
+ * Hyderabad's cos 17.4° = 0.95 would push its pin across the rim (0.95 × 92 + 9 > 92) and its gold ring
+ * into the sun's rays, so it is drawn at 0.89: still well outside California, in a model not to scale.
+ */
 const LAT_R: Record<Place, number> = { california: 0.8, india: 0.89 };
 const PIN: Record<Place, string> = { california: '#ff8a3d', india: '#ff5fa2' };
 
@@ -823,14 +833,14 @@ export const whosInTheSunlight: InvestigateGame<Round, Answer> = {
   why,
   cover: 'art/games/whos-in-the-sunlight.png',
   note: {
-    what: 'A model of the Earth seen from above the North Pole, the sun on one side, pins for California and India. Level 1: day or night at a pin. Level 2: the Earth first turns 6, 12, 18 or 24 hours (the gold disc shows how much of a turn). Level 3: the Moon on its path; which shape do we see? Try draws the result beside the setup.',
-    expect: "Many five-year-olds explain night as the sun going behind the hills or going to sleep, so he may first answer from his own window: day here, so day in India too. On level 2 the likely break is 12 hours: clocks go round in 12, so he may expect the pin back where it started; the gold disc shows only half a turn. On level 3 the Earth's-shadow explanation of the crescent is common, even among adults.",
+    what: 'A model of the Earth seen from above the North Pole, the sun on one side, a pin for home in California and one for India, at Hyderabad, where Nanamma and Tatayya live. Level 1: day or night at a pin. Level 2: the Earth first turns 6, 12, 18 or 24 hours (the gold disc shows how much of a turn). Level 3: the Moon on its path; which shape do we see? Try draws the result beside the setup.',
+    expect: "Many five-year-olds explain night as the sun going behind the hills or going to sleep, so he may first answer from his own window: day in our backyard, so day at Nanamma and Tatayya's too. On level 2 the likely break is 12 hours: clocks go round in 12, so he may expect the pin back where it started; the gold disc shows only half a turn. On level 3 the Earth's-shadow explanation of the crescent is common, even among adults.",
     practising: 'Day is the half of the Earth facing the sun; the Earth spinning carries each place into and out of that half, once every 24 hours. Moon phases: the Moon always has a sunlit half, and the shape we see depends on how much of that half faces us.',
-    ask: "When the pins show night in California and day in India: 'Who do we know in India? What are they doing while you sleep?'",
-    next: "In a dark room, shine a torch on an orange with a sticker on it and turn the orange slowly: watch the sticker go from light to dark. Then video-call family in India at his bedtime and ask them to show the sky out of their window. For the Moon: a lamp across the room, a ball held at arm's length, turning yourself round in a circle.",
+    ask: "When the pins show night in California and day in India: 'It is your bedtime here. What are Nanamma and Tatayya doing right now?' Nanna can ask it in Telugu: 'Ippudu Nanamma, Tatayya em chestuntaru?' (What would Nanamma and Tatayya be doing now?)",
+    next: "In a dark room, shine a torch on an orange with a sticker on it and turn the orange slowly: watch the sticker go from light to dark. Then, at his bedtime, video-call Nanamma and Tatayya in Hyderabad, or Paati and Thatha in Chennai, and ask them to show the sky out of their window: it is morning there. For the Moon: a lamp across the room, a ball held at arm's length, turning yourself round in a circle.",
     honest: "This is a model at the equinox and in sun time, not to scale: real clocks differ by 12½ or 13½ hours, and summer days are longer than nights. Reading a view from above the pole is not yet linking it to the sky outside his window; the torch-and-ball game is that step. Nor does it show he knows why the Earth spins.",
     easier: 'Stay on level 1 and use the torch and orange beside the screen, pressing a finger on the pin as you turn it.',
-    harder: 'On level 2, ask what time it is in India when he wakes at 7: Indian clocks are 12½ hours ahead while California is on summer time, 13½ in winter. On level 3, ask in which order the shapes come, night after night.',
+    harder: "On level 2, ask what time it is at Nanamma and Tatayya's when he wakes at 7: Indian clocks are 12½ hours ahead while California is on summer time, 13½ in winter. On level 3, ask in which order the shapes come, night after night.",
     safety: 'Never look at the sun, even for a moment, and never through binoculars. Keep the torch-and-orange game to a torch, not a candle.',
   },
 };

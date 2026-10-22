@@ -85,32 +85,32 @@ export const EVENT_DECK: readonly EventCard[] = [
   {
     id: 'lost-game',
     label: 'the game was lost',
-    alt: 'Leo at the end of a board game he did not win, his hands still on his pieces.',
+    alt: 'Arjun at the end of a board game he did not win, his hands still on his pieces.',
   },
   {
     id: 'blocks-knocked',
     label: 'the build came down',
-    alt: 'A tall block tower spread across the floor, Leo kneeling beside the pieces.',
+    alt: 'A tall block tower spread across the floor, Arjun kneeling beside the pieces.',
   },
   {
     id: 'sister-grabs',
     label: 'Mia took it out of your hands',
-    alt: 'Mia, two years old, holding on to the toy truck Leo was playing with.',
+    alt: 'Mia, two years old, holding on to the toy truck her brother Arjun was playing with.',
   },
   {
     id: 'dog-barks',
     label: 'a dog barked, close',
-    alt: 'A big dog barking right beside Leo on a path, Leo leaning back.',
+    alt: 'A big dog barking right beside Arjun on a path, Arjun leaning back.',
   },
   {
     id: 'first-day',
     label: 'a room where you knew nobody',
-    alt: 'Leo standing at the edge of a busy classroom on the first day, bag still on.',
+    alt: 'Arjun standing at the edge of a busy classroom on the first day, bag still on.',
   },
   {
     id: 'surprise-gift',
     label: 'a parcel with your name on it',
-    alt: 'Leo opening a wrapped parcel at a table, the paper half off.',
+    alt: 'Arjun opening a wrapped parcel at a table, the paper half off.',
   },
 ] as const;
 

@@ -568,7 +568,45 @@ const PENDULUM: Record<string, (label: string) => ReactElement> = {
   ),
 };
 
-export const MAKE_FIGURES: Record<string, (label: string) => ReactElement> = { ...KOLAM, ...TANGRAM, ...LEVER, ...BALANCE, ...BRIDGE, ...PENDULUM };
+/* -------------------------------------------------------- coat-hanger ---- */
+
+/** Fingers in the ears' flaps vs fingers away: the same tap, two loudnesses. */
+function Hanger({ x, ear }: { readonly x: number; readonly ear: boolean }) {
+  const top = 150;
+  const hy = 640;
+  return (
+    <g>
+      {/* a head seen from the front, with the fingers either at the ear flaps or held away */}
+      <circle cx={x} cy={top + 70} r={70} fill="#b9784a" stroke={INK} strokeWidth={5} />
+      <path d={`M ${x - 70} ${top + 60} q -14 10 0 30 M ${x + 70} ${top + 60} q 14 10 0 30`} fill="none" stroke={INK} strokeWidth={5} />
+      {(ear ? [x - 78, x + 78] : [x - 150, x + 150]).map((fx) => (
+        <g key={fx}>
+          <circle cx={fx} cy={top + 75} r={13} fill="#b9784a" stroke={INK} strokeWidth={4} />
+          <line x1={fx} y1={top + 88} x2={fx > x ? x + 110 : x - 110} y2={hy - 120} stroke={INK} strokeWidth={4} />
+        </g>
+      ))}
+      <path d={`M ${x - 110} ${hy - 120} L ${x + 110} ${hy - 120} L ${x} ${hy - 30} Z`} fill="none" stroke="#7a8590" strokeWidth={9} strokeLinejoin="round" />
+      <path d={`M ${x} ${hy - 30} q 0 30 -22 30`} fill="none" stroke="#7a8590" strokeWidth={9} strokeLinecap="round" />
+      <rect x={x - 150} y={hy + 40} width={300} height={26} rx={6} fill="#c99a62" stroke={TABLE_EDGE} strokeWidth={4} />
+      {/* sound marks: big and many when it travels up the string to the ear, small when only through air */}
+      {(ear ? [0, 1, 2] : [0]).map((i) => (
+        <path key={i} d={`M ${x + 130 + i * 26} ${top + 20 - i * 8} q 18 55 0 110`} fill="none" stroke={GOLD_LINE} strokeWidth={ear ? 8 : 4} strokeLinecap="round" />
+      ))}
+    </g>
+  );
+}
+const GOLD_LINE = '#e9b949';
+
+const HANGER: Record<string, (label: string) => ReactElement> = {
+  'hanger-5': (label) => (
+    <Frame label={label} ground={PAPER}>
+      <Hanger x={300} ear />
+      <Hanger x={852} ear={false} />
+    </Frame>
+  ),
+};
+
+export const MAKE_FIGURES: Record<string, (label: string) => ReactElement> = { ...KOLAM, ...TANGRAM, ...LEVER, ...BALANCE, ...BRIDGE, ...PENDULUM, ...HANGER };
 
 export function MakeFigure({ id, label }: { readonly id: string; readonly label: string }) {
   const f = MAKE_FIGURES[id];

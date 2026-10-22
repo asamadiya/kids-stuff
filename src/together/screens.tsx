@@ -6,6 +6,7 @@ import { cardSrc } from '../learn/catalog';
 import type { GrownUpNote } from '../notes/types';
 import { IDEAS, MIA_LABEL, PLAY_GROUPS, WHERE_LABEL, getIdea } from './index';
 import type { PlayIdea } from './types';
+import { altText } from '../learn/alt';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -150,7 +151,7 @@ export function IdeaPage({ id, back }: { readonly id: string; readonly back: { r
     <Page title={x.title} back={back} note={x.note} expect={`${x.minutes} minutes · ${WHERE_LABEL[x.where]} · ${x.hook}`}>
       <div className="idea">
         <figure className="idea__picture">
-          <img src={`${BASE}art/together/${x.id}.webp`} alt={x.picture} width={1152} height={896} />
+          <img src={`${BASE}art/together/${x.id}.webp`} alt={altText(x.picture)} width={1152} height={896} />
         </figure>
         <div className="idea__side">
           <dl className="idea__facts">

@@ -10,31 +10,37 @@ import { Choice, Slot } from '../../play/parts';
  * air as water vapour, which is invisible — the white "steam" is tiny drops
  * of liquid water. Separately (level 3, never mixed into the same round): a
  * towel makes no heat, it slows heat moving, so wrapped ice melts SLOWER and a
- * wrapped roti stays warm.
+ * wrapped chapati stays warm.
  *
  * Shape: predict → Try → before/after side by side → why. Every round is one
- * place (counter, freezer, fridge, courtyard, sill, stove) drawn with a room
- * thermometer whose 0° line is marked, and a time tag ("Start" / "1 hour
- * later"), so the after picture carries its own evidence. Static SVG only.
+ * place (counter, freezer, fridge, backyard patio, sill, stove) in the Bay Area
+ * house, drawn with a room thermometer whose 0° line is marked, and a time tag
+ * ("Start" / "1 hour later"), so the after picture carries its own evidence.
+ * Static SVG only.
  *
  * Every answer is a picture of the outcome, drawn as the after picture would
- * draw it (the bowl of water, the dry tiles, the wet lid), with its word small
+ * draw it (the bowl of water, the dry patio, the wet lid), with its word small
  * underneath. Tapping one puts the same picture, bigger, in the guess slot
  * under the scene. Amounts are objects: cubes are counted out as cubes under
- * each bowl, and a roti stack's warmth is a red column on its thermometer.
+ * each bowl, and a chapati stack's warmth is a red column on its thermometer.
  *
  * Levels:
  *  1. Warm or cold: one bowl or cup on the counter, in the freezer or in the
  *     fridge. The fridge (4 °C) breaks "cold freezes things".
- *  2. Water into air: a puddle, an open plate and a wet dupatta dry; a
- *     closed jar does not; an idli-steamer lid and an icy steel tumbler
+ *  2. Water into air: a patio puddle, an open plate and Thatha's wet veshti
+ *     dry; a closed jar does not; an idli-steamer lid and an icy steel tumbler
  *     collect drops. The steamer's white cloud is named as tiny drops.
  *  3. Wrap it up: two equal bowls of ice, one wrapped. Then a control in the
- *     freezer (neither melts — a towel makes no heat), a hot roti in cloth
- *     (the same slowing, run outwards), thin against thick, and Dadi's shawl.
+ *     freezer (neither melts — a towel makes no heat), hot chapatis in cloth
+ *     (the same slowing, run outwards), thin against thick, and Paati's shawl.
+ *
+ * The grown-ups are Amma and Amma's parents, Paati and Thatha, visiting from
+ * Chennai: Amma lifts the idli lid (her teal sleeve), Thatha's veshti dries on
+ * the backyard line, and Paati's woollen shawl is the one she wraps up in on
+ * cool Bay Area evenings.
  */
 
-type Place = 'counter' | 'freezer' | 'fridge' | 'courtyard' | 'sill' | 'stove';
+type Place = 'counter' | 'freezer' | 'fridge' | 'backyard' | 'sill' | 'stove';
 type State = 'ice' | 'water' | 'dry';
 type Side = 'left' | 'right' | 'same';
 type Vessel = 'bowl' | 'cup' | 'jar' | 'plate' | 'puddle' | 'steamer' | 'tumbler' | 'line';
@@ -56,7 +62,7 @@ type StateScene =
   | 'cold-tumbler'
   | 'washing';
 
-type WrapScene = 'towel' | 'shawl' | 'freezer-towel' | 'roti' | 'thin-thick';
+type WrapScene = 'towel' | 'shawl' | 'freezer-towel' | 'chapati' | 'thin-thick';
 
 export type Round =
   | { readonly kind: 'state'; readonly scene: StateScene; readonly result: State }
@@ -90,7 +96,7 @@ interface StateSpec extends Common {
 const THERMO_RING: Ring = [334, 4, 76, 272];
 const MELT_RULE = 'Warmer than the 0 line, ice melts into water. Colder than the 0 line, water freezes into ice.';
 const AIR_RULE = 'Water can go into the air as water vapour, which you cannot see. Cooled, vapour turns back into drops.';
-const WRAP_RULE = 'A wrapping makes no heat. It slows heat moving through it: into cold ice, or out of hot rotis.';
+const WRAP_RULE = 'A wrapping makes no heat. It slows heat moving through it: into cold ice, or out of hot chapatis.';
 
 const STATE: Record<StateScene, StateSpec> = {
   'counter-ice': {
@@ -175,8 +181,8 @@ const STATE: Record<StateScene, StateSpec> = {
   },
   'idli-lid': {
     place: 'stove', temp: null, vessel: 'steamer', start: 'dry', result: 'water', after: 'Lid lifted',
-    prompt: 'Mummy lifts the hot idli steamer lid. Is its underside wet?',
-    name: 'Idlis cooking in a closed steel steamer on the stove, with water boiling underneath.',
+    prompt: 'Amma lifts the hot idli steamer lid. Is its underside wet?',
+    name: 'Idlis cooking in a closed steel steamer on the stove at home, with water boiling underneath. Amma is about to lift the lid.',
     end: 'Under the lifted lid hang drops of water, and a white cloud rises from the pot.',
     look: 'Blue flames heat the pot from below. The lid on top stays cooler.',
     rule: AIR_RULE,
@@ -184,10 +190,10 @@ const STATE: Record<StateScene, StateSpec> = {
     ring: [80, 98, 170, 132],
   },
   puddle: {
-    place: 'courtyard', temp: 32, vessel: 'puddle', start: 'water', result: 'dry', after: '3 hours later',
-    prompt: 'A puddle on the sunny courtyard tiles. After three hours?',
-    name: 'A puddle of water on the stone tiles of a sunny courtyard. The thermometer reads 32 degrees.',
-    end: 'Three hours later the tiles are dry. A dashed line shows where the puddle was.',
+    place: 'backyard', temp: 32, vessel: 'puddle', start: 'water', result: 'dry', after: '3 hours later',
+    prompt: 'A puddle on the sunny backyard patio. After three hours?',
+    name: 'A puddle of water on the paving stones of the backyard patio, by the lawn and the wooden fence, on a sunny afternoon. The thermometer reads 32 degrees.',
+    end: 'Three hours later the paving stones are dry. A dashed line shows where the puddle was.',
     look: 'The thermometer says 32 degrees, and the puddle lies open to the sunny air.',
     rule: AIR_RULE,
     why: 'The water did not vanish. Warmed by the sun, it went up into the air as water vapour, which you cannot see. Water going into the air like this is called evaporation.',
@@ -204,10 +210,10 @@ const STATE: Record<StateScene, StateSpec> = {
     ring: [119, 112, 92, 120],
   },
   washing: {
-    place: 'courtyard', temp: 32, vessel: 'line', start: 'water', result: 'dry', after: 'By evening',
-    prompt: "Mummy's wet dupatta on the line in the sun. By evening?",
-    name: 'A wet, dripping dupatta hung on a washing line in a sunny courtyard. The thermometer reads 32 degrees.',
-    end: 'By evening the dupatta is dry and paler than when wet, with no drips.',
+    place: 'backyard', temp: 32, vessel: 'line', start: 'water', result: 'dry', after: 'By evening',
+    prompt: "Thatha's wet veshti on the line in the sun. By evening?",
+    name: "Thatha's white veshti with its green border, wet and dripping, pegged on a washing line in the sunny backyard. The thermometer reads 32 degrees.",
+    end: 'By evening the veshti is dry and bright white again, with no drips.',
     look: 'Sun, 32 degrees, and the cloth hangs spread wide open to the air.',
     rule: AIR_RULE,
     why: 'The water in the cloth went into the warm air as invisible water vapour. Spread out on a line, every part of the cloth touches the air, so it dries fast.',
@@ -216,13 +222,13 @@ const STATE: Record<StateScene, StateSpec> = {
 };
 
 interface WrapSpec extends Common {
-  readonly vessel: 'bowl' | 'roti';
+  readonly vessel: 'bowl' | 'chapati';
   readonly left: Wrap;
   readonly right: Wrap;
   readonly leftLabel: string;
   readonly rightLabel: string;
   readonly result: Side;
-  /** Ice cubes in each bowl, or degrees for the rotis: at the start, and after. */
+  /** Ice cubes in each bowl, or degrees for the chapatis: at the start, and after. */
   readonly startAmount: number;
   readonly leftAfter: number;
   readonly rightAfter: number;
@@ -253,16 +259,16 @@ const WRAP: Record<WrapScene, WrapSpec> = {
     why: 'In the freezer nothing around the ice is warm, so there is no warmth for the towel to slow down. Both stay frozen. If a towel made heat, the wrapped ice would have melted.',
     ring: THERMO_RING,
   },
-  roti: {
-    place: 'counter', temp: 25, vessel: 'roti', left: 'cloth', right: 'none', after: '20 minutes later',
-    leftLabel: 'Wrapped rotis', rightLabel: 'Bare rotis', result: 'left',
+  chapati: {
+    place: 'counter', temp: 25, vessel: 'chapati', left: 'cloth', right: 'none', after: '20 minutes later',
+    leftLabel: 'Wrapped chapatis', rightLabel: 'Bare chapatis', result: 'left',
     startAmount: 70, leftAfter: 55, rightAfter: 35,
-    prompt: 'Two stacks of hot rotis, one wrapped in cloth. Which stays warmer?',
-    name: 'Two stacks of rotis, both just off the tava at 70 degrees, on plates on a 25 degree counter. The left stack is folded inside a cotton cloth.',
+    prompt: 'Two stacks of hot chapatis, one wrapped in cloth. Which stays warmer?',
+    name: 'Two stacks of chapatis, both just off the tava at 70 degrees, on steel plates on a 25 degree kitchen counter. The left stack is folded inside a cotton cloth.',
     end: 'Twenty minutes later the wrapped stack is still warm, at 55 degrees. The bare stack has cooled to 35.',
     look: 'Both stacks start equally hot, in the same kitchen. Only one is wrapped.',
     rule: WRAP_RULE,
-    why: 'The cloth made no heat. It slowed the rotis\' warmth getting out into the room. A wrapping slows heat moving both ways: into cold ice, and out of hot rotis.',
+    why: 'The cloth made no heat. It slowed the chapatis\' warmth getting out into the room. A wrapping slows heat moving both ways: into cold ice, and out of hot chapatis.',
     ring: [14, 78, 312, 156],
   },
   'thin-thick': {
@@ -278,15 +284,15 @@ const WRAP: Record<WrapScene, WrapSpec> = {
     ring: [16, 114, 312, 124],
   },
   shawl: {
-    place: 'courtyard', temp: 32, vessel: 'bowl', left: 'shawl', right: 'none', after: '2 hours later',
+    place: 'backyard', temp: 32, vessel: 'bowl', left: 'shawl', right: 'none', after: '2 hours later',
     leftLabel: 'Shawl bowl', rightLabel: 'Bare bowl', result: 'left',
     startAmount: 4, leftAfter: 2, rightAfter: 0,
-    prompt: "One bowl of ice in Dadi's woollen shawl. Which keeps more?",
-    name: "Two glass bowls of four ice cubes in the shade of a 32 degree courtyard in Jaipur. The left one is wrapped in Dadi's winter shawl.",
+    prompt: "One bowl of ice in Paati's woollen shawl. Which keeps more?",
+    name: "Two glass bowls of four ice cubes in the shade of the backyard patio cover on a 32 degree afternoon. The left one is wrapped in Paati's woollen shawl.",
     end: 'Two hours later the shawl bowl still has two cubes. The bare one holds only water.',
-    look: 'Dadi wears this shawl to keep warm. It is only wool, with no heater inside.',
+    look: 'Paati wraps up in this shawl on cool evenings here. It is only wool, with no heater inside.',
     rule: WRAP_RULE,
-    why: "Dadi's shawl feels warm because it holds her own body's heat in. It makes no heat itself. Round the bowl it slowed the courtyard's heat getting in, so the ice lasted longer.",
+    why: "Paati's shawl feels warm because it holds her own body's heat in. It makes no heat itself. Round the bowl it slowed the hot afternoon's heat getting in, so the ice lasted longer.",
     ring: [16, 114, 152, 124],
   },
 };
@@ -294,7 +300,7 @@ const WRAP: Record<WrapScene, WrapSpec> = {
 const ORDER: Record<Level, readonly (StateScene | WrapScene)[]> = {
   1: ['counter-ice', 'freezer-water', 'fridge-ice', 'counter-water', 'freezer-ice', 'fridge-water'],
   2: ['open-plate', 'closed-jar', 'idli-lid', 'puddle', 'cold-tumbler', 'washing'],
-  3: ['towel', 'freezer-towel', 'roti', 'thin-thick', 'shawl'],
+  3: ['towel', 'freezer-towel', 'chapati', 'thin-thick', 'shawl'],
 };
 
 export function generate(level: Level, index: number): Round {
@@ -321,7 +327,7 @@ function options(round: Round): ReadonlyArray<readonly [Exclude<Answer, null>, s
     case 'idli-lid':
       return [['water', 'Wet with drops'], ['dry', 'Dry']];
     case 'puddle':
-      return [['water', 'Still a puddle'], ['dry', 'Dry tiles']];
+      return [['water', 'Still a puddle'], ['dry', 'Dry patio']];
     case 'cold-tumbler':
       return [['water', 'Wet with drops'], ['dry', 'Stays dry']];
     case 'washing':
@@ -410,13 +416,21 @@ function Backdrop({ place, shade }: { readonly place: Place; readonly shade?: bo
           <rect x="0" y={FLOOR + 10} width="420" height={280 - FLOOR - 10} fill="#e8eeec" />
         </g>
       );
-    case 'courtyard':
+    case 'backyard':
+      // The Bay Area backyard: sky, the wooden fence, a strip of lawn, and the patio's paving stones underfoot.
       return (
         <g>
-          <rect x="0" y="0" width="420" height={FLOOR} fill="#eab792" />
-          <path d="M70 222 V120 Q70 70 120 70 H210 Q260 70 260 120 V222" fill="#d79a72" stroke="#b9764d" strokeWidth="3" />
+          <rect x="0" y="0" width="420" height={FLOOR} fill="#bfe3f5" />
           {shade ? null : <circle cx="292" cy="36" r="20" fill="#ffd34d" stroke="#e59a00" strokeWidth="3" />}
-          {tiles('#d8a27a', '#bf8460', FLOOR, 280, 29)}
+          <rect x="0" y="118" width="420" height={196 - 118} fill="#c99560" />
+          {Array.from({ length: 22 }, (_, i) => (
+            <line key={i} x1={i * 20} y1="118" x2={i * 20} y2="196" stroke="#a8743f" strokeWidth="2" />
+          ))}
+          <line x1="0" y1="118" x2="420" y2="118" stroke="#8a5a2b" strokeWidth="4" />
+          <line x1="0" y1="140" x2="420" y2="140" stroke="#a8743f" strokeWidth="3" />
+          <line x1="0" y1="178" x2="420" y2="178" stroke="#a8743f" strokeWidth="3" />
+          <rect x="0" y="196" width="420" height={FLOOR - 196} fill="#7cbf5a" />
+          {tiles('#d9d3c6', '#b3aa98', FLOOR, 280, 29)}
           <line x1="0" y1={FLOOR} x2="420" y2={FLOOR} stroke={INK} strokeWidth="3" />
           {shade ? (
             <g>
@@ -618,7 +632,7 @@ function Jar({ drops, empty }: { readonly drops: boolean; readonly empty?: boole
   );
 }
 
-/** A steel thali on the sill. Wet: a spill of water. Dry: a dashed line where the spill was. */
+/** A steel plate on the sill. Wet: a spill of water. Dry: a dashed line where the spill was. */
 function Plate({ wet }: { readonly wet: boolean }) {
   const x = ONE;
   return (
@@ -634,7 +648,7 @@ function Plate({ wet }: { readonly wet: boolean }) {
   );
 }
 
-/** A puddle on the courtyard tiles. Dry: a dashed line where it was. */
+/** A puddle on the patio paving. Dry: a dashed line where it was. */
 function Puddle({ wet }: { readonly wet: boolean }) {
   const x = ONE;
   const d = `M${x - 96} 250 q8 -18 48 -16 q30 -12 66 -2 q44 0 42 18 q-6 16 -54 14 q-30 8 -64 0 q-42 4 -38 -14 z`;
@@ -686,6 +700,7 @@ function Steamer({ open }: { readonly open: boolean }) {
       <g transform={`translate(0 ${open ? -60 : 0})`}>
         <Lid wet={open} />
       </g>
+      {/* Amma's arm in her teal kurta sleeve, lifting the lid by its knob. */}
       {open ? (
         <g>
           <line x1="440" y1="12" x2={x + 22} y2="56" stroke="#1f8a8a" strokeWidth="22" strokeLinecap="round" />
@@ -717,16 +732,20 @@ function Tumbler({ wet }: { readonly wet: boolean }) {
   );
 }
 
-/** Mummy's dupatta on the washing line. Wet: dark, heavy, dripping. Dry: paler and light. */
-function Dupatta({ wet }: { readonly wet: boolean }) {
-  const fill = wet ? '#8d1078' : '#e46fcb';
+/**
+ * Thatha's white veshti, green border at the hem, on the backyard washing line.
+ * Wet: grey, heavy, dripping. Dry: bright white and light.
+ */
+function Veshti({ wet }: { readonly wet: boolean }) {
+  const fill = wet ? '#aeb8be' : '#fbfaf3';
+  const border = '#2e8b57';
   return (
     <g>
       <rect x="84" y="62" width="8" height={FLOOR - 62} fill="#7a5230" stroke={INK} strokeWidth="2" />
       <rect x="240" y="62" width="8" height={FLOOR - 62} fill="#7a5230" stroke={INK} strokeWidth="2" />
       <path d="M88 70 Q166 82 244 70" fill="none" stroke={INK} strokeWidth="2.5" />
       <path d={`M110 76 Q166 86 222 76 L${wet ? 226 : 230} ${wet ? 194 : 176} Q166 ${wet ? 204 : 182} ${wet ? 106 : 102} ${wet ? 194 : 176} Z`} fill={fill} stroke={INK} strokeWidth="3" />
-      <path d={`M${wet ? 108 : 104} ${wet ? 184 : 166} Q166 ${wet ? 194 : 172} ${wet ? 224 : 228} ${wet ? 184 : 166}`} fill="none" stroke={GOLD} strokeWidth="5" />
+      <path d={`M${wet ? 108 : 104} ${wet ? 184 : 166} Q166 ${wet ? 194 : 172} ${wet ? 224 : 228} ${wet ? 184 : 166}`} fill="none" stroke={border} strokeWidth="5" />
       {[122, 166, 210].map((x) => (
         <rect key={x} x={x - 3} y="72" width="6" height="12" rx="2" fill="#f0d27a" stroke={INK} strokeWidth="1.5" />
       ))}
@@ -812,8 +831,8 @@ function CubeCount({ cx, n, of }: { readonly cx: number; readonly n: number; rea
   );
 }
 
-/** A stack of five rotis on a steel plate. */
-function Rotis({ cx }: { readonly cx: number }) {
+/** A stack of five chapatis on a steel plate. */
+function Chapatis({ cx }: { readonly cx: number }) {
   return (
     <g>
       <ellipse cx={cx} cy={FLOOR - 5} rx="62" ry="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
@@ -830,7 +849,7 @@ function Rotis({ cx }: { readonly cx: number }) {
 }
 
 /** The cotton cloth folded over the stack: a dome with a check pattern and a tucked corner. */
-function RotiCloth({ cx }: { readonly cx: number }) {
+function ChapatiCloth({ cx }: { readonly cx: number }) {
   const { fill, band } = CLOTH.cloth;
   return (
     <g>
@@ -847,7 +866,7 @@ function RotiCloth({ cx }: { readonly cx: number }) {
 }
 
 /**
- * A food thermometer pushed into a roti stack. The red column is how hot, on
+ * A food thermometer pushed into a chapati stack. The red column is how hot, on
  * one scale for both stacks, so the warmer stack is the taller column; the
  * number in the box beside it says the same. `plain` drops the number.
  */
@@ -879,11 +898,11 @@ function PairSide({ s, side, phase, guess }: { readonly s: WrapSpec; readonly si
   const cx = PAIR[side === 'left' ? 0 : 1];
   const wrap = side === 'left' ? s.left : s.right;
   const n = guess ?? (phase === 'before' ? s.startAmount : side === 'left' ? s.leftAfter : s.rightAfter);
-  if (s.vessel === 'roti') {
+  if (s.vessel === 'chapati') {
     return (
       <g>
-        <Rotis cx={cx} />
-        {wrap !== 'none' ? <RotiCloth cx={cx} /> : null}
+        <Chapatis cx={cx} />
+        {wrap !== 'none' ? <ChapatiCloth cx={cx} /> : null}
         <Probe cx={cx} deg={n} plain={guess !== undefined} />
       </g>
     );
@@ -933,7 +952,7 @@ function Thing({ vessel, state, after }: { readonly vessel: Vessel; readonly sta
     case 'tumbler':
       return <Tumbler wet={wet} />;
     case 'line':
-      return <Dupatta wet={wet} />;
+      return <Veshti wet={wet} />;
   }
 }
 
@@ -983,10 +1002,10 @@ const CROP: Record<Exclude<Vessel, 'steamer'>, Box> = {
   line: [72, 54, 188, 206],
 };
 const LID_CROP: Box = [90, 68, 150, 82];
-const ROTI_CROP: Box = [24, 80, 290, 150];
+const CHAPATI_CROP: Box = [24, 80, 290, 150];
 const MINI: Box = [0, 0, 120, 70];
 
-/** The steamer as Mummy lifts the lid: the pot's top, the lid held over it, wet or dry underneath. */
+/** The steamer as Amma lifts the lid: the pot's top, the lid held over it, wet or dry underneath. */
 function LiftedLid({ wet }: { readonly wet: boolean }) {
   return (
     <g transform="translate(0 -10)">
@@ -1045,8 +1064,8 @@ const PIC: CSSProperties = { display: 'block', background: '#fffaf0', borderRadi
 
 /**
  * An answer drawn as the outcome it predicts, with the board's own pieces in
- * the board's own place: the bowl of water, the dry tiles, the lid with drops
- * under it, the warmer roti stack's taller red column. `fit` is the largest
+ * the board's own place: the bowl of water, the dry patio, the lid with drops
+ * under it, the warmer chapati stack's taller red column. `fit` is the largest
  * width and height it may take.
  */
 function OutcomePic({ round, value, fit }: { readonly round: Round; readonly value: Exclude<Answer, null>; readonly fit: readonly [number, number] }) {
@@ -1063,9 +1082,9 @@ function OutcomePic({ round, value, fit }: { readonly round: Round; readonly val
     );
   } else {
     const s = WRAP[round.scene];
-    if (s.vessel === 'roti') {
+    if (s.vessel === 'chapati') {
       const deg = (side: 'left' | 'right') => (value === 'same' ? 48 : value === side ? 60 : 35);
-      vb = ROTI_CROP;
+      vb = CHAPATI_CROP;
       body = (
         <g>
           <Backdrop place={s.place} />
@@ -1189,15 +1208,15 @@ export const whereDidTheIceGo: InvestigateGame<Round, Answer> = {
   why: (round) => spec(round).why,
   cover: 'art/games/where-did-the-ice-go.png',
   note: {
-    what: 'Levels 1 and 2 show one thing in one place (ice on the counter, water in the freezer, a puddle in the sun) with a thermometer on the wall; level 3 shows two bowls of ice or two stacks of rotis, one wrapped. He taps what he thinks it will be later, then presses Try to see the later picture beside the first. The thermometer is in Celsius, so freezing is the heavy 0 line.',
+    what: 'Levels 1 and 2 show one thing in one place at home (ice on the kitchen counter, water in the freezer, a puddle on the backyard patio, Thatha\'s veshti on the line) with a thermometer beside it; level 3 shows two bowls of ice or two stacks of chapatis, one wrapped. He taps what he thinks it will be later, then presses Try to see the later picture beside the first. The thermometer is in Celsius, so freezing is the heavy 0 line.',
     expect: 'Level 1 is quick until the fridge: most children say the fridge freezes water, because it is cold. On level 2 expect "the puddle went into the ground" and "the steam is the water going up". On level 3 most five-year-olds pick the bare bowl, because a towel is what you use to get warm; the freezer round, where neither bowl melts, is the one that settles it.',
     practising: 'Water changes state at a temperature, not at "cold": it freezes below 0 °C and melts above it. Water vapour is invisible, and the white cloud over a pot is tiny liquid drops. A wrapping makes no heat; it slows heat moving, in either direction.',
     ask: "On the freezer round of level 3, after Try: 'Neither bowl melted. If the towel made heat, what would the wrapped bowl look like now?'",
     next: 'Do the towel test for real: two equal ice cubes in two matching small bowls on the counter, one wrapped in a thick towel. Check both every 20 minutes and compare. Then put a cold steel tumbler of ice water on the table and watch the outside fill with drops.',
-    honest: 'The after pictures are drawn models, not recordings: the cube counts and roti temperatures are typical, not measured. Getting these right shows he can predict from the 0 line and the wrapping; it does not show he understands heat as energy, or why vapour cannot be seen.',
-    easier: 'Stay on level 1 and run each one in your own kitchen: an ice cube on a saucer on the counter, one in the fridge, one in the freezer, checked together after an hour.',
-    harder: 'Ask him to choose a wrapping to keep a tiffin warm until lunch and to say what he would compare it against to test it fairly: same rotis, same box, only the wrapping changed.',
-    safety: 'Steam and boiling water scald: the idli steamer is opened by an adult, with the child standing back. Ice cubes are a choking risk for the two-year-old; give her a large frozen block in a bowl instead.',
+    honest: 'The after pictures are drawn models, not recordings: the cube counts and chapati temperatures are typical, not measured. Getting these right shows he can predict from the 0 line and the wrapping; it does not show he understands heat as energy, or why vapour cannot be seen.',
+    easier: 'Stay on level 1 and run each one in your own kitchen: an ice cube on a saucer on the counter, one in the fridge, one in the freezer, checked together after an hour. Amma can ask the title question in Tamil as you look: "Ice enga pochu?" (Where did the ice go?)',
+    harder: 'Ask him to choose a wrapping to keep the pongal in his steel tiffin warm until lunch, and to say what he would compare it against to test it fairly: same pongal, same tiffin, only the wrapping changed.',
+    safety: 'Steam and boiling water scald: only a grown-up opens the idli steamer, with Arjun and Mia standing back. Ice cubes are a choking risk for Mia at two; give her a large frozen block in a bowl instead.',
   },
 };
 

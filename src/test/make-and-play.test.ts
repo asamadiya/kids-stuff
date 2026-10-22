@@ -27,6 +27,7 @@ const EXCLUDED: ReadonlyArray<readonly [RegExp, string]> = [
   [/\b(swing|swinging|spin|spinning) (him|the child) (round )?by (the )?(wrists?|arms?|ankles?|legs?|hands?)/i, 'swinging by limbs'],
   [/\bbutton batter/i, 'button battery'],
   [/\bRikki\b/, 'the reader as a character'],
+  [/\b(Mummy|Papa|Dadi|Dada|Jaipur)\b/, 'the old household (this family is Amma/Nanna, Nanamma/Tatayya, Paati/Thatha)'],
 ];
 
 describe('Make & Do', () => {
@@ -85,8 +86,8 @@ describe('Play with Dad & Mom', () => {
   });
 
   it('pictures dads and mums about equally', () => {
-    const dad = IDEAS.filter((x) => x.cast.includes('Papa')).length;
-    const mum = IDEAS.filter((x) => x.cast.includes('Mummy')).length;
+    const dad = IDEAS.filter((x) => x.cast.includes('Nanna')).length;
+    const mum = IDEAS.filter((x) => x.cast.includes('Amma')).length;
     expect(Math.abs(dad - mum)).toBeLessThanOrEqual(8);
   });
 

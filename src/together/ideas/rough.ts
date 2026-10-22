@@ -33,11 +33,11 @@ export const IDEAS: readonly PlayIdea[] = [
       "He sets your handicap ('only your little finger'), says 'Ready, steady, push', and decides when the game ends. He can swap: he kneels holding the cushion with sofa cushions behind him, you push it with one finger from your knees, and he chooses when to topple.",
     mia: {
       way: 'apart',
-      text: 'Mia is with Mummy or another grown-up, in another room or on the sofa outside the play area, so he has you to himself. She gets her own gentle push turn later, not in the middle of his.',
+      text: 'Mia is with Amma or another grown-up, in another room or on the sofa outside the play area, so he has you to himself. She gets her own gentle push turn later, not in the middle of his.',
     },
     picture:
-      'Arjun, barefoot, leans in with both hands flat against a big orange sofa cushion, pushing, while Papa kneels on the living-room rug behind it, holding it with one hand and tipping slowly backwards with an exaggerated groaning face; the coffee table is pushed back against the wall of the sunny California living room.',
-    cast: ['Arjun', 'Papa'],
+      'Arjun, barefoot, leans in with both hands flat against a big orange sofa cushion, pushing, while Nanna kneels on the living-room rug behind it, holding it with one hand and tipping slowly backwards with an exaggerated groaning face; the coffee table is pushed back against the wall of the sunny living room of the Bay Area house, with the patio door and the backyard lawn beyond.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       {
         label: "Journal of Child and Family Studies (2018), StGeorge, Goodwin and Fletcher: Parents' Views of Father-Child Rough-and-Tumble Play (Newcastle University repository copy)",
@@ -81,17 +81,17 @@ export const IDEAS: readonly PlayIdea[] = [
       'Each of you puts one sock on the same foot. Kneel facing each other in the middle of the rug.',
       "On 'Go', each tries to pull the other's sock off while keeping their own on. Tug the sock by its toe, never his foot or leg. Stay on your knees.",
       "Say your handicap before a round: 'I'll keep one hand behind my back.' Win some, lose some, and make him work for each.",
-      'Play short rounds and check he still wants another. Finish with a handshake, a hug or a namaste, so the end of the game is clear.',
+      'Play short rounds and check he still wants another. Finish with a handshake, a hug or a namaskaram, so the end of the game is clear.',
     ],
     hisWay:
       "He chooses the handicap for you, invents a new rule ('you have to keep your sock foot tucked under you'), or decides it is best of three. He can also call a sock swap so you wrestle for the other foot.",
     mia: {
       way: 'apart',
-      text: 'Mia is with Papa or another grown-up in the kitchen or the garden while the two of you wrestle, outside the play area. If she wants a turn afterwards, she can pull a sock off that grown-up slowly on the sofa.',
+      text: 'Mia is with Nanna or another grown-up in the kitchen or the backyard while the two of you wrestle, outside the play area. If she wants a turn afterwards, she can pull a sock off that grown-up slowly on the sofa.',
     },
     picture:
-      "On the living-room rug, Arjun and Mummy kneel upright facing each other, an arm’s length apart, about to start: each has one long red-and-white striped sock pulled up over one shin. Mummy holds up one flat open hand like a policeman’s stop sign and Arjun copies her, both shouting the stop word together and grinning. Cushions are piled round the edge of the rug and the coffee table is pushed back against the wall.",
-    cast: ['Arjun', 'Mummy'],
+      "On the living-room rug of the Bay Area house, Arjun and Amma kneel upright facing each other, an arm’s length apart, about to start: each has one long red-and-white striped sock pulled up over one shin. Amma holds up one flat open hand like a policeman’s stop sign and Arjun copies her, both shouting the stop word together and grinning. Cushions are piled round the edge of the rug and the coffee table is pushed back against the wall beside the bookshelves.",
+    cast: ['Arjun', 'Amma'],
     sources: [
       {
         label: 'The Conversation (Emily Freeman, University of Newcastle): Kids learn valuable life skills through rough-and-tumble play with their dads',
@@ -140,17 +140,17 @@ export const IDEAS: readonly PlayIdea[] = [
       'Put the sock mango at the far side of the room. You are a slow, sleepy tiger on hands and knees, guarding it. Tigers may not enter the cave.',
       'He sneaks out, grabs the mango and runs for his cave. Crawl after him slowly, growling; sometimes pretend to doze so he can creep past.',
       'If you reach him before the cave, give a slow, loose hug from your knees and a soft growl. Open your arms the moment he wriggles; he always escapes.',
-      'Swap after a few raids: he is the tiger and you sneak for the mango on your knees. Finish with a namaste and a glass of water.',
+      'Swap after a few raids: he is the tiger and you sneak for the mango on your knees. Finish with a namaskaram and a steel tumbler of water.',
     ],
     hisWay:
       'He decides how fast the tiger may move (sleepy, slow, very slow), where the cave and the mango go, or adds a second mango. When he is the tiger, he decides what the tiger does when it reaches the thief: a roar, a sniff or a loose hug.',
     mia: {
       way: 'apart',
-      text: 'Mia is with Papa or another grown-up, so he has you to himself. She can watch from a lap on the sofa and growl along with her own soft toy, well away from the floor where the chase happens. She never comes down into the play area and is never chased; if she wriggles to get down, the grown-up takes her off to play somewhere else.',
+      text: 'Mia is with Nanna or another grown-up, so he has you to himself. She can watch from a lap on the sofa and growl along with her own soft toy, well away from the floor where the chase happens. She never comes down into the play area and is never chased; if she wriggles to get down, the grown-up takes her off to play somewhere else.',
     },
     picture:
-      'Arjun runs barefoot across the living-room rug towards a big orange floor cushion lying on the rug ahead of him on the left side of the picture, hugging a round yellow ball of rolled-up socks to his chest with both hands and grinning back over his shoulder. Behind him on the right, far from the cushion, Mummy crawls slowly on her hands and knees with a playful sleepy-tiger face, mouth open in a soft growl, one hand lifted off the rug like a paw. The furniture is pushed back against the walls of the sunny California living room. Mummy’s face is playful and smiling, a pretend-tiger grin, never cross or fierce.',
-    cast: ['Arjun', 'Mummy'],
+      'Arjun runs barefoot across the living-room rug towards a big orange floor cushion lying on the rug ahead of him on the left side of the picture, hugging a round yellow ball of rolled-up socks to his chest with both hands and grinning back over his shoulder. Behind him on the right, far from the cushion, Amma crawls slowly on her hands and knees with a playful sleepy-tiger face, mouth open in a soft growl, one hand lifted off the rug like a paw. The furniture is pushed back against the walls of the sunny living room of the Bay Area house. Amma’s face is playful and smiling, a pretend-tiger grin, never cross or fierce.',
+    cast: ['Arjun', 'Amma'],
     sources: [
       {
         label: "The Conversation (Emily Freeman, University of Newcastle): 'That's getting a bit wild, kids!' Why children love to play-fight",
@@ -167,7 +167,7 @@ export const IDEAS: readonly PlayIdea[] = [
       expect: 'He will probably tease the tiger, creeping close and squealing away, more than go straight for the mango. Many children want to be caught now and then, just to escape. If the growls are too fierce, the game turns scary quickly; start soft.',
       practising: 'Choosing his own small thrill: deciding when to dash, judging how close the tiger is, and coming back to a safe place he controls.',
       ask: "After an escape, if he stops to catch his breath: 'How did you know when to run?'",
-      next: 'Tell him an Indian folk tale with a tiger in it, such as The Tiger, the Brahmin and the Jackal, and let him decide whether the tiger was clever or foolish.',
+      next: 'Tell him an Indian folk tale with a tiger in it, such as The Tiger, the Brahmin and the Jackal, and let him decide whether the tiger was clever or foolish. Amma can start the growl in Tamil: "Naan oru puli!" (I am a tiger!)',
       honest: 'The research behind games like this is about rough-and-tumble play in general, not this game; it does not show that a slow chase builds courage. A tiger that is too fast or too frightening turns play into fear, and a wound-up child close to bedtime will not settle.',
       easier: 'Make the tiger very sleepy: it may only crawl while his back is turned, or must count to five before every move.',
       harder: 'Put two mangoes in different corners so he must choose which to go for, or give the tiger one quick pounce per raid.',
@@ -199,13 +199,13 @@ export const IDEAS: readonly PlayIdea[] = [
       "He chooses where the line goes, what counts as a touch (knee only, or both shoulders), and when to swap. He can set your raiding rule too: 'You have to raid with your hands on your head.'",
     mia: {
       way: 'apart',
-      text: "Mia is with Mummy or another grown-up, so he has you to himself. She can watch from a lap on the back step (or the sofa, indoors), chanting 'kabaddi' and clapping along. She never crosses the line or comes into the play area; if she wriggles to get down, the grown-up takes her off to play somewhere else.",
+      text: "Mia is with Amma or another grown-up, so he has you to himself. She can watch from a lap on the patio step (or the sofa, indoors), chanting 'kabaddi' and clapping along. She never crosses the line or comes into the play area; if she wriggles to get down, the grown-up takes her off to play somewhere else.",
     },
     picture:
-      "In the sunny back garden of the California home, a straight row of chappals lies on the lawn between Arjun and Papa as a dividing line. Arjun, mouth open mid-chant, leans across the row of chappals from his own side and touches Papa’s forearm with one open hand, his back foot still on his own side and already turning for home. Papa kneels on a flat cushion on the grass just past the chappals and reaches one open hand round to tap Arjun lightly on the back; his other hand rests on his knee.",
-    cast: ['Arjun', 'Papa'],
+      "In the sunny backyard of the Bay Area house, with the wooden fence and the raised vegetable beds behind, a straight row of chappals lies on the lawn between Arjun and Nanna as a dividing line. Arjun, mouth open mid-chant, leans across the row of chappals from his own side and touches Nanna’s forearm with one open hand, his back foot still on his own side and already turning for home. Nanna kneels on a flat cushion on the grass just past the chappals and reaches one open hand round to tap Arjun lightly on the back; his other hand rests on his knee.",
+    cast: ['Arjun', 'Nanna'],
     tradition:
-      "Kabaddi is played across India and at national level by boys and girls; it is also called Hu-tu-tu, Chedugudu (Andhra Pradesh), Sadugudu (Tamil Nadu) and Hadudu (Bengal). The real game is two teams of seven on a court: defenders he touches go out, and the defending team tries to hold the raider until his breath breaks. This is a two-person adaptation: one raider, one defender who stays on his knees and may only tap, never hold or tackle; nobody goes out, and you take turns. The one-breath chant is kept as it is.",
+      "Kabaddi is played across India and at national level by boys and girls; it is also called Hu-tu-tu, Chedugudu (Andhra Pradesh), Sadugudu (Tamil Nadu) and Hadudu (Bengal), so Nanna's family and Amma's family each have their own name for it. The real game is two teams of seven on a court: defenders he touches go out, and the defending team tries to hold the raider until his breath breaks. This is a two-person, tag-only adaptation: one raider, one defender who stays on his knees and may only tap, never hold or tackle; nobody goes out, nobody tests who can last longest on a breath, and you take turns. The one-breath chant is kept as it is.",
     sources: [
       {
         label: "D'Source, IDC IIT Bombay (Periwal and Poovaiah), Indian Games: Kabaddi",
@@ -216,17 +216,17 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://en.wikipedia.org/wiki/Kabaddi',
       },
     ],
-    tags: ['garden', 'outdoors', 'Indian games', 'kabaddi', 'rough play', 'breath', 'chant'],
+    tags: ['backyard', 'garden', 'outdoors', 'Indian games', 'kabaddi', 'chedugudu', 'sadugudu', 'rough play', 'breath', 'chant'],
     note: {
       what: "A two-person, kneeling version of kabaddi. He crosses a line chanting 'kabaddi' on one breath, touches you and gets home before the breath runs out; you stay on your knees and may only tap him lightly, never hold him.",
       expect: 'He will probably forget the chant the moment he reaches you, or sneak a breath mid-word. Expect him to argue about whether he breathed; a quick start-again settles it better than a ruling. At five, one breath of chanting may last only a few seconds.',
       practising: 'Keeping one thing going (the chant) while planning another (a touch and a quick way home), against a time limit set by his own breath.',
       ask: "After a raid where the giggles broke his chant: 'What happens to the kabaddi when you start laughing?'",
-      next: "Next time you speak to Dadi or Dada, ask them to tell him whether they played kabaddi as children, and what they called it.",
+      next: "On the next video calls, ask Tatayya whether he played chedugudu as a boy, and ask Paati what she called it; she may say sadugudu.",
       honest: 'This is not kabaddi as it is played: there are no teams, no court, no outs and no tackling, so he has not played the sport yet. A short breath at five is normal and says nothing about fitness or lungs.',
       easier: "Drop the breath rule: he raids saying 'kabaddi' as many times as he likes, and you keep your hands on your knees instead of tapping.",
-      harder: 'He must touch two places, such as your knee and your shoulder, on one breath. Or, out of curiosity, count together how many kabaddis fit into one of his breaths and one of yours.',
-      safety: "Outdoors, play on grass, not a hard patio; check it for sticks and sprinkler heads, and play away from the pool, the drive and the street. Indoors, clear a long strip of floor away from furniture corners, barefoot on smooth floors. You stay on your knees all game and only tap his arm or back with a light open hand. Never hold his hand or arm, so nothing pulls on his joints when he twists away, and never grab, tackle or pull him down. One ordinary breath only: no big puffing breaths first, no silent breath-holding, and stop at any dizziness. Keep raids short and check he still wants to play. Stop on 'Freeze', even if he is laughing. Mia stays off the play area with another adult.",
+      harder: 'He must touch two places, such as your knee and your shoulder, on one breath. Or he raids chanting “chedugudu” one round and “sadugudu” the next: Nanna’s word, then Amma’s.',
+      safety: "Outdoors, play on grass, not a hard patio; check it for sticks and sprinkler heads, and play away from the driveway, the street and any pool. Indoors, clear a long strip of floor away from furniture corners, barefoot on smooth floors. You stay on your knees all game and only tap his arm or back with a light open hand. Never hold his hand or arm, so nothing pulls on his joints when he twists away, and never grab, tackle or pull him down. One ordinary breath only: no big puffing breaths first, no silent breath-holding, and stop at any dizziness. Keep raids short and check he still wants to play. Stop on 'Freeze', even if he is laughing. Mia stays off the play area with another adult.",
     },
   },
 ];

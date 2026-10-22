@@ -199,7 +199,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     setup: {
       panel: `${P}-dino-setup`,
-      alt: 'Leo kneeling on a rug beside a half-built toy dinosaur, with Mia reaching one hand onto its tail.',
+      alt: 'Arjun kneeling on the living-room rug beside a half-built toy dinosaur, with Mia reaching one hand onto its tail.',
       says: 'Mia has her hand on the dinosaur you are still building.',
       at: 'here',
     },
@@ -209,24 +209,24 @@ export const SCENARIOS: readonly Scenario[] = [
     lines: {
       'n-my-turn': 'I am using it right now.',
       'a-give-back': 'Please give me that piece.',
-      'x-get-adult': 'If you do not, I will get Dad.',
+      'x-get-adult': 'If you do not, I will get Nanna.',
     },
     yieldsAt: 5,
     stops: {
       panel: `${P}-dino-stops`,
-      alt: 'Mia sitting back on her heels with both hands in her lap while Leo holds a loose dinosaur piece.',
+      alt: 'Mia sitting back on her heels with both hands in her lap while Arjun holds a loose dinosaur piece.',
       says: 'She let go. One piece came off in her hand and you put it back on.',
       at: 'here',
     },
     goesOn: {
       panel: `${P}-dino-goes-on`,
-      alt: 'Mia pulling at the toy dinosaur with both hands as two pieces fall onto the rug beside Leo.',
+      alt: 'Mia pulling at the toy dinosaur with both hands as two pieces fall onto the rug beside Arjun.',
       says: 'She did not let go. She pulled, and two pieces came off onto the rug.',
       at: 'here',
     },
     left: {
       panel: `${P}-dino-left`,
-      alt: 'Leo walking to the low table by the window carrying a tray of pieces, while Mia stays on the rug holding one up, toy dinosaurs around her.',
+      alt: 'Arjun walking to the low table by the window carrying a tray of pieces, while Mia stays on the rug holding one up, toy dinosaurs around her.',
       says: 'You carried the pieces over to the low table. Mia stayed on the rug with a dinosaur and kept one of your pieces.',
       at: 'away',
     },
@@ -241,7 +241,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     setup: {
       panel: `${P}-controller-setup`,
-      alt: "Leo on a sofa with empty hands while another boy beside him holds the game controller and looks at the screen.",
+      alt: "Arjun on Sam's sofa with empty hands while Sam beside him holds the game controller and looks at the screen.",
       says: 'Sam has taken the controller while your turn is still going.',
       at: 'here',
     },
@@ -251,24 +251,24 @@ export const SCENARIOS: readonly Scenario[] = [
     lines: {
       'n-mine': 'That is my controller.',
       'n-unfinished': 'My turn is not finished.',
-      'x-get-adult': 'If you do not, I will ask your mum.',
+      'x-get-adult': 'If you do not, I will ask your mom.',
     },
     yieldsAt: 5,
     stops: {
       panel: `${P}-controller-stops`,
-      alt: 'Sam holding out the controller to Leo with both hands, then sitting back with his arms folded.',
+      alt: 'Sam holding out the controller to Arjun with both hands, then sitting back with his arms folded.',
       says: 'He gave the controller back. He watched the rest of your turn without saying anything.',
       at: 'here',
     },
     goesOn: {
       panel: `${P}-controller-goes-on`,
-      alt: 'Sam leaning forward playing the game while Leo sits beside him watching the screen with empty hands.',
+      alt: 'Sam leaning forward playing the game while Arjun sits beside him watching the screen with empty hands.',
       says: 'He kept playing. Your turn ended while he was holding it.',
       at: 'here',
     },
     left: {
       panel: `${P}-controller-left`,
-      alt: 'Leo standing at the fish tank on a chest of drawers, watching the fish, while Sam stays on the sofa in the next room with the controller.',
+      alt: 'Arjun standing at the fish tank on a chest of drawers, watching the fish, while Sam stays on the sofa in the next room with the controller.',
       says: 'You put your hands down and went to the fish tank. Sam played on without you.',
       at: 'away',
     },
@@ -283,7 +283,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     setup: {
       panel: `${P}-tease-setup`,
-      alt: 'Two children at a low outdoor table laughing and pointing at the dinosaur lunchbox in front of Leo.',
+      alt: 'Two children at a low outdoor table laughing and pointing at the dinosaur lunchbox in front of Arjun.',
       says: 'Two children are laughing about your dinosaur lunchbox. It does have a dinosaur on it.',
       at: 'here',
     },
@@ -303,19 +303,19 @@ export const SCENARIOS: readonly Scenario[] = [
     yieldsAt: 6,
     stops: {
       panel: `${P}-tease-stops`,
-      alt: 'The two children turning back to their own food at the table while Leo opens his lunchbox.',
+      alt: 'The two children turning back to their own food at the table while Arjun opens his lunchbox.',
       says: 'They stopped. One of them said her lunchbox had a horse on it last year.',
       at: 'here',
     },
     goesOn: {
       panel: `${P}-tease-goes-on`,
-      alt: 'The two children leaning towards each other laughing louder while Leo sits still with his lunchbox closed.',
+      alt: 'The two children leaning towards each other laughing louder while Arjun sits still with his lunchbox closed.',
       says: 'They said it again, louder, and one of them copied your voice.',
       at: 'here',
     },
     left: {
       panel: `${P}-tease-left`,
-      alt: 'Leo walking away across the yard towards the climbing frame carrying his lunchbox, the two children still at the table behind him.',
+      alt: 'Arjun walking away across the yard towards the climbing frame carrying his lunchbox, the two children still at the table behind him.',
       says: 'You carried your lunchbox to the climbing frame. They went on talking at the table without you.',
       at: 'away',
     },
@@ -330,7 +330,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     setup: {
       panel: `${P}-swap-setup`,
-      alt: 'A boy sitting cross-legged on the classroom floor holding out a card on an open hand towards Leo, who sits facing him holding his own card.',
+      alt: 'Ben sitting cross-legged on the classroom floor holding out a card on an open hand towards Arjun, who sits facing him holding his own card.',
       says: 'Ben wants to swap. He is holding out his card with his hand open, waiting.',
       at: 'here',
     },
@@ -355,7 +355,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     goesOn: {
       panel: `${P}-swap-goes-on`,
-      alt: "Ben leaning closer with his hand out over Leo's card while Leo keeps one hand on it.",
+      alt: "Ben leaning closer with his hand out over Arjun's card while Arjun keeps one hand on it.",
       says: 'He asked four more times, and then picked your card up off the carpet to look at it.',
       at: 'here',
     },
@@ -364,14 +364,14 @@ export const SCENARIOS: readonly Scenario[] = [
       // The plate shows him on the bench looking at his card, at ease, with the
       // others a few steps off. It does not show him alone or unhappy, and the
       // alt no longer says it does.
-      alt: 'Leo sitting cross-legged on the bench in the book corner beside a basket of books, looking at the card in his hands, with children on the rug behind him holding a card between them.',
+      alt: 'Arjun sitting cross-legged on the bench in the book corner beside a basket of books, looking at the card in his hands, with children on the rug behind him holding a card between them.',
       says: 'You took your card over to the book corner and looked at it there. The others carried on swapping on the rug.',
       at: 'away',
     },
   },
   {
     id: 'baby-voice',
-    where: 'At the market on Saturday',
+    where: 'At the farmers’ market on Saturday',
     awayTo: {
       id: 'apples',
       label: 'the apples',
@@ -379,7 +379,7 @@ export const SCENARIOS: readonly Scenario[] = [
     },
     setup: {
       panel: `${P}-baby-voice-setup`,
-      alt: 'A grown-up bending down close to Leo at a market stall, hands on knees, speaking to him while a parent stands behind.',
+      alt: 'A grown-up bending down close to Arjun at a farmers’ market stall, hands on knees, speaking to him while Amma stands behind with the shopping bag and Mia looks up beside him.',
       says: 'A grown-up you have met twice is bending down and talking to you in a baby voice.',
       at: 'here',
     },
@@ -390,7 +390,7 @@ export const SCENARIOS: readonly Scenario[] = [
       'n-true': 'I am five.',
       'n-not-true': 'I am not a baby.',
       'a-wait': 'Please wait until I have finished talking.',
-      'x-get-adult': 'If you do not, I will ask my parent to tell you.',
+      'x-get-adult': 'If you do not, I will ask my mom to tell you.',
       'x-done': 'I am finished talking now.',
     },
     weights: { 'n-true': 2 },
@@ -398,20 +398,20 @@ export const SCENARIOS: readonly Scenario[] = [
     yieldsAt: 7,
     stops: {
       panel: `${P}-baby-voice-stops`,
-      alt: 'The grown-up standing up straight and speaking to Leo at normal height while the parent watches.',
+      alt: 'The grown-up standing up straight and speaking to Arjun at normal height while Amma watches.',
       says: 'She stood up straight and asked about your morning in her ordinary voice.',
       at: 'here',
     },
     goesOn: {
       panel: `${P}-baby-voice-goes-on`,
-      alt: 'The grown-up smiling past Leo at his parent and bending down towards him again.',
-      says: 'She smiled at your parent over your head and did the voice again.',
+      alt: 'The grown-up smiling past Arjun at Amma and bending down towards him again.',
+      says: 'She smiled at Amma over your head and did the voice again.',
       at: 'here',
     },
     left: {
       panel: `${P}-baby-voice-left`,
-      alt: 'Leo standing at the crate of the apples with a parent’s hand on his shoulder, turning one over in his hands while the market goes on around them.',
-      says: 'You went and stood by the apples with your parent and turned one over until she had gone.',
+      alt: 'Arjun standing at the crate of the apples with Amma’s hand on his shoulder, turning one over in his hands while the market goes on around them.',
+      says: 'You went and stood by the apples with Amma and turned one over until the grown-up had gone.',
       at: 'away',
     },
   },

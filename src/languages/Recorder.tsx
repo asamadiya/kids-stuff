@@ -1,0 +1,223 @@
+import { useEffect, useRef, useState } from 'react';
+import type { Lang } from './types';
+import { LANG_NAME } from './types';
+import { clipKey, deleteClip, getClip, isCurrent, onVoicesChange, recordingType, saveClip, voicesChanged } from './voices';
+
+/**
+ * The grown-up's recorder for one line in one language (advisor q8 ruling E):
+ * record, listen back, then Save explicitly. Saving over an existing
+ * recording asks first, and the old one is kept until the new one is saved.
+ * Only shown on the adult recording screen, never on a child screen.
+ *
+ * The microphone is released whenever this recorder goes away: leaving the
+ * page, switching language (each line's recorder is keyed by language), the
+ * page being hidden, a recorder error, or a permission prompt answered after
+ * the grown-up has already left. Only one line records at a time; starting
+ * another finishes this one.
+ */
+
+/**
+ * The one line on the page that is recording or waiting for the microphone,
+ * and how to stop it. Owned by a per-recorder token, not a function, because
+ * a recorder's functions are recreated on every render.
+ */
+let active: { readonly owner: object; readonly stop: () => void } | null = null;
+
+export function Recorder({ id, lang, who, script, text }: { readonly id: string; readonly lang: Lang; readonly who: string; readonly script: string; readonly text: string }) {
+  const key = clipKey(id, lang);
+  /** 'old': a recording exists but was made from words this line no longer has. */
+  const [have, setHave] = useState<'none' | 'old' | 'yes'>('none');
+  const [state, setState] = useState<'idle' | 'asking' | 'recording' | 'review' | 'error'>('idle');
+  const [take, setTake] = useState<{ blob: Blob; url: string } | null>(null);
+  const [error, setError] = useState('');
+  const rec = useRef<MediaRecorder | null>(null);
+  const stream = useRef<MediaStream | null>(null);
+  const chunks = useRef<Blob[]>([]);
+  /** Bumped on every start and on teardown, so a late permission answer knows it is stale. */
+  const attempt = useRef(0);
+  const mounted = useRef(true);
+  const me = useRef({}).current;
+  const claim = (stop: () => void) => {
+    active = { owner: me, stop };
+  };
+  const unclaim = () => {
+    if (active?.owner === me) active = null;
+  };
+
+  const release = () => {
+    stream.current?.getTracks().forEach((t) => t.stop());
+    stream.current = null;
+  };
+  /** Finish the take normally: Stop pressed, or another line started. */
+  const stopThis = () => {
+    if (rec.current && rec.current.state !== 'inactive') rec.current.stop();
+    else release();
+  };
+  /** Stop and drop the take: the recorder is going away. */
+  const teardown = () => {
+    attempt.current += 1;
+    const r = rec.current;
+    rec.current = null;
+    if (r) {
+      r.ondataavailable = null;
+      r.onstop = null;
+      r.onerror = null;
+      if (r.state !== 'inactive') r.stop();
+    }
+    release();
+    unclaim();
+  };
+
+  useEffect(() => {
+    const refresh = () => {
+      getClip(key)
+        .then((c) => mounted.current && setHave(!c ? 'none' : isCurrent(c, script) ? 'yes' : 'old'))
+        .catch(() => mounted.current && setHave('none'));
+    };
+    refresh();
+    return onVoicesChange(refresh);
+  }, [key, script]);
+
+  useEffect(() => {
+    mounted.current = true;
+    const hide = () => teardown();
+    window.addEventListener('pagehide', hide);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener('pagehide', hide);
+      teardown();
+    };
+    // teardown reads refs only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => () => (take ? URL.revokeObjectURL(take.url) : undefined), [take]);
+
+  /** Another line started while this one was still waiting for the microphone: drop the wait. */
+  const cancelAsk = () => {
+    attempt.current += 1;
+    unclaim();
+    if (mounted.current) setState('idle');
+  };
+
+  const start = async () => {
+    if (state === 'asking' || state === 'recording') return;
+    active?.stop();
+    setError('');
+    setState('asking');
+    const mine = ++attempt.current;
+    // Claim the one live slot now, not when permission arrives, so two lines
+    // waiting on the same prompt cannot both start recording.
+    claim(cancelAsk);
+    let s: MediaStream;
+    try {
+      s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      if (!mounted.current || mine !== attempt.current) return;
+      unclaim();
+      setError(e instanceof Error && e.name === 'NotAllowedError' ? 'The microphone was not allowed. Allow it in the browser settings and try again.' : 'This browser could not record.');
+      setState('error');
+      return;
+    }
+    if (!mounted.current || mine !== attempt.current) {
+      s.getTracks().forEach((t) => t.stop());
+      return;
+    }
+    stream.current = s;
+    try {
+      const type = recordingType();
+      const r = new MediaRecorder(s, type ? { mimeType: type } : undefined);
+      chunks.current = [];
+      r.ondataavailable = (e) => {
+        if (e.data.size) chunks.current.push(e.data);
+      };
+      r.onstop = () => {
+        release();
+        rec.current = null;
+        unclaim();
+        if (!mounted.current) return;
+        const blob = new Blob(chunks.current, { type: r.mimeType || type || 'audio/webm' });
+        setTake({ blob, url: URL.createObjectURL(blob) });
+        setState('review');
+      };
+      r.onerror = () => {
+        teardown();
+        if (!mounted.current) return;
+        setError('The recording stopped because of a browser error. Try again.');
+        setState('error');
+      };
+      rec.current = r;
+      claim(stopThis);
+      r.start();
+      setState('recording');
+    } catch {
+      teardown();
+      setError('This browser could not record.');
+      setState('error');
+    }
+  };
+
+  const save = async () => {
+    if (!take) return;
+    if (have === 'yes' && !window.confirm(`Replace the saved ${LANG_NAME[lang]} recording of “${text}”?`)) return;
+    try {
+      await saveClip({ key, blob: take.blob, type: take.blob.type, who: who.trim() || 'Grown-up', at: Date.now(), script });
+    } catch {
+      setError('The recording could not be saved. The browser may be out of space, or storage may be blocked. Your take is still here.');
+      return;
+    }
+    setError('');
+    setHave('yes');
+    setTake(null);
+    setState('idle');
+    voicesChanged();
+  };
+
+  const remove = async () => {
+    if (!window.confirm(`Delete the ${LANG_NAME[lang]} recording of “${text}”?`)) return;
+    try {
+      await deleteClip(key);
+    } catch {
+      setError('The recording could not be deleted. Try again.');
+      return;
+    }
+    setError('');
+    setHave('none');
+    voicesChanged();
+  };
+
+  return (
+    <div className={`recorder recorder--${state}`}>
+      {state === 'recording' ? (
+        <button type="button" className="btn btn--rec" onClick={stopThis}>
+          <span className="recorder__dot" aria-hidden="true" /> Stop
+        </button>
+      ) : state === 'asking' ? (
+        <span className="recorder__status">Waiting for the microphone…</span>
+      ) : state === 'review' && take ? (
+        <>
+          <audio src={take.url} controls className="recorder__preview" />
+          <button type="button" className="btn btn--primary" onClick={() => void save()}>
+            Save
+          </button>
+          <button type="button" className="btn" onClick={() => { setTake(null); setState('idle'); setError(''); }}>
+            Discard
+          </button>
+        </>
+      ) : (
+        <>
+          <button type="button" className="btn" onClick={() => void start()}>
+            <span className="recorder__dot" aria-hidden="true" /> {have === 'none' ? 'Record' : 'Record again'}
+          </button>
+          {have !== 'none' ? (
+            <button type="button" className="btn btn--quiet" onClick={() => void remove()}>
+              Delete
+            </button>
+          ) : null}
+          <span className="recorder__status">{have === 'yes' ? 'Saved' : have === 'old' ? 'The words changed since this was recorded; record it again' : 'Not recorded yet'}</span>
+        </>
+      )}
+      {error ? <p className="recorder__error" role="alert">{error}</p> : null}
+    </div>
+  );
+}

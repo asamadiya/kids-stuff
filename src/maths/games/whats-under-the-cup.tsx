@@ -5,10 +5,11 @@ import { Stepper } from '../../play/parts';
  * What's Under the Cup? — maths game 3 (advisor catalogue).
  *
  * Concept (charter, maths 2): parts combine, and subtraction reverses
- * addition. The board is two fixed pictures of one woven mat. "Before" holds
- * every mango Dadi put down; "Now" holds the same mangoes after her brass cup
- * covers some. Nothing is taken away, so the whole and the visible part fix
- * the hidden part: 4 + ? = 6, which is 6 − 4.
+ * addition. The board is two fixed pictures of Paati's woven grass mat, out
+ * on the patio. "Before" holds every mango Paati put down; "Now" holds the
+ * same mangoes after her brass cup covers some. Nothing is taken away, so
+ * the whole and the visible part fix the hidden part: 4 + ? = 6, which is
+ * 6 − 4.
  *
  * Levels:
  *  1. Wholes of 4 to 6, drawn in the Before row. He can still match one to one.
@@ -36,7 +37,7 @@ import { Stepper } from '../../play/parts';
  */
 
 export interface Round {
-  /** Every mango Dadi put down. */
+  /** Every mango Paati put down. */
   readonly whole: number;
   /** How many the cup covers. Always at least 1. */
   readonly hidden: number;
@@ -129,7 +130,7 @@ function Mango({ x, y, s = 1, look = 'ripe' }: { x: number; y: number; s?: numbe
   );
 }
 
-/** A woven chatai mat. */
+/** Paati's woven korai grass mat, spread on the patio. */
 function Mat({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
   return (
     <g>
@@ -142,7 +143,7 @@ function Mat({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
 }
 
 /**
- * Dadi's brass cup, mouth down, its mouth centred on (x, y). Lifted, it
+ * Paati's brass cup, mouth down, its mouth centred on (x, y). Lifted, it
  * hangs 140 above the mat, tipped, so what it covered shows underneath.
  */
 function Cup({ x, y, lifted }: { x: number; y: number; lifted: boolean }) {
@@ -250,7 +251,7 @@ function Frames({ n, guess = 0, least = 1, x, top }: { n: number; guess?: number
   );
 }
 
-/** A small school slate (pati) with the whole chalked on it, over the mangoes it counts. */
+/** A small school slate with the whole chalked on it, over the mangoes it counts. */
 function Slate({ n, cx, cy }: { n: number; cx: number; cy: number }) {
   return (
     <g>
@@ -420,7 +421,7 @@ export const whatsUnderTheCup: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'whats-under-the-cup',
   title: "What's Under the Cup?",
-  hook: "Dadi's brass cup hides some mangoes.",
+  hook: "Paati's brass cup hides some mangoes.",
   group: 'together',
   levels: ['Up to six', 'Up to ten', 'Up to thirty'],
   generate,
@@ -431,15 +432,15 @@ export const whatsUnderTheCup: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/whats-under-the-cup.png',
   note: {
-    what: "Two pictures of the same mat. Before shows every mango Dadi put down; Now shows some of them and her brass cup turned over the rest. He sets how many are under the cup with the two big buttons; each press draws or removes one dashed mango on Now, after the real ones.",
+    what: "Two pictures of the same grass mat on the patio. Before shows every mango Paati put down; Now shows some of them and her brass cup turned over the rest. He sets how many are under the cup with the two big buttons; each press draws or removes one dashed mango on Now, after the real ones.",
     expect: "At level 1 he will pair each mango in Before with one in Now and count the ones left without a partner. At level 2 the rows are long enough that pairing slips, and some children answer with the whole. At level 3 both mats are ten-frames, with the total also chalked on a slate, and every round crosses a ten (16 on the mat, 22 in all); counting on in ones from 16 to 22 is where he usually loses his place, and filling the empty squares frame by frame is the way through.",
     practising: "Part and whole: the mangoes on the mat plus the hidden ones make all of them, so the hidden part is the whole minus the part you can see. Subtraction as finding a missing part, not only taking away. At level 3, going through the next ten: 16 + 4 = 20, then 2 more.",
-    ask: "Before he presses Check, point at the cup: 'Did Dadi take any mangoes away? Then where are the rest?'",
-    next: "Count 7 dried beans onto a plate together, then cover some with a steel katori while he looks away. He says how many are hidden and lifts it to see. Then he hides and you answer, and he checks you.",
+    ask: "Before he presses Check, point at the cup: 'Did Paati take any mangoes away? Then where are the rest?' Amma can ask the first part in Tamil: 'Paati edhavadhu eduthaangala?' (did Paati take anything?).",
+    next: "Count 7 dried beans onto a steel plate together, then cover some with an upturned steel tumbler while he looks away. He says how many are hidden and lifts it to see. Then he hides and you answer, and he checks you.",
     honest: "Getting these right does not show he can do 9 − 4 or 4 + ? = 9 written on paper. After a round, write both forms down and ask which one the cup was.",
     easier: "Stay on level 1, and ask him to touch each mango in Before and find its partner in Now before he uses the buttons.",
     harder: "On level 3, ask for the number before he touches the buttons, and ask how he got from the ten-frames to the slate's number.",
-    safety: "Dried beans are a choking hazard for his 2-year-old sister: do the katori game at a table she cannot reach and count the beans back into the tin.",
+    safety: "Dried beans are a choking hazard for his 2-year-old sister: do the tumbler game at a table she cannot reach and count the beans back into the tin.",
   },
 };
 

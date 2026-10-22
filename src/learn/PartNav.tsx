@@ -22,7 +22,12 @@ export function PartNav({ current }: { readonly current: Part | 'home' | null })
           aria-current={current === p.id ? 'page' : undefined}
         >
           <span className="partnav__dot" aria-hidden="true" />
-          {p.id === 'together' ? (
+          {p.id === 'langs' ? (
+            <>
+              <span className="partnav__long">{p.name}</span>
+              <span className="partnav__short">Telugu & Tamil</span>
+            </>
+          ) : p.id === 'together' ? (
             <>
               <span className="partnav__long">{p.name}</span>
               <span className="partnav__short">Play Together</span>

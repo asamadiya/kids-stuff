@@ -10,6 +10,8 @@ import { MATHS_GAMES, mathsGame } from '../maths/registry';
 import { SCIENCE_GAMES, scienceGame } from '../science/registry';
 import { ACTIVITIES } from '../make/activities';
 import { IDEAS } from '../together';
+import { LANG_BOOKS, MOMENTS, RHYMES } from '../languages';
+import { LangBookPage, LangGuide, LangsHub, MomentPage, RecordPage, RhymePage, WordsPage } from '../languages/screens';
 import { GameShell } from '../play/GameShell';
 import { Home, LibraryPage, MakeHub, MathsHub, ScienceHub, ShelfPage, Stories, SubjectPage, markRead } from './screens';
 import { ActivityPage } from './ActivityPage';
@@ -42,13 +44,16 @@ export function knownRoutes(): Known {
     science: new Set(SCIENCE_GAMES.map((g) => g.id)),
     activities: new Set(ACTIVITIES.map((a) => a.id)),
     ideas: new Set(IDEAS.map((x) => x.id)),
+    moments: new Set(MOMENTS.map((x) => x.id)),
+    rhymes: new Set(RHYMES.map((x) => x.id)),
+    langBooks: new Map(LANG_BOOKS.map((x) => [x.id, x.pages.length])),
   };
 }
 
 const shelfOf = (slug: string) => getBook(slug)?.shelf;
 
 /** Screens that are lists of things to open: these remember their scroll position. */
-const LISTINGS: ReadonlySet<Route['kind']> = new Set(['home', 'stories', 'shelf', 'library', 'subject', 'maths', 'science', 'make', 'together', 'all']);
+const LISTINGS: ReadonlySet<Route['kind']> = new Set(['home', 'stories', 'shelf', 'library', 'subject', 'maths', 'science', 'make', 'together', 'all', 'langs', 'langWords']);
 
 export function LearningCenter() {
   const known = useMemo(knownRoutes, []);
@@ -238,6 +243,20 @@ function render(route: Route, go: (r: Route) => void) {
       return <IdeaPage id={route.id} back={backFor(route)} />;
     case 'all':
       return <Everything />;
+    case 'langs':
+      return <LangsHub />;
+    case 'langMoment':
+      return <MomentPage id={route.id} back={backFor(route)} />;
+    case 'langRhyme':
+      return <RhymePage id={route.id} back={backFor(route)} />;
+    case 'langBook':
+      return <LangBookPage id={route.id} page={route.page} back={backFor(route)} onPage={(p) => go({ kind: 'langBook', id: route.id, page: p })} />;
+    case 'langWords':
+      return <WordsPage />;
+    case 'langGuide':
+      return <LangGuide />;
+    case 'langRecord':
+      return <RecordPage />;
   }
 }
 

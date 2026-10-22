@@ -33,8 +33,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia is with the other grown-up in another room, or asleep. This is his time alone with you. She can have a Special Time of her own another day, and the grown-ups can swap children.',
     },
     picture:
-      'On the living-room carpet of the California home, Arjun points to the exact spot where the next block must go on his tall, wobbly tower, while Papa, sitting cross-legged beside him, holds out a wooden block on his open palm. A round kitchen timer sits on the carpet between them.',
-    cast: ['Arjun', 'Papa'],
+      'On the living-room rug of the Bay Area house, Arjun points to the exact spot where the next block must go on his tall, wobbly tower, while Nanna, sitting cross-legged beside him, holds out a wooden block on his open palm. A round kitchen timer sits on the rug between them.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'Hand in Hand Parenting: Five Tools That Can Transform Your Parenting (Special Time)', url: 'https://www.handinhandparenting.org/2016/08/five-tools-that-can-transform-your-parenting/' },
       { label: 'The Conversation (Whitington, University of South Australia): "Mum, can you play with me?" Let them make the rules', url: 'https://theconversation.com/mum-can-you-play-with-me-its-important-to-play-with-your-kids-but-let-them-make-the-rules-213748' },
@@ -47,7 +47,7 @@ export const IDEAS: readonly PlayIdea[] = [
         'The first few times he may test it: ask for something big, change his mind often, or protest when the timer rings. Some children choose games where they hold the power and you are the clumsy one; that is common and fine.',
       practising:
         'Leading: making choices and having a grown-up go along with them. For you, it is practice in following without steering.',
-      ask: 'Only near the end, if it fits: "What shall we play next Special Time?" Then remember his answer.',
+      ask: 'Only near the end, if it fits: "What shall we play next Special Time?" Then remember his answer. Nanna can ask it in Telugu: "Vacche saari em aadukundaam?" (What shall we play next time?)',
       next: 'Do it again soon, at about the same time of day, so he can count on it. A short time most days is easier to keep up than a long one now and then.',
       honest:
         'Ten minutes will not fix a hard week, and some days he will spend it on something that looks like nothing. It is easy to slip into teaching or tidying without noticing; if you catch yourself, just go back to following.',
@@ -55,7 +55,7 @@ export const IDEAS: readonly PlayIdea[] = [
       harder:
         'The harder part is yours: twenty minutes with no instructions and no questions, only describing what he does. Or try it outdoors, where he chooses the route and you follow.',
       safety:
-        'You stay with him the whole time. Outdoors, you pick the space (the garden, or a park well away from the road) and he chooses everything inside it. If he chooses something unsafe, offer two safe choices rather than a lecture. If he chooses rough play, agree "Freeze" as the stop word first, rehearse it once, and use the rough-and-tumble rules.',
+        'You stay with him the whole time. Outdoors, you pick the space (the backyard, or a park well away from the road) and he chooses everything inside it. If he chooses something unsafe, offer two safe choices rather than a lecture. If he chooses rough play, agree "Freeze" as the stop word first, rehearse it once, and use the rough-and-tumble rules.',
     },
   },
   {
@@ -71,25 +71,25 @@ export const IDEAS: readonly PlayIdea[] = [
     players: 'You, him and Mia',
     need: ['a notebook and a pencil'],
     steps: [
-      'Sit together with the notebook. Start with one sentence: "One morning in Jaipur, a monkey found a red umbrella."',
+      'Sit together with the notebook. Start with one sentence: "One morning by the lemon tree, a squirrel found a red umbrella."',
       'He adds the next sentence, then you. If Mia is playing, she adds a word or a sound. Write each line down as it is said.',
       'Go round five or six times. Do not correct his plot; if the story wanders off, follow it.',
       'At bedtime, read the whole story back to him from the notebook. He can draw a picture for it the next day.',
     ],
     hisWay:
-      'He can choose who starts, set a rule (every line must have an animal in it, or it all happens in Dadi\'s courtyard), switch to Hindi, or decide when the story ends.',
+      'He can choose who starts, set a rule (every line must have an animal in it, or it all happens on the plane to Hyderabad), switch to Tamil with Amma or Telugu with Nanna, or decide when the story ends.',
     mia: {
       way: 'joins',
       text: 'Ask him first whether Mia gets a turn. If so, she adds one word or a sound: a roar, a splash, "ball!". Whatever she says goes into the story, and he decides how it fits.',
     },
     picture:
-      'Mummy writes in an open notebook resting on her knee, holding a pencil in her right hand and steadying the notebook with her left, on the sofa in the California living room in the evening. Arjun sits on one side of her and spreads both arms wide, hands open, as he tells the next line of the family story. Mia is tucked against Mummy’s other side, away from the notebook, with no pencil in her hands. She swings one straight arm out in front of her chest, pretending her arm is an elephant’s trunk, and her mouth is open in a loud trumpeting call. Her face is an ordinary toddler’s face.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'Amma writes in an open notebook resting on her knee, holding a pencil in her right hand and steadying the notebook with her left, on the sofa in the living room of the Bay Area house in the evening. Arjun sits on one side of her and spreads both arms wide, hands open, as he tells the next line of the family story. Mia is tucked against Amma’s other side, away from the notebook, with no pencil in her hands. She swings one straight arm out in front of her chest, pretending her arm is an elephant’s trunk, and her mouth is open in a loud trumpeting call. Her face is an ordinary toddler’s face. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       { label: 'Harvard Center on the Developing Child: Executive Function Activities for 3- to 5-year-olds (group stories)', url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-3-to-5-year-olds.pdf' },
       { label: 'UNICEF Parenting: Screen-free activities for children (Storytellers)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },
     ],
-    tags: ['bedtime', 'stories', 'storytelling', 'rainy day', 'car journey', 'Hindi', 'words'],
+    tags: ['bedtime', 'stories', 'storytelling', 'rainy day', 'car journey', 'Telugu', 'Tamil', 'words'],
     note: {
       what: 'Each of you adds one sentence to a story that grows as it goes round. You write it down, and at bedtime you read the whole thing back to him.',
       expect:
@@ -97,12 +97,12 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Listening to the story so far and adding something that follows on from it, and telling events in order. Hearing his own words read back from the page.',
       ask: 'When you read it back, only if he is listening closely: "Which bit was yours?"',
-      next: 'Read it to Dadi and Dada on the next video call, or ask them to add a line. Keep the notebook: a few of these make a small family book.',
+      next: 'Read it to Nanamma and Tatayya on the next video call, or ask Paati and Thatha to add a line when they ring. Keep the notebook: a few of these make a small family book.',
       honest:
         'A wandering story is not a sign of a problem; five-year-olds often add their own idea rather than build on yours. Writing his words down shows him they matter, but it does not teach reading on its own.',
       easier: 'Open a picture book at any page and start the story from what you both see. Or let him add two words instead of a whole sentence.',
       harder:
-        'Add a rule: every line must start with "And then" or "But", or the story must end back where it began. Or tell a whole story in Hindi.',
+        'Add a rule: every line must start with "And then" or "But", or the story must end back where it began. Or tell a whole story in Tamil with Amma, or in Telugu with Nanna.',
     },
   },
   {
@@ -134,8 +134,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia sits at the low table nearby with her own chunky crayon and a big sheet of paper, drawing whatever she likes. Her paper is hers; his drawing stays out of her reach.',
     },
     picture:
-      'Arjun and Papa sit on the living-room rug of the California home with their backs pressed together, facing opposite ways: Arjun faces the left edge of the picture and Papa faces the right edge, so neither can see the other’s paper. Each has a sheet of paper on a hardback book on his lap and a pencil in his right hand. Papa looks up as he describes his picture aloud. Arjun looks down at his own paper and draws a big circle with a short straight flat line underneath it, the line not touching the circle.',
-    cast: ['Arjun', 'Papa'],
+      'Arjun and Nanna sit on the living-room rug of the Bay Area house with their backs pressed together, facing opposite ways: Arjun faces the left edge of the picture and Nanna faces the right edge, so neither can see the other’s paper. Each has a sheet of paper on a hardback book on his lap and a pencil in his right hand. Nanna looks up as he describes his picture aloud. Arjun looks down at his own paper and draws a big circle with a short straight flat line underneath it, the line not touching the circle.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'PBS KIDS for Parents: Can You Draw What I Describe? A Partner Drawing Game', url: 'https://www.pbs.org/parents/crafts-and-experiments/can-you-draw-what-i-describe-a-partner-drawing-game' },
       { label: 'NRICH Early Years (University of Cambridge): Barrier Games', url: 'https://nrich.maths.org/eyfs-activities/barrier-games' },
@@ -158,10 +158,10 @@ export const IDEAS: readonly PlayIdea[] = [
     },
   },
   {
-    id: 'packing-for-jaipur',
+    id: 'packing-for-chennai',
     group: 'quiet',
-    title: 'Packing for Jaipur',
-    hook: '"I\'m packing my bag for Jaipur and I\'m taking..." Each adds one.',
+    title: 'Packing for Chennai',
+    hook: '"I\'m packing my bag for Chennai and I\'m taking..." Each adds one.',
     where: 'indoors',
     energy: 'quiet',
     contact: false,
@@ -170,30 +170,30 @@ export const IDEAS: readonly PlayIdea[] = [
     players: 'You and him',
     need: [
       'a small bag or backpack',
-      'six to ten everyday things, none small enough to fit inside a toilet-roll tube: a shawl, a toothbrush, a sock, a book, a cap, a steel tumbler',
+      'six to ten everyday things, none small enough to fit inside a toilet-roll tube: a small towel, a toothbrush, a sock, a book, a cap, a steel tumbler',
     ],
     steps: [
-      'Lay the things out on the floor and name each one together. Say: "We are going to Jaipur to see Dadi and Dada."',
-      'Start: "I\'m packing my bag for Jaipur and I\'m taking a shawl." Put the shawl in the bag.',
+      'Lay the things out on the floor and name each one together. Say: "We are going to Chennai to see Paati and Thatha."',
+      'Start: "I\'m packing my bag for Chennai and I\'m taking a towel." Put the towel in the bag.',
       'He says the whole list so far, then adds one thing and packs it. Take turns, the list growing each time.',
       'Once he knows the game, put the leftover things out of sight and pack only from memory and imagination.',
       'If anyone gets stuck, open the bag and peek together, then carry on. Nobody is out.',
     ],
     hisWay:
-      'He can pack silly things ("an elephant", "a camel from the desert"), make a rule that everything must be red or soft, choose the place (the beach, the moon, Dadi\'s rooftop), or play the one who checks the list.',
+      'He can pack silly things ("an elephant", "the whole lemon tree"), make a rule that everything must be red or soft, choose the place (the beach, the moon, Nanamma\'s kitchen in Hyderabad), or play the one who checks the list.',
     mia: {
       way: 'alongside',
       text: 'Mia has her own bag and a few soft things, a teddy and a sunhat, to pack and unpack beside you. Her bag is separate from the game, and his bag stays on his side, away from her.',
     },
     picture:
-      'On the bedroom floor of the California home, Arjun drops a folded red shawl into an open blue backpack, looking up at the ceiling as he tries to remember what is already inside; Mummy, kneeling opposite him, waits her turn beside a row of everyday things: a toothbrush, a cap, a book and a steel tumbler.',
-    cast: ['Arjun', 'Mummy'],
+      'On the bedroom floor of the Bay Area house, Arjun drops a small folded green towel into an open blue backpack, looking up at the ceiling as he tries to remember what is already inside; Amma, kneeling opposite him, waits her turn beside a row of everyday things: a toothbrush, a cap, a book and a steel tumbler.',
+    cast: ['Arjun', 'Amma'],
     sources: [
       { label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-year-olds (Packing a Suitcase for Grandma)', url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-5-to-7-year-olds.pdf' },
       { label: 'Harvard Center on the Developing Child: Enhancing and Practicing Executive Function Skills, activities guide', url: 'https://developingchild.harvard.edu/resources/activities-guide-enhancing-and-practicing-executive-function-skills-with-children-from-infancy-to-adolescence/' },
       { label: 'Nemours KidsHealth: Choosing Safe Toys for Toddlers and Preschoolers (the toilet-roll tube test)', url: 'https://kidshealth.org/en/parents/safetoys-young.html' },
     ],
-    tags: ['memory game', 'Jaipur', 'Dadi and Dada', 'travel', 'car journey', 'rainy day'],
+    tags: ['memory game', 'Chennai', 'Paati and Thatha', 'grandparents', 'travel', 'car journey', 'rainy day'],
     note: {
       what: 'A memory game in which each turn repeats the whole packing list and adds one more thing. Real objects and a real bag come first; later the list lives only in your heads.',
       expect:
@@ -206,7 +206,7 @@ export const IDEAS: readonly PlayIdea[] = [
         'How long the list gets depends on the day, how tired he is, and how silly the items are. A short list is not a sign of a poor memory, and there is no need to keep a record to beat.',
       easier: 'Keep all the things in sight the whole time, and stop at five. Or let him point to each thing as he says it.',
       harder:
-        'Pack in alphabet order (an apple, a book, a cap...), or say the list backwards before adding. Or play it in Hindi, and try it with Dadi and Dada on a video call.',
+        'Pack in alphabet order (an apple, a book, a cap...), or say the list backwards before adding. Or play it in Tamil with Amma, and try it with Paati and Thatha on a video call.',
       safety:
         'Choose only things too big to fit inside a toilet-roll tube, so nothing small enough for Mia to choke on is lying about: no coins, beads, hair clips or small toys. No plastic bags in the game; use a cloth bag or a backpack.',
     },
@@ -226,12 +226,12 @@ export const IDEAS: readonly PlayIdea[] = [
       'two or three kinds of fruit: a banana, an apple, grapes, orange segments (or whatever is in the fruit bowl)',
       'a butter knife for him, and a sharp knife that only you use',
       'a chopping board, a big bowl and one small bowl for each person',
-      'chaat masala (or a pinch of salt and roasted cumin) and half a lemon',
+      'chaat masala (or a pinch of salt and roasted cumin) and half a lemon (from the backyard tree, when it has fruit)',
     ],
     steps: [
       'Wash hands together. He rinses the fruit in a bowl of cold water; then you cut the apple and peel the orange.',
       'He peels the banana and slices it into rounds with the butter knife on the board. You quarter the grapes lengthwise.',
-      'He shares the fruit into the family\'s bowls, one piece at a time: one for Papa, one for Mummy, one for me, and round again.',
+      'He shares the fruit into the family\'s bowls, one piece at a time: one for Nanna, one for Amma, one for me, and round again.',
       'He counts each bowl to check it is fair, then sprinkles a pinch of chaat masala over each. You squeeze the lemon.',
     ],
     hisWay:
@@ -241,8 +241,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia sits in her high chair beside the table with her own bowl and drops in the quartered grapes you pass her, one at a time. She can eat as they land, while he deals out the other bowls himself.',
     },
     picture:
-      'At the kitchen table, Arjun peels a ripe banana with both hands and drops pieces he has broken off with his fingers into a steel bowl, while Mummy, beside him, holds a small steel bowl of washed grapes and smiles; Mia sits on Mummy’s other side holding a spoon. There is no knife anywhere in the picture.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'At the kitchen table of the Bay Area house, with steel tumblers on the counter behind, Arjun peels a ripe banana with both hands and drops pieces he has broken off with his fingers into a steel bowl, while Amma, beside him, holds a small steel bowl of washed grapes and smiles; Mia sits in her high chair on Amma’s other side holding a spoon. There is no knife anywhere in the picture. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       { label: 'Stanford DREME Family Math: Math Talk While Cooking Together', url: 'https://familymath.stanford.edu/activity/tips-for-cooking-with-math-2/' },
       { label: 'Harvard Center on the Developing Child: Executive Function Activities for 3- to 5-year-olds (cooking)', url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-3-to-5-year-olds.pdf' },
@@ -291,11 +291,11 @@ export const IDEAS: readonly PlayIdea[] = [
       'He decides the sorting rule and when to change it: whose clothes, stripes and spots, things with pockets. He can be the one who checks your pairs, and he says when the job is done.',
     mia: {
       way: 'joins',
-      text: 'Mia sits beside you on the bed and hands him socks from the pile, one at a time, then carries a folded pair to a room holding your hand. She has her own two tubs to stack while he matches the lids.',
+      text: 'Mia sits beside you on the bed and hands him socks from the pile, one at a time, when you say "Give it to Arjun anna". Then she carries a folded pair to a room holding your hand. She has her own two tubs to stack while he matches the lids.',
     },
     picture:
-      'On the big bed in the California home, Arjun lays a pair of matching blue socks on Papa\'s pile, while Papa folds a small towel in half beside him and Mia, sitting among the clean washing, holds out a striped sock to Arjun.',
-    cast: ['Arjun', 'Papa', 'Mia'],
+      'On the big bed in the Bay Area house, Arjun lays a pair of matching blue socks on Nanna\'s pile, while Nanna folds a small towel in half beside him and Mia, sitting among the clean washing, holds out a striped sock to Arjun. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Nanna', 'Mia'],
     sources: [
       { label: 'Harvard Center on the Developing Child: Executive Function Activities for 3- to 5-year-olds (sort by one rule, then switch)', url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-3-to-5-year-olds.pdf' },
       { label: 'CDC Learn the Signs. Act Early: Milestones by 5 Years', url: 'https://www.cdc.gov/act-early/milestones/5-years.html' },
@@ -314,7 +314,7 @@ export const IDEAS: readonly PlayIdea[] = [
         'It will take longer than doing it yourself, and some pairs will be wrong. The real gain is that he did a useful job for the family; it does not prove much about his thinking.',
       easier: 'Sort only socks, into two piles: his and everyone else\'s. Use three tubs with very different sizes of lid.',
       harder:
-        'Add a second rule at once ("Papa\'s socks that are dark"), or match lids with his eyes closed by feel, or fold a T-shirt: sides in, then in half.',
+        'Add a second rule at once ("Nanna\'s socks that are dark"), or match lids with his eyes closed by feel, or fold a T-shirt: sides in, then in half.',
       safety:
         'The iron stays off and away. Keep plastic bags and dry-cleaning covers out of the room, as they are a suffocation risk for Mia, and keep detergent, especially pods, shut away. Plastic tubs only, no glass jars. Keep the lid game on the floor, not on the counter.',
     },

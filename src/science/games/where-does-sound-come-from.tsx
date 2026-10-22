@@ -12,11 +12,12 @@ import { Choice } from '../../play/parts';
  * louder sound, at the same note. The misconceptions it fixes: "louder means
  * higher", and "sound has nothing to do with something moving".
  *
- * Shape: two tries with the same ruler, stacked in one frame (Ruler 1 above,
- * Ruler 2 below). The child taps which one makes the higher note, the lower
- * note, the louder sound, or any sound at all. The outcome draws the SAME
- * frame with each ruler's swing width (dashed ghosts at both ends of the
- * swing), the tip's swings over one short moment, and note/loudness labels.
+ * Shape: two tries with the same ruler on the kitchen table at home, Nanna's
+ * hand holding it flat, stacked in one frame (Ruler 1 above, Ruler 2 below).
+ * The child taps which one makes the higher note, the lower note, the louder
+ * sound, or any sound at all. The outcome draws the SAME frame with each
+ * ruler's swing width (dashed ghosts at both ends of the swing), the tip's
+ * swings over one short moment, and note/loudness labels.
  * All drawing is static; nothing moves.
  *
  * The swing trace is drawn to the physics of a ruler held at one end: swings
@@ -146,7 +147,7 @@ const TRACE_Y = 172;
 const INK = '#24170f';
 const PLASTIC = '#a9d6ee'; // a plain pale-blue plastic ruler
 const SKIN = '#a5683f';
-const SLEEVE = '#b4532a'; // Papa's rust shirt
+const SLEEVE = '#b4532a'; // Nanna's rust shirt
 const WOOD = '#b7773f';
 const WOOD_DEEP = '#8a5528';
 const TEAL = 'var(--science, #0d8063)';
@@ -194,7 +195,7 @@ function Ruler({ s, d, ghost }: { readonly s: Setup; readonly d: number; readonl
   );
 }
 
-/** The table, and a grown-up's hand pressing the ruler flat just behind the edge. */
+/** The table, and Nanna's hand pressing the ruler flat just behind the edge, his rust shirt sleeve rolled up. */
 function TableAndHand() {
   const e = EDGE;
   return (
@@ -778,21 +779,21 @@ export const whereDoesSoundComeFrom: InvestigateGame<Round, Answer> = {
   why,
   cover: 'art/games/where-does-sound-come-from.png',
   note: {
-    what: 'Two pictures of the same ruler held flat at a table edge, its tip pushed down by a finger. He taps which one makes the higher note, the lower note, the louder sound or any sound, then presses Try to see each ruler swing.',
+    what: 'Two pictures of the same ruler held flat at a table edge by Nanna\'s hand (the rust sleeve), its tip pushed down by a finger. He taps which one makes the higher note, the lower note, the louder sound or any sound, then presses Try to see each ruler swing.',
     expect:
       'Level 1 usually goes well: short sounds high, long sounds low. Level 2 is where it breaks: many five-year-olds say the harder pluck makes the higher note, because at home "turn it up" means louder. On level 3 expect him to pick the wider swing as higher, even when it is the longer ruler.',
     practising:
       'Sound comes from something vibrating. Pitch (high or low) depends on how fast it swings; loudness depends on how wide it swings. These are two separate things, and changing one variable at a time is how you tell them apart.',
     ask: "After Try on a level 2 round where both stick out the same: 'This one swings wider. Does that make it higher, louder, or both?'",
     next:
-      'Hold a 30 cm ruler flat on the table with most of it on top, and let him pluck the free end. Try 15 cm out, then 7 cm out, then the same length plucked gently and hard. Let him rest a finger on the table to feel it buzz.',
+      'At the kitchen table, Nanna or Amma holds a 30 cm ruler flat with most of it on top, and he plucks the free end. Try 15 cm out, then 7 cm out, then the same length plucked gently and hard. Let him rest a finger on the table to feel it buzz; Nanna can say "Vinu!" (Listen!) before each pluck.',
     honest:
       'A still picture cannot make a sound; the swings in the strip are a drawn model, not a recording, and the real ruler is the lesson. Part of what you hear is the ruler slapping the table edge, at the same rate it swings, so the rule still holds. Getting every round right shows he can apply "shorter is higher, wider is louder" to a picture; it does not show he can hear the difference.',
     easier: 'Stay on level 1, and after each round make that exact length sing on a real ruler before the next one.',
     harder:
       'Ask him to find, on a real ruler, the overhang that matches a note you hum, then explain why plucking harder did not change it.',
     safety:
-      'A grown-up holds the ruler down firmly. Use a flexible plastic ruler, not a thin metal one with sharp edges, and keep faces back from the free end.',
+      'A grown-up holds the ruler down firmly. Use a flexible plastic ruler, not a thin metal one with sharp edges, and keep faces back from the free end, Mia\'s most of all: at two she will lean in close to look.',
   },
 };
 

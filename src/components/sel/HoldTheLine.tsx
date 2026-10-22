@@ -133,7 +133,41 @@ export function HoldTheLine() {
           <p className="bench__figure-caption">{scenario.where}</p>
         </div>
 
-        <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} role="group"
+        {/* Phones: the same frame as readable cards with a full-size button.
+            The drawn frame below stays the one that prints and exports. */}
+        <div className="hold-cards" role="group" aria-label="The line, in three parts">
+          {SLOTS.map((slot, k) => {
+            const id = pick[slot];
+            const chip = id ? chipById(id) : undefined;
+            const done = phase === 'said' || k < said;
+            const now = slot === sayingSlot;
+            return (
+              <div key={slot} className={`hold-card${now ? ' is-now' : ''}${done ? ' is-done' : ''}`}>
+                <p className="hold-card__label">{SLOT_LABELS[slot]}</p>
+                {chip ? (
+                  <div className="hold-card__body">
+                    <svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true" focusable="false">
+                      {mark(chip.glyph, INK)}
+                    </svg>
+                    <p className="hold-card__words">{wordsFor(scenario, chip.id)}</p>
+                  </div>
+                ) : (
+                  <p className="hold-card__empty">Pick a picture below</p>
+                )}
+                {now && id ? (
+                  <button type="button" className="bench-btn bench-btn--primary hold-card__said" onClick={sayNext}>
+                    I said it
+                  </button>
+                ) : done && chip ? (
+                  <p className="hold-card__done" aria-label="Said">✓ said</p>
+                ) : null}
+              </div>
+            );
+          })}
+          {outcome ? <p className={`hold-cards__reply${outcome === 'left' ? ' is-left' : ''}`}>{panelFor(scenario, outcome).says}</p> : null}
+        </div>
+
+        <svg ref={svgRef} className="hold-frame" viewBox={`0 0 ${W} ${H}`} role="group"
           aria-label={full
             ? `The frame holds: ${line}`
             : 'A frame with three empty slots: name the thing, ask for the change, what next.'}>

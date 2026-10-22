@@ -36,14 +36,19 @@ HOUSE = ('Rich gouache picture-book illustration, saturated warm colour, visible
          'no text, no letters, no numbers, no signature.')
 
 SHEET_CAST = {
-    'family': ['Arjun', 'Mia', 'Mummy', 'Papa'],
-    'grandparents': ['Dadi', 'Dada', 'Arjun', 'Mia'],
+    'family': ['Arjun', 'Mia', 'Amma', 'Nanna'],
+    'telugu-grandparents': ['Nanamma', 'Arjun', 'Mia', 'Tatayya'],
+    'tamil-grandparents': ['Arjun', 'Paati', 'Thatha', 'Mia'],
+    'family-and-tamil-grandparents': ['Arjun', 'Nanna', 'Amma', 'Paati', 'Thatha', 'Mia'],
     'friends': ['Arjun', 'Zoe', 'Ben'],
 }
 
 CAST_SHEETS = {
     'family': 'public/art/cast/family.png',
-    'grandparents': 'public/art/cast/grandparents.png',
+    'telugu-grandparents': 'public/art/cast/telugu-grandparents.png',
+    'tamil-grandparents': 'public/art/cast/tamil-grandparents.png',
+    # Composed from the family and Tamil grandparents sheets by .redesign/v3/compose-cast.py.
+    'family-and-tamil-grandparents': 'public/art/cast/family-and-tamil-grandparents.png',
     'friends': 'public/art/cast/friends.png',
 }
 
@@ -51,13 +56,25 @@ CAST_SHEETS = {
 LOOKS = {
     'Arjun': 'the five-year-old boy Arjun (short tousled black hair, warm brown skin, dark green T-shirt with a small orange dinosaur, navy shorts, white sneakers)',
     'Mia': 'his two-year-old sister Mia (black hair in a small top tuft with a red clip, round cheeks, coral flowered cotton frock, bare feet)',
-    'Mummy': 'their mother (long black hair in a plait, teal cotton kurta over blue jeans, small gold earrings)',
-    'Papa': 'their father (short black hair, neat short beard, black-rimmed glasses, rust-coloured shirt, khaki trousers)',
-    'Dadi': 'their grandmother Dadi (silver hair in a low bun, round gold-rimmed glasses, deep indigo cotton saree with a thin orange border, glass bangles)',
-    'Dada': 'their grandfather Dada (white hair, thick white moustache, cream kurta-pyjama, grey Nehru waistcoat, wooden walking stick)',
+    'Amma': 'their mother, Amma (long black hair in a plait, teal cotton kurta over blue jeans, small gold earrings)',
+    'Nanna': 'their father, Nanna (short black hair, neat short beard, black-rimmed glasses, rust-coloured shirt, khaki trousers)',
+    'Nanamma': 'their Telugu grandmother Nanamma (silver-grey hair in a low bun, gold-rimmed glasses, small red bindi, glass bangles, maroon cotton saree with a mustard-yellow border)',
+    'Tatayya': 'their Telugu grandfather Tatayya (short white hair, white moustache, black-rimmed glasses, white half-sleeved shirt, white pancha with a thin gold border)',
+    'Paati': 'their Tamil grandmother Paati (grey hair in a bun with a little jasmine, small nose stud, red kumkum dot, bottle-green cotton saree with a pink border)',
+    'Thatha': 'their Tamil grandfather Thatha (bald on top with white hair at the sides, round steel-framed glasses, clean-shaven, light-blue shirt, white veshti with a thin green border, a white towel over one shoulder)',
     'Zoe': 'their friend Zoe (black bob with a straight fringe, yellow raincoat over a striped top, red rain boots)',
     'Ben': 'their friend Ben (sandy curly hair, freckles, blue denim overalls over a grey T-shirt)',
 }
+
+# The parent: "the sizes of the kids must be more or less consistent". Advisor q8 ruling F.
+SIZES = ('Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); '
+         'preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs, round tummy; '
+         'Arjun a five-year-old: longer legs, slimmer body); compare height only at equal depth; kneeling upright puts '
+         "Arjun's head about level with Mia's; sitting back on his heels puts it lower.")
+
+# One house in every family picture (.redesign/v3/HOUSEHOLD.md).
+HOME = ('The family lives in a San Francisco Bay Area single-family house with a backyard (lawn, wooden fence, raised beds, '
+        'a lemon tree, curry-leaf and tulsi plants in pots on the patio); ordinary contemporary furniture.')
 
 ZONES = {
     'top': 'The TOP QUARTER of the picture is calm, open, uncluttered background (sky, plain wall or soft ground colour) with nothing important in it, kept clear for words.',
@@ -76,11 +93,12 @@ def page_prompt(book: dict, page: dict) -> tuple[str, str | None]:
     cast = book.get('cast')
     if cast:
         people = '; '.join(LOOKS[n] for n in who) if who else 'none of the people'
+        sizes = SIZES + ' ' if 'Arjun' in who and 'Mia' in who else ''
         prompt = (f'ACTION FIRST: {scene} '
                   f'New camera angle and natural mid-action poses — do NOT copy the standing poses of the reference image. '
                   f'Take ONLY the identities from the reference image: {people}; keep their faces, hair and clothes exactly. '
                   + (f"Not in this picture: {', '.join(absent)}. " if absent else '')
-                  + f'{zone} {HOUSE}')
+                  + f'{sizes}{zone} {HOUSE}')
         return prompt, CAST_SHEETS[cast]
     # The character line describes EVERY recurring character, so that each looks
     # the same on every page. Listing them all in every prompt also invites the

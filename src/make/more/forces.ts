@@ -27,7 +27,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Slide your fingers slowly towards each other. Watch which finger moves, then which.',
-        art: 'Arjun slides his two pointing fingers inwards under the wooden ruler, seen close at his chest height: his left finger stays still while his right finger glides in towards it, and Papa leans in on one knee with his chin on his hand, watching the fingers take turns.',
+        art: 'Arjun slides his two pointing fingers inwards under the wooden ruler, seen close at his chest height: his left finger stays still while his right finger glides in towards it, and Nanna leans in on one knee with his chin on his hand, watching the fingers take turns.',
       },
       {
         text: 'When your fingers meet, the ruler balances just above them. The grown-up tapes that spot. Can one finger hold it there?',
@@ -91,7 +91,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'The grown-up tapes the broom across two chair backs and ties on two strings. You push a rice bag into each sock.',
-        art: 'Mummy knots a long string around a broom handle taped across the backs of two dining chairs, a shorter string already hanging beside it, while Arjun kneels on the floor below, pushing a small zip-lock bag of rice down into the toe of an old striped sock.',
+        art: 'Amma knots a long string around a broom handle taped across the backs of two dining chairs, a shorter string already hanging beside it, while Arjun kneels on the floor below, pushing a small zip-lock bag of rice down into the toe of an old striped sock.',
       },
       {
         text: 'The grown-up hangs the socks, rice 70 cm and 25 cm below. Pull both back a hand’s width; let go together.',
@@ -100,19 +100,19 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Swing only the long sock. The grown-up times ten seconds; count each time it comes back to you.',
-        art: 'Arjun sits cross-legged on the floor a step back from two dining chairs and counts out loud, both hands resting on his knees, as an old sock filled with rice on a long string swings towards him from a broom handle taped across the chair backs; beside it a second rice sock on a much shorter string, about a third as long, hangs still; Mummy kneels next to Arjun holding a phone in one hand, looking at its stopwatch.',
+        art: 'Arjun sits cross-legged on the floor a step back from two dining chairs and counts out loud, both hands resting on his knees, as an old sock filled with rice on a long string swings towards him from a broom handle taped across the chair backs; beside it a second rice sock on a much shorter string, about a third as long, hangs still; Amma kneels next to Arjun holding a phone in one hand, looking at its stopwatch.',
       },
       {
         text: 'Now swing only the short sock and count the same way. Which one made more swings?',
-        art: 'Arjun sits on the floor a step back from two dining chairs and counts out loud, watching an old sock filled with rice on a short string swing quickly back and forth under a broom handle taped across the chair backs, while a second rice sock on a much longer string hangs still beside it; Mummy kneels next to him, holding a phone stopwatch in one hand and pencilling tally marks on a notepad on her knee with the other.',
+        art: 'Arjun sits on the floor a step back from two dining chairs and counts out loud, watching an old sock filled with rice on a short string swing quickly back and forth under a broom handle taped across the chair backs, while a second rice sock on a much longer string hangs still beside it; Amma kneels next to him, holding a phone stopwatch in one hand and pencilling tally marks on a notepad on her knee with the other.',
       },
       {
         text: 'Guess: will a heavier sock swing faster? Add a second rice bag; the grown-up rehangs it at 70 cm. Count again.',
-        art: 'Mummy kneels under a broom handle taped across two dining chairs, holding open the top of an ordinary old sock with both hands, its string untied and dangling from the handle above; one small zip-lock bag of rice already sits in the toe of the sock, and Arjun pushes a second small zip-lock bag of rice down into it with one hand; a second sock of the same size hangs still on a short string beside them.',
+        art: 'Amma kneels under a broom handle taped across two dining chairs, holding open the top of an ordinary old sock with both hands, its string untied and dangling from the handle above; one small zip-lock bag of rice already sits in the toe of the sock, and Arjun pushes a second small zip-lock bag of rice down into it with one hand; a second sock of the same size hangs still on a short string beside them.',
       },
       {
         text: 'Compare the counts. Then the grown-up unties both strings and puts the string, socks and bags away.',
-        art: 'Mummy unties a string from the broom handle across the two chair backs and winds it into a loop around her fingers, while Arjun drops the two rice socks into a cloth shopping bag hanging from one chair’s back.',
+        art: 'Amma unties a string from the broom handle across the two chair backs and winds it into a loop around her fingers, while Arjun drops the two rice socks into a cloth shopping bag hanging from one chair’s back.',
       },
     ],
     notice: 'The short string swings faster: more swings in the same ten seconds. With a second bag of rice inside, the long sock makes about the same number of swings as before.',
@@ -128,7 +128,7 @@ export const MORE: readonly Activity[] = [
       what: 'You hang two rice-filled socks from a broom handle, one on a long string and one on a short one. He counts how many times each swings in ten seconds, then counts the long one again with a second bag of rice inside.',
       expect: 'With the middle of the rice about 70 cm and 25 cm below the handle, expect roughly six and ten swings. His counts may be off by one or two; the gap still shows. He may expect the heavier sock to swing faster, or slower. It hardly changes, and he may want to try it twice before he believes it.',
       practising: 'The period of a pendulum: the time one swing takes depends on the length of the string and hardly at all on the weight at the end, as long as the swing is small. Also counting at a steady pace against a fixed time, and a fair test with one change.',
-      ask: 'Before the second rice bag goes in: “This will make it heavier. Will it swing faster, slower or the same?” Write his guess on the notepad beside the tallies.',
+      ask: 'Before the second rice bag goes in: “This will make it heavier. Will it swing faster, slower or the same?” Write his guess on the notepad beside the tallies. Amma can ask it in Tamil: “Innum vegamaa, innum medhuvaa, illa adhe maadhiriyaa?” (Faster, slower, or the same?)',
       next: 'At the park, give him one gentle push on a swing, let him sit still, and count his swings in ten seconds together. Ask whether a swing with longer chains would go faster or slower. Then play Which One Lands First?, where a heavy ball and a light one land together.',
       honest: 'Two counts on one afternoon show that length matters; they do not show he knows why, and nobody expects him to. Ten-second counts are rough: a difference of one swing is within counting error, not a sign that weight matters. That is also why the heavy sock is rehung at the same 70 cm; a sock hanging lower swings more slowly, and he would read that as weight. A big swing, a push instead of a let-go, or a twisting sock can spoil a count, so repeat any surprise.',
       easier: 'Skip the counting. Let both socks go together three times and just watch which one gets ahead.',
@@ -148,7 +148,7 @@ export const MORE: readonly Activity[] = [
       'a stiff 30 cm wooden ruler',
       'a pencil with flat sides, and masking tape',
       'a bar of soap still in its wrapper, about 100 g',
-      'the plastic lid of a dahi or yoghurt tub, about 10 cm across',
+      'the plastic lid of a curd or yoghurt tub, about 10 cm across',
       'about 60 pennies in a plastic screw-top jar',
       'a small steel bowl',
       'a second pencil and a notepad, for tallies',
@@ -156,7 +156,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Count sixty pennies from the jar into the bowl. The grown-up tapes the soap and the tub lid to the ruler’s ends.',
-        art: 'At the kitchen table, Papa presses a strip of masking tape over a wrapped bar of soap lying right at one end of a 30 cm wooden ruler; at the ruler’s other end a flat round plastic tub lid is already taped on rim-side up, like a shallow dish; Arjun holds a plastic jar of pennies in one hand and drops pennies one at a time into a small steel bowl with the other.',
+        art: 'At the kitchen table, Nanna presses a strip of masking tape over a wrapped bar of soap lying right at one end of a 30 cm wooden ruler; at the ruler’s other end a flat round plastic tub lid is already taped on rim-side up, like a shallow dish; Arjun holds a plastic jar of pennies in one hand and drops pennies one at a time into a small steel bowl with the other.',
       },
       {
         text: 'Tape a pencil flat on the table. Lay the ruler across it, with the pencil under the middle.',
@@ -180,7 +180,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Count every penny back into the jar. Are all sixty there? Then screw the lid on.',
-        art: 'Arjun counts pennies one at a time from the small steel bowl back into the plastic screw-top jar on the kitchen table, while Papa holds the jar’s lid ready in one hand and peels the masking tape off the ruler with the other.',
+        art: 'Arjun counts pennies one at a time from the small steel bowl back into the plastic screw-top jar on the kitchen table, while Nanna holds the jar’s lid ready in one hand and peels the masking tape off the ruler with the other.',
       },
     ],
     notice: 'With the pencil under the middle, it takes a big pile of pennies to lift the soap. With the pencil close to the soap, only a few pennies lift it.',

@@ -70,7 +70,7 @@ export interface Scenario {
   readonly turn: string;
   /** How many marks one turn is drawn as under each frame. */
   readonly turnTicks: number;
-  /** Who comes when he asks: "Papa". */
+  /** Who comes when he asks: "Nanna". */
   readonly grownUp: string;
   /** The situation, said plainly. */
   readonly where: string;
@@ -96,13 +96,13 @@ export const SCENARIOS: readonly Scenario[] = [
     thing: 'swing',
     turn: '10 pushes each',
     turnTicks: 10,
-    grownUp: 'Papa',
+    grownUp: 'Nanna',
     where: 'One swing in the park, and you and Sam got to it at the same moment.',
     guide: null,
     setup: 'one-swing-two-kids-swing-setup',
-    setupAlt: 'You and a boy your size standing either side of one empty swing in the evening park.',
+    setupAlt: 'You and a boy your size standing either side of one empty swing in the neighbourhood park in the evening, Nanna waiting by the park gate behind.',
     outcome: 'one-swing-two-kids-swing-outcome',
-    outcomeAlt: 'The swing hanging still, the two of you walking off the grass as the light goes.',
+    outcomeAlt: 'The swing hanging still, the two of you walking off the grass as the light goes, and Nanna holding the park gate open.',
     short: 'One swing in the park',
     replies: {
       'you-first': {
@@ -111,17 +111,17 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: null,
       },
       'them-first': {
-        says: 'Sam got on and swung for a long time. When he got off you had a short go, and then Papa called you both home.',
+        says: 'Sam got on and swung for a long time. When he got off you had a short go, and then Nanna said it was time to walk home.',
         settled: true,
         picture: 'outcome',
       },
       turns: {
-        says: 'Sam said, “Okay, I will count yours.” He counted your ten pushes out loud, then you counted his, round and round until Papa called you home.',
+        says: 'Sam said, “Okay, I will count yours.” He counted your ten pushes out loud, then you counted his, round and round until Nanna called you home.',
         settled: true,
         picture: 'outcome',
       },
       'grown-up': {
-        says: 'Papa came over and counted ten pushes each out loud, Sam and then you, until it was time to go home.',
+        says: 'Nanna came over from the gate and counted ten pushes each out loud, Sam and then you, until it was time to go home.',
         settled: true,
         picture: 'outcome',
       },
@@ -135,13 +135,13 @@ export const SCENARIOS: readonly Scenario[] = [
     thing: 'controller',
     turn: 'one race each',
     turnTicks: 1,
-    grownUp: 'Tomas’s mum',
+    grownUp: 'Tomas’s mom',
     where: 'One controller on the rug at Tomas’s house, and you both want to play.',
     guide: null,
     setup: 'one-swing-two-kids-console-setup',
     setupAlt: 'A living room floor at another family, one controller on the rug between you and the boy who lives there.',
     outcome: 'one-swing-two-kids-console-outcome',
-    outcomeAlt: 'The dark television and the controller back on the shelf while you pull on your shoes at the door.',
+    outcomeAlt: 'The dark television and the controller back on the shelf while you pull on your shoes at the door, and Amma’s face at the glass.',
     short: 'One controller at Tomas’s',
     replies: {
       'you-first': {
@@ -150,7 +150,7 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: null,
       },
       'them-first': {
-        says: 'Tomas played one race, then another, then another. When you asked for your go, Mummy was at the door to take you home.',
+        says: 'Tomas played one race, then another, then another. When you asked for your go, Amma was at the door to take you home.',
         settled: true,
         picture: 'outcome',
       },
@@ -160,7 +160,7 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: 'outcome',
       },
       'grown-up': {
-        says: 'Tomas’s mum came in, said one race each with the guest first, and sat on the sofa to watch.',
+        says: 'Tomas’s mom came in, said one race each with the guest first, and sat on the sofa to watch.',
         settled: true,
         picture: null,
       },
@@ -174,17 +174,17 @@ export const SCENARIOS: readonly Scenario[] = [
     thing: 'crackers',
     turn: 'one cracker each',
     turnTicks: 1,
-    grownUp: 'Mummy',
+    grownUp: 'Amma',
     where: 'Six crackers left in the box, and you and Ravi both reached for it.',
     guide: null,
     setup: 'one-swing-two-kids-snack-setup',
-    setupAlt: 'You and another boy kneeling at a low table with an open cracker box between you at snack time.',
+    setupAlt: 'You and Ravi kneeling at the low table in the living room with an open cracker box between you at snack time, Mia watching from the end of the table.',
     outcome: 'one-swing-two-kids-snack-outcome',
     outcomeAlt: 'The empty box on its side on the table, crumbs on the wood, one chair pushed back.',
     short: 'Six crackers left',
     replies: {
       'you-first': {
-        says: 'You took a handful first. When Ravi reached into the box there were two left. He ate them and went out to the sandpit on his own.',
+        says: 'You took a handful first. When Ravi reached into the box there were two left. He ate them and went out to the sandbox in the backyard on his own.',
         settled: true,
         picture: 'outcome',
       },
@@ -199,7 +199,7 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: null,
       },
       'grown-up': {
-        says: 'Mummy tipped the crackers onto a plate in two rows of three, one row for each of you.',
+        says: 'Amma tipped the crackers onto a steel plate in two rows of three, one row for each of you.',
         settled: true,
         picture: null,
       },
@@ -208,12 +208,12 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'window',
     other: 'Nadia',
-    about: 'Nadia is your age. Her mum is driving you both to the swimming pool.',
+    about: 'Nadia is your age. Her mom is driving you both to the swimming pool.',
     little: false,
     thing: 'seat',
     turn: 'swap halfway',
     turnTicks: 1,
-    grownUp: 'Nadia’s mum',
+    grownUp: 'Nadia’s mom',
     where: 'One window seat in the back of the car, and you and Nadia both climbed in for it.',
     guide: null,
     setup: 'one-swing-two-kids-window-setup',
@@ -233,12 +233,12 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: 'outcome',
       },
       turns: {
-        says: 'Nadia’s mum said nobody unbuckles while the car is moving, so you could not swap halfway. You were both still holding the seatbelt.',
+        says: 'Nadia’s mom said nobody unbuckles while the car is moving, so you could not swap halfway. You were both still holding the seatbelt.',
         settled: false,
         picture: null,
       },
       'grown-up': {
-        says: 'Nadia’s mum said Nadia by the window on the way there and you on the way home, and buckled you both in.',
+        says: 'Nadia’s mom said Nadia by the window on the way there and you on the way home, and buckled you both in.',
         settled: true,
         picture: 'outcome',
       },
@@ -247,22 +247,22 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'tablet',
     other: 'Mia',
-    about: 'Mia is your sister. She is two, and she is reaching for the tablet with both hands.',
+    about: 'Mia is your little sister. She is two, and she is reaching for the tablet with both hands.',
     little: true,
     thing: 'tablet',
     turn: 'one song each',
     turnTicks: 1,
-    grownUp: 'Mummy',
+    grownUp: 'Amma',
     where: 'You are watching the tablet, and Mia wants it too.',
     guide: 'Mia is two. Waiting for a turn is very hard at two, so a plan that works with a friend may not work with her yet.',
     setup: 'one-swing-two-kids-tablet-setup',
-    setupAlt: 'You on the sofa holding the tablet while your two-year-old sister stands at your knee reaching for it.',
+    setupAlt: 'You on the living-room sofa holding the tablet while Mia, two, stands at your knee reaching for it, and Amma carries a pan to the dinner table behind.',
     outcome: 'one-swing-two-kids-tablet-outcome',
-    outcomeAlt: 'The tablet dark on a high shelf and two places laid at the dinner table.',
+    outcomeAlt: 'The tablet dark on a high kitchen shelf, you climbing onto your chair, Amma settling Mia into her high chair, and two bowls of rasam steaming on the dinner table.',
     short: 'Mia and the tablet',
     replies: {
       'you-first': {
-        says: 'Mia reached for the tablet twice and then started to cry. Waiting for “then” is very hard when you are two.',
+        says: 'Mia reached for the tablet twice, said, “Anna, anna,” and then started to cry. Waiting for “then” is very hard when you are two.',
         settled: false,
         picture: null,
       },
@@ -277,7 +277,7 @@ export const SCENARIOS: readonly Scenario[] = [
         picture: null,
       },
       'grown-up': {
-        says: 'Mummy said it was nearly dinner. She put the tablet up on the high shelf and lifted Mia into her high chair.',
+        says: 'Amma said it was nearly dinner. She put the tablet up on the high shelf and lifted Mia into her high chair.',
         settled: true,
         picture: 'outcome',
       },

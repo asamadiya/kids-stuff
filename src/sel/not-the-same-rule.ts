@@ -77,12 +77,12 @@ export interface RuleCard {
 export const RULE_CARDS: readonly RuleCard[] = [
   {
     id: 'not-the-same-rule-mia-hands',
-    front: 'Mia eats with her hands.',
+    front: 'Mia eats pasta with her hands.',
     short: "Mia's hands",
-    alt: 'A two-year-old in a high chair pushing pasta into her mouth with her fist while her brother sits beside her holding a fork.',
+    alt: 'Mia, two, in her high chair at the kitchen table pushing pasta into her mouth with her fist while Arjun sits beside her holding a fork.',
     grownUpColumn: 'reasoned',
     reverse:
-      'You are right that this is not the same rule. Mia is two. Her fingers cannot hold a fork steady yet. When they can, she will be asked to use one, the way you were.',
+      'You are right that this is not the same rule. Mia is two. Her fingers cannot hold a fork steady yet. When they can, she will be asked to use one for pasta, the way you were. At this table everyone eats rice and sambar by hand, Amma and Nanna too.',
     arguable: false,
     concedes: true,
   },
@@ -90,7 +90,7 @@ export const RULE_CARDS: readonly RuleCard[] = [
     id: 'not-the-same-rule-mia-spill',
     front: 'Mia is not told off when she spills.',
     short: "Mia's spill",
-    alt: 'A tipped beaker spreading milk across a kitchen table, the two-year-old watching it, her brother already reaching for the cloth.',
+    alt: 'A tipped cup spreading milk across the kitchen table, Mia watching it from her high chair, Arjun already reaching for the cup, and Amma’s hand coming in with a cloth.',
     grownUpColumn: 'reasoned',
     reverse:
       'You are right that you get asked to clean up and she does not. She is two and cannot see the cup coming before it goes. You could see it coming at three. That is the whole of the reason.',
@@ -101,10 +101,10 @@ export const RULE_CARDS: readonly RuleCard[] = [
     id: 'not-the-same-rule-tablet-longer',
     front: 'You get the tablet for longer than Mia.',
     short: 'Tablet time',
-    alt: 'A boy on a sofa with a tablet on his knees and a kitchen timer beside him, his little sister watching from the rug.',
+    alt: 'Arjun cross-legged on the living-room sofa with a tablet on his knees and a kitchen timer beside him, Mia standing at the sofa with one hand on the cushion, watching.',
     grownUpColumn: 'reasoned',
     reverse:
-      'You are right that this one is not the same either. This one runs your way. A grown-up decided that twenty minutes is a long time for a two-year-old and a short time for you. Some families set one timer for both.',
+      'You are right that this one is not the same either. This one runs your way. Amma and Nanna decided that twenty minutes is a long time for a two-year-old and a short time for you. Some families set one timer for both.',
     arguable: true,
     concedes: true,
   },
@@ -112,10 +112,10 @@ export const RULE_CARDS: readonly RuleCard[] = [
     id: 'not-the-same-rule-helmets',
     front: 'Everyone wears a helmet on a bike.',
     short: 'Helmets',
-    alt: 'A father and his son at the end of a driveway, both fastening bicycle helmet straps under their chins.',
+    alt: 'Nanna kneeling beside Arjun at the end of the driveway, both fastening bicycle helmet straps under their chins, while Mia watches from the curb.',
     grownUpColumn: 'everyone',
     reverse:
-      'Every head on a bike is the same kind of head. Nobody in this family rides without one, grown-ups included.',
+      'Every head on a bike is the same kind of head. Nobody in this family rides without one, Amma and Nanna included.',
     arguable: false,
     concedes: false,
   },
@@ -134,10 +134,10 @@ export const RULE_CARDS: readonly RuleCard[] = [
     id: 'not-the-same-rule-shoes-off',
     front: 'Shoes come off inside this house.',
     short: 'Shoes off',
-    alt: 'A row of small and large shoes lined up on a mat inside a front door, a boy in socks stepping past them.',
+    alt: 'Seen from where Arjun sits on the mat inside the front door, pulling off a sneaker with both hands: small and large shoes lined up along the hallway wall, and Mia on her hands and knees on the clean floor at the far end.',
     grownUpColumn: 'reasoned',
     reverse:
-      'This house keeps the floor clean for a baby who crawls on it. Some houses do this the other way and keep shoes on all the way through.',
+      'This house leaves outside shoes at the door, the way Nanamma’s house and Paati’s house always have, so the floor stays clean for sitting and playing on. Some houses do this the other way and keep shoes on all the way through.',
     arguable: true,
     concedes: false,
   },

@@ -35,23 +35,23 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'The grown-up folds a pointed paper boat. You fold the other sheet into a flat tray.',
-        art: 'At the patio table, Mummy presses the last crease of a pointed paper boat with her thumbs, while Arjun folds up the four edges of a second sheet of the same size and pinches the corners into a flat paper tray.',
+        art: 'At the table on the backyard patio, Amma presses the last crease of a pointed paper boat with her thumbs, while Arjun folds up the four edges of a second sheet of the same size and pinches the corners into a flat paper tray.',
       },
       {
         text: 'Float the boat in the tub. Put in pennies one at a time.',
-        art: 'Arjun kneels beside a washing-up tub of water on the patio and lowers one copper penny into the floating paper boat, a few more pennies in his other palm, while Mummy kneels across the tub watching the boat sit lower.',
+        art: 'Arjun kneels beside a washing-up tub of water on the patio, the lawn and the lemon tree behind him, and lowers one copper penny into the floating paper boat, a few more pennies in his other palm, while Amma kneels across the tub watching the boat sit lower.',
       },
       {
         text: 'Count each penny out loud. Stop when water comes over the side.',
-        art: 'Water trickles over one side of the paper boat, which sits very low with a heap of pennies inside, while Arjun counts on his fingers and Mummy writes the number on a notepad.',
+        art: 'Water trickles over one side of the paper boat, which sits very low with a heap of pennies inside, while Arjun counts on his fingers and Amma, kneeling by the tub, writes the number on a notepad.',
       },
       {
         text: 'Guess first: will the flat tray carry more pennies, or fewer?',
-        art: 'Arjun holds the dry flat paper tray up in one hand and taps his chin with the other, thinking, while Mummy lifts the soggy paper boat dripping out of the tub and waits for his guess.',
+        art: 'Arjun holds the dry flat paper tray up in one hand and taps his chin with the other, thinking, while Amma lifts the soggy paper boat dripping out of the tub and waits for his guess.',
       },
       {
         text: 'Float the tray and load it the same way, spreading the pennies out.',
-        art: 'Arjun lays pennies one by one in neat rows across the bottom of the flat paper tray floating in the tub, while Mummy steadies the tub with both hands; the tray sits low and level, its rim still above the water.',
+        art: 'Arjun lays pennies one by one in neat rows across the bottom of the flat paper tray floating in the tub, while Amma steadies the tub with both hands; the tray sits low and level, its rim still above the water.',
       },
     ],
     notice: 'Each penny pushes the boat a little lower, and the wide flat tray sinks much more slowly than the pointed boat.',
@@ -86,52 +86,52 @@ const FIRST: readonly Activity[] = [
       'a straight stick about as long as a ruler, with a blunt top',
       'a lump of modelling clay as big as an orange',
       'thick chalk',
-      'a sunny balcony or patio floor that gets sun all day',
+      'a patch of patio or path that gets sun all day',
       'a clock or watch',
     ],
     steps: [
       {
         text: 'Push the stick upright into the lump of clay, in a sunny spot.',
-        art: 'Arjun pushes a straight wooden stick, about as long as a ruler, upright into a lump of grey modelling clay that Papa holds pressed onto the sunny stone paving of the back patio; the stick throws a long thin shadow across the stone.',
+        art: 'Arjun pushes a straight wooden stick, about as long as a ruler, upright into a lump of grey modelling clay that Nanna holds pressed onto the sunny concrete of the backyard patio, the lawn and wooden fence behind them; the stick throws a long thin shadow across the concrete.',
       },
       {
         text: 'Draw a chalk circle round the clay, so the stick can go back exactly.',
-        art: 'Arjun crouches and draws a white chalk circle around the lump of clay at the foot of the upright stick, while Papa kneels beside him and points to where the circle still needs to join up.',
+        art: 'Arjun crouches and draws a white chalk circle around the lump of clay at the foot of the upright stick, while Nanna kneels beside him and points to where the circle still needs to join up.',
       },
       {
         text: 'At 9 o’clock, draw a chalk line along the shadow. Write 9 at its tip.',
-        art: 'Arjun kneels and draws a chalk line along the stick’s long morning shadow on the patio paving, while Papa crouches beside him holding up a wristwatch that shows nine o’clock; a chalk 9 is written at the shadow’s tip.',
+        art: 'Arjun kneels and draws a chalk line along the stick’s long morning shadow on the patio concrete, while Nanna crouches beside him holding up a wristwatch that shows nine o’clock; a chalk 9 is written at the shadow’s tip.',
       },
       {
         text: 'Every hour, draw the new shadow and write the hour beside it.',
-        art: 'Arjun, wearing a sun hat, chalks a much shorter shadow line near the stick, with older chalk lines marked 9, 10 and 11 fanning out beside it, while Papa stands holding the watch and reads out the hour.',
+        art: 'Arjun, wearing a sun hat, chalks a much shorter shadow line near the stick, with older chalk lines marked 9, 10 and 11 fanning out beside it, while Nanna stands by the patio table holding the watch and reads out the hour.',
       },
       {
         text: 'After the last mark, look: which line is shortest? Which way did they turn?',
-        art: 'Arjun stands over a fan of chalk shadow lines around the stick, each labelled with an hour from 9 to 4, tracing the curve of their tips with his pointing finger, while Papa crouches beside him and touches the shortest line.',
+        art: 'Arjun stands over a fan of chalk shadow lines around the stick, each labelled with an hour from 9 to 4, tracing the curve of their tips with his pointing finger, while Nanna crouches beside him and touches the shortest line.',
       },
       {
         text: 'Tomorrow at 9, put the stick back. Does its shadow land on the 9?',
-        art: 'The next morning Arjun sets the clay and stick back inside the chalk circle while Papa, holding the watch, points at the stick’s shadow, which lies along yesterday’s chalk line marked 9.',
+        art: 'The next morning Arjun sets the clay and stick back inside the chalk circle on the patio while Nanna, holding the watch, points at the stick’s shadow, which lies along yesterday’s chalk line marked 9.',
       },
     ],
     notice: 'The shadow is long in the morning, shortest around the middle of the day, and long again in the afternoon, pointing the other way.',
     ask: 'The shadow moved, but the stick did not. What moved?',
     pairsWith: 'a-tiny-dinosaur-a-huge-shadow',
-    trial: 'The day before, look at your spot at about 9, at midday and at about 3: a wall, a tree or the balcony railing can shade it for part of the day and leave gaps in the fan. Push the stick into the clay and check it stands straight and stays put when nudged, and that the chalk shows on your floor and washes off it.',
+    trial: 'The day before, look at your spot at about 9, at midday and at about 3: the house, the fence or a tree can shade it for part of the day and leave gaps in the fan. Push the stick into the clay and check it stands straight and stays put when nudged, and that the chalk shows on your patio and washes off it.',
     sources: [
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk, on making shadows and tracking the sun’s path from morning to bedtime', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
     ],
     note: {
-      what: 'He stands a stick upright on a sunny balcony or patio and, once an hour through the day, draws its shadow in chalk and writes the hour at the tip.',
+      what: 'He stands a stick upright on the sunny patio and, once an hour through the day, draws its shadow in chalk and writes the hour at the tip.',
       expect: 'Plan it for a sunny day at home: about ten minutes to set up before 9, then a few minutes every hour until about 4, and one look at 9 the next morning. He may expect the shadow to stay put, or to grow all day. It is long in the morning, shortest around the middle of the day and long again in the afternoon, and its tip swings round the stick the same way clock hands turn. While the clocks are on daylight saving time, the shortest shadow comes nearer 1 pm than noon.',
       practising: 'The sun’s position in the sky changes through the day, and a shadow always points away from the light. Also reading the hour on a clock and recording an observation at regular intervals.',
       ask: 'At the shortest mark: “This is the shortest shadow so far. Where is the sun now?” Let him point towards it without looking at it.',
-      next: 'On the next sunny morning, check whether the 9 o’clock shadow falls on yesterday’s line. On a visit to Jaipur, see the Samrat Yantra at the Jantar Mantar, a giant sundial built for Maharaja Sawai Jai Singh II and completed in the 1730s.',
+      next: 'On the next sunny morning, check whether the 9 o’clock shadow falls on yesterday’s line. When you pass a sundial in a park or a garden, show him that it is the same stick and shadow with the hours already marked. As they chalk, Nanna can call it by its Telugu name, needa (shadow).',
       honest: 'The marks hold for a few days and then drift as the seasons change, so this is a record of one day’s shadows, not a working clock. Seeing the shadow move does not mean he understands that the Earth’s turning causes it; that comes much later.',
       easier: 'Make only three marks: after breakfast, at lunch and before dinner.',
       harder: 'Measure each shadow with a ruler, write the lengths in a row, and ask him at which hour the shortest one came.',
-      safety: 'Never look straight at the sun, even for a moment, and not through sunglasses, binoculars or a tube either. Use a sun hat and sunscreen for the midday marks. On a balcony, keep him back from the railing and move away anything he could climb on. Keep the clay and chalk away from the two-year-old’s mouth.',
+      safety: 'Never look straight at the sun, even for a moment, and not through sunglasses, binoculars or a tube either. Use a sun hat and sunscreen for the midday marks. Keep the clay and chalk away from the two-year-old’s mouth.',
     },
   },
   {
@@ -152,27 +152,27 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Soak two equal handfuls of moong in water overnight.',
-        art: 'In the kitchen, Arjun tips a heaped handful of small green moong beans into one of two steel bowls of water on the counter, while Mummy pours a second, equal handful into the other bowl.',
+        art: 'In the kitchen, Arjun tips a heaped handful of small green moong beans into one of two steel bowls of water on the counter, while Nanna pours a second, equal handful into the other bowl.',
       },
       {
         text: 'In the morning, drain them. Line both jars with wet cloth and add the moong.',
-        art: 'Mummy holds a sieve of swollen green moong over the sink while Arjun spoons the wet beans into a glass jar lined with a damp white cotton cloth; a second lined jar of moong already stands on the counter.',
+        art: 'Nanna holds a sieve of swollen green moong over the sink while Arjun spoons the wet beans into a glass jar lined with a damp white cotton cloth; a second lined jar of moong already stands on the counter.',
       },
       {
         text: 'Put one jar in a dark cupboard and one on a bright windowsill.',
-        art: 'Arjun sets one glass jar of moong inside an open, dark kitchen cupboard while Mummy places the other jar on a sunny kitchen windowsill, looking back at him over her shoulder.',
+        art: 'Arjun sets one glass jar of moong inside an open, dark kitchen cupboard while Nanna, at the sink, places the other jar on the bright windowsill above it and looks back over his shoulder at Arjun; the backyard lemon tree shows through the window.',
       },
       {
         text: 'Morning and evening, sprinkle both cloths with the same spoonful of water.',
-        art: 'Arjun sprinkles one tablespoon of water over the damp cloth in a glass jar of moong, while Mummy holds the second jar and the measuring spoon ready for him to do the same.',
+        art: 'Arjun sprinkles one tablespoon of water over the damp cloth in a glass jar of moong, while Nanna holds the second jar and the measuring spoon ready for him to do the same.',
       },
       {
         text: 'Each day, draw both jars side by side. What changed?',
-        art: 'At the kitchen table Arjun draws two jars side by side with a pencil on a sheet of paper, the two real jars of sprouting moong standing in front of him, while Mummy points at the tiny white root tips in one of them.',
+        art: 'At the kitchen table Arjun draws two jars side by side with a pencil on a sheet of paper, the two real jars of sprouting moong standing in front of him, while Nanna points at the tiny white root tips in one of them.',
       },
       {
         text: 'On day five, tip both jars out and lay the sprouts side by side.',
-        art: 'On a white plate on the kitchen table, Arjun lays two little heaps of moong sprouts side by side: one with pale yellow stalks, one with green-topped stalks; Mummy leans in with him to compare the colours.',
+        art: 'On a steel plate on the kitchen table, Arjun lays two little heaps of moong sprouts side by side: one with pale yellow stalks, one with green-topped stalks; Nanna leans in with him to compare the colours.',
       },
     ],
     notice: 'Both jars sprout, but the sprouts from the dark grow pale yellow and long, while the ones in the light turn green at the top.',
@@ -188,7 +188,7 @@ const FIRST: readonly Activity[] = [
       expect: 'Start the evening before with the soak. Setting up the jars takes about fifteen minutes the next morning; after that it is a minute or two each morning and evening for five days to water, sniff and draw, and the rest is waiting. He will probably predict that the dark jar will not sprout at all. Both usually sprout within a day or two, because a seed carries its own food. Over the next days the dark sprouts grow pale yellow and lanky while the light ones open small green leaves. In warm weather a jar can spoil; the safety line says what to do if one does.',
       practising: 'Seeds need water, air and warmth to sprout; light is not needed for sprouting but is needed for a seedling to make its own food and turn green. Also a fair test: same seeds, same water, one change only.',
       ask: 'On the day both jars have roots: “The dark jar sprouted too. Did it need the light?” Then, a few days later: “So what is the light for?”',
-      next: 'If the batch stayed fresh to the end, cook the sprouts that day: boil them, or stir-fry them in a sprouts sabzi, until they are steaming hot all the way through, so he eats what he grew. Never eat sprouts from a batch that went off. Then read The Bean in the Dark together.',
+      next: 'If the batch stayed fresh to the end, cook the sprouts that day: boil them until they are steaming hot all the way through, then toss them with grated coconut and a tempering of mustard seeds and curry leaves, as a sundal, so he eats what he grew. Never eat sprouts from a batch that went off. Nanna can tell him these are pesalu in Telugu, the same green gram that is ground for pesarattu. Then read The Bean in the Dark together.',
       honest: 'Five days shows the change in colour; it does not show why it happens. One pair of jars is a single trial, and a warmer windowsill can speed up the light jar for reasons that have nothing to do with light. Chlorophyll and photosynthesis are names for later.',
       easier: 'Look only on day one and day five, and ask which jar looks different.',
       harder: 'Add a third jar that gets no water at all, and ask him beforehand which jars will sprout.',
@@ -212,27 +212,27 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Rest one end of the board on two books. Mark a start line near its top.',
-        art: 'On the smooth kitchen floor, Papa props one end of a long flat board on a stack of two thick books, while Arjun presses a strip of masking tape across the top of the board as a start line.',
+        art: 'On the smooth kitchen floor, Amma props one end of a long flat board on a stack of two thick books, while Arjun presses a strip of masking tape across the top of the board as a start line.',
       },
       {
         text: 'Set the car on the start line. Let go. Do not push.',
-        art: 'Arjun crouches at the top of the low ramp with one finger just lifting off the back of a small red toy car resting on the tape start line, while Papa lies on his stomach at the bottom of the ramp, watching.',
+        art: 'Arjun crouches at the top of the low ramp with one finger just lifting off the back of a small red toy car resting on the tape start line, while Amma lies on her stomach on the kitchen floor at the bottom of the ramp, chin on her hands, watching.',
       },
       {
         text: 'Where the car stops, stick a piece of tape and write 2.',
-        art: 'Arjun kneels on the floor and presses a short piece of masking tape marked with a big 2 beside the stopped red toy car, while Papa stands with the roll of tape and marker, looking back along the floor to the ramp.',
+        art: 'Arjun kneels on the floor and presses a short piece of masking tape marked with a big 2 beside the stopped red toy car, while Amma stands with the roll of tape and marker, looking back along the floor to the ramp.',
       },
       {
         text: 'Now guess: from four books, will it stop nearer, farther, or the same?',
-        art: 'Arjun points down the floor past the tape marked 2, guessing, while Papa slides two more thick books under the end of the board to make a stack of four.',
+        art: 'Arjun points down the floor past the tape marked 2, guessing, while Amma, kneeling at the ramp, slides two more thick books under the end of the board to make a stack of four.',
       },
       {
         text: 'Let go from the same start line. Mark where it stops with 4.',
-        art: 'Arjun lets go of the red toy car at the tape start line on the steeper ramp resting on four books, his hand open and back, while Papa crouches far down the floor beside a new piece of tape marked 4.',
+        art: 'Arjun lets go of the red toy car at the tape start line on the steeper ramp resting on four books, his hand open and back, while Amma crouches far down the floor beside a new piece of tape marked 4.',
       },
       {
         text: 'Run each height three times. Do the stops land close together?',
-        art: 'Arjun sits on the floor beside two small clusters of masking-tape marks, three marked 2 and three marked 4 farther along, pointing from one cluster to the other, while Papa sits beside the ramp holding the car.',
+        art: 'Arjun sits on the floor beside two small clusters of masking-tape marks, three marked 2 and three marked 4 farther along, pointing from one cluster to the other, while Amma sits beside the ramp holding the car.',
       },
     ],
     notice: 'From the higher start the car is going faster at the bottom and rolls farther along the floor, though no one pushed it harder.',
@@ -248,7 +248,7 @@ const FIRST: readonly Activity[] = [
       expect: 'He will probably want to push the car, and a push spoils the comparison, so say “let go, no push” before every run. The stops will scatter a little from run to run; three runs at each height show a pattern that one run cannot. Very steep ramps make the car bounce off the end, so stop at four or five books.',
       practising: 'Height stores energy: a car lifted higher gains more speed as it rolls down and travels farther before friction stops it. Also a fair test, changing only the height, and repeating a measurement because single runs vary.',
       ask: 'After the first run from four books: “You didn’t push it. So why did it go farther?” Accept a gesture up the ramp as an answer.',
-      next: 'Roll the car off the same ramp onto a towel instead of the bare floor and compare the stops; that is friction. Then play Start Higher, Roll Farther.',
+      next: 'Roll the car off the same ramp onto a towel instead of the bare floor and compare the stops; that is friction. At the playground, ask him whether he comes off the slide faster from the top or from halfway up. Then play Start Higher, Roll Farther.',
       honest: 'Farther from higher up is the pattern; it does not show that he understands stored energy, and a wheel that rubs or a wobbly board can muddy it. A swerving car may stop short because it hit something, not because the ramp was lower.',
       easier: 'Do one run at each height and compare only which mark is farther.',
       harder: 'Add a run from three books and ask him, before he lets go, where between the 2 marks and the 4 marks it will stop.',
@@ -259,7 +259,7 @@ const FIRST: readonly Activity[] = [
     id: 'why-is-a-ruler-called-a-foot',
     area: 'numbers',
     title: 'Why Is a Ruler Called a Foot?',
-    hook: 'Your feet say one number. Papa’s say another.',
+    hook: 'Your feet say one number. Nanna’s say another.',
     where: 'table',
     minutes: 20,
     need: [
@@ -271,31 +271,31 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Walk heel to toe along the table. Count each foot out loud.',
-        art: 'Arjun walks heel to toe along the side of the dining table in his socks, his front heel pressed against his back toe and his arms out for balance, counting aloud, while Papa walks slowly beside him counting on his fingers.',
+        art: 'Arjun walks heel to toe along the side of the dining table in his socks, his front heel pressed against his back toe and his arms out for balance, counting aloud, while Nanna walks slowly beside him, counting Arjun’s steps on his own fingers.',
       },
       {
         text: 'Now the grown-up walks heel to toe along the same side. Count again.',
-        art: 'Papa sets one big socked foot heel to toe in front of the other along the same side of the dining table, wobbling a little, while Arjun crouches beside Papa’s feet and counts them with his pointing finger.',
+        art: 'Nanna sets one big socked foot heel to toe in front of the other along the same side of the dining table, wobbling a little, while Arjun crouches beside Nanna’s feet and counts them with his pointing finger.',
       },
       {
         text: 'Write both numbers down. Same table, two answers. Put your feet side by side.',
-        art: 'At the end of the dining table, Arjun and Papa sit on the floor with their bare feet side by side, heels on the same floor-tile line, Arjun’s foot clearly shorter; a sheet of paper with two numbers on it lies between them.',
+        art: 'At the end of the dining table, Arjun and Nanna sit on the wooden floor with their bare feet side by side, heels lined up on the same floorboard seam, Arjun’s foot clearly shorter; a sheet of paper with two numbers on it lies between them.',
       },
       {
         text: 'Put the ruler’s end at the table’s edge. Hold a finger at its far end.',
-        art: 'Arjun lines up the end of a wooden 12-inch ruler exactly with the edge of the dining table and presses his finger on the tabletop at the ruler’s far end, while Papa leans in and points at the two lined-up edges.',
+        art: 'Arjun lines up the end of a wooden 12-inch ruler exactly with the edge of the dining table and presses his finger on the tabletop at the ruler’s far end, while Nanna leans in and points at the two lined-up edges.',
       },
       {
         text: 'Slide the ruler up to your finger, with no gap. Count each ruler.',
-        art: 'Arjun slides the ruler forward along the tabletop until its end touches his fingertip, mouthing the count, while Papa writes a row of tally marks on the sheet of paper at the end of the table.',
+        art: 'Arjun slides the ruler forward along the tabletop until its end touches his fingertip, mouthing the count, while Nanna writes a row of tally marks on the sheet of paper at the end of the table.',
       },
       {
         text: 'The grown-up measures with the ruler too. Do you get the same number?',
-        art: 'Papa lays the same ruler along the dining table and moves it end to end while Arjun walks beside him holding up the paper with his own ruler count written on it, checking Papa’s count against it.',
+        art: 'Nanna lays the same ruler along the dining table and moves it end to end while Arjun walks beside him holding up the paper with his own ruler count written on it, checking Nanna’s count against it.',
       },
     ],
-    notice: 'Your feet give a bigger number than Papa’s because each of your feet is shorter, but the ruler gives you both the same number.',
-    ask: 'Why did the ruler give you and Papa the same number?',
+    notice: 'Your feet give a bigger number than Nanna’s because each of your feet is shorter, but the ruler gives you both the same number.',
+    ask: 'Why did the ruler give you and Nanna the same number?',
     pairsWith: 'how-long-is-that-dinosaur',
     trial: 'Walk the table heel to toe and lay the ruler along it yourself first, so you know roughly what both counts should be and can spot a skipped step. Choose a side with no chair legs in the way. Check whether your ruler is exactly a foot from end to end: many are a little longer, with a blank strip before the 0, so the count is in rulers, not quite in feet.',
     sources: [
@@ -311,7 +311,7 @@ const FIRST: readonly Activity[] = [
       honest: 'Counting rulers along one table does not mean he understands measurement. The test is whether he can say why a gap or an overlap changes the answer, and whether he can measure something you did not choose.',
       easier: 'Measure only in his feet and yours, and ask which of you got the bigger number.',
       harder: 'Ask him to guess the next item’s length in rulers before measuring, and to say how many of his feet make one ruler.',
-      safety: 'Walk heel to toe on a clear floor, away from chair legs, and keep a hand near him for balance; socks slip on smooth tiles, so go slowly or go barefoot. The ruler is not a sword; keep it below shoulder height near the two-year-old.',
+      safety: 'Walk heel to toe on a clear floor, away from chair legs, and keep a hand near him for balance; socks slip on a smooth floor, so go slowly or go barefoot. The ruler is not a sword; keep it below shoulder height near the two-year-old.',
     },
   },
   {
@@ -332,27 +332,27 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Pack the box with crumpled paper or socks. Press a nest into the middle.',
-        art: 'Arjun stuffs crumpled newspaper and a pair of rolled socks into a cardboard shoebox on the kitchen floor and presses a hollow into the middle with his fist, while Mummy, sitting cross-legged beside him, holds out another sheet of newspaper.',
+        art: 'Arjun stuffs crumpled newspaper and a pair of rolled socks into a cardboard shoebox on the kitchen floor and presses a hollow into the middle with his fist, while Amma, sitting cross-legged beside him, holds out another sheet of newspaper.',
       },
       {
         text: 'The grown-up drops a bare boiled egg onto the tray from chair-back height.',
-        art: 'Mummy, standing on the floor beside a kitchen chair, lets go of a white boiled egg in its shell from level with the top of the chair back, over a metal baking tray on the floor, while Arjun crouches at the tray’s edge watching the egg fall.',
+        art: 'Amma, standing on the floor beside a kitchen chair, lets go of a white boiled egg in its shell from level with the top of the chair back, over a metal baking tray on the floor, while Arjun crouches at the tray’s edge watching the egg fall.',
       },
       {
         text: 'Look at the shell closely. Find every crack.',
-        art: 'Arjun crouches over the baking tray and points at a web of cracks and a flattened spot on the bare boiled egg lying on it, while Mummy kneels across the tray and turns the egg gently so he can see the other side.',
+        art: 'Arjun crouches over the baking tray and points at a web of cracks and a flattened spot on the bare boiled egg lying on it, while Amma kneels across the tray and turns the egg gently so he can see the other side.',
       },
       {
         text: 'The grown-up sets the second egg in your nest. Close the lid.',
-        art: 'Mummy lowers the second white boiled egg into the hollow in the crumpled newspaper inside the shoebox, while Arjun holds the shoebox lid ready in both hands to close it.',
+        art: 'Amma lowers the second white boiled egg into the hollow in the crumpled newspaper inside the shoebox, while Arjun holds the shoebox lid ready in both hands to close it.',
       },
       {
         text: 'Guess: cracked or whole? Then the grown-up drops the box from the same height.',
-        art: 'Mummy holds the closed shoebox level with the top of the chair back above the baking tray, about to let go, while Arjun crouches beside the tray holding a card on which he has drawn an egg with no cracks.',
+        art: 'Amma holds the closed shoebox level with the top of the chair back above the baking tray, about to let go, while Arjun crouches beside the tray holding a card on which he has drawn an egg with no cracks.',
       },
       {
         text: 'Open the box and check every side of the egg. Peel the cracked one: did the white break too?',
-        art: 'At the kitchen table, Arjun turns the whole, uncracked boiled egg slowly in his fingers, checking every side, while Mummy peels the cracked egg onto a small steel plate beside him.',
+        art: 'At the kitchen table, Arjun turns the whole, uncracked boiled egg slowly in his fingers, checking every side, while Amma peels the cracked egg onto a small steel plate beside him.',
       },
     ],
     notice: 'The bare egg cracks on the tray, and the packed egg falling from the same height usually comes out whole.',
@@ -391,27 +391,27 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'The grown-up tapes a string loop to each cup and hangs one cup at each end.',
-        art: 'Papa tapes a loop of string across the mouth of a paper cup while Arjun hooks a second cup by its string loop into the notch at one end of a plastic coat hanger hanging from a broom handle laid across the backs of two dining chairs.',
+        art: 'Amma tapes a loop of string across the mouth of a paper cup while Arjun hooks a second cup by its string loop into the notch at one end of a plastic coat hanger hanging from a broom handle laid across the backs of two dining chairs.',
       },
       {
         text: 'Hang the hanger on the broom handle. Do the empty cups hang level?',
-        art: 'Arjun crouches so his eyes are level with the plastic coat hanger hanging from the broom handle between two chair backs, a paper cup dangling from each end, while Papa holds a hand flat beside the hanger’s bar to show it is level.',
+        art: 'Arjun crouches so his eyes are level with the plastic coat hanger hanging from the broom handle between two chair backs, a paper cup dangling from each end, while Amma holds a hand flat beside the hanger’s bar to show it is level.',
       },
       {
         text: 'Drop three pennies in one cup. Which way does the hanger tip?',
-        art: 'Arjun drops a third penny into the left paper cup and the left end of the coat hanger dips lower, while Papa points at the empty right cup, now hanging higher.',
+        art: 'Arjun drops a third penny into the left paper cup and the left end of the coat hanger dips lower, while Amma points at the empty right cup, now hanging higher.',
       },
       {
         text: 'Guess how many pennies the other cup needs. Then add them, one at a time.',
-        art: 'Arjun holds up three fingers on one hand and drops a penny into the right paper cup with the other, while Papa watches the hanger bar starting to level out.',
+        art: 'Arjun holds up three fingers on one hand and drops a penny into the right paper cup with the other, while Amma watches the hanger bar starting to level out.',
       },
       {
         text: 'Now put five in one cup. Make the other side match.',
-        art: 'Arjun counts pennies from his palm into the right-hand paper cup while the left cup, already holding five, hangs lower; Papa holds up five fingers as a reminder.',
+        art: 'Arjun counts pennies from his palm into the right-hand paper cup while the left cup, already holding five, hangs lower; Amma holds up five fingers as a reminder.',
       },
       {
         text: 'Try two pennies plus three in one cup, and four plus one in the other.',
-        art: 'Arjun drops the last penny into the right paper cup and steps back to see the coat hanger hanging level, while Papa writes 2 + 3 = 4 + 1 on a sheet of paper lying on a chair seat below the hanger.',
+        art: 'Arjun drops the last penny into the right paper cup and steps back to see the coat hanger hanging level, while Amma writes 2 + 3 = 4 + 1 on a sheet of paper lying on a chair seat below the hanger.',
       },
     ],
     notice: 'The hanger hangs level only when both cups hold the same number of pennies, however you split them up.',
@@ -443,7 +443,7 @@ const FIRST: readonly Activity[] = [
     minutes: 15,
     need: [
       'a large fridge magnet, too big to swallow',
-      'a steel spoon, a steel bowl and a steel lid',
+      'a steel spoon, a steel tumbler and a steel lid',
       'a wooden spoon, a plastic cup and a ceramic mug',
       'a roll of kitchen foil and a clean, empty food tin',
       'two trays labelled with a drawn magnet and a crossed-out magnet',
@@ -451,23 +451,23 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Lay everything on the counter. Guess for each one: will the magnet hold it?',
-        art: 'Arjun sets a wooden spoon, a steel spoon, a plastic cup, a ceramic mug, a steel bowl, a ball of kitchen foil and an empty food tin in a row on the kitchen counter, while Mummy holds a large fridge magnet ready.',
+        art: 'Arjun sets a wooden spoon, a steel spoon, a plastic cup, a ceramic mug, a steel tumbler, a ball of kitchen foil and an empty food tin in a row on the kitchen counter, while Nanna holds a large fridge magnet ready.',
       },
       {
         text: 'Touch the magnet to each thing. Does it hold on?',
-        art: 'Arjun presses a large fridge magnet against the side of an empty food tin and lets go of the magnet, which stays stuck to the tin, while Mummy holds the tin steady and watches.',
+        art: 'Arjun presses a large fridge magnet against the side of an empty food tin and lets go of the magnet, which stays stuck to the tin, while Nanna holds the tin steady and watches.',
       },
       {
         text: 'Put things the magnet holds on one tray. Put the others on the second tray.',
-        art: 'Arjun places a steel spoon on a tray marked with a drawn magnet, beside the tin, while Mummy points at the other tray, marked with a crossed-out magnet, which holds the wooden spoon and the plastic cup.',
+        art: 'Arjun places a steel spoon on a tray marked with a drawn magnet, beside the tin, while Nanna points at the other tray, marked with a crossed-out magnet, which holds the wooden spoon and the plastic cup.',
       },
       {
         text: 'Try the kitchen foil. It is metal. Does the magnet want it?',
-        art: 'Arjun holds a crumpled ball of shiny kitchen foil against the fridge magnet in Mummy’s hand, and the foil falls away; his eyebrows go up in surprise.',
+        art: 'Arjun holds a crumpled ball of shiny kitchen foil against the fridge magnet in Nanna’s hand, and the foil falls away; Arjun’s eyebrows go up in surprise.',
       },
       {
         text: 'Try steel things from all over the kitchen. Do all of them stick?',
-        art: 'Arjun holds the fridge magnet against the side of the steel kitchen sink and it slides straight off into his other hand, while Mummy leans on the counter beside him, pointing at a steel spoon on the magnet tray for comparison.',
+        art: 'Arjun holds the fridge magnet against the side of the steel kitchen sink and it slides straight off into his other hand, while Nanna leans on the counter beside him, pointing at a steel spoon on the magnet tray for comparison.',
       },
     ],
     notice: 'The magnet holds the tin and some steel things, but not the foil, the wood, the plastic or the mug, and not every steel thing either.',
@@ -479,7 +479,7 @@ const FIRST: readonly Activity[] = [
     ],
     note: {
       what: 'He guesses whether a fridge magnet will hold each kitchen object, tests it, and sorts everything onto two trays: held, or not held.',
-      expect: 'Most children think a magnet holds all metal. Foil (aluminium) does not stick, and many stainless-steel sinks, pans and spoons do not either, while a food tin and a painted fridge door usually do. The surprises are the point; do not explain them away before he tests.',
+      expect: 'Most children think a magnet holds all metal. Foil (aluminium) does not stick, and many stainless-steel sinks, tumblers, pans and spoons do not either, while a food tin and a painted fridge door usually do. The surprises are the point; do not explain them away before he tests.',
       practising: 'Magnetism: magnets attract iron and some kinds of steel, not all metals. Also sorting by a tested property rather than by appearance, and comparing a prediction with a result.',
       ask: 'After the foil falls away: “It is shiny and it is metal. Why didn’t the magnet hold it?” Accept “some metals are different” as a good answer.',
       next: 'Walk round the house with the magnet and find three more things it holds. Then play Will the Magnet Pick It Up?',
@@ -505,23 +505,23 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Put one ice cube in each bowl. Check they look the same size.',
-        art: 'Arjun drops one ice cube into each of two small steel bowls on the kitchen counter, while Mummy holds the ice tray and bends down to compare the two cubes at eye level.',
+        art: 'Arjun drops one ice cube into each of two small steel bowls on the kitchen counter, while Amma holds the ice tray and bends down to compare the two cubes at eye level.',
       },
       {
         text: 'Wrap one bowl up tightly in the thick towel. Leave the other bare.',
-        art: 'Arjun folds a thick striped hand towel over and around one small steel bowl on the counter, tucking the ends under, while the second bowl with its ice cube stands uncovered beside it and Mummy sets the kitchen timer.',
+        art: 'Arjun folds a thick striped hand towel over and around one small steel bowl on the counter, tucking the ends under, while the second bowl with its ice cube stands uncovered beside it and Amma sets the kitchen timer.',
       },
       {
         text: 'Guess: will the wrapped cube melt faster, slower, or the same?',
-        art: 'Arjun points from the towel bundle to the bare steel bowl, deciding, while Mummy holds a pencil over a card with a drawn towel and a drawn bare bowl, ready to circle his guess.',
+        art: 'Arjun points from the towel bundle to the bare steel bowl, deciding, while Amma holds a pencil over a card with a drawn towel and a drawn bare bowl, ready to circle his guess.',
       },
       {
         text: 'After half an hour, unwrap the towel. Put the bowls side by side.',
-        art: 'Arjun peels back the towel and finds a still-solid ice cube in the first bowl, while beside it Mummy tilts the bare bowl to show a much smaller cube sitting in a pool of water.',
+        art: 'Arjun peels back the towel and finds a still-solid ice cube in the first bowl, while beside it Amma tilts the bare bowl to show a much smaller cube sitting in a pool of water.',
       },
       {
         text: 'Feel the towel’s inside. Is it warm, or cool?',
-        art: 'Arjun presses his palm flat against the inside of the unwrapped thick towel, his face puzzled, while Mummy holds the towel open for him and waits for his answer.',
+        art: 'Arjun presses his palm flat against the inside of the unwrapped thick towel, his face puzzled, while Amma holds the towel open for him and waits for his answer.',
       },
     ],
     notice: 'The wrapped ice cube melts more slowly, and the inside of the towel feels cool, not warm.',
@@ -536,7 +536,7 @@ const FIRST: readonly Activity[] = [
       expect: 'Most children expect the towel to melt the ice faster, because blankets “make you warm”. The wrapped cube usually lasts much longer. He may then decide the towel is “cold”, so ask him to feel it.',
       practising: 'Insulation slows heat moving from one place to another. A blanket keeps you warm by holding in your own body’s heat; it makes no heat itself, so around ice it slows the room’s heat getting in. Also a fair test with one change.',
       ask: 'After unwrapping: “We wrap up in a blanket to stay warm. Why did the towel keep the ice cold?”',
-      next: 'Pack his lunch with a cold pack in an insulated bag and check at lunchtime whether it is still cold. Then play Where Did the Ice Go?',
+      next: 'Pack his curd rice in his steel tiffin with a cold pack, inside an insulated lunch bag, and ask him at pick-up whether it was still cold at lunchtime. Then play Where Did the Ice Go?',
       honest: 'One pair of ice cubes shows that the towel slowed melting. It does not show that he understands heat transfer, and a sunny spot or unequal cubes can change the result. “The towel makes cold” is a common next idea; it is wrong, and it is worth a second try.',
       easier: 'Check after ten minutes and just ask which cube is bigger.',
       harder: 'Wrap a third cube in kitchen foil only, and ask him beforehand to put the three in order of which will melt first.',
@@ -559,23 +559,23 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Lay the ruler across the middle of the thali. That is the mirror line.',
-        art: 'Arjun lays a wooden ruler straight across the middle of a large steel thali on the dining table, while Mummy places small steel bowls of white rice, yellow toor dal, green moong and orange masoor dal beside the thali.',
+        art: 'Arjun lays a wooden ruler straight across the middle of a large steel thali on the dining table, while Amma places small steel bowls of white rice, yellow toor dal, green moong and orange masoor dal beside the thali.',
       },
       {
         text: 'The grown-up makes a pattern on one side only, starting at the ruler.',
-        art: 'Mummy pinches a thin line of white rice into a petal shape on one half of the thali, starting at the ruler, while Arjun watches closely with a pinch of yellow toor dal ready in his fingers.',
+        art: 'Amma pinches a thin line of white rice into a petal shape on one half of the thali, starting at the ruler, while Arjun watches closely with a pinch of yellow toor dal ready in his fingers.',
       },
       {
         text: 'Copy each shape on your side, the same distance from the ruler.',
-        art: 'Arjun sprinkles yellow toor dal into a petal shape on his half of the thali, opposite Mummy’s yellow petal, measuring the gap to the ruler with two fingers, while Mummy holds the bowl steady.',
+        art: 'Arjun sprinkles yellow toor dal into a petal shape on his half of the thali, opposite Amma’s yellow petal, measuring the gap to the ruler with two fingers, while Amma holds the bowl steady.',
       },
       {
         text: 'Check: a shape close to the ruler stays close. A far one stays far.',
-        art: 'Mummy points to a green moong dot right beside the ruler on her side, and Arjun points to his matching green dot at the same place on his side, both faces close to the thali.',
+        art: 'Amma points to a green moong dot right beside the ruler on her side, and Arjun points to his matching green dot at the same place on his side, both faces close to the thali.',
       },
       {
         text: 'Lift the ruler away carefully. Does one half match the other?',
-        art: 'Arjun lifts the ruler straight up from the middle of a finished rice-and-dal rangoli on the steel thali, while Mummy leans in to look along the middle line where the two halves meet.',
+        art: 'Arjun lifts the ruler straight up from the middle of a finished rice-and-dal rangoli on the steel thali, while Amma leans in to look along the middle line where the two halves meet.',
       },
     ],
     notice: 'Each shape on your side is the same size and the same distance from the line as its partner, but it faces the other way.',
@@ -591,8 +591,8 @@ const FIRST: readonly Activity[] = [
       expect: 'His first copy will probably repeat your shape facing the same way, slid across instead of flipped, or drift away from the line. Point to the ruler and ask how far your shape is from it. Mirror reversal of a curved petal is the hardest part.',
       practising: 'Line symmetry: a reflection keeps each shape’s size and its distance from the mirror line but reverses which way it faces. Also fine finger control and careful copying.',
       ask: 'When he has copied one petal: “My petal is two fingers from the ruler. How far is yours?”',
-      next: 'Find a symmetric rangoli at a doorstep or in a temple at Diwali, and ask him where its mirror line is. Then play Make the Other Half.',
-      honest: 'Copying a half with your help does not show he can see symmetry on his own. The test is whether he can find a mirror line in a new picture, or spot a deliberate mistake in one half. Many rangolis also have turning symmetry, which is a different idea.',
+      next: 'At Deepavali or Sankranti, when the muggu goes down at the front door, ask him where its mirror line is; many have two. Amma calls it a kolam, the Tamil name for the same doorstep drawing. Then play Make the Other Half.',
+      honest: 'Copying a half with your help does not show he can see symmetry on his own. The test is whether he can find a mirror line in a new picture, or spot a deliberate mistake in one half. Many muggulu and kolams also have turning symmetry, which is a different idea.',
       easier: 'Use only straight lines and dots, close to the ruler.',
       harder: 'Draw two mirror lines in a plus sign and ask him to complete all four quarters from your one.',
       safety: 'Raw dal and rice are choking hazards for the two-year-old, and small enough for her to push into a nose or an ear; keep the thali well out of her reach, and sweep up spills.',
@@ -614,28 +614,28 @@ const FIRST: readonly Activity[] = [
     ],
     steps: [
       {
-        text: 'Draw four columns. At the bottom, draw eggs, fruit, poha and paratha.',
-        art: 'Arjun draws a small round paratha at the bottom of the fourth of four ruled columns on a large sheet of paper at the dining table, below drawings of a boiled egg, a banana and a plate of poha, while Papa holds the ruler steady along the paper.',
+        text: 'Draw four columns. At the bottom, draw eggs, fruit, upma and dosa.',
+        art: 'Arjun draws a round golden dosa at the bottom of the fourth of four ruled columns on a large sheet of paper at the dining table, beside drawings of a boiled egg, a banana and a heap of upma on a plate, while Nanna holds the ruler steady along the paper.',
       },
       {
         text: 'Ask each person what they ate. Make a tally mark under their answer.',
-        art: 'Arjun stands beside Mummy’s chair at the breakfast table holding a pencil and a sheet of paper with four food pictures, a tally mark under the paratha, while she points to the half-eaten paratha on her steel plate and Papa sits across the table waiting for his turn.',
+        art: 'Arjun stands beside Amma’s chair at the breakfast table holding a pencil and a sheet of paper with four food pictures, a tally mark under the dosa, while she points to the half-eaten dosa and a katori of chutney on her steel plate and Nanna sits across the table with a steel tumbler of coffee, waiting for his turn.',
       },
       {
         text: 'Draw one square for each tally mark. Glue it in that food’s column, from the bottom.',
-        art: 'Arjun presses a small paper square with a drawn egg onto the egg column, just above the bottom picture, while Papa holds out the next square, already drawn with a paratha.',
+        art: 'Arjun presses a small paper square with a drawn egg onto the egg column, just above the bottom picture, while Nanna holds out the next square, already drawn with a dosa.',
       },
       {
         text: 'Keep the squares the same size and touching, with no gaps.',
-        art: 'Arjun lines up the edge of a new paper square against the one below it in the poha column, pressing it flat with his thumb, while Papa points at a small gap in the fruit column for him to close up.',
+        art: 'Arjun lines up the edge of a new paper square against the one below it in the upma column, pressing it flat with his thumb, while Nanna points at a small gap in the fruit column for him to close up.',
       },
       {
         text: 'Which column is tallest? Which is shortest? Count each one.',
-        art: 'Arjun runs his finger up the tallest column of paper squares on the finished breakfast pictograph, counting, while Papa holds the chart up against the kitchen wall and points at the shortest column.',
+        art: 'Arjun runs his finger up the tallest column of paper squares on the finished breakfast pictograph, counting, while Nanna holds the chart up against the side of the fridge and points at the shortest column.',
       },
     ],
     notice: 'The tallest column is the food the most people ate, and you can see it at a glance without counting.',
-    ask: 'If Dadi and Dada came and both ate paratha, what would change?',
+    ask: 'If Paati and Thatha came to stay and both ate dosa, what would change?',
     pairsWith: 'what-did-our-class-choose',
     trial: 'Rule the four columns yourself first and stick two test squares in one of them: check that a square fits the column’s width, and that the columns are tall enough for everyone in the house plus visitors. Cut all the squares from one strip of paper so they really are the same size; a short column made of bigger squares looks tall.',
     sources: [
@@ -643,15 +643,15 @@ const FIRST: readonly Activity[] = [
       { label: 'Erikson Institute Early Math Collaborative: Shoe Graph, making a real graph and then a pictorial one', url: 'https://www.erikson.edu/early-math-collaborative/idea/shoe-graph-3-5-year-old-childrens-education-programs-and-activities/' },
     ],
     note: {
-      what: 'He asks each person in the family what they ate for breakfast — eggs, fruit, poha or paratha — keeps a tally, and builds a pictograph with one paper square per person, stacked in columns.',
-      expect: 'Unequal square sizes and gaps between squares are the usual mistakes, and they make a short column look tall. Someone will have eaten two things; decide together whether they get one square or two, and stick to it. With only four or five family members the columns will be short; ask visiting grandparents or count a whole week.',
+      what: 'He asks each person in the family what they ate for breakfast — eggs, fruit, upma or dosa — keeps a tally, and builds a pictograph with one paper square per person, stacked in columns.',
+      expect: 'Unequal square sizes and gaps between squares are the usual mistakes, and they make a short column look tall. Someone will have eaten two things, a dosa and a banana; decide together whether they get one square or two, and stick to it. Mia counts too: she can point to what is on her plate. With four people the columns will be short; add Nanamma and Tatayya or Paati and Thatha when they are staying, or count a whole week.',
       practising: 'Data handling: collecting answers to one question, sorting them into categories and showing each answer as one equal unit, so the heights of the columns can be compared. Also counting and comparing small numbers.',
-      ask: 'When the chart is done: “How many more people ate paratha than eggs?” Let him count up the difference on the chart.',
+      ask: 'When the chart is done: “How many more people ate dosa than eggs?” Let him count up the difference on the chart.',
       next: 'Repeat every morning for a week on the same chart, adding a new square each day, and on Sunday ask which breakfast the family eats most. Then play What Did Our Class Choose?',
-      honest: 'A chart of five people does not show that he can read graphs in general. The test is a chart someone else made: can he say which is most, least and how many more? A family chart also tells you nothing about anyone outside the family.',
-      easier: 'Use only two foods, such as eggs and paratha, and two or three people.',
+      honest: 'A chart of four or six people does not show that he can read graphs in general. The test is a chart someone else made: can he say which is most, least and how many more? A family chart also tells you nothing about anyone outside the family.',
+      easier: 'Use only two foods, such as eggs and dosa, and two or three people.',
       harder: 'Ask each person what they would like tomorrow, make a second chart, and ask him what changed and why.',
-      safety: 'Keep the glue stick and paper squares from the two-year-old; she can join by pointing to her own breakfast.',
+      safety: 'Keep the glue stick and paper squares from the two-year-old; she joins by pointing, not by sticking.',
     },
   },
   {
@@ -670,27 +670,27 @@ const FIRST: readonly Activity[] = [
     steps: [
       {
         text: 'Walk slowly and pick up fallen leaves. Only ones already on the ground.',
-        art: 'Arjun bends to pick up a large fallen leaf from the grass under a tree in a park, a cloth bag over his arm half full of leaves, while Papa walks beside him holding another fallen leaf up for him to see.',
+        art: 'Arjun bends to pick up a large star-shaped fallen leaf from the grass under a sweetgum tree in the neighbourhood park, a cloth bag over his arm half full of red and gold leaves, while Nanna walks beside him holding another fallen leaf up for him to see.',
       },
       {
         text: 'Sit down. Guess how many leaves are in the bag. Write the guess.',
-        art: 'Arjun sits on a park bench with the cloth bag of leaves on his lap, frowning as he guesses, while Papa writes Arjun’s guess at the top of a large sheet of paper on a clipboard.',
+        art: 'Arjun sits on a park bench with the cloth bag of leaves on his lap, frowning as he guesses, while Nanna writes Arjun’s guess at the top of a large sheet of paper on a clipboard.',
       },
       {
         text: 'Count out ten leaves. Stack them and loop a rubber band round them.',
-        art: 'Arjun holds a neat stack of ten fallen leaves together by their stems while Papa stretches a rubber band round the stems; a spread-out row of leaves waits on the bench beside them.',
+        art: 'Arjun holds a neat stack of ten fallen leaves together by their stems while Nanna stretches a rubber band round the stems; a spread-out row of leaves waits on the bench beside them.',
       },
       {
         text: 'Make more bundles of ten until fewer than ten are left loose.',
-        art: 'Arjun lays a third rubber-banded bundle of ten leaves beside two others on the park bench, with a few loose leaves left over, while Papa points from the bundles to the loose leaves.',
+        art: 'Arjun lays a third rubber-banded bundle of ten leaves beside two others on the park bench, with a few loose leaves left over, while Nanna points from the bundles to the loose leaves.',
       },
       {
         text: 'Count the bundles in tens: ten, twenty, thirty. Then add the loose ones.',
-        art: 'Arjun touches each bundle of leaves in turn, counting “ten, twenty, thirty” out loud, then points at the four loose leaves, while Papa writes the number 34 on the sheet of paper below the guess.',
+        art: 'Arjun touches each bundle of leaves in turn, counting “ten, twenty, thirty” out loud, then points at the four loose leaves, while Nanna writes the number 34 on the sheet of paper below the guess.',
       },
       {
         text: 'Undo one bundle. Are there more leaves now, fewer, or the same?',
-        art: 'Arjun pulls the rubber band off one bundle and spreads its ten leaves out across the bench, while Papa sits beside him with eyebrows raised, waiting for his answer.',
+        art: 'Arjun pulls the rubber band off one bundle and spreads its ten leaves out across the bench, while Nanna sits beside him with eyebrows raised, waiting for his answer.',
       },
     ],
     notice: 'Counting the bundles in tens and then the loose ones is quicker than counting every leaf, and gives the same number.',
@@ -706,7 +706,7 @@ const FIRST: readonly Activity[] = [
       expect: 'He may count a bundle as “one” and forget that it stands for ten, or count every leaf again from one. Expect a miscount inside a bundle; recount it together rather than correcting him. Undoing a bundle often makes young children think there are now more leaves because they cover more ground.',
       practising: 'Place value and unitising: ten ones can be treated as one ten, and the number 34 means three tens and four ones. Also conservation of number when a bundle is undone, and comparing a guess with a count.',
       ask: 'When he undoes a bundle: “Are there more leaves now, fewer, or the same?” Then: “How do you know?”',
-      next: 'At home, bundle ice-cream sticks or straws in tens and make the number of family members’ ages. Then play Ten Loose, One Bundle.',
+      next: 'At home, bundle ice-cream sticks or straws in tens and make everyone’s age: his, Mia’s, Amma’s and Nanna’s. Then play Ten Loose, One Bundle.',
       honest: 'Bundling leaves with your help does not show that he understands place value. The test is whether he can tell you, without counting, how many leaves are in 3 bundles and 4 loose, and what the 3 in 34 stands for.',
       easier: 'Stop at 20, with two bundles and a few loose leaves.',
       harder: 'Once he has 10 bundles, tie them into one bundle of a hundred and ask how to write the number.',
