@@ -19,7 +19,7 @@ export const IDEAS: readonly PlayIdea[] = [
     setup: 'Two minutes to fetch pots and spoons',
     players: 'You, him and Mia',
     need: [
-      'two or three steel pots or a kadhai, turned upside down (or a plastic bucket)',
+      'two or three steel pots, or the idli pot without its stand, turned upside down (or a plastic bucket)',
       'two steel pan lids, not glass ones (or two steel plates)',
       'a wooden spoon each (or a plastic spatula)',
       'a few steel tumblers or katoris',
@@ -27,18 +27,18 @@ export const IDEAS: readonly PlayIdea[] = [
     steps: [
       'Sit on the kitchen floor with the pots upside down. Play a short beat, such as pot, pot, lid, and he plays it back.',
       'Keep it to five beats or fewer at first. Then play loud and soft, then fast and slow, and he copies those too.',
-      'Say the start of teentaal, a common tabla rhythm, as you play: dha dhin dhin dha, one sound to each beat. He copies the words and the beat.',
+      'Say Carnatic rhythm syllables as you play, as a mridangam teacher does: ta ka dhi mi, one sound to each beat. He copies the words and the beat.',
       'Swap: he plays a beat and you copy it. Then he drums while everyone else marches round the room, to a slow beat first, then a fast one.',
     ],
     hisWay:
-      'He becomes the bandleader: he picks who plays which pot, makes up beats for you to copy, and decides when the band plays soft. If he wants to play along to a song, he chooses it, a film song, a bhajan or a nursery rhyme, and you sing while he drums.',
+      'He becomes the bandleader: he picks who plays which pot, makes up beats for you to copy, and decides when the band plays soft. If he wants to play along to a song, he chooses it, a Telugu or Tamil film song, Chandamaama raave or a nursery rhyme, and you sing while he drums.',
     mia: {
       way: 'joins',
       text: 'Mia gets her own steel tumbler and wooden spoon and bangs along however she likes; nobody waits for her to copy the beat. Sit her across from him, not beside his ear.',
     },
     picture:
-      'Arjun beats an upturned steel pot with a wooden spoon on the kitchen floor of the California home, while Papa, cross-legged opposite, holds two steel pan lids ready to copy the beat, and Mia, sitting beside Papa, taps an upturned steel tumbler with her own wooden spoon.',
-    cast: ['Arjun', 'Papa', 'Mia'],
+      'On the floor of the open kitchen of the Bay Area house, with steel tumblers and plates on the counter behind and the pressure cooker on the shelf, Arjun beats an upturned steel pot with a wooden spoon, while Nanna, cross-legged opposite, holds two steel pan lids ready to copy the beat, and Mia, sitting beside Nanna, taps an upturned steel tumbler with her own wooden spoon. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Nanna', 'Mia'],
     sources: [
       { label: 'NAEYC for Families: Playing Music at Home', url: 'https://www.naeyc.org/our-work/families/playing-music-home' },
       { label: 'UNICEF Parenting: Screen-free activities (Family band)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },
@@ -51,14 +51,14 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Listening to a short pattern of sounds and playing it back, and controlling how hard and how fast he hits. NAEYC suggests copying patterns of five beats or fewer before trying longer ones.',
       ask: 'After he has copied a soft beat well: "How did you make it so quiet?"',
-      next: 'Tap along to the beat of a song he likes on the table after dinner. The next time a dholak or tabla is played at a family gathering, sit close together and watch the drummer\'s hands.',
+      next: 'Tap along to the beat of a song he likes on the table after dinner. The next time a mridangam is played, at a temple concert or a cousin\'s dance recital, sit close together and watch the drummer\'s hands.',
       honest:
         'Copying four beats is not a measure of musical talent, and a child who misses the pattern may simply be enjoying the noise. It is loud; pick a time that suits the neighbours and Mia\'s nap.',
       easier: 'Play only two or three beats, all on one pot, and let him copy just loud or soft.',
       harder:
         'Make the beat longer, or put a rest in the middle: pot, pot, wait, lid. Or one of you keeps a steady beat while the other plays a pattern on top of it.',
       safety:
-        'Play when nothing is cooking, with cold, clean pots and lids from the cupboard, never one that has just been on the hob. Steel lids, not glass ones; wooden spoons only, nothing sharp, and keep loud clashing at arm\'s length from everyone\'s ears, especially Mia\'s. For the march, clear toys off the floor and go barefoot on tiles rather than in socks.',
+        'Play when nothing is cooking, with cold, clean pots and lids from the cupboard, never one that has just been on the stove. Steel lids, not glass ones; wooden spoons only, nothing sharp, and keep loud clashing at arm\'s length from everyone\'s ears, especially Mia\'s. For the march, clear toys off the floor and go barefoot on the kitchen floor rather than in socks.',
     },
   },
   {
@@ -74,23 +74,23 @@ export const IDEAS: readonly PlayIdea[] = [
     players: 'You and him',
     need: [],
     steps: [
-      "Warm up with words. Say \"aam\" and stretch the last sound, mmm. He finds a word starting with it, like \"mor\". Now you need an r word.",
-      'Sing two lines starting with m, the usual opening: "Machhli jal ki rani hai, jeevan uska paani hai". In Hindi the last consonant letter passes on: "hai" passes h.',
+      "Warm up with words. Say \"drum\" and stretch the last sound, mmm. He finds a word starting with it, like \"moon\". Now you need an n word.",
+      'Sing a line of a song he knows: "Nilaa nilaa odi vaa". A Tamil or Telugu line passes on the consonant of its last syllable: "vaa" passes v.',
       'An English rhyme passes on the last sound he hears instead: "Baa, baa, black sheep", sung to the end, finishes "down the lane", which passes n, not e.',
-      'You say which letter or sound is passed on. He sings anything he knows starting with it: a nursery rhyme, a film song, a bhajan. Then it is your turn.',
+      'You say which sound is passed on. He sings anything he knows starting with it: a nursery rhyme, a Telugu or Tamil film song, a bhajan. Then you sing.',
       'If he is stuck, count slowly to five. Then a made-up line starting with that sound counts, or you hum the start of a song that fits. Nobody is out.',
     ],
     hisWay:
-      'He can change the rule: the next song starts with the first sound instead of the last, or only songs about animals count, or only songs in Hindi. He can also be the judge who decides whether a new song starts with the right sound.',
+      'He can change the rule: the next song starts with the first sound instead of the last, or only songs about animals count, or only songs in Tamil. He can also be the judge who decides whether a new song starts with the right sound.',
     mia: {
       way: 'alongside',
       text: 'Mia sits nearby with a rattle, or a steel katori and a spoon, and plays along to any song she likes. She does not take a turn, so his chain never has to start again for her.',
     },
     picture:
-      'Arjun sits cross-legged on a charpai in the sunlit Jaipur courtyard, singing with one hand raised to keep time, while Dadi sits beside him with her palms together in a soft clap, leaning in to catch the last sound of his song.',
-    cast: ['Arjun', 'Dadi'],
+      'On the sunny patio of the Bay Area house, beside the potted curry-leaf plant, with the backyard lawn and the lemon tree behind, Arjun sits cross-legged on a cotton mat, singing with one hand raised to keep time, while Thatha, visiting, sits beside him on a low patio chair with his palms together in a soft clap, leaning in to catch the last sound of the song.',
+    cast: ['Arjun', 'Thatha'],
     tradition:
-      "Antakshari, from the Sanskrit antya (end) and akshara (letter), is a singing game played in India at family gatherings and on journeys, and made widely known by radio and television shows. In the usual game, two or more players or teams take turns with Hindi film songs or Hindustani classical songs, each starting with the last consonant of the song before; no song may be repeated, and a side that cannot sing is out. This version has two players, accepts any song or rhyme he knows in any language, keeps the last-consonant rule for Hindi songs but matches English rhymes by the last sound heard rather than the spelling, allows repeats, accepts a made-up line or a hummed hint after a count of five, and has no winner and nobody out.",
+      "Antakshari, from the Sanskrit antya (end) and akshara (letter), is a singing game played in India at family gatherings and on journeys, and made widely known by radio and television shows. In the usual game, two or more players or teams take turns with Hindi film songs or Hindustani classical songs, each starting with the last consonant of the song before; songs in other languages are allowed if everyone agrees first. No song may be repeated, and a side that cannot sing is out. This version has two players, accepts any song or rhyme he knows in Telugu, Tamil, English or Hindi, keeps the last-consonant rule for songs in Indian languages but matches English rhymes by the last sound heard rather than the spelling, allows repeats, accepts a made-up line or a hummed hint after a count of five, and has no winner and nobody out.",
     sources: [
       { label: 'Wikipedia: Antakshari', url: 'https://en.wikipedia.org/wiki/Antakshari' },
       {
@@ -102,22 +102,22 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://www.understood.org/en/articles/phonological-awareness-what-it-is-and-how-it-works',
       },
     ],
-    tags: ['songs', 'singing', 'car journey', 'no equipment', 'Hindi', 'grandparents', 'word game', 'sounds'],
+    tags: ['songs', 'singing', 'car journey', 'no equipment', 'Telugu', 'Tamil', 'grandparents', 'Thatha', 'word game', 'sounds'],
     note: {
-      what: 'A song chain: each new song or rhyme has to begin where the one before ended. A Hindi song passes on its last consonant letter, as in the traditional game; an English rhyme passes on the last sound he hears. Two of you take turns, and any song he already knows counts.',
+      what: 'A song chain: each new song or rhyme has to begin where the one before ended. A Telugu, Tamil or Hindi song passes on the consonant of its last syllable, as in the traditional game; an English rhyme passes on the last sound he hears. Two of you take turns, and any song he already knows counts.',
       expect:
-        'Expect to name the passed-on letter or sound for him each time; finding a song that starts with it is his part. English lines that end on a vowel, such as "sky", are awkward to pass on, so stop at a line that ends on a clear consonant. He may sing the same three songs again and again; repeats are allowed in this version. Expect friendly arguments over close sounds, such as k and kh, or b and bh.',
+        'Expect to name the passed-on letter or sound for him each time; finding a song that starts with it is his part. English lines that end on a vowel, such as "sky", are awkward to pass on, so stop at a line that ends on a clear consonant. He may sing the same three songs again and again; repeats are allowed in this version. Expect friendly arguments over close sounds, such as k and g, or t and d, which Tamil writes with the same letter.',
       practising:
-        'Hearing the sound a word begins with and finding a song that starts with it; Understood.org says sound awareness, the groundwork for reading, starts with rhyming and beginning sounds. Also pulling songs out of memory when he needs them. Working out the last consonant letter of a Hindi line is a rule of the grown-ups\' game: you call it, and he is not expected to.',
+        'Hearing the sound a word begins with and finding a song that starts with it; Understood.org says sound awareness, the groundwork for reading, starts with rhyming and beginning sounds. Also pulling songs out of memory when he needs them. Working out the last consonant of a Telugu or Tamil line is a rule of the grown-ups\' game: you call it, and he is not expected to.',
       ask: 'When he finds a song for a hard sound: "How did you think of that one?"',
-      next: 'Play it on the next long car journey, or on a video call to Jaipur: Dadi and Dada\'s old film songs against his rhymes.',
+      next: 'Play it on the next long drive while Paati and Thatha are visiting: their old Tamil film songs against his rhymes. On a video call, Nanamma and Tatayya can bring Telugu ones.',
       honest:
         'Finding a song for a sound shows he can hear how familiar words begin and recall a song to fit; it does not mean he is ready to read, and finding it hard does not mean he is behind. English spelling often hides the sound a word ends on ("lane" passes n, not e), so judge English rhymes by ear, and do not correct his singing.',
-      easier: 'Play with single words only, no songs, and offer him a choice of two: "Does mor or kela start with mmm?"',
+      easier: 'Play with single words only, no songs, and offer him a choice of two: "Does moon or sun start with mmm?"',
       harder:
         'Bring back one of the real rules: no song can be used twice, or each singer must manage a whole verse rather than two lines.',
       safety:
-        'Nothing to watch indoors. In the car, whoever is driving sings without turning round. On a walk, hold hands near the road and pause the game to cross.',
+        'Nothing to watch indoors. In the car, whoever is driving sings without turning round to the car seats. On a walk, hold hands near the road and pause the game to cross.',
     },
   },
   {
@@ -149,8 +149,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia dances and freezes in any shape she likes; the cards are for him and you. Whatever she does when the music stops counts as her statue.',
     },
     picture:
-      'Arjun stands frozen in a star shape on the rug of the cleared California living room: both feet planted wide apart on the rug, both arms stretched up and out wide above his shoulders with open hands, grinning and holding still. On the rug in front of his feet lies a white paper card with a simple black stick figure drawn in the same star shape: a round head, both arms stretched up and out wide, both legs spread wide apart. Mummy stands a few steps away, holding up a phone in her right hand with her other hand at her side, counting aloud. Mia stands on the rug a little way off with both hands on top of her head, frozen and smiling. No writing anywhere in the picture.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'Arjun stands frozen in a star shape on the rug of the cleared living room of the Bay Area house, the sofa pushed back against the bookshelves: both feet planted wide apart on the rug, both arms stretched up and out wide above his shoulders with open hands, grinning and holding still. On the rug in front of his feet lies a white paper card with a simple black stick figure drawn in the same star shape: a round head, both arms stretched up and out wide, both legs spread wide apart. Amma stands a few steps away, holding up a phone in her right hand with her other hand at her side, counting aloud. Mia stands on the rug a little way off with both hands on top of her head, frozen and smiling. No writing anywhere in the picture. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       {
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds',
@@ -169,7 +169,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         "Stopping on a signal, then switching his attention from the dancing to a picture and turning it into a pose. Harvard's activity guides suggest freezing in particular positions as a harder version of freeze dance.",
       ask: 'When he holds a hard shape all the way to five: "What did you do to stay still?"',
-      next: 'Pin his best cards to the fridge, and run musical statues at the next family gathering with everyone in the room, played his way: a wobble means you turn the next card, and nobody is out.',
+      next: 'Pin his best cards to the fridge, and run musical statues at the next Deepavali get-together or birthday party with everyone in the room, played his way: a wobble means you turn the next card, and nobody is out.',
       honest:
         'Holding a pose for five counts shows he can do it in this game, with music he likes; it does not show how well he stops himself at school or in a temper. Balance at five varies a lot, so wobbling is not a problem to fix.',
       easier: 'Skip the cards and just freeze in any shape. Or call a shape out loud as the music stops: "Freeze like a tree!"',
@@ -192,7 +192,7 @@ export const IDEAS: readonly PlayIdea[] = [
     players: 'You, him and Mia',
     need: ['an upturned pot and a wooden spoon to drum on (or just clap)'],
     steps: [
-      'Clear a long stretch of rug, hallway or lawn. Call an animal and show its walk once: a crab goes sideways on hands and feet, tummy up.',
+      'Clear a long stretch of rug, hallway or backyard lawn. Call an animal and show its walk once: a crab goes sideways on hands and feet, tummy up.',
       'Drum on the upturned pot while he moves: quick light taps for the crab, a slow heavy beat for an elephant swinging one arm as its trunk.',
       'Try more: a bear on hands and feet with its bottom up, a frog squatting and jumping, a peacock strutting with hands fanned behind like a tail.',
       'Swap: he invents an animal walk and teaches it to you. You walk it exactly as he says, however odd, while he drums.',
@@ -204,14 +204,14 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia stomps along as the elephant or a slow tortoise at her own pace, on the side away from the frog jumps. She does not have to copy his animal, and he does not wait for her.',
     },
     picture:
-      'On the back lawn, Arjun stomps along on all fours with his bottom high in the air and his arms and legs straight, walking like a bear, grinning, while Papa kneels on the grass beating an upturned steel cooking pot with a wooden spoon, and Mia waddles beside Arjun flapping her arms like a duck.',
-    cast: ['Arjun', 'Papa', 'Mia'],
+      'On the backyard lawn of the Bay Area house, by the wooden fence and the raised vegetable beds, Arjun stomps along on all fours with his bottom high in the air and his arms and legs straight, walking like a bear, grinning, while Nanna kneels on the grass beating an upturned steel cooking pot with a wooden spoon, and Mia waddles a few steps to the side of Arjun, flapping her arms like a duck. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Nanna', 'Mia'],
     sources: [
       { label: 'Zero to Three: A Year of Play (walk and talk like an animal)', url: 'https://www.zerotothree.org/resource/a-year-of-play/' },
       { label: 'NAEYC for Families: Turn Any Walk into a Nature Walk', url: 'https://www.naeyc.org/our-work/families/turn-any-walk-nature-walk' },
       { label: 'UNICEF Parenting: Screen-free activities (Guess the animal)', url: 'https://www.unicef.org/parenting/child-care/screen-free-activities' },
     ],
-    tags: ['rainy day', 'garden', 'animals', 'moving', 'drum', 'beat', 'burn off energy', 'pretend'],
+    tags: ['rainy day', 'backyard', 'garden', 'animals', 'moving', 'drum', 'beat', 'burn off energy', 'pretend'],
     note: {
       what: 'He moves like one animal after another while you drum a beat to match it, slow and heavy or quick and light. Then he invents an animal and you have to walk like it.',
       expect:
@@ -219,7 +219,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         "Moving his body in unfamiliar ways, on hands and feet, and fitting his movement to a beat. Also thinking about how animals get about with bodies very different from ours, which NAEYC suggests asking about on a nature walk.",
       ask: 'After he invents an animal: "Why does your animal move like that?"',
-      next: 'On your next walk, stop and watch how a real animal moves, a squirrel, a pigeon or a line of ants, and try it when you get home. On a visit to Jaipur, watch how a peacock walks.',
+      next: 'On your next walk, stop and watch how a real animal moves, a squirrel on the fence, a crow, a hummingbird or a line of ants, and try it when you get home. On a visit to Hyderabad, look for peacocks in a city park and watch how one walks.',
       honest:
         'Walking like a crab does not teach him much about crabs; the walks are a guess from pictures, which is fine for a game. Some children find the all-fours walks hard work and stop quickly, so let him keep to the standing animals if he prefers.',
       easier: 'Only standing animals: elephant, peacock, penguin, camel. Drop the drum and just call the animal.',
@@ -245,19 +245,19 @@ export const IDEAS: readonly PlayIdea[] = [
       'Sit facing each other. Clap a short pattern, such as clap, clap, knees, and he claps it straight back.',
       'Add one clap or knee-pat each round. When it falls apart, laugh, go back to the last one that worked, and he makes the next pattern.',
       'Teach a crossed-hands pattern slowly: clap your own hands, right palm to right palm, own hands, left palm to left palm, then both palms together.',
-      'Add a rhyme he knows, Hindi or English, one word to each clap. Say it three times, a little faster each time.',
+      'Add a rhyme he knows, in Telugu, Tamil or English, one word to each clap. Say it three times, a little faster each time.',
     ],
     hisWay:
       'He makes the patterns for you to copy and chooses the rhyme. He can add stamps, knee-pats or a click of the tongue, or a rule such as "a clap on the knees means stand up". When you get his pattern wrong, he teaches it to you again.',
     mia: {
       way: 'apart',
-      text: 'This goes best one to one, while Papa has Mia at bath time or on a walk, so the two of you can build a pattern without interruptions. Later, if he wants to, he can show her how to clap her knees along with him.',
+      text: 'This goes best one to one, while Nanna has Mia at bath time or on a walk, so the two of you can build a pattern without interruptions. Later, if he wants to, he can show her how to clap her knees along with him.',
     },
     picture:
-      'Arjun sits cross-legged facing Mummy on the living-room rug of the California home, both of them singing a clapping rhyme, his two palms pressed flat against her two palms in the middle of a clap.',
-    cast: ['Arjun', 'Mummy'],
+      'Arjun sits cross-legged facing Amma on the rug in the living room of the Bay Area house, by the bookshelves of picture books, both of them singing a clapping rhyme, his two palms pressed flat against her two palms in the middle of a clap.',
+    cast: ['Arjun', 'Amma'],
     tradition:
-      'The harder version uses January February, a two-player hand game that D\'Source (IIT Bombay) records among Indian children aged three to six: one player stacks their hands palm up on the other\'s, they take turns tapping a hand and naming the months, and on December the player being tapped must snatch a hand away. This version keeps those rules, uses only a light tap, drops the hit that wins the round, and adds a round in the Hindu calendar months, Chaitra to Phalgun, with Phalgun as the snatch; the original does not use them, and D\'Source notes that children usually say the months only in English. The copying game and the crossed-hands rhyme are not adapted from a particular traditional game.',
+      'The harder version uses January February, a two-player hand game that D\'Source (IIT Bombay) records among Indian children aged three to six: one player stacks their hands palm up on the other\'s, they take turns tapping a hand and naming the months, and on December the player being tapped must snatch a hand away. This version keeps those rules, uses only a light tap, drops the hit that wins the round, and adds a round in the Tamil months, Chithirai to Panguni, or the Telugu months, Chaitramu to Phalgunamu, with the last month as the snatch; the original does not use them, and D\'Source notes that children usually say the months only in English. The copying game and the crossed-hands rhyme are not adapted from a particular traditional game.',
     sources: [
       {
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds',
@@ -265,7 +265,7 @@ export const IDEAS: readonly PlayIdea[] = [
       },
       { label: 'NAEYC for Families: Playing Music at Home', url: 'https://www.naeyc.org/our-work/families/playing-music-home' },
       { label: "D'Source, IIT Bombay, Indian Games: January February", url: 'https://www.dsource.in/resource/indian-games/indoor-games/january-february' },
-      { label: 'Wikipedia: Hindu calendar (the lunar months)', url: 'https://en.wikipedia.org/wiki/Hindu_calendar' },
+      { label: 'Wikipedia: Hindu calendar (the Telugu month names and the Tamil solar months)', url: 'https://en.wikipedia.org/wiki/Hindu_calendar' },
     ],
     tags: ['clapping', 'rhythm', 'rhymes', 'no equipment', 'waiting', 'car journey', 'months', 'one to one'],
     note: {
@@ -275,12 +275,12 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         "Holding a short sequence in mind long enough to play it back, and keeping his hands to a pattern while he says the words. Harvard's activity guide for ages 5 to 7 suggests complicated clapping rhythms as practice for working memory, self-control and flexible thinking; the copying rounds here are a simpler start, and a game is practice, not a measure of any of these.",
       ask: 'After he makes up a pattern that catches you out: "Can you teach me that one slowly?"',
-      next: 'On a video call, ask Dadi or Dada for a clapping rhyme from their own childhood and learn it together, or he teaches them his.',
+      next: 'When Nanamma visits, ask her for Chemma chekka, the Telugu clapping song (it is under Sing in Telugu & Tamil), and learn it together. Then ask Paati what she clapped to as a girl.',
       honest:
         'Losing the pattern once it grows long is part of the game, not a measure of musical ability; NAEYC suggests starting with five beats or fewer before longer patterns. Clapping right palm to right palm does not show he knows left from right; he may simply be following your hand across.',
       easier: 'Copy only two or three claps, all on his own hands, with no crossing. Or clap a rhyme on your own knees side by side.',
       harder:
-        'Play January February: he rests his hands palm up on yours, and you take turns tapping a hand and naming the next month. On December, the one being tapped snatches a hand away. Then try the Hindu months, with Phalgun as the snatch: Chaitra, Vaishakh, Jyeshtha, Ashadh, Shravan, Bhadrapad, Ashwin, Kartik, Margashirsha, Paush, Magh, Phalgun.',
+        'Play January February: he rests his hands palm up on yours, and you take turns tapping a hand and naming the next month. On December, the one being tapped snatches a hand away. Then try the Tamil months, with Panguni as the snatch: Chithirai, Vaikasi, Aani, Aadi, Aavani, Purattasi, Aippasi, Karthigai, Margazhi, Thai, Maasi, Panguni. Nanna can play it in the Telugu months, Chaitramu to Phalgunamu.',
       safety:
         'Gentle palms only: a clap meets, it does not slap, and small hands sting easily. In January February the tap is light. Outdoors, sit on flat ground rather than on steps, where leaning back after a missed clap means a fall.',
     },
