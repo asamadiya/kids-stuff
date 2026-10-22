@@ -251,8 +251,20 @@
   .index__meta span:nth-child(2) { display: none; }
   .filters__set { border-right: none; padding-right: 0; }
   .chip { min-height: 40px; padding: 0 var(--s3); }
-  .jumps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-  .jumps__link { min-height: 40px; padding: 0 var(--s2) 0 var(--s3); justify-content: space-between; font-size: 0.8rem; line-height: 1.15; }
+  /* One scrolling row of group jumps, so the first pictures are in the first screen. */
+  .jumps { flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin: 0 calc(-1 * var(--s3)) var(--s3); padding: 0 var(--s3) 4px; scrollbar-width: none; }
+  .jumps::-webkit-scrollbar { display: none; }
+  .jumps__link { flex: none; min-height: 40px; padding: 0 var(--s2) 0 var(--s3); font-size: 0.8rem; white-space: nowrap; }
+  /* Title and the grown-up tools on one line; the lede is in the grown-ups note too. */
+  /* Listings (no Back): title and tools on one line. Items keep the title on its own line under Home, Back and tools. */
+  .lc-top:not(:has(.lc-top__back)) { flex-wrap: nowrap; }
+  .lc-top:not(:has(.lc-top__back)) .lc-top__title { order: 0; flex: 1 1 auto; min-width: 0; }
+  .lc-lede { display: none; }
+  .hubbar { margin-bottom: var(--s2); }
+  .hub__group-head { margin-bottom: var(--s2); }
+  .hub__group-line { display: none; }
+  .partnav { margin-bottom: var(--s2); }
+  .partnav__link { min-height: 44px; }
   .filters__count { margin-left: 0; width: 100%; }
   .idea { grid-template-columns: 1fr; }
   .idea__facts { grid-template-columns: 1fr 1fr; }
