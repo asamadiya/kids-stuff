@@ -59,6 +59,11 @@
   gap: var(--s3);
   margin-bottom: var(--s6);
 }
+/* Six doors in one row only on wide screens; a tablet gets three big pictures a row. */
+@media (max-width: 1280px) {
+  .doors { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .door__art { aspect-ratio: 16 / 9; }
+}
 .door {
   --q: var(--ink); --q-tint: var(--paper-2);
   display: flex; flex-direction: column; min-width: 0;
@@ -300,6 +305,12 @@
 .moment__who { font-size: var(--t-md); margin-top: var(--s3); color: var(--langs-deep); }
 .rhyme__actions { font-family: var(--font-read); margin-top: var(--s4); background: var(--gold-tint); border-radius: var(--radius-sm); padding: var(--s3) var(--s4); }
 .langbook { display: grid; gap: var(--s4); max-width: 900px; margin: 0 auto; }
+/* Landscape tablets: picture beside the words, sized so the line, its voice and
+   the page-turn buttons are all on screen with it. */
+@media (min-width: 761px) and (orientation: landscape) {
+  .langbook { max-width: none; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: center; }
+  .langbook__picture img { max-height: calc(100vh - 300px); width: auto; max-width: 100%; margin: 0 auto; display: block; }
+}
 .langs__adult { display: flex; flex-wrap: wrap; gap: var(--s3); }
 .listen { background: var(--langs-tint); border-radius: var(--radius); padding: var(--s4) var(--s5); margin-bottom: var(--s5); }
 .listen h2 { font-size: var(--t-md); margin-bottom: var(--s3); }
