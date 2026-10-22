@@ -577,7 +577,7 @@ export const MOMENTS: readonly Moment[] = [
     // it under a part of the day it does not belong to.
     when: 'play',
     picture:
-      'Nanna, crouching on the patio, gently blows on Arjun\'s scraped knee while Arjun, sitting on the patio step with a teary face, points at the knee with one finger; his scooter lies on its side on the lawn behind them. Lemon tree, wooden fence, potted curry-leaf plant, afternoon light. No words or letters anywhere in the picture.',
+      'On the sunny backyard patio beside a small scooter, Nanna kneels and gives Arjun a warm hug, one hand patting his back, while Arjun, already smiling again, holds out his leg to show a small dinosaur sticking plaster on his knee.',
     cast: ['Nanna', 'Arjun'],
     grownUp: [
       {

@@ -162,7 +162,7 @@ export const RHYMES: readonly Rhyme[] = [
     origin:
       'Traditional Telugu folk and school rhyme from oral tradition, no known author; Telugu Wikipedia lists it among children\'s songs. Public domain. Do not use the song "Bujji meka" from the 2024 film Pottel: it is copyrighted, and its lyric was not compared with this folk text.',
     picture:
-      'Arjun, on all fours as the goat, trots between the raised vegetable beds in the backyard and lifts his head to answer, while Nanna, holding Mia by the hand on the lawn, leans down to ask where the little goat went.',
+      'In the backyard, Arjun crawls on hands and knees between the raised vegetable beds pretending to be a little goat, smiling up at Nanna, who stands on the lawn holding Mia’s hand and laughing as he sings the question to the goat.',
     cast: ['Arjun', 'Nanna', 'Mia'],
     note: {
       what: 'A Telugu sung conversation between children and a little goat. They ask where it went and what it saw; the goat says it went to graze in the king\'s garden and saw the queen\'s flowers.',
