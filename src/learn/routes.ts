@@ -190,6 +190,11 @@ function pageOf(raw: string | undefined, count: number): number {
   return Math.min(Math.max(0, zero), count);
 }
 
+/** Items whose id changed when the family was recast; an old link still opens them. */
+const RENAMED_BOOKS: Readonly<Record<string, string>> = { 'i-want-papa-too': 'i-want-nanna-too' };
+const RENAMED_GAMES: Readonly<Record<string, string>> = { 'share-the-roti': 'share-the-dosa' };
+const RENAMED_IDEAS: Readonly<Record<string, string>> = { 'packing-for-jaipur': 'packing-for-chennai' };
+
 /**
  * Parse a hash into the deepest route it really names. An unknown segment
  * falls back to the nearest real ancestor, never to a blank page.
@@ -207,8 +212,9 @@ export function parseHash(rawHash: string, known: Known): Route {
       return { kind: 'stories' };
     }
     case 'book': {
-      const count = a ? known.books.get(a) : undefined;
-      if (a && count !== undefined) return { kind: 'book', slug: a, page: pageOf(b, count) };
+      const slug = a ? (RENAMED_BOOKS[a] ?? a) : a;
+      const count = slug ? known.books.get(slug) : undefined;
+      if (slug && count !== undefined) return { kind: 'book', slug, page: pageOf(b, count) };
       return { kind: 'stories' };
     }
     case 'library':
@@ -222,18 +228,22 @@ export function parseHash(rawHash: string, known: Known): Route {
     case 'situation':
       if (a && known.situations.has(a)) return { kind: 'situation', id: a };
       return { kind: 'shelf', shelf: 'family' };
-    case 'maths':
-      if (a && known.maths.has(a)) return { kind: 'mathsGame', id: a };
+    case 'maths': {
+      const id = a ? (RENAMED_GAMES[a] ?? a) : a;
+      if (id && known.maths.has(id)) return { kind: 'mathsGame', id };
       return { kind: 'maths' };
+    }
     case 'science':
       if (a && known.science.has(a)) return { kind: 'scienceGame', id: a };
       return { kind: 'science' };
     case 'make':
       if (a && known.activities.has(a)) return { kind: 'activity', id: a };
       return { kind: 'make' };
-    case 'together':
-      if (a && known.ideas.has(a)) return { kind: 'idea', id: a };
+    case 'together': {
+      const id = a ? (RENAMED_IDEAS[a] ?? a) : a;
+      if (id && known.ideas.has(id)) return { kind: 'idea', id };
       return { kind: 'together' };
+    }
     case 'all':
       return { kind: 'all' };
     case 'langs':

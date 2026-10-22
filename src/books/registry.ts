@@ -14,7 +14,7 @@ const modules = import.meta.glob<{ book: Book }>(['./data/*.ts', '!./data/_*.ts'
 
 /** The advisor's slate order (RULINGS-4-slate). */
 export const SLATE: readonly string[] = [
-  'i-was-still-building-that', 'this-dinosaur-is-mine', 'i-want-papa-too', 'can-i-join-the-game',
+  'i-was-still-building-that', 'this-dinosaur-is-mine', 'i-want-nanna-too', 'can-i-join-the-game',
   'the-chase-stops-here', 'that-wasnt-the-rule', 'build-beside-me', 'who-left-the-shoes-there',
   'the-monkey-and-the-crocodile', 'the-quails-lift-the-net', 'make-this-line-shorter',
   'a-hill-for-an-umbrella', 'the-pumpkin-that-rolled-home',

@@ -110,7 +110,7 @@ export const MORE: readonly Activity[] = [
     ],
     notice: 'Two pieces are halves only when they are the same size: one laid on the other covers it exactly. A quarter is smaller than a half, even though four is more than two.',
     ask: 'Two pieces of one dosa. How can you tell whether they are halves?',
-    pairsWith: 'share-the-roti',
+    pairsWith: 'share-the-dosa',
     trial: 'Fold and cut one dosa yourself first. A crisp dosa cracks along the fold instead of bending, so make these soft and a little thick, the morning you play, and keep them covered as they cool. Check that your paper circles fold edge to edge; a circle cut out unevenly will not, and that will confuse the first step.',
     sources: [
       { label: 'NRICH (University of Cambridge) Early Years: Two Halves', url: 'https://nrich.maths.org/eyfs-activities/two-halves' },

@@ -8,7 +8,7 @@ import type { Book } from '../types';
  * The slug keeps its old name so bookmarks still open the book.
  */
 export const book: Book = {
-  slug: 'i-want-papa-too',
+  slug: 'i-want-nanna-too',
   title: 'I Want Nanna, Too',
   shelf: 'family',
   hook: 'A book with Nanna, but Mia needs him first.',

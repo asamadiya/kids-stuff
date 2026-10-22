@@ -10,14 +10,14 @@ import { DEPTH, QUADRANT, isDescent, parseHash, toHash } from '../learn/routes';
 
 const known: Known = {
   shelves: new Set(['family', 'tales', 'festivals', 'how', 'people']),
-  books: new Map([['this-dinosaur-is-mine', 12]]),
+  books: new Map([['this-dinosaur-is-mine', 12], ['i-want-nanna-too', 12]]),
   subjects: new Set(['numbers', 'measure']),
   archive: new Map([['aryabhata-circle-number', 13]]),
   situations: new Set(['what-happens-next']),
-  maths: new Set(['make-both-sides-match']),
+  maths: new Set(['make-both-sides-match', 'share-the-dosa']),
   science: new Set(['will-this-clay-boat-float']),
   activities: new Set(['paper-boat']),
-  ideas: new Set(['sock-wrestle']),
+  ideas: new Set(['sock-wrestle', 'packing-for-chennai']),
   moments: new Set(['good-morning']),
   rhymes: new Set(['te-chandamama']),
   langBooks: new Map([['come-here', 8]]),
@@ -73,6 +73,9 @@ describe('routes', () => {
     ['#/book/this-dinosaur-is-mine/999', { kind: 'book', slug: 'this-dinosaur-is-mine', page: 12 }],
     ['#/book/this-dinosaur-is-mine/-4', { kind: 'book', slug: 'this-dinosaur-is-mine', page: 0 }],
     ['#/book/%E0%A4', { kind: 'stories' }],
+    ['#/book/i-want-papa-too/4', { kind: 'book', slug: 'i-want-nanna-too', page: 3 }],
+    ['#/maths/share-the-roti', { kind: 'mathsGame', id: 'share-the-dosa' }],
+    ['#/together/packing-for-jaipur', { kind: 'idea', id: 'packing-for-chennai' }],
     ['#/stories?p=2', { kind: 'stories' }],
   ])('%s canonicalises to a real ancestor', (hash, route) => {
     expect(parseHash(hash, known)).toEqual(route);

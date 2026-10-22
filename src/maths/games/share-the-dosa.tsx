@@ -1023,9 +1023,9 @@ function Board(props: BoardProps<Round, Answer>) {
   }
 }
 
-export const shareTheRoti: SolveGame<Round, Answer> = {
+export const shareTheDosa: SolveGame<Round, Answer> = {
   kind: 'solve',
-  id: 'share-the-roti',
+  id: 'share-the-dosa',
   title: 'Share the Dosa',
   hook: 'Halves must be equal pieces.',
   group: 'groups',
@@ -1036,7 +1036,7 @@ export const shareTheRoti: SolveGame<Round, Answer> = {
   Board,
   check,
   explain,
-  cover: 'art/games/share-the-roti.png',
+  cover: 'art/games/share-the-dosa.png',
   note: {
     what: 'Dosas on steel plates, cut in different ways. He taps the cut that makes equal halves, thirds or quarters, says whether a given cut is fair, and at level 3 compares shares (a half with a quarter, two thirds with three quarters) and finds how many quarters cover a half.',
     expect: "At level 1 he will often pick any cut with two pieces, including one well off the middle — 'two pieces' is what half means to most 5-year-olds. At level 2 every wrong cut has the right number of pieces, so counting stops working. At level 3 many children say a quarter is more than a half because four is more than two; the small-dosa round catches the opposite rule, that a half always wins. On two thirds against three quarters, expect 'thirds are bigger pieces, so two thirds' — the hint shows the sliver of Mia's dosa that Arjun's pieces do not reach.",
@@ -1049,4 +1049,4 @@ export const shareTheRoti: SolveGame<Round, Answer> = {
   },
 };
 
-export default shareTheRoti;
+export default shareTheDosa;
