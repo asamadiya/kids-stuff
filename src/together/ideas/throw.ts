@@ -35,8 +35,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia has her turn after each of his rounds, from her own spot a big step in front of his line, and you stand the bottles up for her. If she walks into the bottles during his round, you lift her back and reset them; he does not have to stop her.',
     },
     picture:
-      'Arjun crouches at a tape line in the hallway of the California home and rolls a rolled-up sock ball along the floor towards a small group of empty plastic bottles standing a few steps away. Mummy kneels beside him holding another sock ball, and Mia sits to one side, nearer the bottles, holding a sock ball in both hands.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'Arjun crouches at a tape line in the hallway of the Bay Area house, sneakers lined up by the front door behind him, and rolls a rolled-up sock ball along the floor towards a small group of empty plastic bottles standing a few steps away. Amma kneels beside him holding another sock ball, and Mia sits to one side, nearer the bottles, holding a sock ball in both hands. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     sources: [
       { label: 'Zero to Three: 5 Ways to Play with Socks (sock balls and a cup tower)', url: 'https://www.zerotothree.org/resource/5-ways-to-play-with-socks/' },
       { label: 'PBS KIDS for Parents: Peg + Cat Indoor Games (plastic bottles as targets; count and compare what landed)', url: 'https://www.pbs.org/parents/thrive/peg-indoor-games-to-keep-kids-learning-in-summer' },
@@ -86,19 +86,19 @@ export const IDEAS: readonly PlayIdea[] = [
       'He sets how far the line is, how many pieces go in the tower, where the shoe goes, and whether the rebuild has to be in size order. He can add his own rule for the roller, such as counting to five first.',
     mia: {
       way: 'apart',
-      text: 'Best while Mia is with Papa or asleep: a toddler next to the tower knocks it over mid-rebuild, which spoils the part he cares about most. Later, she can have three cups of her own to stack and knock.',
+      text: 'Best while Mia is with Nanna or asleep: a toddler next to the tower knocks it over mid-rebuild, which spoils the part he cares about most. Later, she can have three cups of her own to stack and knock.',
     },
     picture:
-      'On the patio of the California home, Arjun kneels on the paving on the left, quickly stacking coloured plastic stacking cups back into a tower, biggest at the bottom, with a few cups still scattered beside him. A single sandal stands on the paving a big step to the right of the tower, away from Arjun. On the far right, a few steps back from the sandal, Mummy crouches low and rolls a soft blue sponge ball along the ground straight at the sandal; the ball is on the paving between her hand and the sandal, travelling towards the sandal and not towards Arjun.',
-    cast: ['Arjun', 'Mummy'],
+      'On the backyard patio of the Bay Area house, with the lawn and the wooden fence behind, Arjun kneels on the paving on the left, quickly stacking coloured plastic stacking cups back into a tower, biggest at the bottom, with a few cups still scattered beside him. A single sandal stands on the paving a big step to the right of the tower, away from Arjun. On the far right, a few steps back from the sandal, Amma crouches low and rolls a soft blue sponge ball along the ground straight at the sandal; the ball is on the paving between her hand and the sandal, travelling towards the sandal and not towards Arjun.',
+    cast: ['Arjun', 'Amma'],
     tradition:
-      'Seven stones, played across South Asia under many names: Lagori in Karnataka, Pithu or Pitto across much of north India, Sitoliya in Rajasthan, Ezhu Kallu in Tamil Nadu, and Saat Patha. The real game has two teams (D\'Source says at least three a side), a pile of seven or more flat stones, and the hitting team throws the ball at the rebuilders. In D\'Source\'s rules a hit puts the whole team out; in others only that player is out. This version is for two, uses cups or boxes instead of stones, aims a soft ball only at a shoe, never at a player, and nobody is out: the roles just swap.',
+      'Seven stones, played across South Asia under many names: Yedu Penkulata or Yedu Rallu in Andhra Pradesh, Lingoj in Telangana, Ezhu Kallu in Tamil Nadu, Lagori in Karnataka, and Pithu or Pitto across much of north India. The real game has two teams (D\'Source says at least three a side), a pile of seven or more flat stones, and the hitting team throws the ball at the rebuilders. In D\'Source\'s rules a hit puts the whole team out; in others only that player is out. This version is for two, uses cups or boxes instead of stones, aims a soft ball only at a shoe, never at a player, and nobody is out: the roles just swap.',
     sources: [
       { label: "D'Source (IDC, IIT Bombay), Indian Games: Lagori", url: 'https://www.dsource.in/resource/indian-games/outdoor-games/lagori' },
       { label: 'Wikipedia: Seven stones (Lagori), regional names and rules', url: 'https://en.wikipedia.org/wiki/Lagori' },
       { label: 'Zero to Three: 5 Ways to Play with Socks (sock ball at a cup tower)', url: 'https://www.zerotothree.org/resource/5-ways-to-play-with-socks/' },
     ],
-    tags: ['Indian games', 'Lagori', 'Pithu', 'Sitoliya', 'seven stones', 'cups', 'garden', 'patio'],
+    tags: ['Indian games', 'Lagori', 'Yedu Penkulata', 'Ezhu Kallu', 'Pithu', 'seven stones', 'cups', 'backyard', 'garden', 'patio'],
     note: {
       what: 'A two-person game inspired by Lagori. He knocks a tower of seven pieces down with a soft ball, then rebuilds it while you fetch the ball and try to roll it so it touches a shoe beside the tower.',
       expect:
@@ -106,7 +106,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Aiming a throw at a target. Putting things in order of size while hurrying a little. Switching between three roles that each have their own rule: thrower, builder, roller.',
       ask: 'Only if the tower keeps toppling while he rebuilds: "Which one has to go at the bottom?"',
-      next: 'On the next call to Jaipur, ask Dadi or Dada what they called this game and how they played it; in Rajasthan it is often Sitoliya. With cousins at the park, try it in two small teams, still rolling the ball at a shoe, never at people.',
+      next: 'On the next video calls, ask Tatayya what he called this game and how he played it, then ask Thatha; in Tamil Nadu it is Ezhu Kallu, seven stones. With cousins at the park, try it in two small teams, still rolling the ball at a shoe, never at people.',
       honest:
         'With two players and no teams, this keeps the aiming and the rush to rebuild but loses the team play the real game is known for. Whether he beats the ball depends mostly on how fast you fetch and how well you aim.',
       easier: 'Use four or five pieces, bring the throwing line closer, and count slowly to five aloud before you roll.',
@@ -144,8 +144,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Give Mia her own small basket or a cardboard box and two or three sock balls, set to one side, where she can drop them in from right beside it. His basket and his line stay his.',
     },
     picture:
-      'Side view in the living room of the California home: Arjun stands behind a strip of tape on the floor, facing a laundry basket pushed against the wall on the right, and swings one arm forward underarm, letting go of a round rolled-up sock ball that flies in a low arc towards the basket; two round sock balls already sit inside the basket. Papa stands a step behind Arjun on the left, holding a small armful of round rolled-up sock balls against his chest with both arms, and watches the sock ball fly towards the basket.',
-    cast: ['Arjun', 'Papa'],
+      'Side view in the living room of the Bay Area house: Arjun stands behind a strip of tape on the floor, facing a laundry basket pushed against the wall on the right, and swings one arm forward underarm, letting go of a round rolled-up sock ball that flies in a low arc towards the basket; two round sock balls already sit inside the basket. Nanna stands a step behind Arjun on the left, holding a small armful of round rolled-up sock balls against his chest with both arms, and watches the sock ball fly towards the basket.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'Zero to Three: 5 Ways to Play with Socks (sock balls into a laundry basket)', url: 'https://www.zerotothree.org/resource/5-ways-to-play-with-socks/' },
       { label: 'Zero to Three: 5 Ways to Play with a Laundry Basket', url: 'https://www.zerotothree.org/resource/5-ways-to-play-with-a-laundry-basket/' },
@@ -200,13 +200,13 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia gets her own bottle and two rings at a spot of her own, where she can drop the rings over the top from right beside it. She does not need to throw from his line.',
     },
     picture:
-      'On the living-room floor of the California home, Arjun stands behind a strip of tape and tosses a flat ring cut from a white paper plate, its rim coloured with crayon, towards a small group of plastic bottles; one paper ring already lies round a bottle and another lies flat on the floor. Mummy kneels to one side holding more paper-plate rings.',
-    cast: ['Arjun', 'Mummy'],
+      'On the living-room floor of the Bay Area house, Arjun stands behind a strip of tape and tosses a flat ring cut from a white paper plate, its rim coloured with crayon, towards a small group of plastic bottles; one paper ring already lies round a bottle and another lies flat on the floor. Amma kneels to one side holding more paper-plate rings.',
+    cast: ['Arjun', 'Amma'],
     sources: [
       { label: 'PBS KIDS for Parents: Peg + Cat Indoor Games to Keep Kids Learning in Summer (ring toss)', url: 'https://www.pbs.org/parents/thrive/peg-indoor-games-to-keep-kids-learning-in-summer' },
       { label: 'Nemours KidsHealth: Choosing Safe Toys for Toddlers and Preschoolers (small parts and the toilet-roll test)', url: 'https://kidshealth.org/en/parents/safetoys-young.html' },
     ],
-    tags: ['rainy day', 'paper plates', 'bottles', 'mela', 'counting', 'position words'],
+    tags: ['rainy day', 'paper plates', 'bottles', 'fair', 'mela', 'counting', 'position words'],
     note: {
       what: 'You cut rings from paper plates; he tosses them at a group of capped plastic bottles from a line, and together you count where they landed.',
       expect:
@@ -214,7 +214,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Aiming a light, spinning object. Counting and comparing two small groups, landed and missed. Words for position: on, next to, behind, between.',
       ask: 'Only after a ring lands somewhere odd: "Where did that one end up?"',
-      next: 'At a mela or a school fair he may see a real ring-toss stall. At home, the rings can become steering wheels, crowns or plates for a pretend shop.',
+      next: 'At a school fair or a Deepavali mela he may see a real ring-toss stall. At home, the rings can become steering wheels, crowns or plates for a pretend shop.',
       honest:
         'Light paper rings mostly reward luck, so a good round and a poor round may look very different with nothing changed. Counting where the rings landed is a start on comparing, not a test of it.',
       easier: 'Cut the rings wider, move the line right up close, and stand the bottles touching each other.',
@@ -248,13 +248,13 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia stands in the circle and taps whenever it comes near her; any touch of hers counts as a tap. If the ball lands after her touch, pick it up and carry on from the same number, so his count is never lost because of her.',
     },
     picture:
-      'On the lawn behind the California home, Arjun jumps with both arms up and taps a big striped beach ball into the air, counting aloud; Papa stands opposite with his hands ready for the next tap, and Mia stands between them reaching up towards the ball with both hands.',
-    cast: ['Arjun', 'Papa', 'Mia'],
+      'On the backyard lawn of the Bay Area house, with the lemon tree and the wooden fence behind, Arjun jumps with both arms up and taps a big striped beach ball into the air, counting aloud; Nanna stands opposite with his hands ready for the next tap, and Mia stands between them reaching up towards the ball with both hands. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Nanna', 'Mia'],
     sources: [
       { label: 'PBS KIDS for Parents: 9 Family Games for Your Backyard Olympics (beach-ball volleyball)', url: 'https://www.pbs.org/parents/thrive/family-games-for-your-backyard-olympics' },
       { label: 'AAP HealthyChildren: Choking Prevention (balloons a risk up to age 8)', url: 'https://www.healthychildren.org/English/health-issues/injuries-emergencies/Pages/Choking-Prevention.aspx' },
     ],
-    tags: ['rainy day', 'beach ball', 'garden', 'counting', 'cooperative', 'no balloons'],
+    tags: ['rainy day', 'beach ball', 'backyard', 'garden', 'counting', 'cooperative', 'no balloons', 'grandparents'],
     note: {
       what: 'You keep a beach ball off the ground together by tapping it up, counting every tap out loud. When it lands, you start again and try to go past your own number together.',
       expect:
@@ -262,7 +262,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Tracking a slow ball with his eyes and moving to meet it. Counting on from the last number, and playing on the same side as you rather than against you.',
       ask: 'Only after a long run, if he is pleased: "What did you do differently that time?"',
-      next: 'At the park or the beach, play over a towel laid on the sand as the net. When Dadi and Dada visit, make the circle bigger and keep it going with five.',
+      next: 'At the park or the beach, play over a towel laid on the sand as the net. When Paati and Thatha visit, make the circle bigger and keep it going with everyone; Thatha may count the taps in Tamil.',
       honest:
         'The count depends on draughts, the ball and how much you save his taps, so a new number is not a measure of progress. This is not volleyball; it only borrows the idea of keeping the ball off the ground.',
       easier: 'You make every second tap a high, slow one straight to him, and any touch at all counts.',
@@ -287,7 +287,7 @@ export const IDEAS: readonly PlayIdea[] = [
       'a soft ball (a beach ball, a foam ball, or a pair of rolled-up socks indoors)',
     ],
     steps: [
-      'Set two shoes four big steps apart on the lawn, or against the side walls at the end of a clear hallway. He kicks from a few steps out.',
+      'Set two shoes four big steps apart on the backyard lawn, or against the side walls at the end of a clear hallway. He kicks from a few steps out.',
       'After a few goals, you kneel between the shoes as goalie. Stay on your knees and stop the ball with your hands only.',
       'He decides when to make the goal narrower by moving one shoe in a step.',
       'Swap: he guards the goal, and you kick gently along the ground from where he says.',
@@ -299,14 +299,14 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia has her own soft ball and a cardboard box on its side as her goal, well to one side of his lane, so she can push the ball in with her feet or hands while he plays.',
     },
     picture:
-      'On the lawn of the California home, Arjun swings his right foot and kicks a soft foam ball along the grass towards a goal made of two sandals set apart; Papa kneels between the sandals as goalie, leaning to one side with both hands out, the ball heading past his reach.',
-    cast: ['Arjun', 'Papa'],
+      'On the backyard lawn of the Bay Area house, with the raised vegetable beds and the wooden fence behind, Arjun swings his right foot and kicks a soft foam ball along the grass towards a goal made of two sandals set apart; Nanna kneels between the sandals as goalie, leaning to one side with both hands out, the ball heading past his reach.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       { label: 'Zero to Three: 5 Ways to Play with a Laundry Basket (kick a ball into a basket on its side)', url: 'https://www.zerotothree.org/resource/5-ways-to-play-with-a-laundry-basket/' },
       { label: 'PBS KIDS for Parents: 9 Family Games for Your Backyard Olympics (a mini football pitch)', url: 'https://www.pbs.org/parents/thrive/family-games-for-your-backyard-olympics' },
       { label: 'AAP HealthyChildren: The Power of Play (outdoor play, balance and movement)', url: 'https://www.healthychildren.org/English/family-life/power-of-play/Pages/the-power-of-play-how-fun-and-games-help-children-thrive.aspx' },
     ],
-    tags: ['football', 'soccer', 'kicking', 'garden', 'park', 'shoes', 'goalie'],
+    tags: ['football', 'soccer', 'kicking', 'backyard', 'garden', 'park', 'shoes', 'goalie'],
     note: {
       what: 'Two shoes make a goal and he kicks a soft ball through it. Then you kneel in goal, and later you swap so he guards it.',
       expect:
@@ -320,7 +320,7 @@ export const IDEAS: readonly PlayIdea[] = [
       easier: 'Widen the goal, use a bigger, slower ball such as a beach ball, and let him kick from close.',
       harder: 'Move one shoe in, kick with the other foot, or kick from a spot further away that he chooses.',
       safety:
-        'A soft ball indoors, and only in a clear hallway with nothing breakable at the end. Outdoors, play on grass away from the street or driveway; if the ball rolls out of the garden, a grown-up fetches it. Stay on your knees in goal and stop the ball with your hands, never by lunging at his feet. Nobody kicks at a face.',
+        'A soft ball indoors, and only in a clear hallway with nothing breakable at the end. Outdoors, play on grass away from the street or driveway; if the ball goes over the fence or out of the backyard, a grown-up fetches it. Stay on your knees in goal and stop the ball with your hands, never by lunging at his feet. Nobody kicks at a face.',
     },
   },
 ];

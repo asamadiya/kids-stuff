@@ -26,27 +26,27 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'The grown-up cuts the bottle two-thirds of the way up, then tapes over both cut edges.',
-        art: 'At the patio table, Papa cuts round a clear 2-litre plastic bottle about two-thirds of the way up with kitchen scissors, gripping the bottle firmly in his other hand, while Arjun stands back holding a roll of clear tape in both hands, ready to pass it to him for the cut edge.',
+        art: 'At the patio table in the backyard, Nanna cuts round a clear 2-litre plastic bottle about two-thirds of the way up with kitchen scissors, gripping the bottle firmly in his other hand, while Arjun stands back holding a roll of clear tape in both hands, ready to pass it to him for the cut edge.',
       },
       {
         text: 'Press the clay into the bottom and pat it flat. Its flat top is the zero line.',
-        art: 'At the patio table, Arjun reaches into the bottom half of the cut plastic bottle and pats a lump of grey modelling clay flat across its base with his fingertips, while Papa holds the bottle steady with both hands and peers in to check the clay lies level.',
+        art: 'At the patio table, Arjun reaches into the bottom half of the cut plastic bottle and pats a lump of grey modelling clay flat across its base with his fingertips, while Nanna holds the bottle steady with both hands and peers in to check the clay lies level.',
       },
       {
         text: 'Fit the top in upside down as a funnel, and tape it. Tape the ruler on, 0 level with the clay.',
-        art: 'At the patio table, Papa holds a straight-sided clear plastic cylinder steady with one hand and wraps a strip of clear tape round it with the other; the cylinder is the cut-off bottom of a 2-litre bottle, open at the top, with no neck or shoulders. Inside, a thin flat layer of grey modelling clay covers only the very bottom. Arjun holds a clear plastic ruler upright against the outside of the cylinder with both hands, its bottom end lifted off the table so it lines up with the top of the clay. The bottle’s cut-off top sits upside down in the cylinder’s open mouth like a funnel, its narrow spout pointing down into the empty space above the clay.',
+        art: 'At the patio table, Nanna holds a straight-sided clear plastic cylinder steady with one hand and wraps a strip of clear tape round it with the other; the cylinder is the cut-off bottom of a 2-litre bottle, open at the top, with no neck or shoulders. Inside, a thin flat layer of grey modelling clay covers only the very bottom. Arjun holds a clear plastic ruler upright against the outside of the cylinder with both hands, its bottom end lifted off the table so it lines up with the top of the clay. The bottle’s cut-off top sits upside down in the cylinder’s open mouth like a funnel, its narrow spout pointing down into the empty space above the clay.',
       },
       {
         text: 'Stand it in the open, away from the roof, trees and sprinklers. Box it in with four bricks.',
-        art: 'In the middle of the open back lawn, the bottle rain gauge, a clear plastic cylinder with an upside-down funnel in its open top and a clear ruler taped up its side, stands upright on the grass. Papa kneels on the grass and slides the last of four bricks flat against the bottle with both hands, closing a tight square of bricks that all touch the bottle’s base. Arjun crouches on the opposite side with both palms on another of the bricks, already lying on the grass, nudging it snug against the bottle.',
+        art: 'In the middle of the open back lawn, well away from the lemon tree and the raised beds, the bottle rain gauge, a clear plastic cylinder with an upside-down funnel in its open top and a clear ruler taped up its side, stands upright on the grass. Nanna kneels on the grass and slides the last of four bricks flat against the bottle with both hands, closing a tight square of bricks that all touch the bottle’s base. Arjun crouches on the opposite side with both palms on another of the bricks, already lying on the grass, nudging it snug against the bottle.',
       },
       {
         text: 'Each morning at the same time, crouch down and read where the water reaches. Write it in the diary.',
-        art: 'On a grey morning after rain, Arjun crouches on the wet lawn with his eyes level with the water in the bottle gauge and his finger on the ruler at the water line, while Papa crouches beside him with the rain diary open and a pencil ready.',
+        art: 'On a grey morning after rain, Arjun crouches on the wet lawn with his eyes level with the water in the bottle gauge and his finger on the ruler at the water line, while Nanna crouches beside him with the rain diary open and a pencil ready.',
       },
       {
         text: 'Tip the water out onto the grass and stand the gauge back. Which day had the most rain?',
-        art: 'Arjun holds the bottle rain gauge, a clear plastic cylinder with a clear ruler taped up its side, in both hands and tips it sideways so a stream of rainwater splashes onto the lawn, while Papa kneels beside him on the grass, the closed rain diary resting on his knee under one hand and a pencil in the other, ready for the next morning’s reading.',
+        art: 'Arjun holds the bottle rain gauge, a clear plastic cylinder with a clear ruler taped up its side, in both hands and tips it sideways so a stream of rainwater splashes onto the lawn, while Nanna kneels beside him on the grass, the closed rain diary resting on his knee under one hand and a pencil in the other, ready for the next morning’s reading.',
       },
     ],
     notice: 'After a rainy night the water has climbed up the ruler; after a dry one it sits at zero, however grey the sky looked.',
@@ -61,10 +61,10 @@ export const MORE: readonly Activity[] = [
     tags: ['rain', 'rainy day', 'monsoon', 'winter rain', 'weather', 'rain gauge', 'measuring', 'ruler', 'garden', 'recycling'],
     note: {
       what: 'He helps build a rain gauge from a cut plastic bottle with a ruler taped up its side, stands it in the open, and each morning reads how deep the rain is and writes it in a diary. It follows the Met Office’s school gauge, with modelling clay in place of its jelly base, and Arvind Gupta’s ring of four bricks against toppling.',
-      expect: 'At home in California most rain falls in winter, roughly November to March; in summer the gauge can sit at zero for weeks, so set it up when the forecast shows rain. In Jaipur most rain falls in the monsoon, roughly July to September. He may read the ruler from standing height at first and get a different number from you; crouching to the water line fixes it.',
+      expect: 'In the Bay Area most rain falls in winter, roughly November to March; in summer the gauge can sit at zero for weeks, so set it up when the forecast shows rain. In Hyderabad most rain falls in the monsoon, roughly June to September, while Chennai gets much of its rain from the northeast monsoon, from late October. He may read the ruler from standing height at first and get a different number from you; crouching to the water line fixes it.',
       practising: 'Measuring from a zero line, reading a scale, and recording at the same time each day so the readings can be fairly compared. Rainfall is measured as a depth: how deep the rain would stand on flat ground if none soaked in or ran away.',
       ask: 'On the second rainy morning, before he reads it: “Do you think there is more rain than yesterday, or less?” Then read it together.',
-      next: 'When the rainy spell ends, draw one bar for each day in the diary, as tall as that day’s reading, and find the tallest. On a call with Dadi and Dada, ask whether it is raining in Jaipur, and which months their rain comes.',
+      next: 'When the rainy spell ends, draw one bar for each day in the diary, as tall as that day’s reading, and find the tallest. On a video call with Paati and Thatha, he can ask whether it is raining in Chennai, and which months their rain comes.',
       honest: 'A bottle gauge is rough: wind blows rain past it, splashes jump in, and a little evaporates before you read it, so its numbers will not match the weather report exactly. Reading the ruler with you does not mean he understands a centimetre as a unit yet.',
       easier: 'Skip the numbers: each morning draw a short line on the bottle with a permanent marker at the water level, a new colour each day, then compare the lines.',
       harder: 'Put a second, identical gauge under a tree. Ask him beforehand which will catch more after the same rain, then compare. Either can win: leaves shelter a gauge, but where they drip they can pour extra in.',
@@ -91,27 +91,27 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Draw a sun and a cloud near the top of each bag, and wavy sea along the bottom.',
-        art: 'At the kitchen table, Arjun draws a round sun and a puffy cloud near the top of a flat zip-lock bag with a black marker, wavy sea lines already drawn along its bottom, while Mummy holds the bag flat with both hands; beside it lies a second zip-lock bag with the same black sun, cloud and wavy sea already drawn on it.',
+        art: 'At the kitchen table, Arjun draws a round sun and a puffy cloud near the top of a flat zip-lock bag with a black marker, wavy sea lines already drawn along its bottom, while Amma holds the bag flat with both hands; beside it lies a second zip-lock bag with the same black sun, cloud and wavy sea already drawn on it.',
       },
       {
         text: 'Hold each bag upright. Spoon in two tablespoons of blue water, low down, without splashing the sides.',
-        art: 'Mummy holds a zip-lock bag upright and open by its top corners while Arjun lowers a tablespoon of pale blue water deep inside and tips it gently into the bottom, a small jug of blue water standing on the kitchen table beside them.',
+        art: 'Amma holds a zip-lock bag upright and open by its top corners while Arjun lowers a tablespoon of pale blue water deep inside and tips it gently into the bottom, a small jug of blue water standing on the kitchen table beside them.',
       },
       {
         text: 'The grown-up presses each seal shut and tapes over it. Look now: the top is dry.',
-        art: 'Mummy runs her thumb and finger along the zip of the bag and smooths a strip of clear tape over the seal, while Arjun leans close and looks at the dry, clear plastic above the little pool of blue water at the bottom.',
+        art: 'Amma runs her thumb and finger along the zip of the bag and smooths a strip of clear tape over the seal, while Arjun leans close and looks at the dry, clear plastic above the little pool of blue water at the bottom.',
       },
       {
         text: 'Tape one bag high on a sunny window and the other high on a shady window.',
-        art: 'Mummy, standing on the kitchen floor, reaches up with both hands and presses strips of tape over the two top corners of a zip-lock bag of blue water high on a sunlit kitchen window. Arjun stands on the kitchen floor beside her, both feet on the floor, holding the second zip-lock bag of blue water against his chest with both hands, waiting to tape it up next. The view shows only this one sunny window and the plain wall beside it, so the bag on the glass and the bag in Arjun’s hands are the only two bags in the picture.',
+        art: 'Amma, standing on the kitchen floor, reaches up with both hands and presses strips of tape over the two top corners of a zip-lock bag of blue water high on a sunlit kitchen window. Arjun stands on the kitchen floor beside her, both feet on the floor, holding the second zip-lock bag of blue water against his chest with both hands, waiting to tape it up next. The view shows only this one sunny window and the plain wall beside it, so the bag on the glass and the bag in Arjun’s hands are the only two bags in the picture.',
       },
       {
         text: 'Look at lunch, before dinner and next morning. Where are drops growing?',
-        art: 'Arjun stands on the floor beneath the sunny kitchen window pointing up at tiny drops misting the inside top of the zip-lock bag above the blue water, while Mummy stands beside him and tilts her head to look where he points.',
+        art: 'Arjun stands on the floor beneath the sunny kitchen window pointing up at tiny drops misting the inside top of the zip-lock bag above the blue water, while Amma stands beside him and tilts her head to look where he points.',
       },
       {
         text: 'Watch a big drop slide down into the sea. Which bag made more drops?',
-        art: 'Arjun stands on the kitchen floor below the sunny window, head tipped back, tracing with his right index finger a fat drop that slides down the inside of the zip-lock bag taped high on the glass toward the blue water at its bottom. Mummy stands beside him, turned the other way to face a dim, shadowed window on the far wall of the kitchen; her left hand rests on Arjun’s shoulder and her right index finger points at the second zip-lock bag of blue water taped high on that shady window.',
+        art: 'Arjun stands on the kitchen floor below the sunny window, head tipped back, tracing with his right index finger a fat drop that slides down the inside of the zip-lock bag taped high on the glass toward the blue water at its bottom. Amma stands beside him, turned the other way to face a dim, shadowed window on the far wall of the kitchen; her left hand rests on Arjun’s shoulder and her right index finger points at the second zip-lock bag of blue water taped high on that shady window.',
       },
     ],
     notice: 'Drops appear inside the top of the bag, where there were none before, usually sooner in the sunny bag; they grow, join and run down. Nothing got in through the seal.',
@@ -129,7 +129,7 @@ export const MORE: readonly Activity[] = [
       expect: 'Results are not guaranteed the same day. In strong sun, a mist of tiny drops can appear within a few hours; on a cool or cloudy day it may take until the next day, and the shady bag may show very little. Children often say the water “jumped up” or “splashed”, which is why you look at the dry top together right after sealing.',
       practising: 'Evaporation and condensation: water leaves the liquid as water vapour, which is invisible, faster when the sun warms it, and turns back into liquid drops on a cooler surface. Also a comparison with one change, sun against shade.',
       ask: 'When he first spots drops at the top: “Nothing could get in, and the top was dry. Where did these come from?” Take whatever he says without correcting it.',
-      next: 'At dinner, fill a steel tumbler with water straight from the fridge and watch its outside fog up; in very dry weather it may stay clear. Then play Where Did the Ice Go? together.',
+      next: 'At dinner, fill a steel tumbler with water straight from the fridge and watch its outside fog up, the same drops as in the bag; in very dry weather it may stay clear. Then play Where Did the Ice Go? together.',
       honest: 'This is a limited model, not the whole water cycle: real clouds form when rising air cools high in the sky, and real rain soaks into ground and flows in rivers. It shows evaporation and condensation only. Seeing drops does not mean he understands invisible water vapour; children his age often say the water splashed up, or simply went up as water.',
       easier: 'Make just the sunny bag and look at it together at bedtime.',
       harder: 'Stir half a teaspoon of salt into the water of a third bag. Ask him whether the drops at the top will be salty too. At the end the grown-up snips a top corner, dabs one top drop and one drop of the salty sea onto a dark plate or tray, and lets them dry: the sea drop leaves a crusty ring, the top drop almost nothing. Nobody tastes.',
@@ -155,27 +155,27 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'On a sunny morning, find two puddles on the paving: one in the sun, one in the shade.',
-        art: 'On a bright morning after rain, Arjun in a straw sun hat walks along a paved garden path and points down at a shallow puddle sparkling in full sunshine. A few steps further on, the path runs into the deep blue-grey shadow of a tall wooden fence, and there Papa, holding a plain brown cardboard box of thick chalk sticks in one hand, points with the other at a second shallow puddle lying dark and dull inside that shadow, with no sunlight on it.',
+        art: 'On a bright morning after rain, Arjun in a straw sun hat walks along the paved path beside the backyard lawn and points down at a shallow puddle sparkling in full sunshine. A few steps further on, the path runs into the deep blue-grey shadow of the tall wooden backyard fence, and there Nanna, holding a plain brown cardboard box of thick chalk sticks in one hand, points with the other at a second shallow puddle lying dark and dull inside that shadow, with no sunlight on it.',
       },
       {
         text: 'Chalk a line all the way round the edge of each puddle.',
-        art: 'Arjun crouches at the sunny puddle on the paving and draws a thick yellow chalk line round its wet edge, while Papa crouches at the shady puddle by the fence tracing its edge in yellow too, both watching to keep the line close to the water.',
+        art: 'Arjun crouches at the sunny puddle on the paving and draws a thick yellow chalk line round its wet edge, while Nanna crouches at the shady puddle by the fence tracing its edge in yellow too, both watching to keep the line close to the water.',
       },
       {
         text: 'Guess together: which puddle will shrink faster, the sunny one or the shady one?',
-        art: 'Arjun stands on the paved path between two puddles ringed in yellow chalk, his left arm pointing at the puddle in bright sun and his right arm pointing at the puddle in the fence’s dark shadow, while Papa kneels beside him holding an open, plain brown cardboard tray of coloured chalk sticks in both hands, waiting for his guess.',
+        art: 'Arjun stands on the paved path between two puddles ringed in yellow chalk, his left arm pointing at the puddle in bright sun and his right arm pointing at the puddle in the fence’s dark shadow, while Nanna kneels beside him holding an open, plain brown cardboard tray of coloured chalk sticks in both hands, waiting for his guess.',
       },
       {
         text: 'While you wait, put a drop on your palm and one on a shady step. Spread both thin. Which dries first?',
-        art: 'Arjun crouches on a shaded pale grey stone step and spreads a drop of clear water thin across his open left palm with one fingertip of his right hand; beside his feet, a thin damp smear no bigger than his hand darkens the grey stone. Papa sits on the step beside him holding a small clear plastic cup of clear water in one hand, his other hand resting on his knee, both watching the two wet patches closely.',
+        art: 'Arjun crouches on the shaded pale grey stone step down from the back patio and spreads a drop of clear water thin across his open left palm with one fingertip of his right hand; beside his feet, a thin damp smear no bigger than his hand darkens the grey stone. Nanna sits on the step beside him holding a small clear plastic cup of clear water in one hand, his other hand resting on his knee, both watching the two wet patches closely.',
       },
       {
         text: 'Every hour, chalk round each puddle’s new edge in a new colour.',
-        art: 'Arjun kneels by the sunny puddle and draws a pink chalk line round its shrunken edge, a band of dry paving now showing between the water and the first yellow chalk ring, while Papa stands beside him holding up a wristwatch.',
+        art: 'Arjun kneels by the sunny puddle and draws a pink chalk line round its shrunken edge, a band of dry paving now showing between the water and the first yellow chalk ring, while Nanna stands beside him holding up a wristwatch.',
       },
       {
         text: 'Look at the rings. Which puddle shrank faster? Feel the dry paving: where did the water go?',
-        art: 'The paved path is split by light: the left half is in bright sunshine, the right half in the deep blue-grey shadow of a tall wooden fence. In the sunny half, Arjun crouches and presses one palm flat on dry, pale paving inside three nested chalk rings, yellow outermost, then pink, then blue, with no water inside any ring. A few steps away in the fence’s shadow, Papa kneels and points at a dark, dull puddle sitting inside its own yellow chalk ring, a thin gap of dry paving between the water’s edge and the chalk all the way round.',
+        art: 'The paved path is split by light: the left half is in bright sunshine, the right half in the deep blue-grey shadow of a tall wooden fence. In the sunny half, Arjun crouches and presses one palm flat on dry, pale paving inside three nested chalk rings, yellow outermost, then pink, then blue, with no water inside any ring. A few steps away in the fence’s shadow, Nanna kneels and points at a dark, dull puddle sitting inside its own yellow chalk ring, a thin gap of dry paving between the water’s edge and the chalk all the way round.',
       },
     ],
     notice: 'The sunny puddle shrinks ring by ring and is often gone before the shady one has changed much. Nobody carried the water away: most of it went into the air as invisible water vapour, and a little soaked into the cracks.',
@@ -219,27 +219,27 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Pour coloured water into both tumblers to the same height. Mark each level with a strip of tape.',
-        art: 'Arjun presses a strip of masking tape flat onto the side of the first of two identical clear plastic tumblers on a tray at the kitchen table, the tape’s top edge level with the orange water inside, while Mummy pours the same orange water from a clear jug into the second tumbler; both tumblers hold orange water to the same height.',
+        art: 'Arjun presses a strip of masking tape flat onto the side of the first of two identical clear plastic tumblers on a tray at the kitchen table, the tape’s top edge level with the orange water inside, while Amma pours the same orange water from a clear jug into the second tumbler; both tumblers hold orange water to the same height.',
       },
       {
         text: 'Look side by side, eyes level with the water. The tapes match: the same water in each.',
-        art: 'At the kitchen table, Arjun stands on the floor and bends his knees so his eyes are level with two identical clear plastic tumblers of orange water on a tray, each with a strip of masking tape at the same height, and points one finger from one water line to the other, while Mummy leans in beside him to look too; both of Arjun’s feet are on the kitchen floor.',
+        art: 'At the kitchen table, Arjun stands on the floor and bends his knees so his eyes are level with two identical clear plastic tumblers of orange water on a tray, each with a strip of masking tape at the same height, and points one finger from one water line to the other, while Amma leans in beside him to look too; both of Arjun’s feet are on the kitchen floor.',
       },
       {
         text: 'Watch closely while the grown-up pours one tumbler into the tall, narrow cup.',
-        art: 'Mummy tips a short, wide clear plastic tumbler of orange water into a tall, skinny, tube-shaped clear plastic cup standing on a tray on the kitchen table; the skinny cup is only as wide as Arjun’s wrist and twice as tall as the tumbler, and the orange water climbs high up it. Arjun stands on the kitchen floor beside the table, both hands flat on the table, watching wide-eyed next to the second short, wide tumbler of orange water with its strip of masking tape.',
+        art: 'Amma tips a short, wide clear plastic tumbler of orange water into a tall, skinny, tube-shaped clear plastic cup standing on a tray on the kitchen table; the skinny cup is only as wide as Arjun’s wrist and twice as tall as the tumbler, and the orange water climbs high up it. Arjun stands on the kitchen floor beside the table, both hands flat on the table, watching wide-eyed next to the second short, wide tumbler of orange water with its strip of masking tape.',
       },
       {
         text: 'Now: same water, or does one have more? Say what you think, and why.',
-        art: 'Arjun, standing on the kitchen floor at the table, points with his right index finger at a tall, skinny, tube-shaped clear plastic cup on the tray, only as wide as his wrist, where orange water stands high; his left hand lies flat on the table beside a short, wide clear plastic tumbler of orange water whose water stands low. His mouth is open as he talks. Mummy sits across the kitchen table with both hands folded in her lap, listening.',
+        art: 'Arjun, standing on the kitchen floor at the table, points with his right index finger at a tall, skinny, tube-shaped clear plastic cup on the tray, only as wide as his wrist, where orange water stands high; his left hand lies flat on the table beside a short, wide clear plastic tumbler of orange water whose water stands low. His mouth is open as he talks. Amma sits across the kitchen table with both hands folded in her lap, listening.',
       },
       {
         text: 'Prove it: pour the tall cup back into its own tumbler. Does it reach the tape again?',
-        art: 'At the kitchen table, Arjun, standing on the floor, holds a tall, skinny, tube-shaped clear plastic cup, as wide as his wrist, in both hands and tips the last of its orange water into a short, wide clear plastic tumbler on the tray. A strip of masking tape runs round the tumbler high up, near its rim, and the orange water inside has risen to just under the tape’s lower edge, with a thin band of clear empty plastic still showing between the water and the tape. Mummy holds the tumbler steady with both hands, and both of them watch the water creep up toward the tape.',
+        art: 'At the kitchen table, Arjun, standing on the floor, holds a tall, skinny, tube-shaped clear plastic cup, as wide as his wrist, in both hands and tips the last of its orange water into a short, wide clear plastic tumbler on the tray. A strip of masking tape runs round the tumbler high up, near its rim, and the orange water inside has risen to just under the tape’s lower edge, with a thin band of clear empty plastic still showing between the water and the tape. Amma holds the tumbler steady with both hands, and both of them watch the water creep up toward the tape.',
       },
       {
         text: 'Your turn to trick the grown-up: pour one tumbler into the wide bowl, and ask the question.',
-        art: 'Arjun pours a tumbler of coloured water into a short, wide clear plastic bowl on the tray, where it lies low and flat, grinning at Mummy, who sits across the kitchen table with her hand on her chin, pretending to think hard.',
+        art: 'Arjun pours a tumbler of coloured water into a short, wide clear plastic bowl on the tray, where it lies low and flat, grinning at Amma, who sits across the kitchen table with her hand on her chin, pretending to think hard.',
       },
     ],
     notice: 'The water stands high in the tall cup and low in the wide bowl, but poured back into its own tumbler it comes up to the same tape line every time.',
@@ -257,7 +257,7 @@ export const MORE: readonly Activity[] = [
       expect: 'Many five-year-olds say the tall cup has more “because it is higher”, or the wide bowl has more “because it is fatter”; most children answer this the way adults do at around six or seven. Agree the two are the same by looking, not by asking; then ask the question once only, after the pour. Asking before and after, or following up with “Are you sure?”, tells him his first answer was wrong, and he may switch without changing his mind.',
       practising: 'Conservation of liquid, as Piaget called it: pouring water into a different shape changes how high it stands, not how much water there is, and pouring it back undoes the change. Also comparing amounts fairly by using one tumbler as the measure.',
       ask: 'After the water reaches the tape again: “It went so high in the tall cup. How can it be the same water?” Listen; there is nothing to correct.',
-      next: 'At dinner, measure two equal helpings of lassi with one cup, pour one into a tall steel tumbler and one into a wide katori, and see who at the table thinks it is unfair. Then play Spread Them Out, which asks the same question about dinosaurs moved apart.',
+      next: 'At dinner, measure two equal helpings of buttermilk with one cup, pour one into a tall steel tumbler and one into a wide katori, and see who at the table thinks it is unfair. Then play Spread Them Out, which asks the same question about dinosaurs moved apart.',
       honest: 'This is not a pass-or-fail test, and today’s answer does not measure how clever he is: the same child can say “the tall one” on Monday and “the same” on Friday, or give the right answer for a wrong reason. Pouring back shows the amount did not change; it does not make him believe it.',
       easier: 'Skip the bowl. Use only the tall cup, and pour it back straight away while he watches the water return to the tape.',
       harder: 'Find out which holds more when full, the tall cup or the wide bowl, by counting how many tumblers fill each. Then line up four kitchen containers from holds-least to holds-most, guessing first.',
@@ -267,7 +267,7 @@ export const MORE: readonly Activity[] = [
   {
     id: 'why-the-matka-keeps-water-cool',
     area: 'water',
-    title: 'Why the Matka Keeps Water Cool',
+    title: 'Why a Clay Pot Keeps Water Cool',
     hook: 'Two bottles of the same water. One wears a wet cloth.',
     where: 'garden',
     places: ['outdoors'],
@@ -281,28 +281,28 @@ export const MORE: readonly Activity[] = [
       'two small steel cups',
       'a kitchen timer',
       'a digital kitchen thermometer, if you have one',
-      'if you have one: an unglazed clay matka or surahi',
+      'if you have one: an unglazed clay water pot or a kooja',
     ],
     steps: [
       {
         text: 'Fill both steel bottles right to the top from the same jug. Screw the caps on.',
-        art: 'At the patio table, Arjun pours water from a plastic jug into the second of two identical steel bottles, his tongue between his teeth, while Mummy holds the bottle steady with one hand and holds its cap ready in the other; the first bottle stands capped beside it.',
+        art: 'At the backyard patio table, Arjun pours water from a plastic jug into the second of two identical steel bottles, his tongue between his teeth, while Amma holds the bottle steady with one hand and holds its cap ready in the other; the first bottle stands capped beside it.',
       },
       {
         text: 'The grown-up soaks the cloth and wrings it out. You wrap it snugly round one bottle. Leave the other bare.',
-        art: 'At the patio table, Arjun wraps a damp white cotton cloth snugly round one of two identical steel bottles and tucks its end in with both hands. Mummy stands across the table, her face and long plait in view, holding the rim of a steel bowl of water with both hands; the second steel bottle stands bare beside the bowl. Arjun’s cloth is the only cloth in the picture.',
+        art: 'At the patio table, Arjun wraps a damp white cotton cloth snugly round one of two identical steel bottles and tucks its end in with both hands. Amma stands across the table, her face and long plait in view, holding the rim of a steel bowl of water with both hands; the second steel bottle stands bare beside the bowl. Arjun’s cloth is the only cloth in the picture.',
       },
       {
         text: 'Stand both side by side in a shady, breezy spot. Guess: which will be colder in an hour?',
-        art: 'In the shade of the patio roof where a breeze stirs the plants, Arjun sets a steel bottle wrapped in a damp cotton cloth beside a bare steel bottle on a low stool, while Mummy kneels beside him setting a kitchen timer and waiting for his guess.',
+        art: 'In the shade of the patio roof where a breeze stirs the potted curry-leaf and tulsi plants, Arjun sets a steel bottle wrapped in a damp cotton cloth beside a bare steel bottle on a low stool, while Amma kneels beside him setting a kitchen timer and waiting for his guess.',
       },
       {
         text: 'When the timer rings, pour a little from each bottle into its own cup. Dip a finger in each.',
-        art: 'At the low patio stool, Arjun dips one finger of each hand into two small steel cups of water, his eyebrows raised, while Mummy holds a digital kitchen thermometer in the first cup and the wrapped and bare steel bottles stand beside them.',
+        art: 'At the low patio stool, Arjun dips one finger of each hand into two small steel cups of water, his eyebrows raised, while Amma holds a digital kitchen thermometer in the first cup and the wrapped and bare steel bottles stand beside them.',
       },
       {
         text: 'Feel the cloth now. Is it drier than when you wrapped it? Where did that water go?',
-        art: 'Arjun pinches a corner of the cotton cloth he has just unwrapped from the steel bottle, now only slightly damp, and rubs it between finger and thumb, frowning in thought, while Mummy dips her fingers in the bowl of soaking water and holds them out wet for him to compare.',
+        art: 'Arjun pinches a corner of the cotton cloth he has just unwrapped from the steel bottle, now only slightly damp, and rubs it between finger and thumb, frowning in thought, while Amma dips her fingers in the bowl of soaking water and holds them out wet for him to compare.',
       },
     ],
     notice: 'The water in the wrapped bottle is usually a little cooler than the water in the bare one, though on a humid day you may not feel a difference, and the cloth is drier than when you wrapped it.',
@@ -312,15 +312,15 @@ export const MORE: readonly Activity[] = [
       { label: 'Wikipedia: Pot-in-pot refrigerator (ghara, matka and surahi)', url: 'https://en.wikipedia.org/wiki/Pot-in-pot_refrigerator' },
       { label: 'Practical Action: Zeer Pots, a Fridge Made of Two Clay Pots', url: 'https://practicalaction.org/zeer-pot-fridge' },
     ],
-    tags: ['matka', 'surahi', 'ghara', 'clay pot', 'summer', 'hot day', 'evaporation', 'cooling', 'Jaipur', 'India', 'no fridge'],
+    tags: ['matka', 'kooja', 'surahi', 'ghara', 'clay pot', 'summer', 'hot day', 'evaporation', 'cooling', 'Hyderabad', 'India', 'no fridge'],
     pairsWith: 'where-did-the-ice-go',
     note: {
-      what: 'In Indian summers many homes keep drinking water in an unglazed clay matka or a long-necked surahi; water seeps through the clay and dries off the outside, which is why the pot feels damp. Here he tests the same idea with two steel bottles of the same water, one wrapped in a wet cotton cloth, left an hour in a shady, breezy spot.',
+      what: 'In Indian summers many homes keep drinking water in an unglazed clay pot: a narrow-necked kooja in Telugu homes, a matka or surahi in north India; water seeps through the clay and dries off the outside, which is why the pot feels damp. Here he tests the same idea with two steel bottles of the same water, one wrapped in a wet cotton cloth, left an hour in a shady, breezy spot.',
       expect: 'He may guess either way: that the bare bottle stays colder, that the wet cloth makes no difference, or that the wet one wins because wet cloth feels cold. The wrapped water is usually only a little cooler, so fingers may disagree; a thermometer settles it. He may call the cloth “cold”, as if coldness were in it.',
       practising: 'Evaporative cooling: when water dries off a surface it takes heat with it, so whatever it dries from gets cooler. Also a fair comparison: the same water, the same bottles and the same spot, with only the cloth changed.',
       ask: 'When he feels the cloth has dried: “The water in the cloth went somewhere. Did it take anything with it?” Accept any answer.',
-      next: 'If you have a matka or surahi, fill it and a bare steel bottle from the same jug in the morning and compare the two at lunch. On a call with Dadi and Dada, ask him to find out whether they keep a matka in summer, and why the outside feels damp.',
-      honest: 'One run, judged by fingers, can mislead: a sunny spot, a breeze on one bottle only, or water that started colder than the air can each swamp the difference. He can say “the wet one was cooler” without understanding that drying takes heat away; that idea usually comes much later. A matka cools water a little; it is not a fridge, and it works less well in humid, monsoon weather.',
+      next: 'If you have a clay pot, fill it and a bare steel bottle from the same jug in the morning and compare the two at lunch. On a video call with Nanamma and Tatayya, he can ask whether they keep a clay pot of water in the Hyderabad summer, and why its outside feels damp.',
+      honest: 'One run, judged by fingers, can mislead: a sunny spot, a breeze on one bottle only, or water that started colder than the air can each swamp the difference. He can say “the wet one was cooler” without understanding that drying takes heat away; that idea usually comes much later. A clay pot cools water a little; it is not a fridge, and it works less well in humid, monsoon weather.',
       easier: 'Wet one of his hands and leave the other dry. Both of you blow gently on both hands: which one feels cooler?',
       harder: 'Add a third identical bottle wrapped in a dry cloth. Ask him beforehand to put the three in order from coolest to warmest; the dry cloth shows whether it is the cloth or the water in it that cools. If he has done Does a Towel Keep Ice Cold?, he may expect any cloth to keep things cold; a dry cloth round water already at air temperature changes almost nothing.',
       safety: 'Plain tap water only. A grown-up stays within arm’s reach of the bowl and the cups the whole time, keeps the two-year-old’s hands out of them, and tips all the water away when you finish. An unglazed clay pot breaks into sharp pieces: stand it low and steady where she cannot pull it over, and keep him from carrying it full. Use a digital thermometer, not a glass one; if you have only glass, leave it out and use fingers. Put the bottles in the shade, not in sun.',

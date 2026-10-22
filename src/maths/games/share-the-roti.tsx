@@ -3,10 +3,10 @@ import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Choice } from '../../play/parts';
 
 /**
- * Share the Roti — fractions as EQUAL parts of one specified whole.
+ * Share the Dosa — fractions as EQUAL parts of one specified whole.
  *
  * Concept (advisor, maths 6 / game 8): a half is one of two EQUAL pieces of
- * the same roti, not "one of two pieces". The misconceptions it targets, from
+ * the same dosa, not "one of two pieces". The misconceptions it targets, from
  * the charter: any two pieces are halves; more pieces means more food; a
  * quarter must beat a half because four beats two.
  *
@@ -18,18 +18,18 @@ import { Choice } from '../../play/parts';
  *     but unequal ones — an off-centre cross, two cuts through the middle that
  *     are not square, four strips of equal width — or equal pieces of the
  *     wrong number. Counting pieces is no longer enough.
- *  3. Compare and combine. Which shaded part is more roti (a half or a
+ *  3. Compare and combine. Which shaded part is more dosa (a half or a
  *     quarter, a quarter or a third, a half or two quarters, two thirds or
- *     three quarters, and half of a small roti against a quarter of a big
+ *     three quarters, and half of a small dosa against a quarter of a big
  *     one); how many quarters cover a half; how many thirds make a whole.
  *
  * Control: tap-to-choose only.
- * Evidence: on 'hint' the roti he chose (every roti, if he chose none) shows
+ * Evidence: on 'hint' the dosa he chose (every dosa, if he chose none) shows
  * its smallest piece folded over a cut onto its neighbour (a dashed blue
  * copy) — the paper-folding test from the charter. Equal pieces cover
  * exactly; unequal ones leave a gap. A cut with the wrong number of pieces is
  * numbered instead of folded. On 'worked'
- * the right roti's pieces are labelled 1/2, 1/3 or 1/4. In the compare and
+ * the right dosa's pieces are labelled 1/2, 1/3 or 1/4. In the compare and
  * combine rounds the hint lays one share on the other (or lays as many unit
  * pieces as he chose), and 'worked' lays down the right number, numbered.
  * Fixed SVG states only.
@@ -38,7 +38,7 @@ import { Choice } from '../../play/parts';
 export type Parts = 2 | 3 | 4;
 
 /**
- * How a roti is cut, in screen coordinates on a roti of radius 1 (y points
+ * How a dosa is cut, in screen coordinates on a dosa of radius 1 (y points
  * down), then turned `turn` degrees clockwise.
  * - fan: straight cuts from the centre out; `angles` are the pieces' angles,
  *   clockwise from the top. Two pieces of 180 make one straight cut.
@@ -51,10 +51,10 @@ export type Cut =
   | { readonly kind: 'cross'; readonly x: number; readonly y: number; readonly turn: number };
 
 /**
- * Someone's share: `k` of `n` equal pieces of a roti, full size or half as
- * wide, drawn solid while the rest of that roti stays as a dashed ghost, so
+ * Someone's share: `k` of `n` equal pieces of a dosa, full size or half as
+ * wide, drawn solid while the rest of that dosa stays as a dashed ghost, so
  * the whole is always on the board. The share starts `turn` degrees
- * clockwise from the top, so two rotis on one board never line up by accident.
+ * clockwise from the top, so two dosas on one board never line up by accident.
  */
 export interface Share {
   readonly n: Parts | 1;
@@ -68,7 +68,7 @@ export type Round =
   | { readonly kind: 'judge'; readonly n: Parts; readonly cut: Cut }
   | { readonly kind: 'compare'; readonly a: Share; readonly b: Share }
   | { readonly kind: 'cover'; readonly unit: 3 | 4; readonly target: 'half' | 'whole'; readonly choices: readonly number[] }
-  /** Two loose quarters: which plate (one Share per option) holds as much roti? */
+  /** Two loose quarters: which plate (one Share per option) holds as much dosa? */
   | { readonly kind: 'join'; readonly options: readonly Share[] };
 
 /** The index of the tapped choice. */
@@ -108,7 +108,7 @@ const TABLE: Record<Level, readonly Round[]> = {
     { kind: 'judge', n: 3, cut: THIRDS(30) },
   ],
   3: [
-    // Compare and combine. Index 2 (a small roti) is the "half of WHAT?" round;
+    // Compare and combine. Index 2 (a small dosa) is the "half of WHAT?" round;
     // index 4 is two thirds against three quarters, each one piece short of a
     // whole, where the missing pieces have to be compared, not the counts.
     { kind: 'compare', a: share(2, 1, 0), b: share(4, 1, 135) },
@@ -130,10 +130,10 @@ export function generate(level: Level, index: number): Round {
 
 /* ------------------------------------------------------------- geometry -- */
 
-/** A point in roti radii, centre at 0, y pointing down the screen. */
+/** A point in dosa radii, centre at 0, y pointing down the screen. */
 type Pt = readonly [number, number];
 
-/** The small roti in the "half of WHAT?" round is half as wide as the others. */
+/** The small dosa in the "half of WHAT?" round is half as wide as the others. */
 const SMALL = 0.5;
 const RAD = Math.PI / 180;
 
@@ -197,7 +197,7 @@ const asinDeg = (v: number) => Math.asin(v) / RAD;
 const acosDeg = (v: number) => Math.acos(v) / RAD;
 const DOWN: Pt = [0, 1];
 
-/** What a cut does to a roti: its pieces, the fold test, and whether the pieces match. */
+/** What a cut does to a dosa: its pieces, the fold test, and whether the pieces match. */
 export interface Cutting {
   readonly pieces: readonly Pt[][];
   /** The smallest piece folded over one of its cuts, onto the piece beside it. */
@@ -214,7 +214,7 @@ function smallest(pieces: readonly Pt[][]): number {
   return areas.reduce((best, a, i) => (a < areas[best] - 1e-9 ? i : best), 0);
 }
 
-export function cutRoti(cut: Cut): Cutting {
+export function cutDosa(cut: Cut): Cutting {
   let pieces: Pt[][];
   let fold: Pt[];
   if (cut.kind === 'fan') {
@@ -250,10 +250,10 @@ export function cutRoti(cut: Cut): Cutting {
   };
 }
 
-/** How much of a full-size roti a share is. */
+/** How much of a full-size dosa a share is. */
 export const amount = (s: Share) => (s.k / s.n) * (s.small ? SMALL * SMALL : 1);
 
-/** A share's roti cut into its n equal slices (one, uncut, for a whole). */
+/** A share's dosa cut into its n equal slices (one, uncut, for a whole). */
 function slices(s: Share): Pt[][] {
   const r = s.small ? SMALL : 1;
   if (s.n === 1) return [arc(0, 360, r)];
@@ -262,8 +262,8 @@ function slices(s: Share): Pt[][] {
 }
 
 /**
- * Share `x` laid on share `y`'s roti, from y's first cut, one piece per
- * slice so the cuts still show. Half of the small roti goes with its straight
+ * Share `x` laid on share `y`'s dosa, from y's first cut, one piece per
+ * slice so the cuts still show. Half of the small dosa goes with its straight
  * edge along that cut: a semicircle on a radius fits inside a right angle,
  * so it sits wholly inside a big quarter.
  */
@@ -289,31 +289,31 @@ const PLURAL: Record<Parts, string> = { 2: 'halves', 3: 'thirds', 4: 'quarters' 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 const same = (a: number, b: number) => Math.abs(a - b) < 1e-9;
 
-/** Who cut the roti in a judge round. */
-const CUTTER: Record<Parts, string> = { 2: 'Papa', 3: 'Dadi', 4: 'Mummy' };
+/** Who cut the dosa in a judge round: whichever parent made it. */
+const CUTTER: Record<Parts, string> = { 2: 'Nanna', 3: 'Amma', 4: 'Nanna' };
 
 /** Who holds each share in a compare round. */
 const WHO = ['Arjun', 'Mia'] as const;
 
-/** A share as it is said aloud: "a half", "two quarters", "half a small roti". */
+/** A share as it is said aloud: "a half", "two quarters", "half a small dosa". */
 function said(s: Share): string {
-  if (s.n === 1) return 'a whole roti';
+  if (s.n === 1) return 'a whole dosa';
   const part = s.k === 1 ? UNIT[s.n] : `${WORD[s.k]} ${PLURAL[s.n]}`;
-  if (s.small) return s.k === 1 && s.n === 2 ? 'half a small roti' : `${part} of a small roti`;
+  if (s.small) return s.k === 1 && s.n === 2 ? 'half a small dosa' : `${part} of a small dosa`;
   return s.k === 1 ? `a ${part}` : part;
 }
 
-/** The same, after a possessive: "Mia's quarter", "Arjun's half of the small roti". */
+/** The same, after a possessive: "Mia's quarter", "Arjun's half of the small dosa". */
 function owned(s: Share): string {
-  if (s.n === 1) return 'whole roti';
+  if (s.n === 1) return 'whole dosa';
   const part = s.k === 1 ? UNIT[s.n] : `${WORD[s.k]} ${PLURAL[s.n]}`;
-  return s.small ? `${part} of the small roti` : part;
+  return s.small ? `${part} of the small dosa` : part;
 }
 
 /** How many unit pieces the cover round needs. */
 const needed = (r: Extract<Round, { kind: 'cover' }>) => (r.target === 'half' ? r.unit / 2 : r.unit);
 
-/** What Mia's two quarters come to, as a part of one roti. */
+/** What Mia's two quarters come to, as a part of one dosa. */
 const TWO_QUARTERS = 1 / 2;
 
 /** The index of the right choice. Every round in TABLE has exactly one. */
@@ -321,11 +321,11 @@ export function correct(round: Round): number {
   switch (round.kind) {
     case 'pick':
       return round.options.findIndex((cut) => {
-        const c = cutRoti(cut);
+        const c = cutDosa(cut);
         return c.equal && c.pieces.length === round.n;
       });
     case 'judge': {
-      const c = cutRoti(round.cut);
+      const c = cutDosa(round.cut);
       return c.equal && c.pieces.length === round.n ? 0 : 1;
     }
     case 'compare': {
@@ -344,18 +344,18 @@ function prompt(round: Round): string {
   switch (round.kind) {
     case 'pick':
       return {
-        2: 'Arjun and Mia share one roti. Which cut makes halves?',
-        3: 'Arjun, Mia and Papa share a roti. Which cut makes thirds?',
-        4: 'Mummy, Papa, Arjun and Mia share a roti. Which cut makes quarters?',
+        2: 'Arjun and Mia share one dosa. Which cut makes halves?',
+        3: 'Arjun, Mia and Amma share a dosa. Which cut makes thirds?',
+        4: 'Amma, Nanna, Arjun and Mia share a dosa. Which cut makes quarters?',
       }[round.n];
     case 'judge':
-      return `${CUTTER[round.n]} cut this roti into ${WORD[round.n]} pieces. Are they ${PLURAL[round.n]}?`;
+      return `${CUTTER[round.n]} cut this dosa into ${WORD[round.n]} pieces. Are they ${PLURAL[round.n]}?`;
     case 'compare':
       return `Arjun has ${said(round.a)}, Mia ${said(round.b)}. Who has more?`;
     case 'cover':
       return round.target === 'half'
-        ? `How many ${PLURAL[round.unit]} cover half the roti?`
-        : `How many ${PLURAL[round.unit]} make the whole roti?`;
+        ? `How many ${PLURAL[round.unit]} cover half the dosa?`
+        : `How many ${PLURAL[round.unit]} make the whole dosa?`;
     case 'join':
       return 'Mia has two quarters. Which plate holds the same amount?';
   }
@@ -375,16 +375,16 @@ export function hintFor(round: Round, answer: Answer): string {
       if (answer === null) {
         // Cuts with the wrong number of pieces are counted, not folded: their
         // pieces may be equal, so a fold alone would say they fit.
-        const miscounted = round.options.some((cut) => cutRoti(cut).pieces.length !== round.n);
+        const miscounted = round.options.some((cut) => cutDosa(cut).pieces.length !== round.n);
         return miscounted ? 'Blue shapes are pieces folded over a cut. Numbers count the pieces.' : FOLD_NOTE;
       }
-      const c = cutRoti(round.options[answer]);
+      const c = cutDosa(round.options[answer]);
       const count = c.pieces.length;
       if (count !== round.n) return `That cut makes ${WORD[count]} pieces, not ${WORD[round.n]}.`;
       return `That cut makes ${WORD[count]} pieces. Folded over, the blue piece leaves a gap.`;
     }
     case 'judge': {
-      const c = cutRoti(round.cut);
+      const c = cutDosa(round.cut);
       return c.equal
         ? 'Folded over the cut, the blue piece covers the next one exactly.'
         : 'Folded over the cut, the blue piece leaves a gap.';
@@ -402,7 +402,7 @@ export function hintFor(round: Round, answer: Answer): string {
       const count = answer === null ? 1 : round.choices[answer];
       const pieces = `${cap(WORD[count])} ${count === 1 ? UNIT[round.unit] : PLURAL[round.unit]} laid down`;
       const over = count - needed(round);
-      const whole = round.target === 'half' ? 'the half' : 'the roti';
+      const whole = round.target === 'half' ? 'the half' : 'the dosa';
       if (over === 0) return `${pieces} in blue. They cover ${whole} exactly.`;
       if (over < 0) return `${pieces} in blue. Part of ${whole} is still bare.`;
       const red = over === 1 ? 'The red one' : `The ${WORD[over]} red ones`;
@@ -415,7 +415,7 @@ export function hintFor(round: Round, answer: Answer): string {
       const s = round.options[answer];
       return amount(s) > TWO_QUARTERS
         ? `Laid on the ${owned(s)}, Mia's two quarters cover only half of it.`
-        : `Laid on the ${owned(s)}, Mia's second quarter, in red, has no roti under it.`;
+        : `Laid on the ${owned(s)}, Mia's second quarter, in red, has no dosa under it.`;
     }
   }
 }
@@ -428,16 +428,16 @@ function check(round: Round, answer: Answer): Verdict {
 function explain(round: Round): string {
   switch (round.kind) {
     case 'pick':
-      return `${cap(WORD[round.n])} equal pieces of one roti are ${PLURAL[round.n]}. Folded over a cut, each piece covers the next exactly.`;
+      return `${cap(WORD[round.n])} equal pieces of one dosa are ${PLURAL[round.n]}. Folded over a cut, each piece covers the next exactly.`;
     case 'judge': {
       const n = round.n;
-      return cutRoti(round.cut).equal
-        ? `The ${WORD[n]} pieces are the same size, so each is one ${UNIT[n]} of the roti.`
+      return cutDosa(round.cut).equal
+        ? `The ${WORD[n]} pieces are the same size, so each is one ${UNIT[n]} of the dosa.`
         : `The ${WORD[n]} pieces are not the same size, so they are not ${PLURAL[n]}. ${cap(PLURAL[n])} must be equal.`;
     }
     case 'compare': {
       const { a, b } = round;
-      if (a.small || b.small) return 'Half of the small roti is less than a quarter of the big one. A half is half of its own roti.';
+      if (a.small || b.small) return 'Half of the small dosa is less than a quarter of the big one. A half is half of its own dosa.';
       if (same(amount(a), amount(b))) return 'Two quarters cover exactly one half: 1/4 + 1/4 = 1/2.';
       if (a.k === a.n - 1 && b.k === b.n - 1 && a.k > 1 && b.k > 1) {
         // Each is one piece short of the whole: the smaller missing piece wins.
@@ -445,12 +445,12 @@ function explain(round: Round): string {
         return `${cap(said(less))} is one ${UNIT[less.n as Parts]} short of the whole; ${said(more)} is one ${UNIT[more.n as Parts]} short. A ${UNIT[more.n as Parts]} is less than a ${UNIT[less.n as Parts]}, so ${said(more)} is more.`;
       }
       const [big, little] = (a.n < b.n ? [a.n, b.n] : [b.n, a.n]) as [Parts, Parts];
-      return `A ${UNIT[big]} is 1 of ${big} equal pieces; a ${UNIT[little]} is 1 of ${little}. More pieces of one roti means smaller pieces.`;
+      return `A ${UNIT[big]} is 1 of ${big} equal pieces; a ${UNIT[little]} is 1 of ${little}. More pieces of one dosa means smaller pieces.`;
     }
     case 'cover':
       return round.target === 'half'
         ? 'Two quarters cover one half: 1/4 + 1/4 = 1/2.'
-        : 'Three thirds make the whole roti: 1/3 + 1/3 + 1/3 = 1.';
+        : 'Three thirds make the whole dosa: 1/3 + 1/3 + 1/3 = 1.';
     case 'join':
       return 'Two quarters make one half: 1/4 + 1/4 = 1/2.';
   }
@@ -458,59 +458,59 @@ function explain(round: Round): string {
 
 /* -------------------------------------------------------------- drawing -- */
 
-const WHEAT = '#e9b765';
+const CRISP = '#e9b765';
 const CRUST = '#8a5212';
-const TOAST = '#a8642a';
+const BROWNED = '#a8642a';
 const GHOST = '#f8eedb';
-const THALI = '#dfe5ea';
-const THALI_RIM = '#8d99a3';
+const STEEL = '#dfe5ea';
+const STEEL_RIM = '#8d99a3';
 const BLUE = '#1c6dd0';
 const BLUE_WASH = 'rgba(28, 109, 208, 0.2)';
 const RED = '#c8372d';
 const RED_WASH = 'rgba(200, 55, 45, 0.22)';
 const INK = '#24170f';
 
-/** Toasted spots, as [x, y, r] on a roti of radius 1. Fixed, so nothing shifts between stages. */
+/** Browned spots from the pan, as [x, y, r] on a dosa of radius 1. Fixed, so nothing shifts between stages. */
 const SPOTS: readonly (readonly [number, number, number])[] = [
   [-0.52, -0.38, 0.08], [0.12, -0.62, 0.06], [0.58, -0.22, 0.07], [-0.18, -0.05, 0.05],
   [0.3, 0.28, 0.09], [-0.6, 0.3, 0.06], [-0.08, 0.66, 0.07], [0.66, 0.5, 0.05],
   [0.02, 0.25, 0.04], [-0.35, -0.72, 0.04], [0.42, -0.6, 0.04], [-0.82, -0.05, 0.04],
 ];
 
-/** An SVG path for a polygon in roti radii, centred at c and scaled by R pixels. */
+/** An SVG path for a polygon in dosa radii, centred at c and scaled by R pixels. */
 function path(pts: readonly Pt[], c: Pt, R: number): string {
   return `${pts.map(([x, y], i) => `${i ? 'L' : 'M'}${(c[0] + x * R).toFixed(1)} ${(c[1] + y * R).toFixed(1)}`).join(' ')} Z`;
 }
 
 /** A clipPath id that is safe inside url(#...). */
-const useClip = () => `roti${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+const useClip = () => `dosa${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
-interface RotiProps {
+interface DosaProps {
   readonly c: Pt;
-  /** Pixels per roti radius. */
+  /** Pixels per dosa radius. */
   readonly R: number;
-  /** The pieces, in roti radii. */
+  /** The pieces, in dosa radii. */
   readonly pieces: readonly (readonly Pt[])[];
   /** Which pieces are there; the rest are drawn as a pale dashed ghost. Default: all. */
   readonly solid?: readonly boolean[];
-  /** Radius of the whole roti, in roti radii (0.5 for the small one). */
+  /** Radius of the whole dosa, in dosa radii (0.5 for the small one). */
   readonly size?: number;
-  /** Draw the whole roti's outline behind the pieces. Off for a loose piece. */
+  /** Draw the whole dosa's outline behind the pieces. Off for a loose piece. */
   readonly whole?: boolean;
 }
 
-/** One roti: the whole as a pale ghost, the pieces that are there in wheat, the cuts in brown. */
-function Roti({ c, R, pieces, solid, size = 1, whole = true }: RotiProps) {
+/** One dosa: the whole as a pale ghost, the pieces that are there golden, the cuts in brown. */
+function Dosa({ c, R, pieces, solid, size = 1, whole = true }: DosaProps) {
   const clip = useClip();
   const on = (i: number) => solid?.[i] ?? true;
   return (
     <g>
       {whole ? <circle cx={c[0]} cy={c[1]} r={size * R} fill={GHOST} /> : null}
       <clipPath id={clip}>{pieces.map((p, i) => (on(i) ? <path key={i} d={path(p, c, R)} /> : null))}</clipPath>
-      {pieces.map((p, i) => (on(i) ? <path key={i} d={path(p, c, R)} fill={WHEAT} /> : null))}
+      {pieces.map((p, i) => (on(i) ? <path key={i} d={path(p, c, R)} fill={CRISP} /> : null))}
       <g clipPath={`url(#${clip})`}>
         {SPOTS.map(([x, y, r], i) => (
-          <ellipse key={i} cx={c[0] + x * size * R} cy={c[1] + y * size * R} rx={r * size * R * 1.3} ry={r * size * R} fill={TOAST} opacity={0.5} />
+          <ellipse key={i} cx={c[0] + x * size * R} cy={c[1] + y * size * R} rx={r * size * R * 1.3} ry={r * size * R} fill={BROWNED} opacity={0.5} />
         ))}
       </g>
       {pieces.map((p, i) => (
@@ -528,17 +528,17 @@ function Roti({ c, R, pieces, solid, size = 1, whole = true }: RotiProps) {
   );
 }
 
-/** Dadi's steel thali under a roti. */
-function Thali({ c, R }: { readonly c: Pt; readonly R: number }) {
+/** A steel plate from the kitchen shelf under a dosa. */
+function Plate({ c, R }: { readonly c: Pt; readonly R: number }) {
   return (
     <g>
-      <circle cx={c[0]} cy={c[1]} r={R * 1.14} fill={THALI} stroke={THALI_RIM} strokeWidth={3} />
-      <circle cx={c[0]} cy={c[1]} r={R * 1.05} fill="none" stroke={THALI_RIM} strokeWidth={1.5} />
+      <circle cx={c[0]} cy={c[1]} r={R * 1.14} fill={STEEL} stroke={STEEL_RIM} strokeWidth={3} />
+      <circle cx={c[0]} cy={c[1]} r={R * 1.05} fill="none" stroke={STEEL_RIM} strokeWidth={1.5} />
     </g>
   );
 }
 
-/** A piece laid over the roti as evidence: blue where it fits, red where it does not. */
+/** A piece laid over the dosa as evidence: blue where it fits, red where it does not. */
 function Overlay({ pts, c, R, red, dashed = true }: { readonly pts: readonly Pt[]; readonly c: Pt; readonly R: number; readonly red?: boolean; readonly dashed?: boolean }) {
   return (
     <path
@@ -598,13 +598,13 @@ function Svg({ w, h, width, label, children }: { readonly w: number; readonly h:
   );
 }
 
-/** A roti cut one way, on its thali, with the fold test, counted pieces or fractions on top. */
+/** A dosa cut one way, on its plate, with the fold test, counted pieces or fractions on top. */
 function CutView({ cut, c, R, fold, tags, fractions }: { readonly cut: Cut; readonly c: Pt; readonly R: number; readonly fold?: boolean; readonly tags?: boolean; readonly fractions?: boolean }) {
-  const k = cutRoti(cut);
+  const k = cutDosa(cut);
   return (
     <g>
-      <Thali c={c} R={R} />
-      <Roti c={c} R={R} pieces={k.pieces} />
+      <Plate c={c} R={R} />
+      <Dosa c={c} R={R} pieces={k.pieces} />
       {fold ? <Overlay pts={k.fold} c={c} R={R} /> : null}
       {tags ? k.pieces.map((p, i) => <Tag key={i} at={labelAt(p, c, R)} k={i + 1} size={R / 5} />) : null}
       {fractions ? k.pieces.map((p, i) => <Frac key={i} at={labelAt(p, c, R)} n={k.pieces.length} size={R / 4.4} />) : null}
@@ -612,14 +612,14 @@ function CutView({ cut, c, R, fold, tags, fractions }: { readonly cut: Cut; read
   );
 }
 
-/** A share on its own thali: its pieces solid, the rest of its roti a dashed ghost. */
+/** A share on its own plate: its pieces solid, the rest of its dosa a dashed ghost. */
 function ShareView({ s, c, R }: { readonly s: Share; readonly c: Pt; readonly R: number }) {
   const pieces = slices(s);
   const size = s.small ? SMALL : 1;
   return (
     <g>
-      <Thali c={c} R={R * size} />
-      <Roti c={c} R={R} pieces={pieces} solid={pieces.map((_, i) => i < s.k)} size={size} />
+      <Plate c={c} R={R * size} />
+      <Dosa c={c} R={R} pieces={pieces} solid={pieces.map((_, i) => i < s.k)} size={size} />
     </g>
   );
 }
@@ -656,7 +656,7 @@ function choose(i: number, right: number, { answer, setAnswer, stage }: Omit<Sub
 
 const Worked =({ round }: { readonly round: Round }) => <p className="board-caption">{explain(round)}</p>;
 
-/** The label under a roti, inside its picture. */
+/** The label under a dosa, inside its picture. */
 function Caption({ x, y, children }: { readonly x: number; readonly y: number; readonly children: ReactNode }) {
   return (
     <text x={x} y={y} textAnchor="middle" fontSize={26} fontWeight={700} fill={INK}>
@@ -718,14 +718,14 @@ function BothKids() {
   );
 }
 
-/** A cut roti's pieces pulled a little apart from the centre, so their sizes sit side by side. */
+/** A cut dosa's pieces pulled a little apart from the centre, so their sizes sit side by side. */
 function Apart({ cut, c, R }: { readonly cut: Cut; readonly c: Pt; readonly R: number }) {
-  const pieces = cutRoti(cut).pieces.map((p) => {
+  const pieces = cutDosa(cut).pieces.map((p) => {
     const [x, y] = centroid(p);
     const g = 0.22 / Math.hypot(x, y);
     return p.map(([px, py]): Pt => [px + x * g, py + y * g]);
   });
-  return <Roti c={c} R={R} pieces={pieces} whole={false} />;
+  return <Dosa c={c} R={R} pieces={pieces} whole={false} />;
 }
 
 /** The answer pictures for a judge round: the same number of pieces, all equal or not. */
@@ -739,7 +739,7 @@ function pileSpot(j: number, R: number, o: Pt, g: number): Pt {
 
 /**
  * `count` loose 1/unit pieces in a 2 x 2 pile, top row first: 2 * (1.73R + g)
- * wide, 2 * (R + g) tall. `moved`: the pieces have been laid on the roti, so
+ * wide, 2 * (R + g) tall. `moved`: the pieces have been laid on the dosa, so
  * only their dashed outlines stay behind and nothing is counted twice.
  */
 function Pile({ unit, count, R, o, g, fractions, moved }: { readonly unit: 3 | 4; readonly count: number; readonly R: number; readonly o: Pt; readonly g: number; readonly fractions?: boolean; readonly moved?: boolean }) {
@@ -750,7 +750,7 @@ function Pile({ unit, count, R, o, g, fractions, moved }: { readonly unit: 3 | 4
         const at = pileSpot(j, R, o, g);
         return (
           <g key={j}>
-            <Roti c={at} R={R} pieces={[piece]} solid={[!moved]} whole={false} />
+            <Dosa c={at} R={R} pieces={[piece]} solid={[!moved]} whole={false} />
             {fractions ? <Frac at={labelAt(piece, at, R)} n={unit} size={R / 4.6} /> : null}
           </g>
         );
@@ -774,7 +774,7 @@ const MIAS = share(4, 2, 0);
 
 /* --------------------------------------------------------------- boards -- */
 
-/** Choice pictures: a 240 box drawn 180 wide, so every roti in a round is the same size. */
+/** Choice pictures: a 240 box drawn 180 wide, so every dosa in a round is the same size. */
 const BOX = 240;
 const BOX_C: Pt = [BOX / 2, BOX / 2];
 const BOX_R = 92;
@@ -784,10 +784,10 @@ function PickBoard(p: Sub<'pick'>) {
   const { round, answer, stage } = p;
   const right = correct(round);
   return (
-    <div className="board board--roti">
+    <div className="board board--dosa">
       <div className="choices">
         {round.options.map((cut, i) => {
-          const count = cutRoti(cut).pieces.length;
+          const count = cutDosa(cut).pieces.length;
           const looked = stage === 'hint' && (answer === null || answer === i);
           // A cut with the wrong count gets its pieces numbered, never the fold:
           // its pieces may be equal (quarters offered for thirds), and a fold
@@ -811,14 +811,14 @@ function PickBoard(p: Sub<'pick'>) {
 function JudgeBoard(p: Sub<'judge'>) {
   const { round, stage } = p;
   const right = correct(round);
-  const { equal } = cutRoti(round.cut);
+  const { equal } = cutDosa(round.cut);
   const worked = stage === 'worked';
   // The worked answer for an unfair cut puts a fair one beside it, same size.
   const fair = worked && !equal;
   const w = fair ? 640 : 320;
   return (
-    <div className="board board--roti">
-      <Svg w={w} h={330} width={fair ? 560 : 280} label={`${CUTTER[round.n]}'s roti, cut into ${WORD[round.n]} pieces.`}>
+    <div className="board board--dosa">
+      <Svg w={w} h={330} width={fair ? 560 : 280} label={`${CUTTER[round.n]}'s dosa, cut into ${WORD[round.n]} pieces.`}>
         <CutView cut={round.cut} c={[160, 150]} R={120} fold={stage === 'hint' || worked} fractions={worked && equal} />
         {fair ? (
           <>
@@ -856,10 +856,10 @@ function CompareBoard(p: Sub<'compare'>) {
   const { from, onto } = laying(round);
   const C: readonly Pt[] = [[170, 160], [490, 160]];
   const R = 120;
-  // The child he tapped gets a gold ring round their thali (both, for "the same").
+  // The child he tapped gets a gold ring round their plate (both, for "the same").
   const ringed = stage === 'worked' ? right : answer;
   return (
-    <div className="board board--roti">
+    <div className="board board--dosa">
       <Svg w={660} h={390} width={600} label={`Arjun has ${said(round.a)}. Mia has ${said(round.b)}.`}>
         {shares.map((s, i) => (
           <ShareView key={i} s={s} c={C[i]} R={R} />
@@ -914,11 +914,11 @@ function CoverBoard(p: Sub<'cover'>) {
   const { round, answer, stage } = p;
   const right = correct(round);
   const half = round.target === 'half';
-  // The half is the top half of the roti; the pieces are laid from its left end, clockwise.
+  // The half is the top half of the dosa; the pieces are laid from its left end, clockwise.
   const target = half ? share(2, 1, 270) : share(1, 1, 0);
   const from = half ? 270 : 0;
   const count = coverCount(round, answer, stage);
-  // The pieces he has chosen sit loose beside the roti, same scale, from his
+  // The pieces he has chosen sit loose beside the dosa, same scale, from his
   // first tap: one before he chooses, so "a quarter" is on the board before
   // any hint. The question is how many of THESE fill that.
   const loose = stage === 'worked' ? needed(round) : answer === null ? 1 : round.choices[answer];
@@ -926,12 +926,12 @@ function CoverBoard(p: Sub<'cover'>) {
   const R = 110;
   const pile: Pt = [292, 30];
   return (
-    <div className="board board--roti">
+    <div className="board board--dosa">
       <Svg
         w={710}
         h={300}
         width={560}
-        label={`${half ? 'Half of a roti' : 'A whole roti'} on a thali, and ${WORD[loose]} ${loose === 1 ? UNIT[round.unit] : PLURAL[round.unit]} of a roti beside it.`}
+        label={`${half ? 'Half of a dosa' : 'A whole dosa'} on a steel plate, and ${WORD[loose]} ${loose === 1 ? UNIT[round.unit] : PLURAL[round.unit]} of a dosa beside it.`}
       >
         <ShareView s={target} c={c} R={R} />
         <Pile unit={round.unit} count={loose} R={R} o={pile} g={14} fractions moved={count > 0} />
@@ -939,7 +939,7 @@ function CoverBoard(p: Sub<'cover'>) {
           <Overlay key={j} pts={pts} c={c} R={R} red={over(j, round.unit, amount(target))} />
         ))}
         {laid(round.unit, count, from).map((pts, j) => {
-          // A piece laid past the whole roti lands on an earlier one: the later tag
+          // A piece laid past the whole dosa lands on an earlier one: the later tag
           // moves out toward the rim, the earlier one in toward the centre.
           const [x, y] = labelAt(pts, c, R);
           const out = j >= round.unit ? 1.55 : j < count - round.unit ? 0.6 : 1;
@@ -968,12 +968,12 @@ function LooseQuarters() {
   const R = 100;
   const piece = [sector(315, 405)];
   return (
-    <Svg w={420} h={170} width={340} label="Mia's two quarters of a roti, side by side.">
+    <Svg w={420} h={170} width={340} label="Mia's two quarters of a dosa, side by side.">
       <g transform="translate(0 38) scale(1.5)">
         <Kid who={1} />
       </g>
-      <Roti c={[170, 115]} R={R} pieces={piece} whole={false} />
-      <Roti c={[330, 115]} R={R} pieces={piece} whole={false} />
+      <Dosa c={[170, 115]} R={R} pieces={piece} whole={false} />
+      <Dosa c={[330, 115]} R={R} pieces={piece} whole={false} />
       <Caption x={250} y={158}>Mia&rsquo;s two quarters</Caption>
     </Svg>
   );
@@ -983,11 +983,11 @@ function JoinBoard(p: Sub<'join'>) {
   const { round, answer, stage } = p;
   const right = correct(round);
   return (
-    <div className="board board--roti">
+    <div className="board board--dosa">
       <LooseQuarters />
       <div className="choices">
         {round.options.map((s, i) => {
-          // Mia's quarters laid on a plate, from its first cut; any that run past its roti are red.
+          // Mia's quarters laid on a plate, from its first cut; any that run past its dosa are red.
           const show = (stage === 'hint' && (answer === null || answer === i)) || (stage === 'worked' && i === right);
           return (
             <Choice key={i} {...choose(i, right, p)} ariaLabel={`A plate with ${said(s)}`}>
@@ -1026,7 +1026,7 @@ function Board(props: BoardProps<Round, Answer>) {
 export const shareTheRoti: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'share-the-roti',
-  title: 'Share the Roti',
+  title: 'Share the Dosa',
   hook: 'Halves must be equal pieces.',
   group: 'groups',
   levels: ['Fair halves', 'Thirds and quarters', 'Which is more?'],
@@ -1038,14 +1038,14 @@ export const shareTheRoti: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/share-the-roti.png',
   note: {
-    what: 'Rotis on a thali, cut in different ways. He taps the cut that makes equal halves, thirds or quarters, says whether a given cut is fair, and at level 3 compares shares (a half with a quarter, two thirds with three quarters) and finds how many quarters cover a half.',
-    expect: "At level 1 he will often pick any cut with two pieces, including one well off the middle — 'two pieces' is what half means to most 5-year-olds. At level 2 every wrong cut has the right number of pieces, so counting stops working. At level 3 many children say a quarter is more than a half because four is more than two; the small-roti round catches the opposite rule, that a half always wins. On two thirds against three quarters, expect 'thirds are bigger pieces, so two thirds' — the hint shows the sliver of Mia's roti that Arjun's pieces do not reach.",
+    what: 'Dosas on steel plates, cut in different ways. He taps the cut that makes equal halves, thirds or quarters, says whether a given cut is fair, and at level 3 compares shares (a half with a quarter, two thirds with three quarters) and finds how many quarters cover a half.',
+    expect: "At level 1 he will often pick any cut with two pieces, including one well off the middle — 'two pieces' is what half means to most 5-year-olds. At level 2 every wrong cut has the right number of pieces, so counting stops working. At level 3 many children say a quarter is more than a half because four is more than two; the small-dosa round catches the opposite rule, that a half always wins. On two thirds against three quarters, expect 'thirds are bigger pieces, so two thirds' — the hint shows the sliver of Mia's dosa that Arjun's pieces do not reach.",
     practising: 'Fractions as equal parts of one named whole: halves, thirds and quarters of a circle, unit fractions getting smaller as the number of parts grows, 1/4 + 1/4 = 1/2, and comparing two thirds with three quarters by the piece each is missing. Also the folding test for equal pieces.',
     ask: "When a cut's pieces are folded over in blue at the hint: 'Does the folded piece cover the other one, or is there a gap? So are they the same size?'",
-    next: 'At dinner, tear or cut a real roti into two pieces on purpose unequally and ask whether those are halves. Then fold a paper circle in half and in half again, open it, and lay two of the quarters over one half.',
-    honest: 'Picking the fair cut on a round roti does not show he understands fractions in general. Ask for half of a rectangle of paper, half of 8 grapes, and whether half of a small apple equals half of a big one.',
+    next: 'At breakfast, tear a plain round dosa into two pieces, unequal on purpose, and ask whether those are halves. Then fold a paper circle in half and in half again, open it, and lay two of the quarters over one half.',
+    honest: 'Picking the fair cut on a round dosa does not show he understands fractions in general. Ask for half of a rectangle of paper, half of 8 grapes, and whether half of a small apple equals half of a big one.',
     easier: 'Stay on level 1 and cut a real paper circle along each choice before he answers, so he can fold the pieces himself.',
-    harder: "Ask him to cut a paper roti into thirds himself, then prove the pieces are equal by stacking them. Then ask what one piece of six would be called.",
+    harder: "Ask him to cut a paper circle into thirds himself, then prove the pieces are equal by stacking them. Then ask what one piece of six would be called.",
   },
 };
 

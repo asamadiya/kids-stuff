@@ -8,9 +8,10 @@ import { Tray, Piece } from '../../play/parts';
  * Every other maths game copies this file's shape. Read it first.
  *
  * Concept (advisor, maths 3): equality is a relationship, not "the answer
- * comes next". Dadi's brass pan balance holds the problem; the child loads
- * weights onto the lighter pan until the beam is level. The beam has three
- * drawn states and switches instantly — no motion.
+ * comes next". The brass pan balance Tatayya brought from Hyderabad on his
+ * last visit holds the problem; the child loads weights onto the lighter pan
+ * until the beam is level. The beam has three drawn states and switches
+ * instantly — no motion.
  *
  * Levels:
  *  1. One side is a single number (7 = ?). He loads singles: equality as same amount.
@@ -258,7 +259,7 @@ export const makeBothSidesMatch: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'make-both-sides-match',
   title: 'Make Both Sides Match',
-  hook: "Level Dadi's brass balance.",
+  hook: "Level Tatayya's brass balance.",
   group: 'together',
   levels: ['Match one', 'Two each side', 'Either side'],
   generate,
@@ -269,10 +270,10 @@ export const makeBothSidesMatch: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/make-both-sides-match.png',
   note: {
-    what: "A pan balance with weights already on one side. He taps weights in the tray to load the other pan until the beam is level.",
+    what: "The brass pan balance Tatayya brought on his last visit, with weights already on one side. He taps weights in the tray to load the other pan until the beam is level.",
     expect: "At level 1 he will match by eye and count. At level 2, many children add the left and forget the weight already on the right — the beam stays tipped and the totals appear. At level 3 the unknown moves to the left, and that is where it usually breaks.",
     practising: "The equals sign as 'both sides have the same value', not 'the answer comes next'. Also addition, and making a number from 5s, 2s and 1s.",
-    ask: "Before he checks: 'Which pan is heavier right now? How much heavier?'",
+    ask: "Before he checks: 'Which pan is heavier right now? How much heavier?' Nanna or Tatayya can ask the first part in Telugu: 'Ye vaipu ekkuva baruvu undi?' (which side is heavier?).",
     next: "Use a coat hanger with two cups on strings and pennies. Put 3 + 4 pennies on one side, 5 on the other, and ask what is missing.",
     honest: "Balancing correctly here does not mean he reads 7 = 3 + 4 on paper as a true statement. Write a few equations with the sum on the RIGHT and ask if they are true.",
     easier: "Stay on level 1 and use only the 1-weights, so every weight is counted.",

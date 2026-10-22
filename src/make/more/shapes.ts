@@ -2,7 +2,7 @@ import type { Activity } from '../types';
 
 /**
  * Shapes and Patterns: a closed line round a grid of dots, a stamped repeat
- * set beside real Jaipur block printing, one square cut into seven pieces, and
+ * set beside real hand block printing, one square cut into seven pieces, and
  * a room drawn from above. Each is a different idea, not another symmetry
  * craft beside the rangoli in the first twelve.
  */
@@ -50,7 +50,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'The grown-up tries the old way: rice flour trickled from a pinch, round a short row of dots.',
-        art: 'Mummy, kneeling on the sunny back patio, holds a small steel bowl of white rice flour in one hand and, with the pinched fingers of her other hand, trickles a thin wavy white line of flour that loops over one dot and under the next along a short straight row of three white chalk dots; Arjun kneels close beside her holding his blue chalk lowered in his lap, watching the flour line form.',
+        art: 'Amma, kneeling on the sunny back patio, holds a small steel bowl of white rice flour in one hand and, with the pinched fingers of her other hand, trickles a thin wavy white line of flour that loops over one dot and under the next along a short straight row of three white chalk dots; Arjun kneels close beside her holding his blue chalk lowered in his lap, watching the flour line form.',
       },
     ],
     notice: 'When the line weaves between each dot and its neighbours and comes back to its start, every dot ends up in its own little space. If the line closes too soon, some dots are left outside it.',
@@ -63,14 +63,14 @@ export const MORE: readonly Activity[] = [
         url: 'https://web.archive.org/web/20150930060208/http://www.americanscientist.org/issues/feature/the-kolam-tradition',
       },
     ],
-    tags: ['chalk', 'kolam', 'Pongal', 'Tamil Nadu', 'rangoli', 'dot grid', 'driveway', 'no mess'],
+    tags: ['chalk', 'kolam', 'muggu', 'Pongal', 'Sankranti', 'Tamil Nadu', 'Andhra Pradesh', 'rangoli', 'dot grid', 'driveway', 'no mess'],
     noPair: 'None yet: no game here draws one line round dots. Make the Other Half is the closest, about the other kolam idea, symmetry.',
     note: {
-      what: 'He draws a kolam, the South Indian line drawing made around a grid of dots: one line that goes round every dot without touching it and comes back to where it began. You warm up on one, two and three dots, then try a square of nine.',
+      what: 'He draws a kolam, the line drawing made around a grid of dots that Amma’s Tamil family calls kolam and Nanna’s Telugu family calls muggu: one line that goes round every dot without touching it and comes back to where it began. You warm up on one, two and three dots, then try a square of nine.',
       expect: 'His first nine-dot line will probably wander, touch a dot, or close up early with some dots left outside. That is the puzzle, not a failure: rub out with the damp cloth and go again. What works is treating the nine dots as one long row that snakes back and forth, weaving between each dot and the next, as in the row of three.',
       practising: 'A closed curve: a line with no ends, which here must pass between every pair of neighbouring dots so each sits in its own space. Also seeing nine as three rows of three, and planning a path a few moves ahead.',
       ask: 'When the line is nearly done: “Which dots has it not gone round yet?” Let him find them before he draws on.',
-      next: 'Tell him where kolams come from: in Tamil Nadu, Andhra Pradesh and Telangana, women, and some men and boys, draw one at the front door at dawn, in rice flour on ground swept and sprinkled with water, and a fresh one each morning. On a call, ask Dadi to describe mandana, the floor and wall drawings of Rajasthan. The library story The Loop You Draw Without Lifting is about a kolam too.',
+      next: 'Tell him where kolams come from: in Tamil Nadu, Andhra Pradesh and Telangana, women, and some men and boys, draw one at the front door at dawn, in rice flour on ground swept and sprinkled with water, and a fresh one each morning, with bigger, coloured ones on festival days. At Pongal and Sankranti, draw one together at your own front door. The library story The Loop You Draw Without Lifting is about a kolam too.',
       honest: 'This is a first taste of a skilled daily craft, not the craft itself: large kolams use knotted crossings and turn-backs that girls traditionally learn from their mothers and other women in the family. The mathematician Marcia Ascher showed how kolams express mathematical ideas, and computer scientists have written picture languages to describe whole families of them; one line round nine dots with your help is not that mathematics, and does not show he can plan a path alone.',
       easier: 'Stay with one row of three or four dots, and draw the first turns together with his hand under yours.',
       harder: 'Grow the grid to four rows of four. Before he starts, ask how many dots there are and how he could count them quickly without touching each one.',
@@ -86,39 +86,39 @@ export const MORE: readonly Activity[] = [
     places: ['kitchen'],
     minutes: 30,
     need: [
-      'three fresh, firm okra (bhindi), each cut across by the grown-up into a stubby piece about 3 cm long',
+      'three fresh, firm okra (bendakaya), each cut across by the grown-up into a stubby piece about 3 cm long',
       'half a potato, its flat face trimmed by the grown-up so a square about 3 cm across stands up from it',
       'washable poster paint in two colours, a spoonful of each spread thin on two flat saucers',
       'a long strip of paper, about 60 cm by 21 cm (two A4 sheets taped end to end)',
       'old newspaper over the table, and an apron or an old T-shirt',
       'a damp cloth for fingers',
       'a wooden ruler, to keep the second row straight',
-      'a hand block-printed bedsheet, dupatta, kurta or tablecloth; if there is none at home, ask Dadi to show one on a video call',
+      'a hand block-printed bedsheet, tablecloth or saree; if there is none at home, ask Nanamma to hold one up on a video call',
     ],
     steps: [
       {
         text: 'Look at the cut end of an okra. Count the points of the star inside.',
-        art: 'Papa holds out a short stubby piece of okra with its cut end facing Arjun, showing the pale green star in its middle, while Arjun leans in and touches one point of the star with one fingertip, his other hand flat on the table. The dining table is covered with plain grey sheets of old newspaper with only faint grey speckles, no headlines, no letters and no photographs; a wooden chopping board beside Papa holds a halved potato and two more short okra pieces.',
+        art: 'Nanna holds out a short stubby piece of okra with its cut end facing Arjun, showing the pale green star in its middle, while Arjun leans in and touches one point of the star with one fingertip, his other hand flat on the table. The dining table is covered with plain grey sheets of old newspaper with only faint grey speckles, no headlines, no letters and no photographs; a wooden chopping board beside Nanna holds a halved potato and two more short okra pieces.',
       },
       {
         text: 'Dip the okra lightly in paint, dab it once on newspaper, then press it on the paper. Lift straight up.',
-        art: 'Arjun lifts a short stubby piece of okra straight up off a long strip of white paper, its painted cut end facing down, leaving one crisp red star print with sharp clean points and no smudge; a saucer holding a thin film of red paint sits by his other hand, and no paint drips from the okra. Papa holds the far end of the paper strip flat with both palms.',
+        art: 'Arjun lifts a short stubby piece of okra straight up off a long strip of white paper, its painted cut end facing down, leaving one crisp red star print with sharp clean points and no smudge; a saucer holding a thin film of red paint sits by his other hand, and no paint drips from the okra. Nanna holds the far end of the paper strip flat with both palms.',
       },
       {
         text: 'Make a row: okra star, potato square, star, square. Say the rule out loud as you stamp.',
-        art: 'Arjun presses the raised square of a cut potato half onto the paper strip in blue, next to a red okra star, a row of alternating red stars and blue squares running behind it, while Papa points along the row towards the empty space ahead.',
+        art: 'Arjun presses the raised square of a cut potato half onto the paper strip in blue, next to a red okra star, a row of alternating red stars and blue squares running behind it, while Nanna points along the row towards the empty space ahead.',
       },
       {
         text: 'Stop before the next stamp. What comes next? Guess first, then stamp it.',
-        art: 'Arjun holds a short okra piece with a red-painted tip in his left hand and, held well apart in his right hand, a cut potato half with its raised blue-painted square facing down, hovering both above the empty end of one single row of prints on a paper strip that goes red star, blue square, red star, blue square; Papa sits beside him with his hands resting in his lap, watching.',
+        art: 'Arjun holds a short okra piece with a red-painted tip in his left hand and, held well apart in his right hand, a cut potato half with its raised blue-painted square facing down, hovering both above the empty end of one single row of prints on a paper strip that goes red star, blue square, red star, blue square; Nanna sits beside him with his hands resting in his lap, watching.',
       },
       {
         text: 'Start a second row right under the first, each star under a star, like a block printer lining up.',
-        art: 'Arjun lowers the okra carefully to print a red star exactly below a red star in the top row, while Papa lays a wooden ruler along the paper under the first row to help him keep the second row straight.',
+        art: 'Arjun lowers the okra carefully to print a red star exactly below a red star in the top row, while Nanna lays a wooden ruler along the paper under the first row to help him keep the second row straight.',
       },
       {
         text: 'Lay a block-printed cloth beside your strip. Find the shape that repeats. Can you see where one block print meets the next?',
-        art: 'Arjun stands at the table and runs one finger along a row of small printed red flowers on a white block-printed cotton bedsheet spread over one half of the table; right beside the sheet, on the other half, lies his own paper strip with a row of red okra stars and blue potato squares. Papa points with one finger to a matching red flower further along the same row of the bedsheet. The bedsheet pattern is only rows of small red flowers, and nothing else is lying on it.',
+        art: 'Arjun stands at the table and runs one finger along a row of small printed red flowers on a white block-printed cotton bedsheet spread over one half of the table; right beside the sheet, on the other half, lies his own paper strip with a row of red okra stars and blue potato squares. Nanna points with one finger to a matching red flower further along the same row of the bedsheet. The bedsheet pattern is only rows of small red flowers, and nothing else is lying on it.',
       },
     ],
     notice: 'The same okra piece prints the same star shape each time, so the row repeats. Once you know the rule, you can say what comes next before you stamp it.',
@@ -128,16 +128,15 @@ export const MORE: readonly Activity[] = [
     sources: [
       { label: 'NRICH (University of Cambridge) Early Years: Pattern Making', url: 'https://nrich.maths.org/eyfs-activities/pattern-making' },
       { label: 'Wikipedia: Woodblock printing on textiles', url: 'https://en.wikipedia.org/wiki/Woodblock_printing_on_textiles' },
-      { label: 'Wikipedia: Sanganer, the Jaipur block-printing town', url: 'https://en.wikipedia.org/wiki/Sanganer' },
     ],
-    tags: ['painting', 'printing', 'patterns', 'Jaipur', 'block print', 'bhindi', 'okra', 'rainy day', 'messy play'],
+    tags: ['painting', 'printing', 'patterns', 'Kalamkari', 'block print', 'bendakaya', 'vendakkai', 'okra', 'rainy day', 'messy play'],
     note: {
-      what: 'He stamps the cut end of an okra, which prints a star, and a potato cut into a raised square, in a row that repeats: star, square, star, square. Then he compares his paper with a real hand block-printed cloth from Jaipur.',
+      what: 'He stamps the cut end of an okra, which prints a star, and a potato cut into a raised square, in a row that repeats: star, square, star, square. Then he compares his paper with a real hand block-printed cloth.',
       expect: 'The first prints will be blobs or half-stars until he dabs off the extra paint and lifts straight up. Most five-year-olds can keep star, square going; when you stop and ask what comes next, some will name the last thing they stamped instead of the next one. The number of points varies from pod to pod, often five but sometimes more, so let him count rather than telling him.',
       practising: 'A repeating pattern: one unit, here star then square, copied again and again by a rule, so the next piece can be predicted. Also lining up a second row under the first, which is what turns a row into an all-over pattern.',
       ask: 'When the first row is long: “What is the part that keeps repeating?” Let him put a finger round one unit.',
-      next: 'Look for printed cloth in the cupboards: Sanganer, near Jaipur, is known for bright patterns on white, and nearby Bagru also prints by hand. On the next Jaipur visit, ask Dadi and Dada to take him to watch a printer at work. Each colour needs its own carved block, cut by a carver; his okra carried the red and his potato the blue.',
-      honest: 'Okra printing is vegetable stamping, not block printing. A Jaipur printer presses a carved wooden block, coated in dye, onto cloth, lining each print up with the last so closely that the join is hard to find; on hand-printed cloth you may still spot a slight overlap, and either is fine to find. Continuing star, square with you beside him does not show he can find the rule in a pattern he did not make.',
+      next: 'Look for printed cloth in the cupboards together. In Machilipatnam, on the Andhra coast, Kalamkari cloth is printed by hand with carved wooden blocks and vegetable dyes; when Nanamma next visits, ask whether one of her sarees is Kalamkari, and let him find where one block meets the next. Each colour needs its own carved block; his okra carried the red and his potato the blue.',
+      honest: 'Okra printing is vegetable stamping, not block printing. A block printer presses a carved wooden block, coated in dye, onto cloth, lining each print up with the last so closely that the join is hard to find; on hand-printed cloth you may still spot a slight overlap, and either is fine to find. Continuing star, square with you beside him does not show he can find the rule in a pattern he did not make.',
       easier: 'Use only the okra and two colours of paint: red star, blue star, red star.',
       harder: 'Change the rule to star, star, square, stamp half a row, and ask him to carry it on. Then he makes up a rule and you have to guess it.',
       safety: 'The grown-up does all the cutting and puts the knife away before he sits down. Use washable, non-toxic paint; raw potato and okra are not for eating once they have been in paint. If the two-year-old wants to join, give her a potato half and her own sheet at the far end of the table; keep the okra pieces and the paint saucers out of her reach, as a stubby okra piece is a choking risk.',
@@ -160,7 +159,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Fold the square corner to corner and crease it hard. Cut along the fold: this first cut can be yours.',
-        art: 'At the dining table, Arjun presses a hard crease with both thumbs along the folded edge of a square of blue card folded corner to corner into a triangle, concentrating, while Mummy sits beside him with her hands resting flat on the table, watching. There are no scissors in the picture.',
+        art: 'At the dining table, Arjun presses a hard crease with both thumbs along the folded edge of a square of blue card folded corner to corner into a triangle, concentrating, while Amma sits beside him with her hands resting flat on the table, watching. There are no scissors in the picture.',
       },
       {
         text: 'Watch the grown-up fold and cut the rest. Count the pieces: five triangles, a square and one slanted piece.',
@@ -183,7 +182,7 @@ export const MORE: readonly Activity[] = [
         figure: 'tangram-5',
       },
       {
-        text: 'Fill the boat with all seven. The slanted piece will not fit? Flip it over, like a chapati.',
+        text: 'Fill the boat with all seven. The slanted piece will not fit? Flip it over, like a pancake.',
         art: 'A sailboat of all seven pieces: the two big triangles are the sails, and the hull is a small triangle, the square, the other small triangle, the middle triangle upside down and the yellow slanted piece at the back.',
         figure: 'tangram-6',
       },
@@ -238,27 +237,27 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Stand in the doorway together. Name the big things: bed, cupboard, window, door.',
-        art: 'In the doorway of a child’s bedroom, Papa holds a clipboard with a blank sheet of paper against his chest with one hand and points across the room at the bed with the other, while Arjun stands beside him and points at a wooden cupboard against the far wall; a window and a rug are beyond. Papa and Arjun are the only people in the picture, and the room beyond them is empty.',
+        art: 'In the doorway of a child’s bedroom, Nanna holds a clipboard with a blank sheet of paper against his chest with one hand and points across the room at the bed with the other, while Arjun stands beside him and points at a wooden cupboard against the far wall; a window and a rug are beyond. Nanna and Arjun are the only people in the picture, and the room beyond them is empty.',
       },
       {
         text: 'Stand over a toy car and look straight down. From above, it looks like a box. A map shows things that way.',
-        art: 'Arjun stands on the bedroom rug with his head bent right over a red toy car on the floor between his feet, looking straight down at its roof, while Papa crouches beside him and traces a rectangle in the air above the car with one finger.',
+        art: 'Arjun stands on the bedroom rug with his head bent right over a red toy car on the floor between his feet, looking straight down at its roof, while Nanna crouches beside him and traces a rectangle in the air above the car with one finger.',
       },
       {
         text: 'Draw the room from above: walls as a big box, the bed a long box, a gap for the door.',
-        art: 'Sitting cross-legged on the bedroom floor with a clipboard across his knees, Papa pencils a big flat rectangle on the clipboard’s blank sheet for the room’s walls, leaving a gap in one side for the door, while Arjun leans over the same clipboard and pencils a long flat rectangle inside it against one wall, glancing up at his real bed. The drawing is only flat pencil lines on the paper.',
+        art: 'Sitting cross-legged on the bedroom floor with a clipboard across his knees, Nanna pencils a big flat rectangle on the clipboard’s blank sheet for the room’s walls, leaving a gap in one side for the door, while Arjun leans over the same clipboard and pencils a long flat rectangle inside it against one wall, glancing up at his real bed. The drawing is only flat pencil lines on the paper.',
       },
       {
         text: 'Wait outside. The grown-up hides the soft toy low down and marks the spot on the map with an X.',
-        art: 'Papa kneels and tucks a small brown soft-toy elephant out of sight behind the leg of a low bedside table, only one ear peeking out, holding the clipboard map in his other hand; the map is a simple flat room plan of pencilled rectangles with one big pencilled X beside the small rectangle for the table. Arjun stands in the hallway outside the half-open bedroom door with his back turned.',
+        art: 'Nanna kneels and tucks a small brown soft-toy elephant out of sight behind the leg of a low bedside table, only one ear peeking out, holding the clipboard map in his other hand; the map is a simple flat room plan of pencilled rectangles with one big pencilled X beside the small rectangle for the table. Arjun stands in the hallway outside the half-open bedroom door with his back turned.',
       },
       {
         text: 'Find it using only the map. Say where you are going: next to the bed, under the window.',
-        art: 'Arjun holds the clipboard map flat in both hands and turns it to line up with the room, looking down at a big pencilled X on a simple room plan of flat rectangles for the bed, the cupboard and the bedside table; then he looks over at the real low bedside table. Papa stands back by the door with his hands in his pockets, saying nothing.',
+        art: 'Arjun holds the clipboard map flat in both hands and turns it to line up with the room, looking down at a big pencilled X on a simple room plan of flat rectangles for the bed, the cupboard and the bedside table; then he looks over at the real low bedside table. Nanna stands back by the door with his hands in his pockets, saying nothing.',
       },
       {
         text: 'Swap. You hide the toy and draw the X. Can the grown-up find it from your map?',
-        art: 'Arjun kneels on the bare wooden bedroom floor beside a tall laundry basket heaped with clothes and pencils a big X onto the map on a clipboard resting on his knee. The map is the same plain pencil room plan as before: a big rectangle for the walls, a long rectangle for the bed and a small square for the basket in one corner. Only the brown trunk and one ear of a small soft-toy elephant poke up from between the clothes at the top of the basket; the rest of the toy is buried in the clothes. Papa stands in the hallway outside the half-open bedroom door with both hands over his eyes.',
+        art: 'Arjun kneels on the bare wooden bedroom floor beside a tall laundry basket heaped with clothes and pencils a big X onto the map on a clipboard resting on his knee. The map is the same plain pencil room plan as before: a big rectangle for the walls, a long rectangle for the bed and a small square for the basket in one corner. Only the brown trunk and one ear of a small soft-toy elephant poke up from between the clothes at the top of the basket; the rest of the toy is buried in the clothes. Nanna stands in the hallway outside the half-open bedroom door with both hands over his eyes.',
       },
     ],
     notice: 'On a map, everything is drawn as if you were looking down from the ceiling, so the bed becomes a box. The X sits next to the same things on the map as the toy does in the room.',
@@ -282,7 +281,7 @@ export const MORE: readonly Activity[] = [
       expect: 'He will probably draw the bed and cupboard from the front, with legs and doors, because that is how he sees them; the toy car seen from above helps. He may hold the map at an angle that does not match the room, or run to his favourite hiding place and ignore the map. His own map will likely have an X and few other clues, which you will find out together when you search.',
       practising: 'Representing space: a map is a drawing from one point of view, from above, where a place on the paper stands for a place in the room. Also position words such as next to, between, behind and opposite, and turning the map so it matches the room.',
       ask: 'When he picks up the map: “Which way round should it go, so the door on the paper is by the real door?”',
-      next: 'Map the garden, or the walk to the park, with signs you agree on together: a circle for a tree, a square for the swing. When Dadi and Dada next visit, he can hide something for them and draw the map.',
+      next: 'Map the backyard, or the walk to the park, with signs you agree on together: a circle for the lemon tree, a long box for each raised bed. When Paati and Thatha next visit, he can hide something for them and draw the map.',
       honest: 'Finding the toy does not show he read the map: he may know the room well enough to guess, or follow your eyes. The test is a hiding place he would not think of, found while you say nothing. Reading maps of places he does not know, and using left and right on them, comes later.',
       easier: 'Draw only three things, the bed, the door and the window, and hide the toy right beside one of them.',
       harder: 'Map the living room, which he knows less well, hide two things marked in two colours, and answer only yes or no to his questions while he searches.',

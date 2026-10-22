@@ -2,9 +2,12 @@ import type { PlayIdea } from '../types';
 
 /**
  * Games with rules: Indian and family games for taking turns, winning and losing.
- * The advisor made Chidiya Udd and Stapu Together must-includes, asked for short
- * Snakes and Ladders variants, and ruled that adaptations are labelled honestly:
+ * The advisor made Chidiya Udd and Stapu Together (id kept; titled Tokkudu Billa,
+ * Nanna's side's name for hopscotch, Paandi on Amma's) must-includes, asked for
+ * short Snakes and Ladders variants, and ruled that adaptations are labelled honestly:
  * traditional Raja-Mantri needs four players, so the three-player game says so.
+ * Round 3 (a8 ruling D): Telugu and Tamil names only where the rules match;
+ * Chidiya Udd keeps its Hindi calls, with its origin stated.
  */
 export const IDEAS: readonly PlayIdea[] = [
   {
@@ -32,10 +35,10 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia sits close with a toy bird of her own and makes it fly whenever she likes. Her lifts do not count and nobody corrects her, so his game keeps its speed.',
     },
     picture:
-      'In the Jaipur courtyard, Arjun and Dada sit cross-legged facing each other on a cotton durrie. Dada flicks his index finger high in the air as he calls out a name, while Arjun keeps his own index finger pressed firmly to the floor between them and grins; two pigeons sit on the courtyard wall behind them.',
-    cast: ['Arjun', 'Dada'],
+      'On the patio of the Bay Area house, Arjun and Tatayya sit cross-legged facing each other on a cotton mat. Tatayya flicks his index finger high in the air as he calls out a name, while Arjun keeps his own index finger pressed firmly to the mat between them and grins; two mourning doves sit on the wooden backyard fence behind them, beside the lemon tree.',
+    cast: ['Arjun', 'Tatayya'],
     tradition:
-      'Chidiya Udd (“fly away, bird”), a quick Indian finger game for any number of children. In the version D’Source records, a wrong lift or a missed one puts a player out until nobody is left. This version keeps everyone in, starts with easy names before tricky ones, and stops to argue the tricky ones.',
+      'Chidiya Udd (“fly away, bird”), a quick Indian finger game for any number of children, played with Hindi calls, which this version keeps. In the version D’Source records, a wrong lift or a missed one puts a player out until nobody is left. This version keeps everyone in, starts with easy names before tricky ones, and stops to argue the tricky ones.',
     sources: [
       { label: 'D’Source (IDC, IIT Bombay), Indian Games: Chidiya Udd', url: 'https://www.dsource.in/resource/indian-games/indoor-games/chidiya-udd' },
       {
@@ -43,7 +46,7 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-5-to-7-year-olds.pdf',
       },
     ],
-    tags: ['no equipment', 'waiting', 'grandparents', 'birds', 'Hindi words', 'self-control'],
+    tags: ['no equipment', 'waiting', 'grandparents', 'Tatayya', 'birds', 'Hindi words', 'self-control'],
     note: {
       what: 'A finger game. You call a name with “udd” and flick your finger up every time; he lifts his only if the thing really flies. Then he leads.',
       expect:
@@ -55,7 +58,7 @@ export const IDEAS: readonly PlayIdea[] = [
       honest:
         'Catching you out a few times is practice at this game; it does not show his self-control with Mia or in class. The real game puts players out one by one until nobody is left, which suits a big group of older children, not a five-year-old and one grown-up.',
       easier: 'Use only obvious names, go slowly, and keep your own finger still so the only signal is the word.',
-      harder: 'Speed up and mix in people and things from the house: “Papa udd!” (only in an aeroplane, he may argue), “Chappal udd!”, “Titli udd!”.',
+      harder: 'Speed up and mix in people and things from the house: “Tatayya udd!” (only on the plane home to Hyderabad, he may argue), “Chappal udd!”, “Titli udd!”.',
       safety:
         'Sitting down there is nothing to watch for. If it turns into a standing game where everyone jumps for flyers, clear the space and keep it to small jumps on the spot.',
     },
@@ -63,7 +66,7 @@ export const IDEAS: readonly PlayIdea[] = [
   {
     id: 'stapu-together',
     group: 'rules',
-    title: 'Stapu Together',
+    title: 'Tokkudu Billa Together',
     hook: 'A short chalk grid, a bean bag, and a route he gets to redraw.',
     where: 'outdoors',
     energy: 'active',
@@ -78,27 +81,27 @@ export const IDEAS: readonly PlayIdea[] = [
     steps: [
       'Chalk six boxes, each about 45 cm (18 in) across: 1, 2, 3 in a line, then 4 and 5 side by side, then 6. Number them big.',
       'He tosses the bean bag into box 1 and steps through the grid, skipping that box. Walking is fine; hop only when he wants to.',
-      'Say each number as he lands, in English and Hindi: “four, char; five, paanch.” At 6 he turns, comes back, and picks up the bean bag on the way.',
+      'Say each number as he lands, in English and Telugu (“four, naalugu”) or Tamil (“four, naalu”). At 6 he turns, picking up the bean bag on the way back.',
       'Next turn the bean bag goes into box 2, then 3. A wobble or a line touch just means try that box again; nobody sits out.',
       'Hand him the chalk. He adds boxes, a curve, or a rest square, and you follow his route.',
     ],
     hisWay:
-      'He owns the grid: he can add a “ghar” (house) square where both feet go down, draw a snail spiral, number backwards from 10, or set a move for each box. He can also set your rule, such as hopping on your other foot.',
+      'He owns the grid: he can add a “house” square where both feet go down, draw a snail spiral, number backwards from 10, or set a move for each box. He can also set your rule, such as hopping on your other foot.',
     mia: {
       way: 'joins',
-      text: 'Mia walks the grid holding your hand, two feet in every box, while he waits his turn. She can hand him the bean bag before his turn; she does not take his turn or his box.',
+      text: 'Mia walks the grid holding your hand, two feet in every box, while he waits his turn. When you say “Give it to Arjun anna”, she can hand him the bean bag before his turn; she does not take his turn or his box.',
     },
     picture:
-      'On the back garden path of the California house, Arjun hops on one foot along a short chalk hopscotch grid of plain squares, with his arms out for balance. A small red bean bag lies inside one of the chalk squares behind him. At the start of the grid, Mummy stands holding Mia’s hand, and Mia stands with both feet together, waiting for her turn. The chalk squares have no numbers or letters in them. There are no boxes or crates on the path.',
-    cast: ['Arjun', 'Mummy', 'Mia'],
+      'On the concrete path beside the backyard lawn of the Bay Area house, with raised vegetable beds and the wooden fence behind, Arjun hops on one foot along a short chalk hopscotch grid of plain squares, with his arms out for balance. A small red bean bag lies inside one of the chalk squares behind him. At the start of the grid, Amma stands holding Mia’s hand, and Mia stands with both feet together, waiting for her turn. The chalk squares have no numbers or letters in them. There are no boxes or crates on the path. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Amma', 'Mia'],
     tradition:
-      'Stapu, also called Kith-Kith, Tikkar Billa, Langdi, Ekhaat-Duhaat in Bengal, Paandi in Tamil Nadu and Kunte Bille in Karnataka: hopscotch as played across India, with a flat stone as the marker. This version uses a shorter grid, a bean bag instead of a stone, lets him step before he hops, and does not end his turn on a wobble.',
+      'Tokkudu Billa in Andhra Pradesh and Telangana, Paandi in Tamil Nadu, Kunte Bille in Karnataka, Ekhaat-Duhaat in Bengal, and Stapu, Kith-Kith or Langdi in Hindi: hopscotch as played across India, with a flat stone as the marker. Nanna’s family and Amma’s family each have a name for it. This version uses a shorter grid, a bean bag instead of a stone, lets him step before he hops, and does not end his turn on a wobble.',
     sources: [
       { label: 'D’Source (IDC, IIT Bombay), Indian Games: Stapoo', url: 'https://www.dsource.in/resource/indian-games/outdoor-games/stapoo' },
       { label: 'Wikipedia: Hopscotch (Indian names and versions)', url: 'https://en.wikipedia.org/wiki/Hopscotch' },
       { label: 'CDC: Important Milestones, Your Child by Five Years', url: 'https://www.cdc.gov/act-early/milestones/5-years.html' },
     ],
-    tags: ['chalk', 'hopping', 'path', 'Hindi numbers', 'balance', 'garden'],
+    tags: ['chalk', 'hopping', 'path', 'Tokkudu Billa', 'Paandi', 'Stapu', 'hopscotch', 'Telugu numbers', 'Tamil numbers', 'balance', 'backyard', 'garden'],
     note: {
       what: 'Indian hopscotch on a short chalk grid. He tosses a bean bag into a box, goes up and back skipping that box, and picks the bean bag up on the way home.',
       expect:
@@ -106,13 +109,13 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Balance on one foot, and holding a short sequence in mind: which box to skip, where to turn, when to stop and pick up. Saying the numbers in order in two languages.',
       ask: 'When he redesigns the grid: “Which box will be the hardest one to land in?”',
-      next: 'Chalk the same grid at Dadi and Dada’s next time you visit, or draw it on paper and ask Dadi what she called the game as a girl.',
+      next: 'On a video call, hold the phone over the grid and ask Nanamma what she called the game as a girl; on the next, ask Paati. Their rules may differ, and he can try both.',
       honest:
         'Hopping well on this grid is a balance skill and says little about his maths. Some five-year-olds are not steady on one foot yet; that is normal, and stepping through is the same game.',
       easier: 'Walk the grid, two feet in every box, and leave the bean bag out until the route is easy.',
-      harder: 'Toss from behind a line, hop the whole way on one foot, or play the regional version where a finished player claims a box as their ghar.',
+      harder: 'Toss from behind a line, hop the whole way on one foot, or play the regional version where a finished player claims a box as their house.',
       safety:
-        'Draw on flat ground in the back garden or a quiet path, away from the street, the driveway in use and parked cars. Shoes on, and sweep away grit. Use a bean bag, not a stone, while Mia is near.',
+        'Draw on flat ground in the backyard or on a quiet path, away from the street, the driveway in use and parked cars. Shoes on, and sweep away grit. Use a bean bag, not a stone, while Mia is near.',
     },
   },
   {
@@ -138,16 +141,16 @@ export const IDEAS: readonly PlayIdea[] = [
       'On a ladder, say its good deed and climb; on a snake, say its bad one and slide. First to 30 reaches moksha, and you play again.',
     ],
     hisWay:
-      'He draws the next board: where the snakes and ladders go, how long they are and what each one stands for. He can add his own squares, such as “go back to Dadi’s house” or “roll again”, and decide whether you need the exact number to finish.',
+      'He draws the next board: where the snakes and ladders go, how long they are and what each one stands for. He can add his own squares, such as “fly back to Paati’s house in Chennai” or “roll again”, and decide whether you need the exact number to finish.',
     mia: {
       way: 'apart',
       text: 'The die and counters are small enough for Mia to choke on, so play while she naps or is with another grown-up. It also gives him one game with you all to himself.',
     },
     picture:
-      'On a cotton durrie in the Jaipur courtyard, Arjun slides a flat red bottle top, his counter, along a hand-drawn paper Snakes and Ladders board, touching the squares one by one with it as he counts aloud. The board is a short track of three rows of big squares, with a pencil-drawn ladder just ahead of his bottle top and a pencil-drawn wavy snake further along. Dadi sits beside him, holding the only die in her open palm and watching his bottle top. The board has no numbers or writing on it.',
-    cast: ['Arjun', 'Dadi'],
+      'At the low coffee table in the living room of the Bay Area house, Arjun kneels on the rug and slides a flat red bottle top, his counter, along a hand-drawn paper Snakes and Ladders board, touching the squares one by one with it as he counts aloud. The board is a short track of three rows of big squares, with a pencil-drawn ladder just ahead of his bottle top and a pencil-drawn wavy snake further along. Paati sits on the rug beside him, holding the only die in her open palm and watching his bottle top. The board has no numbers or writing on it.',
+    cast: ['Arjun', 'Paati'],
     tradition:
-      'Moksha Patam, or Gyan Chaupar: the Indian board game that became Snakes and Ladders, where ladders stood for virtues and snakes for vices on the way to moksha. The old boards had anything from 72 to 300 squares; on one, cell 24, kusangati (bad company), drops you to cell 8, mithya (falsehood). This version uses a short 30-square board and deeds in his own words.',
+      'Moksha Patam, or Gyan Chaupar (Paramapadam in Tamil, Vaikunthapali in Telugu): the Indian board game that became Snakes and Ladders, where ladders stood for virtues and snakes for vices on the way to moksha. The old boards had anything from 72 to 300 squares; on one, cell 24, kusangati (bad company), drops you to cell 8, mithya (falsehood). This version uses a short 30-square board and deeds in his own words.',
     sources: [
       { label: 'D’Source (IDC, IIT Bombay), Indian Games: Moksha Patam', url: 'https://www.dsource.in/resource/indian-games/board-games/moksha-patam' },
       {
@@ -159,7 +162,7 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://doi.org/10.1111/j.1467-7687.2008.00714.x',
       },
     ],
-    tags: ['board game', 'dice', 'counting', 'grandparents', 'rainy day', 'Indian games'],
+    tags: ['board game', 'dice', 'counting', 'grandparents', 'Paati', 'Paramapadam', 'Vaikunthapali', 'rainy day', 'Indian games'],
     note: {
       what: 'A short Snakes and Ladders on a board you draw together, with good deeds at the feet of the ladders and bad ones at the heads of the snakes, as on the old Moksha Patam boards. Every move is counted aloud from the square you are on.',
       expect:
@@ -167,7 +170,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Counting on from a number instead of from one, and reading the numbers to 30 in order along a track. Also losing to bad luck when nobody is to blame.',
       ask: 'When he is a few squares below a ladder: “Which number would take you onto it?”',
-      next: 'On real stairs, count on from the step he is standing on: “We are on 6. Three more: 7, 8, 9.”',
+      next: 'On real stairs, count on from the step he is standing on: “We are on 6. Three more: 7, 8, 9.” Ask Paati whether her family played Paramapadam late into the night of Vaikunta Ekadasi, to stay awake.',
       honest:
         'The research that found number gains (Siegler and Ramani, with preschoolers) used a straight 1-to-10 board, four 15-minute sessions, numbers named on every move; a winding board with snakes is not quite the same game. The deeds are labels: the die decides, not how good anyone is.',
       easier: 'Use 20 squares, and cover the 4, 5 and 6 on the die with tape marked 1, 2 and 3. Leave the snakes out at first.',
@@ -202,8 +205,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Give Mia a handful of cards from an old pack (or old greeting cards) to spread out, stack and post into an empty tissue box beside you. Hers stay out of the game, and she can “Snap” her own pile whenever she likes.',
     },
     picture:
-      'On the living-room rug of the California house, Arjun slaps one flat open hand down on top of a single neat pile of face-up playing cards between them, with his mouth open mid-shout. Papa sits cross-legged opposite, holding a fan of cards in one hand. He freezes with his other palm open just above the back of Arjun’s hand, and laughs. All the middle cards are in one small stack under Arjun’s hand.',
-    cast: ['Arjun', 'Papa'],
+      'On the living-room rug of the Bay Area house, Arjun slaps one flat open hand down on top of a single neat pile of face-up playing cards between them, with his mouth open mid-shout. Nanna sits cross-legged opposite, holding a fan of cards in one hand. He freezes with his other palm open just above the back of Arjun’s hand, and laughs. All the middle cards are in one small stack under Arjun’s hand.',
+    cast: ['Arjun', 'Nanna'],
     sources: [
       {
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds (card games)',
@@ -224,7 +227,7 @@ export const IDEAS: readonly PlayIdea[] = [
         'Being quick at Snap shows he is quick at Snap; it does not show he can wait his turn elsewhere. Crazy Eights is mostly luck at this age, and he will lose some games, which is part of the point. Expect a few sulks.',
       easier: 'Take out the picture cards. In Crazy Eights, play with your hand face up so he can see how you choose. Or start with DREME’s Line Them Up: take turns laying cards 1 to 10 in order.',
       harder: 'Play Crazy Eights with three players, or add his own rule card. In Snap, also call Snap on a pair of the same suit.',
-      safety: 'Agree on flat hands on the pile, not slapping on each other’s fingers; an open palm is fast enough. Move hot drinks off the rug before a round of Snap.',
+      safety: 'Agree on flat hands on the pile, not slapping on each other’s fingers; an open palm is fast enough. Move hot drinks, such as coffee in a steel tumbler, off the rug before a round of Snap.',
     },
   },
   {
@@ -242,7 +245,7 @@ export const IDEAS: readonly PlayIdea[] = [
     steps: [
       'Draw one picture on each chit: a scroll for the Mantri, a stick for the Sipahi, a bag for the Chor. With four players, add a crown for the Raja.',
       'Fold the chits, shake them in the bowl, and each take one. Look in secret and keep it in your fist.',
-      'Everyone asks, “Mantri kaun hai?” (with four, the Raja asks “Mera Mantri kaun hai?”). The Mantri says “Main!” and points at whoever he thinks is the Chor.',
+      'Everyone asks, “Who is the Mantri?” (with four, the Raja asks “Who is my Mantri?”). The Mantri says “Me!” and points at whoever he thinks is the Chor.',
       'Everyone opens their chit to see if the Mantri found the Chor. Right or wrong, talk about what gave the Chor away, or what fooled the Mantri.',
       'Fold the chits, shake them back into the bowl and pick again, so everyone has a new secret. Nobody counts points; play until he has had enough.',
     ],
@@ -253,8 +256,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia gets her own bowl of big folded half-sheets of paper with scribbles on them to open, shut and share out to anyone she likes. Hers stay out of the real bowl.',
     },
     picture:
-      'In the Jaipur courtyard, Arjun sits on a cotton durrie and points one finger across at Dada with narrowed, suspicious eyes, with his own opened paper chit lying in his lap. Dada keeps a perfectly straight face, both hands pressing his folded chit flat against his chest. Dadi, beside them, hides her chit inside one closed fist and watches. A pencil, a sheet of paper and an empty steel bowl sit on the durrie by Dadi’s knee.',
-    cast: ['Arjun', 'Dadi', 'Dada'],
+      'At the dining table of the Bay Area house, Arjun sits on a dining chair and points one finger across at Tatayya with narrowed, suspicious eyes, with his own opened paper chit lying on the table in front of him. Tatayya keeps a perfectly straight face, both hands pressing his folded chit flat against his chest. Nanamma, beside them, hides her chit inside one closed fist and watches. A pencil, a sheet of paper and an empty steel bowl sit on the table by Nanamma’s elbow.',
+    cast: ['Arjun', 'Nanamma', 'Tatayya'],
     tradition:
       'Raja, Mantri, Chor, Sipahi (King, Minister, Thief, Soldier), a chit game played across India by four players. Traditionally it is scored: in D’Source’s version the chits are worth Raja 1000, Mantri 500, Sipahi 300 and Chor 0, a Mantri who guesses wrong hands his points to the Chor, and after several rounds the highest total wins. Wikipedia records other points and a version where the Sipahi guesses. This family version keeps D’Source’s guessing but leaves the points out altogether, and with three players it drops the Raja chit, so everyone asks the question together.',
     sources: [
@@ -264,7 +267,7 @@ export const IDEAS: readonly PlayIdea[] = [
       },
       { label: 'Wikipedia: Raja Mantri Chor Sipahi (rules and family variations)', url: 'https://en.wikipedia.org/wiki/Raja_Mantri_Chor_Sipahi' },
     ],
-    tags: ['grandparents', 'paper', 'secrets', 'guessing', 'Indian games', 'rainy day'],
+    tags: ['grandparents', 'Nanamma and Tatayya', 'paper', 'secrets', 'guessing', 'Indian games', 'rainy day'],
     note: {
       what: 'A guessing game with folded chits. Each player secretly becomes the Mantri, the Sipahi or the Chor (and the Raja, with four); the Mantri owns up and has to point out the Chor by watching faces.',
       expect:
@@ -272,7 +275,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'Keeping a secret and a straight face, and looking at faces for a clue. As the Sipahi, working out who the Chor must be once the Mantri has owned up.',
       ask: 'After a round where he guessed right as Mantri: “What gave the Chor away?”',
-      next: 'Ask the grandparents which version they played as children and who did the guessing. Families differ, and he may like theirs better.',
+      next: 'Ask Nanamma and Tatayya what they called it as children (was it Raju, Mantri, Donga, Police?) and who did the guessing. Families differ, and he may like theirs better.',
       honest:
         'In the main game, with three or four players, the Mantri always chooses between only two people, so half of all guesses would be right by chance; it is not a test of how well he reads faces. D’Source places the game at 6 to 12, so expect to remind him who asks and who points for the first few rounds.',
       easier: 'Play one practice round with the chits open, so he sees who asks, who answers and who points, then fold them for real. Help him read his chit quietly if the picture is not clear to him.',
@@ -297,7 +300,7 @@ export const IDEAS: readonly PlayIdea[] = [
       'two small bowls, one for each player’s seeds',
       'a jar with a lid to keep the seeds in',
     ],
-    exception: 'Tamarind seeds and cowrie shells are the traditional counters, and most homes outside South India have neither; rajma or other large dried beans do the same job.',
+    exception: 'Tamarind seeds and cowrie shells are the traditional counters. If the block of tamarind kept for rasam has seeds in it, save them; otherwise rajma or other large dried beans do the same job.',
     steps: [
       'Set the box between you, long side facing each of you: your row of six is yours, his row is his. Count three seeds into every cup together.',
       'He scoops every seed from one of his cups and drops one into each following cup, anticlockwise, round onto your side when his row runs out.',
@@ -312,8 +315,8 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Tamarind seeds and beans are just the size Mia could choke on, so this is a game for when she is asleep or out of the room with another grown-up. That makes it his own quiet game with you.',
     },
     picture:
-      'At a low wooden chowki in the Jaipur courtyard, Arjun drops a single brown tamarind seed into a cup of a cardboard egg box, his lips moving as he counts, while Dadi, sitting across from him, holds a steel katori of captured seeds and leans in to watch where his last seed will land.',
-    cast: ['Arjun', 'Dadi'],
+      'At the low coffee table in the living room of the Bay Area house, Arjun drops a single brown tamarind seed into a cup of a cardboard egg box, his lips moving as he counts, while Paati, sitting on the rug across from him, holds a steel katori of captured seeds and leans in to watch where his last seed will land.',
+    cast: ['Arjun', 'Paati'],
     tradition:
       'Pallanguzhi (also Pallankuzhi), a mancala game from Tamil Nadu and Kerala, played on a board of fourteen pits in two rows of seven with tamarind seeds, cowries or pebbles; it is called Alaguli Mane in Kannada and Vamana Guntalu in Telugu. This version uses twelve cups, three seeds in each, and a narrower form of one of D’Source’s capture rules: in D’Source any pit that reaches four as you sow is captured, while here only the cup where the last seed lands counts. In the real game a turn carries on from the next pit; here each turn ends after one sowing.',
     sources: [
@@ -324,7 +327,7 @@ export const IDEAS: readonly PlayIdea[] = [
         url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-5-to-7-year-olds.pdf',
       },
     ],
-    tags: ['counting', 'seeds', 'grandparents', 'board game', 'Indian games', 'Tamil Nadu', 'mancala'],
+    tags: ['counting', 'seeds', 'grandparents', 'Paati', 'Vamana Guntalu', 'board game', 'Indian games', 'Tamil Nadu', 'mancala'],
     note: {
       what: 'A home-made Pallanguzhi. You each own a row of cups, sow seeds one by one round the box, and capture a cup when your last seed makes it exactly four.',
       expect:
@@ -332,7 +335,7 @@ export const IDEAS: readonly PlayIdea[] = [
       practising:
         'One seed for each cup, counted in order, and keeping track of where the count ends. Later, looking a few cups ahead before choosing, and comparing two heaps by counting them in tens.',
       ask: 'Before he scoops a big cup: “Where do you think your last seed will land?”',
-      next: 'Ask Dadi or Dada whether anyone in the family played Pallanguzhi or another seed game as a child, and how their board looked.',
+      next: 'Ask Paati whether she played Pallanguzhi as a girl and how her board looked, then ask Nanamma whether she knows it as Vamana Guntalu. Amma can count the sowing in Tamil: “onnu, rendu, moonu” (one, two, three).',
       honest:
         'This is a simplified family version, not the full game, which has its own scoring, more seeds and longer chains of sowing. Most of his early wins will be luck; planning ahead comes slowly and may not show for many games.',
       easier: 'Use two seeds a cup and capture on three. Sow together, his hand in yours, saying the count aloud.',
@@ -360,14 +363,14 @@ export const IDEAS: readonly PlayIdea[] = [
       'Swap. He is Simon, picks the rule for each round and tries to catch you out. Get caught now and then without making a show of it.',
     ],
     hisWay:
-      'As leader he chooses the round and invents the orders, and he can make his own switch: “Papa says” instead of “Simon says”, or a round where he says the opposite of what he means. He can also call in Hindi: “Simon kehta hai, naak chhuo!”',
+      'As leader he chooses the round and invents the orders, and he can make his own switch: “Nanna says” instead of “Simon says”, or a round where he says the opposite of what he means. He can also give the orders in Telugu when Nanna plays, or in Tamil when Amma plays.',
     mia: {
       way: 'joins',
       text: 'Mia joins in by copying every move, whether Simon says or not and whatever the round; nobody catches her, and he plays to the real rule.',
     },
     picture:
-      'In the California living room, Arjun stands with the tip of one finger touching the tip of his nose, his mouth clear and smiling, and his eyes fixed on Papa. Papa stands opposite, touching his own ear with one hand and holding the other hand open, palm up, as he calls out an order with a sly smile. Mia, beside Arjun, copies Papa and holds her ears with both hands.',
-    cast: ['Arjun', 'Papa', 'Mia'],
+      'In the living room of the Bay Area house, Arjun stands with the tip of one finger touching the tip of his nose, his mouth clear and smiling, and his eyes fixed on Nanna. Nanna stands opposite, touching his own ear with one hand and holding the other hand open, palm up, as he calls out an order with a sly smile. Mia, beside Arjun, copies Nanna and holds her ears with both hands. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun’s head about level with Mia’s, sitting on his heels lower.',
+    cast: ['Arjun', 'Nanna', 'Mia'],
     sources: [
       {
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds (Simon Says and its variants)',
@@ -415,14 +418,14 @@ export const IDEAS: readonly PlayIdea[] = [
       'Then the switch: tip both bowls back and sort the same pile a new way. Same things, new rule.',
     ],
     hisWay:
-      'He makes the rules, and his are often the best ones: “things Mia has put in her mouth”, “things that live in the kitchen”, “things Papa uses”. Let his rule stand even when it is one only he could know, and ask him to tell you at the end.',
+      'He makes the rules, and his are often the best ones: “things Mia has put in her mouth”, “things that live in the kitchen”, “things Nanna uses”. Let his rule stand even when it is one only he could know, and ask him to tell you at the end.',
     mia: {
       way: 'alongside',
       text: 'Give Mia her own basket of big, safe things (a spoon, a sock, a plastic cup) to take out and put back in beside you. She may hand him things for his pile; he decides whether they go in.',
     },
     picture:
-      'At the kitchen table of the California house, Arjun holds a steel spoon in the air between two clear plastic bowls. In the left bowl lie only a round metal jar lid and one bangle. In the right bowl lie only a rolled-up striped sock and a small wooden block. There is no food anywhere on the table. Arjun looks up at Mummy, who sits across from him with one hand over her mouth, keeping her secret rule.',
-    cast: ['Arjun', 'Mummy'],
+      'At the kitchen table of the Bay Area house, Arjun holds a steel spoon in the air between two clear plastic bowls. In the left bowl lie only a round metal jar lid and one bangle. In the right bowl lie only a rolled-up striped sock and a small wooden block. There is no food anywhere on the table. Arjun looks up at Amma, who sits across from him with one hand over her mouth, keeping her secret rule.',
+    cast: ['Arjun', 'Amma'],
     sources: [
       {
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds (Guess My Rule)',

@@ -292,7 +292,7 @@ export const CASES: readonly Case[] = [
     id: 'mia',
     title: 'Mia by your things',
     setupPanelId: plate(`${P}-mia-setup`),
-    setupAlt: 'Seen from the doorway: Mia sitting on the rug crying with one arm out, beside your open box of small cars, with a car on the floor near her.',
+    setupAlt: 'Seen from the living-room doorway: Mia sitting on the rug crying with one arm out, beside your open box of small cars, with a car on the floor near her.',
     setup: 'Mia is crying. She is sitting beside your box of cars, and one car is on the floor.',
     timeline: [
       { says: 'Mia was standing by the low table.' },
@@ -304,7 +304,7 @@ export const CASES: readonly Case[] = [
       {
         kind: 'eye',
         question: 'Did anyone see her?',
-        fact: 'Dad was at the sink. He heard a bump and then crying. He did not see it.',
+        fact: 'Nanna was at the kitchen sink. He heard a bump and then crying. He did not see it.',
         effect: 'unresolved',
       },
       {
@@ -330,16 +330,16 @@ export const CASES: readonly Case[] = [
       {
         id: 'mia-point',
         glyph: 'point',
-        label: 'You tell Dad she was in your things.',
+        label: 'You tell Nanna she was in your things.',
         outcome:
-          'You told Dad she was in your box. He looked at her knee, then at the box, and carried her to the sofa. Your cars stayed where they were.',
+          'You told Nanna she was in your box. He looked at her knee, then at the box, and carried her to the sofa. Your cars stayed where they were.',
       },
       {
         id: 'mia-wait',
         glyph: 'wait',
         label: 'You keep doing what you were doing.',
         outcome:
-          'You kept building. Dad came in and picked her up. Later the box was still closed and nobody said anything about it.',
+          'You kept building. Nanna came in and picked her up. Later the box was still closed and nobody said anything about it.',
       },
     ],
     settles: true,
@@ -361,7 +361,7 @@ export const CASES: readonly Case[] = [
       {
         kind: 'eye',
         question: 'Did he look your way?',
-        fact: 'His mum was walking fast and holding his hand. His head was turned to keep up with her.',
+        fact: 'His mom was walking fast and holding his hand. His head was turned to keep up with her.',
         effect: 'reverses',
       },
       {
@@ -382,7 +382,7 @@ export const CASES: readonly Case[] = [
         glyph: 'ask',
         label: 'You go after him and ask.',
         outcome:
-          'You went after him. He said "not now" and kept walking with his mum. You stood at the gate and watched them go in.',
+          'You went after him. He said "not now" and kept walking with his mom. You stood at the gate and watched them go in.',
       },
       {
         id: 'hello-wait',
@@ -400,7 +400,7 @@ export const CASES: readonly Case[] = [
       },
     ],
     settles: false,
-    closing: 'His arms were full and his mum was pulling him along. He may not have seen you. He may have seen you. You cannot tell from here.',
+    closing: 'His arms were full and his mom was pulling him along. He may not have seen you. He may have seen you. You cannot tell from here.',
   },
   {
     id: 'broken',
@@ -439,21 +439,21 @@ export const CASES: readonly Case[] = [
         glyph: 'point',
         label: 'You say he broke it.',
         outcome:
-          'You said he broke it. He said you did. His mum came in, looked at the shelf, and put the pieces on the table. You played in separate rooms after that.',
+          'You said he broke it. He said you did. His mom came in, looked at the shelf, and put the pieces on the table. You played in separate rooms after that.',
       },
       {
         id: 'broken-ask',
         glyph: 'ask',
         label: 'You ask him what happened.',
         outcome:
-          'You asked. He said it was like that when he came in. You both looked up at the shelf, and then his mum called you down for juice.',
+          'You asked. He said it was like that when he came in. You both looked up at the shelf, and then his mom called you down for juice.',
       },
       {
         id: 'broken-mend',
         glyph: 'mend',
         label: 'You pick up the two pieces.',
         outcome:
-          'You picked up both pieces and put them on the table. His mum said thank you and put them in a drawer. Nobody said how it broke.',
+          'You picked up both pieces and put them on the table. His mom said thank you and put them in a drawer. Nobody said how it broke.',
       },
     ],
     settles: true,

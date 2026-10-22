@@ -260,7 +260,7 @@ describe('the words the room hears', () => {
   it('reads back what he said, then what the other child did', () => {
     const sam = byId('swing');
     expect(saidLine(sam, 'turns')).toBe('You said, “Take turns: 10 pushes each.”');
-    expect(saidLine(sam, 'grown-up')).toBe('You asked Papa to help.');
+    expect(saidLine(sam, 'grown-up')).toBe('You asked Nanna to help.');
     expect(storyLines(sam, ['you-first', 'turns'])).toEqual([
       `You said, “You first, then Sam.” ${replyOf(sam, 'you-first').says}`,
       `You said, “Take turns: 10 pushes each.” ${replyOf(sam, 'turns').says}`,
@@ -272,7 +272,7 @@ describe('the words the room hears', () => {
     const lines = plateLines(sam, ['you-first', 'grown-up']);
     expect(lines[0]).toBe(sam.where);
     expect(lines).toHaveLength(3);
-    expect(lines[2]).toContain('You asked Papa to help.');
+    expect(lines[2]).toContain('You asked Nanna to help.');
     expect(pathText(sam, ['you-first', 'grown-up'])).toBe('You first, then Sam · Ask a grown-up to help');
   });
 });

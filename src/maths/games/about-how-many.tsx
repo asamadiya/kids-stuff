@@ -7,7 +7,7 @@ import { Choice } from '../../play/parts';
  *
  * Concept (advisor): estimate quantities using familiar groups. Estimation is
  * finding a reasonable range, not guessing a hidden exact count. Two glass
- * jars of dried beans stand on Dadi's kitchen shelf: the left jar holds
+ * jars of dried beans stand on the kitchen shelf at home: the left jar holds
  * exactly 10, the right one holds many more. He judges the right jar against
  * the jar of 10 and taps the closest of three amounts ("about 30"). After
  * Check the beans are ringed in tens and counted on — 10, 20, 30, 32 — and a
@@ -53,8 +53,12 @@ import { Choice } from '../../play/parts';
  * the worked answer the card turns blue and shows the closest amount.
  */
 
-/** Rajma (red kidney beans) or lobia (black-eyed beans): two pantry beans of about the same size. */
-export type Bean = 'rajma' | 'lobia';
+/**
+ * Rajma (red kidney beans) or alasanda (black-eyed beans; alasandalu in
+ * Nanna's Telugu, karamani in Amma's Tamil): two pantry beans of about the
+ * same size.
+ */
+export type Bean = 'rajma' | 'alasanda';
 /** 'wide' is exactly two thin jars side by side, so one band holds 20. */
 export type JarWidth = 'thin' | 'wide';
 
@@ -118,7 +122,7 @@ export function generate(level: Level, index: number): Round {
   const rows = TABLE[level];
   const k = index % rows.length;
   const [count, choices, jar] = rows[k];
-  return { count, choices, jar, bean: k % 2 === 0 ? 'rajma' : 'lobia' };
+  return { count, choices, jar, bean: k % 2 === 0 ? 'rajma' : 'alasanda' };
 }
 
 /** The choice closest to the real count. */
@@ -233,7 +237,7 @@ function beanAt(g: Geom, i: number) {
   };
 }
 
-/** Rajma: a dark red kidney. Lobia: a cream bean with its black eye. */
+/** Rajma: a dark red kidney. Alasanda: a cream bean with its black eye. */
 function BeanShape({ bean, cx, cy, rot }: { readonly bean: Bean; readonly cx: number; readonly cy: number; readonly rot: number }) {
   return (
     <g transform={`translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${rot})`}>
@@ -287,7 +291,7 @@ function Beans({ g, n, bean }: { readonly g: Geom; readonly n: number; readonly 
 /** A bean too small to draw as a bean: a dot in its colour. */
 const DOT: Record<Bean, { readonly fill: string; readonly stroke?: string; readonly strokeWidth?: number }> = {
   rajma: { fill: '#8e1b25' },
-  lobia: { fill: '#f1e6c8', stroke: '#6b5a3a', strokeWidth: 0.8 },
+  alasanda: { fill: '#f1e6c8', stroke: '#6b5a3a', strokeWidth: 0.8 },
 };
 
 /**
@@ -318,7 +322,7 @@ function TenMark({ x, y, w, h, bean, beans = 10 }: {
         return (
           <g key={i}>
             <circle cx={cx} cy={cy} r={r} {...DOT[bean]} />
-            {bean === 'lobia' ? <circle cx={cx} cy={cy} r={r * 0.45} fill="#1f1a17" /> : null}
+            {bean === 'alasanda' ? <circle cx={cx} cy={cy} r={r * 0.45} fill="#1f1a17" /> : null}
           </g>
         );
       })}
@@ -512,7 +516,7 @@ function AnswerLine({ g, n, bean }: { readonly g: Geom; readonly n: number; read
   );
 }
 
-/** The kitchen shelf, the jar of 10, the jar he estimates and his amount — one SVG, one scale. */
+/** The kitchen shelf at home, the jar of 10, the jar he estimates and his amount — one SVG, one scale. */
 function Shelf({ round, stage, answer, tapped }: {
   readonly round: Round;
   readonly stage: BoardProps<Round, Answer>['stage'];
@@ -526,7 +530,7 @@ function Shelf({ round, stage, answer, tapped }: {
   const hint = stage === 'hint';
   const shown = stage === 'worked' || stage === 'solved';
   const card = shown ? nearest(round) : tapped;
-  const what = `${round.bean === 'rajma' ? 'Red rajma' : 'Black-eyed lobia'} beans. A thin jar holding 10, ringed as one ten, and a ${round.jar} jar of the same beans.`;
+  const what = `${round.bean === 'rajma' ? 'Red rajma' : 'Black-eyed'} beans. A thin jar holding 10, ringed as one ten, and a ${round.jar} jar of the same beans.`;
   const cardSays = card === null ? ' No amount on the card yet.' : ` The card shows about ${card}: ${card / 10} rings of ten.`;
   return (
     <svg className="board-svg" viewBox="0 0 960 500" role="img" aria-label={`${what}${shown ? ` Ringed in tens: ${round.count}.` : ''}${cardSays}`}>
@@ -673,15 +677,15 @@ export const aboutHowMany: SolveGame<Round, Answer> = {
   explain,
   cover: 'art/games/about-how-many.png',
   note: {
-    what: 'Two glass jars of dried beans on a shelf. The left jar holds exactly 10. He taps the closest of three amounts for the right jar: always 10, 30 or 100 at level 1; closer, changing choices at level 2; at level 3 some jars are twice as wide. Check rings the beans in tens and counts on.',
+    what: 'Two glass jars of dried beans on the kitchen shelf. The left jar holds exactly 10. He taps the closest of three amounts for the right jar: always 10, 30 or 100 at level 1; closer, changing choices at level 2; at level 3 some jars are twice as wide. Check rings the beans in tens and counts on.',
     expect: 'At first he will try to count every bean. That works at 30 and falls apart near 100, which is the point: he needs the jar of 10 as a ruler. At level 3 the wide jar holds 20 per band; reading the height alone gives half the real amount, and that is where it breaks.',
     practising: 'Estimation as choosing a sensible range from a known benchmark (a reference group of 10), not guessing an exact hidden number. Also counting on in tens and comparing distances on a number line.',
-    ask: "Before he taps an amount: 'How many jars of 10 would it take to fill that jar to the same height?' Let him point at the heights, and on a wide jar at each half.",
-    next: 'Pour 10 dried chana into a clear glass and mark the level with tape. Tip in a big handful more without counting, ask "about how many now?", then count them out in tens to check.',
+    ask: "Before he taps an amount: 'How many jars of 10 would it take to fill that jar to the same height?' Let him point at the heights, and on a wide jar at each half. Nanna can ask the game's own question in Telugu: 'Sumaaru enni untaayi?' (about how many are there?).",
+    next: 'Pour 10 dried chickpeas into a clear glass and mark the level with tape. Tip in a big handful more without counting, ask "about how many now?", then count them out in tens to check.',
     honest: 'Choosing "about 30" here does not show he can estimate when the reference group is missing, or when objects are different sizes. A jar of mixed beans or loose blocks on the floor will test that. The wide jar is drawn one bean deep, so two widths make twice as many per band; a real round jar twice as wide holds about four times as many, so keep real follow-ups in one glass.',
     easier: 'Pour 10 real beans into a glass beside the screen so he can hold the jar of 10, and stay on level 1.',
     harder: 'Before Check, ask him for a range in his own words — "more than 40, less than 60" — and see whether the count lands inside it.',
-    safety: 'Dried beans are a choking hazard for the two-year-old: do the real-bean follow-up at a table she cannot reach, and count them back into the tin. Raw rajma is also toxic if chewed (four or five raw beans can cause severe vomiting), so use chana if anyone might taste.',
+    safety: 'Dried beans are a choking hazard for the two-year-old: do the real-bean follow-up at a table she cannot reach, and count them back into the tin. Raw rajma is also toxic if chewed (four or five raw beans can cause severe vomiting), so use chickpeas if anyone might taste.',
   },
 };
 

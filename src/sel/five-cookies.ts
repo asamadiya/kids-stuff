@@ -128,7 +128,7 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'console',
     plate: 'five-cookies-console-p0',
-    alt: 'Four children sitting on a rug in front of a television with one game controller between them.',
+    alt: 'Ravi, Jo, Milo and Mia sitting on a rug in front of a television with one game controller between them.',
     units: 3,
     unit: 'turn',
     unitPlural: 'turns',
@@ -183,7 +183,7 @@ export const SCENARIOS: readonly Scenario[] = [
         reaction: {
           met: 'Mia got a turn. She held the controller upside down and laughed.',
           short: 'Mia got less than one whole turn.',
-          none: 'Mia got no turns. She pulled at your sleeve until somebody picked her up.',
+          none: 'Mia got no turns. She pulled at your sleeve until Nanna picked her up.',
         },
       },
     ],
@@ -191,7 +191,7 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'car-seats',
     plate: 'five-cookies-car-seats-p0',
-    alt: 'Three children standing beside an open car door with only two empty seats left inside.',
+    alt: 'Tom, Ada and Mia standing on the driveway beside an open car door with only two empty seats left inside.',
     units: 2,
     unit: 'seat',
     unitPlural: 'seats',
@@ -202,7 +202,7 @@ export const SCENARIOS: readonly Scenario[] = [
         name: 'Tom',
         kind: 'work',
         asks: 0,
-        claim: 'Tom carried all the bags down and packed them in the boot.',
+        claim: 'Tom carried all the bags down and packed them in the trunk.',
         portrait: { waiting: 'confident', met: 'calm', short: 'annoyed', none: 'disappointed' },
         reaction: {
           met: 'Tom ended up with more than anybody. He looked out of the window the whole way.',
@@ -233,7 +233,7 @@ export const SCENARIOS: readonly Scenario[] = [
         reaction: {
           met: 'Mia got a seat and was asleep before the end of the road.',
           short: 'Mia got less than one whole seat.',
-          none: 'Mia got no seat. Somebody had to stay behind at the house with her.',
+          none: 'Mia got no seat. Amma stayed behind at the house with her.',
         },
       },
     ],
@@ -241,7 +241,7 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'dinosaurs',
     plate: 'five-cookies-dinosaurs-p0',
-    alt: 'A bag of small dinosaur figures tipped out on a bedroom floor, with a boy, a toddler and another child kneeling around them.',
+    alt: 'A bag of small dinosaur figures tipped out on Arjun’s bedroom floor, with Arjun, Mia and Priya kneeling around them.',
     units: 7,
     unit: 'dinosaur',
     unitPlural: 'dinosaurs',

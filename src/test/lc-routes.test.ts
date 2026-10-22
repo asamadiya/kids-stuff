@@ -18,6 +18,9 @@ const known: Known = {
   science: new Set(['will-this-clay-boat-float']),
   activities: new Set(['paper-boat']),
   ideas: new Set(['sock-wrestle']),
+  moments: new Set(['good-morning']),
+  rhymes: new Set(['te-chandamama']),
+  langBooks: new Map([['come-here', 8]]),
 };
 
 const EVERY: readonly Route[] = [
@@ -39,6 +42,13 @@ const EVERY: readonly Route[] = [
   { kind: 'together' },
   { kind: 'idea', id: 'sock-wrestle' },
   { kind: 'all' },
+  { kind: 'langs' },
+  { kind: 'langMoment', id: 'good-morning' },
+  { kind: 'langRhyme', id: 'te-chandamama' },
+  { kind: 'langBook', id: 'come-here', page: 3 },
+  { kind: 'langWords' },
+  { kind: 'langGuide' },
+  { kind: 'langRecord' },
 ];
 
 describe('routes', () => {

@@ -11,6 +11,7 @@ import { SCIENCE_GAMES } from '../science/registry';
 import { ACTIVITIES } from '../make/activities';
 import { IDEAS } from '../together';
 import { ENTRIES } from '../learn/catalog';
+import { LANG_BOOKS, MOMENTS, RHYMES } from '../languages';
 
 /**
  * The parent's rule, as a test: every screen "always has notes for parents on
@@ -47,6 +48,13 @@ const ROUTES: Route[] = [
   { kind: 'together' },
   ...IDEAS.map((x): Route => ({ kind: 'idea', id: x.id })),
   { kind: 'all' },
+  { kind: 'langs' },
+  ...MOMENTS.map((m): Route => ({ kind: 'langMoment', id: m.id })),
+  ...RHYMES.map((r): Route => ({ kind: 'langRhyme', id: r.id })),
+  ...LANG_BOOKS.map((b): Route => ({ kind: 'langBook', id: b.id, page: 0 })),
+  { kind: 'langWords' },
+  { kind: 'langGuide' },
+  { kind: 'langRecord' },
 ];
 
 describe('every screen of the Learning Center', () => {
@@ -73,10 +81,10 @@ describe('every screen of the Learning Center', () => {
     expect(document.querySelector('dialog[open]')).toBeNull();
   });
 
-  it('home offers five doors and, under them, a link to every item but the library stories', () => {
+  it('home offers six doors and, under them, a link to every item but the library stories', () => {
     at({ kind: 'home' });
     const nav = screen.getByRole('navigation', { name: 'Choose' });
-    expect(nav.querySelectorAll('a').length).toBe(5);
+    expect(nav.querySelectorAll('a').length).toBe(6);
     const hrefs = new Set([...document.querySelectorAll('.dir a')].map((a) => a.getAttribute('href')));
     const missing = ENTRIES.filter((e) => e.kind !== 'Longer read-aloud' && !hrefs.has(e.href)).map((e) => e.href);
     expect(missing).toEqual([]);

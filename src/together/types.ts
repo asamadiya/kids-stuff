@@ -35,7 +35,7 @@ export type PlayWhere = 'indoors' | 'outdoors' | 'either';
  */
 export type MiaWay = 'joins' | 'alongside' | 'apart';
 
-export type PlayCast = 'Arjun' | 'Mia' | 'Mummy' | 'Papa' | 'Dadi' | 'Dada';
+export type PlayCast = 'Arjun' | 'Mia' | 'Amma' | 'Nanna' | 'Nanamma' | 'Tatayya' | 'Paati' | 'Thatha';
 
 export interface PlayIdea {
   readonly id: string;

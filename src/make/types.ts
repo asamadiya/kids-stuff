@@ -29,7 +29,7 @@ export const MAKE_AREAS: ReadonlyArray<{ readonly id: MakeArea; readonly title: 
  * question.
  *
  * Step text is addressed to the pair doing it. The pictures show Arjun from
- * the family cast sheet with Mummy or Papa, never a character called Rikki.
+ * the family cast sheet with Amma or Nanna, never a character called Rikki.
  * Each `art` string leads with the action, because an edit-from-reference
  * prompt that does not copies the sheet's standing poses; it is also the
  * picture's alt text, so it shows exactly what the step says.

@@ -50,6 +50,7 @@ const BANNED = [
   [/\b(pin|pins|pinning|hold) (him|her) down\b|\bpinned\b/i, 'pinning or holding down (excluded)'],
   [/\b(push-?ups|sit-?ups|laps) as (a )?(punishment|forfeit)|\bforfeit\b|\bloser (has to|must)\b/i, 'punishment or humiliation (excluded)'],
   [/\bRikki\b/, 'the reader is not a character: say Arjun in pictures, "he" in notes'],
+  [/\b(Mummy|Papa|Dadi|Dada|Nani|Nana|Jaipur|Rajasthan)\b/, 'old household: this family is Amma/Nanna, Nanamma/Tatayya, Paati/Thatha, in the Bay Area (.redesign/v3/HOUSEHOLD.md)'],
   [/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, 'emoji'],
   [/\b(amazing|awesome|magic(al)?|super fun|so much fun)\b/i, 'hype word'],
 ];
@@ -108,7 +109,7 @@ if (mod.MORE) {
   console.log(`${mod.MORE.length} activities in ${file}`);
 } else if (mod.IDEAS) {
   const group = basename(file, '.ts');
-  const CAST = ['Arjun', 'Mia', 'Mummy', 'Papa', 'Dadi', 'Dada'];
+  const CAST = ['Arjun', 'Mia', 'Amma', 'Nanna', 'Nanamma', 'Tatayya', 'Paati', 'Thatha'];
   const seen = new Set();
   for (const x of mod.IDEAS) {
     const id = x.id ?? '(no id)';
@@ -129,13 +130,14 @@ if (mod.MORE) {
     if (!x.hisWay) bad(id, 'hisWay required');
     if (!['joins', 'alongside', 'apart'].includes(x.mia?.way) || !x.mia?.text) bad(id, 'mia.way and mia.text required');
     if (!x.picture || x.picture.length < 120) bad(id, 'picture under 120 characters');
-    if (!(x.cast?.includes('Arjun') && x.cast.some((c) => ['Mummy', 'Papa', 'Dadi', 'Dada'].includes(c)))) bad(id, 'cast must include Arjun and a grown-up');
+    if (!(x.cast?.includes('Arjun') && x.cast.some((c) => ['Amma', 'Nanna', 'Nanamma', 'Tatayya', 'Paati', 'Thatha'].includes(c)))) bad(id, 'cast must include Arjun and a grown-up');
     for (const c of x.cast ?? []) {
       if (!CAST.includes(c)) bad(id, `unknown cast ${c}`);
       if (!new RegExp(`\\b${c}\\b`).test(x.picture ?? '')) bad(id, `cast ${c} not named in picture`);
     }
     for (const c of CAST) if (new RegExp(`\\b${c}\\b`).test(x.picture ?? '') && !x.cast?.includes(c)) bad(id, `picture names ${c} but cast does not`);
-    if (x.cast?.some((c) => c === 'Dadi' || c === 'Dada') && x.cast.some((c) => c === 'Mummy' || c === 'Papa')) bad(id, 'a picture has grandparents OR parents, not both (one reference sheet per picture)');
+    const sides = [['Amma', 'Nanna'], ['Nanamma', 'Tatayya'], ['Paati', 'Thatha']].filter((g) => x.cast?.some((c) => g.includes(c))).length;
+    if (sides > 1) bad(id, 'a picture has one set of grown-ups: parents, OR Telugu grandparents, OR Tamil grandparents (one reference sheet per picture)');
     if (x.mia?.way === 'joins' && !x.cast?.includes('Mia')) bad(id, 'Mia joins: put her in the cast and the picture');
     sourceCheck(id, x.sources);
     scan(id, 'card', `${x.title} ${x.hook} ${x.need?.join(' ')} ${x.hisWay} ${x.mia?.text} ${x.picture} ${x.exception ?? ''} ${x.tradition ?? ''}`);

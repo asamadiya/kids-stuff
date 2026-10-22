@@ -15,8 +15,13 @@ import type { GrownUpNote } from '../notes/types';
  */
 
 export type ShelfId = 'family' | 'tales' | 'festivals' | 'how' | 'people';
-export type CastSheet = 'family' | 'grandparents' | 'friends';
-export type CastName = 'Arjun' | 'Mia' | 'Mummy' | 'Papa' | 'Dadi' | 'Dada' | 'Zoe' | 'Ben';
+export type CastSheet = 'family' | 'telugu-grandparents' | 'tamil-grandparents' | 'friends';
+/**
+ * The family is a Bay Area Telugu–Tamil household (see .redesign/v3/HOUSEHOLD.md):
+ * Amma (Tamil) and Nanna (Telugu); Nanna's parents Nanamma and Tatayya; Amma's
+ * parents Paati and Thatha.
+ */
+export type CastName = 'Arjun' | 'Mia' | 'Amma' | 'Nanna' | 'Nanamma' | 'Tatayya' | 'Paati' | 'Thatha' | 'Zoe' | 'Ben';
 export type TextZone = 'top' | 'bottom' | 'left' | 'right';
 
 export interface BookPage {

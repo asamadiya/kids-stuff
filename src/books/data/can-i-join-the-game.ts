@@ -1,7 +1,8 @@
 import type { Book } from '../types';
 
 /**
- * Can I Join the Game? — friends cast, park.
+ * Can I Join the Game? — friends cast, a Bay Area neighbourhood park; no
+ * family on the page. The home practice in the note uses Amma, Nanna and Mia.
  *
  * Arc (RULINGS-4-slate): Arjun wants to join Zoe and Ben's park game, but his
  * dinosaur roar interrupts it, so he asks what they are playing and joins an
@@ -19,7 +20,7 @@ export const book: Book = {
   hook: 'Arjun’s dinosaur roar stops his friends’ train game.',
   cast: 'friends',
   setting:
-    'A sunny Saturday morning in a California park: green lawn, a big old oak tree shading a sandpit with a low wooden edge, a wooden bench, and a leafy green hedge.',
+    'A sunny Saturday morning in a Bay Area neighbourhood park: green lawn, a big old oak tree shading a sandpit with a low wooden edge, a wooden bench, and a leafy green hedge.',
   refrain: 'What can I be?',
   readMinutes: 4,
   pages: [
@@ -127,7 +128,7 @@ export const book: Book = {
     ask: 'On page 4, when Arjun sits on the bench: “What is he finding out by watching?”',
     next: 'At the next playground visit, before he runs into a game, have him tell you what the children are playing. Then he goes and asks, “Can I play? What can I be?”',
     honest: 'Knowing the words is not using them while excited and running. Expect a roar first and the question second for a while. Some groups will still say no, and that is their answer; the line does not guarantee a place.',
-    easier: 'Practise only the first question, “What are you playing?”, with family members playing with toys.',
+    easier: 'Practise only the first question, “What are you playing?”, at home. Amma starts a game on the rug with Mia and her toys, and he asks before he joins. Nanna can ask it first, in Telugu, to show him how: “Em aadutunnaru?” (what are you playing?).',
     harder: 'Talk about page 7: Arjun wanted to drive and Zoe said no. What else could he have asked for, or offered?',
   },
 };

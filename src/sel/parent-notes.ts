@@ -188,7 +188,7 @@ export const NOTES: Record<string, ParentNote> = {
     practising:
       'Proposing a turn-taking plan out loud and reading the reply. The same plan meets different children '
       + 'differently: Sam will not let him go first, Tomas gives the guest the first race, Ravi eats what is left '
-      + 'and goes off on his own. Mia is two and takes none of the three plans.',
+      + 'and goes off on his own. Mia is two and takes none of the three plans; Amma ends that one.',
     ask: 'You said the same plan to Sam and to Tomas. Why did one of them say no?',
     how: [
       'Tap a picture in the Choose a situation row.',
@@ -234,7 +234,7 @@ export const NOTES: Record<string, ParentNote> = {
 
   'not-the-same-rule': {
     what:
-      'Six rule cards out of his own life — Mia eats with her hands, he gets the tablet longer than Mia — sorted '
+      'Six rule cards out of his own life — Mia eats pasta with her hands, he gets the tablet longer than Mia — sorted '
       + 'into two columns of his own: same for everyone, different for a reason. Each reverse carries the '
       + "grown-up's reason. Then he writes a rule of his own.",
     practising:
@@ -251,9 +251,9 @@ export const NOTES: Record<string, ParentNote> = {
     skills: ['telling equal treatment from fair treatment', 'noticing an asymmetry that favours him', 'stating a rule with its condition'],
     honest:
       'No score: the card stays where he put it, and the reverse is one adult\'s placement beside his. Six cards '
-      + 'is thin, the sort takes him a minute, and four concern a two-year-old, so the deck reads as a defence of '
-      + 'this household more than a tool for examining rules. The rule-builder is the better half and gets less '
-      + 'time.',
+      + 'is thin, the sort takes him a minute, three concern a two-year-old and one is this house\'s shoes-at-the-door '
+      + 'custom, so the deck reads as a defence of this household more than a tool for examining rules. The '
+      + 'rule-builder is the better half and gets less time.',
   },
 
   'put-it-back-together': {
@@ -287,7 +287,8 @@ export const NOTES: Record<string, ParentNote> = {
       + 'between his last two is read back in stops.',
     practising:
       'Graded emotional vocabulary: "angry" is one word in a family of three or four, and events sit at '
-      + 'different places on it. The differential is the output, not the pins.',
+      + 'different places on it. The differential is the output, not the pins. When a pin lands on angry, Nanna '
+      + 'can ask in Telugu: "kopam vachchindaa?" (did you get angry?).',
     ask: 'Two of your pins are further apart than the rest. Tell me what makes the higher one bigger.',
     how: [
       'Pick a family in the Which family of feelings row — annoyed, frustrated, angry is one of them.',
