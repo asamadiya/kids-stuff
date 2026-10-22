@@ -3,6 +3,7 @@ import { Page } from './Page';
 import { getActivity } from '../make/activities';
 import { markRead } from './screens';
 import { ENTRIES } from './catalog';
+import { MakeFigure } from '../make/figures';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -38,7 +39,13 @@ export function ActivityPage({ id }: { readonly id: string }) {
       <ol className="activity__steps">
         {a.steps.map((s, i) => (
           <li key={s.text} className="activity__step">
-            <img src={`${BASE}art/make/${a.id}/step-${i + 1}.webp`} alt={s.art} loading="lazy" width={1152} height={896} />
+            {s.figure ? (
+              <div className="activity__figure">
+                <MakeFigure id={s.figure} label={s.art} />
+              </div>
+            ) : (
+              <img src={`${BASE}art/make/${a.id}/step-${i + 1}.webp`} alt={s.art} loading="lazy" width={1152} height={896} />
+            )}
             <p>
               <span className="activity__n" aria-hidden="true">{i + 1}</span>
               {s.text}

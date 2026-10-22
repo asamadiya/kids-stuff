@@ -182,6 +182,8 @@
 .sources a { color: var(--ink-soft); }
 
 /* activity page additions: the grown-up's trial, the on-screen pair, and the sources line */
+.activity__figure { aspect-ratio: 1152 / 896; border-bottom: var(--line) solid var(--ink); overflow: hidden; }
+.activity__figure svg { width: 100%; height: 100%; display: block; }
 .activity__pair { font-family: var(--font-read); margin-top: var(--s4); }
 .activity__pair b { font-family: var(--font-display); margin-right: var(--s2); }
 .activity__pair a { font-weight: 700; color: var(--make-deep); }

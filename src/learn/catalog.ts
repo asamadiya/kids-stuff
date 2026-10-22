@@ -160,7 +160,8 @@ function activityEntries(): Entry[] {
       title: a.title,
       hook: a.hook,
       href: `#/make/${a.id}`,
-      art: `art/make/${a.id}/step-1.png`,
+      // The card shows the first painted step; a step drawn as a diagram has no picture file.
+      art: `art/make/${a.id}/step-${a.steps.findIndex((s) => !s.figure) + 1}.png`,
       time: a.span ?? `${a.minutes} min`,
       adult: 'With a grown-up',
       where: [a.where, ...(a.places ?? [])].map((p) => PLACE[p]).join(', '),

@@ -94,8 +94,8 @@ if (mod.MORE) {
     if (!(a.steps?.length >= 4 && a.steps.length <= 6)) bad(id, 'steps: 4-6');
     a.steps?.forEach((s, i) => {
       if (!s.text || words(s.text) > 22) bad(id, `step ${i + 1} text missing or over 22 words`);
-      if (!s.art || s.art.length < 120) bad(id, `step ${i + 1} art under 120 characters`);
-      if (s.art && !/\bArjun\b/.test(s.art) && !/\b(close-up|close up)\b/i.test(s.art)) bad(id, `step ${i + 1} art must show Arjun (or say close-up)`);
+      if (!s.art || s.art.length < (s.figure ? 60 : 120)) bad(id, `step ${i + 1} art too short`);
+      if (s.art && !s.figure && !/\bArjun\b/.test(s.art) && !/\b(close-up|close up)\b/i.test(s.art)) bad(id, `step ${i + 1} art must show Arjun (or say close-up)`);
       scan(id, `step ${i + 1}`, `${s.text} ${s.art}`);
     });
     if (!a.notice || !a.ask) bad(id, 'notice and ask required');

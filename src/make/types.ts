@@ -53,7 +53,13 @@ export interface Activity {
    */
   readonly span?: string;
   readonly need: readonly string[];
-  readonly steps: readonly { readonly text: string; readonly art: string }[];
+  /**
+   * `figure` names a drawn diagram (src/make/figures.tsx) shown instead of a
+   * painting, for a step whose point is exact geometry — nine dots in a
+   * square, the seven tangram pieces — which an image model cannot be trusted
+   * to count or fit. `art` is then the diagram's alt text.
+   */
+  readonly steps: readonly { readonly text: string; readonly art: string; readonly figure?: string }[];
   readonly notice: string;
   readonly ask: string;
   /** A maths or science game, or a picture book, about the same idea. */

@@ -49,6 +49,10 @@ def prompt(action: str, people: list[str], *, how_to: bool) -> tuple[str, str]:
          + (f"Not in this picture: {', '.join(absent)}. Draw each person exactly once. " if absent else 'Draw each person exactly once. ')
          + ('Show the hands and the materials clearly so a child can copy the step. ' if how_to else
             'Show the one moment of play clearly: what each person is doing and with what. ')
+         # The first vision review found the boy standing or sitting on a table or counter
+         # in a dozen step pictures, and nonsense lettering on boxes and book spines.
+         + 'Everyone stands, sits or kneels on the floor or on a chair seat; nobody stands or sits on a table, counter or other furniture top. '
+         + 'Steel tumblers and bowls are opaque polished steel, never glass. Book spines, boxes and papers carry no lettering. '
          + 'Fill the whole frame with the scene. ' + STYLE)
     return ' '.join(p.split()), CAST_SHEETS[sheet]
 
@@ -80,6 +84,8 @@ def main() -> int:
             if not act.get('sources'):
                 continue
             for i, step in enumerate(act['steps'], 1):
+                if step.get('figure'):
+                    continue  # a drawn diagram, not a painting (src/make/figures.tsx)
                 people = named(step['art']) or ['Arjun']
                 p, ref = prompt(step['art'], people, how_to=True)
                 jobs.append({'out': f"public/art/make/{act['id']}/step-{i}.png", 'prompt': p, 'ref': ref})
