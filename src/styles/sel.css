@@ -38,3 +38,23 @@
 @media (max-width: 44rem) {
   .bench__figure, .bench__figure-caption { max-width: 100%; }
 }
+
+/* Hold the Line on phones: the drawn frame scales to unreadable 5px text and an
+   11px target, so phones get the same three parts as cards (Astra round 3). */
+.hold-cards { display: none; }
+@media (max-width: 620px) {
+  .bench__stage svg.hold-frame { display: none; }
+  .hold-cards { display: grid; gap: var(--space-3); width: 100%; }
+  .hold-card { border: 1px solid var(--rule); background: var(--paper-raised); border-radius: 12px; padding: var(--space-3); }
+  .hold-card.is-now { border: 2px solid var(--teal, #1f6f7a); }
+  .hold-card__label { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 var(--space-2); }
+  .hold-card__body { display: flex; align-items: center; gap: var(--space-3); }
+  .bench__stage .hold-card__body svg { width: 40px; height: 40px; flex: none; }
+  .hold-card__words { font-size: 1.05rem; margin: 0; }
+  .hold-card__empty { color: var(--ink-soft); margin: 0; }
+  .hold-card__said { margin-top: var(--space-3); min-height: 48px; width: 100%; }
+  .hold-card__done { margin: var(--space-2) 0 0; color: var(--ink-soft); font-size: 0.9rem; }
+  .hold-cards__reply { font-size: 1rem; margin: 0; }
+  .hold-cards__reply.is-left { color: var(--terra, #b5501b); }
+  .bench-part { min-width: 48px; min-height: 48px; }
+}
