@@ -31,5 +31,10 @@ describe('alt text', () => {
     const alt = altText(picture);
     expect(alt).not.toMatch(/\b(110|87) cm\b|character lineup|ACTION FIRST|heels (puts it )?lower|\bno (written )?(words|writing|letters|text|lettering|signs|labels)\b|shows only a picture/i);
     expect(alt.length).toBeGreaterThan(20);
+    expect(alt.split(/\s+/).length, alt).toBeLessThanOrEqual(90);
+  });
+
+  it('keeps only the first sentence: who does what', () => {
+    expect(altText('Arjun rolls the ball to Mia. Wooden fence and lemon tree behind, afternoon sun. The top third is plain sky.')).toBe('Arjun rolls the ball to Mia.');
   });
 });
