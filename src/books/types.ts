@@ -15,7 +15,7 @@ import type { GrownUpNote } from '../notes/types';
  */
 
 export type ShelfId = 'family' | 'tales' | 'festivals' | 'how' | 'people';
-export type CastSheet = 'family' | 'telugu-grandparents' | 'tamil-grandparents' | 'friends';
+export type CastSheet = 'family' | 'telugu-grandparents' | 'tamil-grandparents' | 'family-and-tamil-grandparents' | 'friends';
 /**
  * The family is a Bay Area Telugu–Tamil household (see .redesign/v3/HOUSEHOLD.md):
  * Amma (Tamil) and Nanna (Telugu); Nanna's parents Nanamma and Tatayya; Amma's

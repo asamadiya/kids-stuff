@@ -18,7 +18,8 @@ export const SLATE: readonly string[] = [
   'the-chase-stops-here', 'that-wasnt-the-rule', 'build-beside-me', 'who-left-the-shoes-there',
   'the-monkey-and-the-crocodile', 'the-quails-lift-the-net', 'make-this-line-shorter',
   'a-hill-for-an-umbrella', 'the-pumpkin-that-rolled-home',
-  'first-the-dust-then-the-diyas', 'may-i-put-colour-here', 'the-kite-needs-some-wind', 'a-rakhi-for-both-of-us',
+  'first-the-dust-then-the-diyas', 'watch-for-the-bubbles', 'the-kite-needs-some-wind', 'a-little-of-everything',
+  'may-i-put-colour-here', 'a-rakhi-for-both-of-us',
   'will-this-clay-boat-float', 'one-block-can-balance-two', 'a-tiny-dinosaur-a-huge-shadow', 'the-bean-in-the-dark',
   'aryabhata-and-the-powers-of-ten', 'bose-measures-a-growing-plant', 'raman-and-the-blue-sea',
 ];
@@ -70,14 +71,14 @@ export const SHELVES: readonly Shelf[] = [
   {
     id: 'festivals',
     title: 'Festivals at Home',
-    line: 'Diwali, Holi, Sankranti and Raksha Bandhan, as this family actually does them.',
+    line: 'Deepavali, Sankranti and Pongal, Ugadi, Holi with friends, and Rakhi, as this family does them.',
     note: {
       what: 'One family’s way of keeping each festival — the cleaning, the colour, the kites, the threads — not a lesson about the festival.',
       expect: 'He will compare it with what your family does. Let the differences be the conversation.',
       practising: 'Family routines, helping, and the boundaries that make a celebration safe (asking before colour, adults with flames).',
       ask: '"What do we do that Arjun’s family doesn’t?"',
       next: 'Give him one real job in your next festival preparation, start to finish.',
-      honest: 'Every family keeps these days differently; these books show one Hindi-speaking family, not the right way.',
+      honest: 'Every family keeps these days differently. These books show one Telugu–Tamil family in the Bay Area: Nanna’s Telugu days, Amma’s Tamil days, and the community Holi they go to with friends. They are not the right way, and not how every Telugu or Tamil family does it.',
     },
   },
   {

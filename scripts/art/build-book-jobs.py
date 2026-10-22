@@ -39,6 +39,7 @@ SHEET_CAST = {
     'family': ['Arjun', 'Mia', 'Amma', 'Nanna'],
     'telugu-grandparents': ['Nanamma', 'Arjun', 'Mia', 'Tatayya'],
     'tamil-grandparents': ['Arjun', 'Paati', 'Thatha', 'Mia'],
+    'family-and-tamil-grandparents': ['Arjun', 'Nanna', 'Amma', 'Paati', 'Thatha', 'Mia'],
     'friends': ['Arjun', 'Zoe', 'Ben'],
 }
 
@@ -46,6 +47,8 @@ CAST_SHEETS = {
     'family': 'public/art/cast/family.png',
     'telugu-grandparents': 'public/art/cast/telugu-grandparents.png',
     'tamil-grandparents': 'public/art/cast/tamil-grandparents.png',
+    # Composed from the family and Tamil grandparents sheets by .redesign/v3/compose-cast.py.
+    'family-and-tamil-grandparents': 'public/art/cast/family-and-tamil-grandparents.png',
     'friends': 'public/art/cast/friends.png',
 }
 

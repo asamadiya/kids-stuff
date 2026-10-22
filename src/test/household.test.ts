@@ -11,7 +11,7 @@ import { BOOKS } from '../books/registry';
  * in the picture prompts the art is made from.
  */
 
-const OLD = /\b(Mummy|Papa|Dadi|Dada|Nani|Jaipur|Rajasthan|Rajasthani)\b/;
+const OLD = /\b(Mummy|Papa|Dadi|Dada|Nani|Jaipur|Rajasthan|Rajasthani)\b|Hindi-speaking family/;
 
 const filesUnder = (dir: string, ext: RegExp): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
@@ -20,6 +20,9 @@ const filesUnder = (dir: string, ext: RegExp): string[] =>
 
 const CONTENT = [
   ...filesUnder('src/books/data', /\.ts$/),
+  'src/books/registry.ts',
+  'src/learn/catalog.ts',
+  'src/learn/screens.tsx',
   ...filesUnder('src/make', /\.ts$/),
   ...filesUnder('src/together', /\.tsx?$/),
   ...filesUnder('src/sel', /\.ts$/),
@@ -38,7 +41,7 @@ describe('the household', () => {
   });
 
   it('casts every family book from the new sheets', () => {
-    for (const b of BOOKS) if (b.cast) expect(['family', 'telugu-grandparents', 'tamil-grandparents', 'friends'], b.slug).toContain(b.cast);
+    for (const b of BOOKS) if (b.cast) expect(['family', 'telugu-grandparents', 'tamil-grandparents', 'family-and-tamil-grandparents', 'friends'], b.slug).toContain(b.cast);
   });
 
   it('has Mia call her brother "anna" somewhere in the family books, and nobody call her "Mia akka" or similar', () => {
