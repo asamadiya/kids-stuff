@@ -7,10 +7,11 @@ import type { Moment } from '../types';
  * Every Telugu word is copied from .redesign/v3/research/telugu-words.jsonl
  * and every Tamil word from .redesign/v3/research/tamil-all.jsonl (a headword
  * or a form quoted in its note). Lines of more than one word are composed
- * from those words and say so in their note. The checked lists have no words
- * for "throw", "catch", "turn", "stir", "hot", "careful" or "thank you", so
- * this file does not print them: each card says which words it is missing and
- * leaves the parent to say those in their own way.
+ * from those words and say so in their note. Verbs the first lists lacked
+ * (throw, catch, roll, mix) were checked afterwards against Wiktionary and are
+ * cited in each moment's sources. The checked lists still have no words for
+ * "your turn", "hot", "careful" or "thank you"; the cards say so in Honestly,
+ * and leave those out rather than guess them.
  *
  * Register: grown-ups use the familiar imperative to the children; the
  * children use the familiar form to Amma and Nanna and the respectful form to
@@ -155,6 +156,21 @@ export const MOMENTS: readonly Moment[] = [
         ta: { script: 'பாரு', roman: 'Paaru!', means: 'Look!', note: 'Spoken form; written பார் (paar).' },
       },
       {
+        id: 'play-g5',
+        te: {
+          script: 'పట్టు!',
+          roman: 'Pattu!',
+          means: 'Catch!',
+          note: 'Composed from checked words; have a fluent speaker confirm. పట్టు (pattu) = to hold, grip, catch; the plain imperative, said just as the ball leaves your hand.',
+        },
+        ta: {
+          script: 'பிடி!',
+          roman: 'Pidi!',
+          means: 'Catch!',
+          note: 'Composed from checked words; have a fluent speaker confirm. பிடி (pidi) = to catch, grasp; the plain imperative, said just as the ball leaves your hand.',
+        },
+      },
+      {
         id: 'play-g4',
         te: {
           script: 'నాకు ఇవ్వు',
@@ -182,6 +198,21 @@ export const MOMENTS: readonly Moment[] = [
         ta: { script: 'வா', roman: 'Vaa!', means: 'Come (and play)!' },
       },
       {
+        id: 'play-c4',
+        te: {
+          script: 'విసురు!',
+          roman: 'Visuru!',
+          means: 'Throw it!',
+          note: 'Composed from checked words; have a fluent speaker confirm. విసురు (visuru) = to throw, fling. What he shouts when he is ready to catch.',
+        },
+        ta: {
+          script: 'எறி!',
+          roman: 'Eri!',
+          means: 'Throw it!',
+          note: 'Composed from checked words; have a fluent speaker confirm. எறி (eri) = to throw, fling. What he shouts when he is ready to catch. In everyday speech many families say போடு (podu, put, throw) instead; use whichever Amma says.',
+        },
+      },
+      {
         id: 'play-c3',
         te: {
           script: 'ఇంకొకటి!',
@@ -198,15 +229,15 @@ export const MOMENTS: readonly Moment[] = [
       },
     ],
     note: {
-      what: 'A throwing game with a few fixed words: count to three, name the ball, and ask for it: the grown-up asks for it back, Arjun asks for it and asks for one more go.',
+      what: 'A throwing game with a few fixed words: count to three, name the ball, call "catch!" as it goes, and ask for it: the grown-up asks for it back, Arjun shouts "throw it!", asks for it and asks for one more go.',
       expect:
         'He will probably count along before he says anything else, and may count in English the first few times. "Give it!" is the line most likely to come out on its own, because he wants the ball; "one more" is the one that keeps the game going past three throws.',
       practising:
-        'Counting one to three aloud, and two real requests that get an immediate result: "give it (to me)" and "one more".',
+        'Counting one to three aloud, the two action words of the game (throw, catch), and two real requests that get an immediate result: "give it (to me)" and "one more".',
       ask: 'Hold the ball behind your back and ask which colour it is; take his answer in either language and give the other back.',
       next: 'Count three steps on the stairs, three idlis on a plate or three oranges in the bag, in the same words. Use "Inkokati!" or "Innum onnu!" at the table and on the swing, where it works just as well.',
       honest:
-        'The checked word lists have no words for "throw", "catch", "your turn", "my turn" or "I won", so this card does not print them. "Naaku ivvu" and "Enakku kudu" (give it to me) stand in for taking a turn; say the rest however you say it, in your own words. Counting to three is not counting to ten.',
+        'There is no checked line here for "your turn", "my turn" or "I won", so the card leaves them out rather than guess; "Naaku ivvu" and "Enakku kudu" (give it to me) do the work of taking a turn. Throw and catch are dictionary words, put together here; a fluent speaker should confirm them. Counting to three is not counting to ten.',
       easier: 'For Mia, roll the ball along the grass and say only "Raa!" or "Vaa!" when it reaches her.',
       harder: 'Count to five before each throw (aidu in Telugu, anju in Tamil), or let Arjun do the counting and you do the throwing.',
     },
@@ -217,6 +248,10 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: ఇచ్చు (Telugu, give)', url: 'https://en.wiktionary.org/wiki/ఇచ్చు' },
       { label: 'Wiktionary: తిను (Telugu, eat; inkokka mudda, one more mouthful)', url: 'https://en.wiktionary.org/wiki/తిను' },
       { label: 'Wiktionary: ప్రేమ (Telugu, love; naaku, to me)', url: 'https://en.wiktionary.org/wiki/ప్రేమ' },
+      { label: 'Wiktionary: విసురు (Telugu, throw)', url: 'https://en.wiktionary.org/wiki/విసురు' },
+      { label: 'Wiktionary: పట్టు (Telugu, hold, catch)', url: 'https://en.wiktionary.org/wiki/పట్టు' },
+      { label: 'Wiktionary: எறி (Tamil, throw)', url: 'https://en.wiktionary.org/wiki/%E0%AE%8E%E0%AE%B1%E0%AE%BF' },
+      { label: 'Wiktionary: பிடி (Tamil, catch, grasp)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BF%E0%AE%9F%E0%AE%BF' },
       { label: 'Wiktionary: ஒண்ணு (Tamil, one)', url: 'https://en.wiktionary.org/wiki/%E0%AE%92%E0%AE%A3%E0%AF%8D%E0%AE%A3%E0%AF%81' },
       { label: 'Wiktionary: ரெண்டு (Tamil, two)', url: 'https://en.wiktionary.org/wiki/%E0%AE%B0%E0%AF%86%E0%AE%A3%E0%AF%8D%E0%AE%9F%E0%AF%81' },
       { label: 'Wiktionary: மூணு (Tamil, three)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AE%E0%AF%82%E0%AE%A3%E0%AF%81' },
@@ -356,6 +391,21 @@ export const MOMENTS: readonly Moment[] = [
         },
       },
       {
+        id: 'meals-b-g4',
+        te: {
+          script: 'బాగా కలుపు',
+          roman: 'Baagaa kalupu',
+          means: 'Mix it well',
+          note: 'Composed from checked words; have a fluent speaker confirm. కలుపు (kalupu) = to mix; బాగా (baagaa) = well. Said while he works the curd into the rice with his hand or a spoon.',
+        },
+        ta: {
+          script: 'நல்லா பிசை',
+          roman: 'Nallaa pisai',
+          means: 'Mix it well (with your hand)',
+          note: 'Composed from checked words; have a fluent speaker confirm. பிசை (pisai) = to mix with the fingers, knead, mash, which is how curd rice is mixed by hand; நல்லா (nallaa) = well, spoken form. With a spoon, கலக்கு (kalakku, stir, mix).',
+        },
+      },
+      {
         id: 'meals-b-g3',
         te: {
           script: 'పెరుగన్నం',
@@ -409,7 +459,7 @@ export const MOMENTS: readonly Moment[] = [
       },
     ],
     note: {
-      what: 'Arjun helps make curd rice: he washes his hands, waits on the stool, and mixes curd into rice that has already cooled. He says he is hungry, asks for more curd, and calls a parent to look at what he made.',
+      what: 'Arjun helps make curd rice: he washes his hands, waits on the stool, and mixes curd into rice that has already cooled while the grown-up tells him to mix it well. He says he is hungry, asks for more curd, and calls a parent to look at what he made.',
       expect:
         'He will likely want to do all the mixing himself and spill a little. "Look!" comes out first, because he wants you to see; "hungry" comes when he tastes it.',
       practising:
@@ -417,13 +467,16 @@ export const MOMENTS: readonly Moment[] = [
       ask: 'Before you serve, ask him who should get the first bowl, and take the answer in Telugu, Tamil or English.',
       next: 'At dinner, let him tell the other parent what he made: perugannam to Nanna, thayir saadham to Amma.',
       honest:
-        'The checked word lists have no words for "mix", "stir", "hot" or "careful", so this card does not print them, and the mixing itself goes unnamed. Say those words however you say them; the card is a prompt, not a script. Learning the name of a dish is not learning to talk about cooking.',
+        'There is no checked line here for "hot" or "careful", so the card leaves them out rather than guess; the rice is already cool. "Mix it well" is put together from dictionary words, and a fluent speaker should confirm it. Learning the name of a dish is not learning to talk about cooking.',
       easier: 'For Mia, give her a small bowl and a spoon of her own to mix, and say only "Perugannam" or "Thayir saadham" as she mixes.',
       harder: 'Let Arjun tell Mia "Chetulu kadukko!" or "Kai kazhuvu!" before she gets her spoon.',
       safety:
         'He mixes cooled food only. Keep him and the stool away from the stove, the pressure cooker and its steam, and hot oil; a grown-up does every hot step.',
     },
     sources: [
+      { label: 'Wiktionary: కలుపు (Telugu, mix)', url: 'https://en.wiktionary.org/wiki/కలుపు' },
+      { label: 'Wiktionary: பிசை (Tamil, mix with the fingers, knead)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BF%E0%AE%9A%E0%AF%88' },
+      { label: 'Wiktionary: கலக்கு (Tamil, stir, mix)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AE%B2%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81' },
       { label: 'Wiktionary: కడుగు (Telugu, wash)', url: 'https://en.wiktionary.org/wiki/కడుగు' },
       { label: 'Wiktionary: కూర్చొను (Telugu, sit)', url: 'https://en.wiktionary.org/wiki/కూర్చొను' },
       { label: 'Wiktionary: పెరుగు (Telugu, curd)', url: 'https://en.wiktionary.org/wiki/పెరుగు' },

@@ -500,6 +500,21 @@ export const MOMENTS: readonly Moment[] = [
         },
       },
       {
+        id: 'anna-roll-it-to-me-g5',
+        te: {
+          script: 'మెల్లగా దొర్లించు',
+          roman: 'Mellagaa dorlinchu',
+          means: 'Roll it slowly',
+          note: 'Composed from checked words; have a fluent speaker confirm. దొర్లించు (dorlinchu) = to cause to roll, roll (a ball); మెల్లగా (mellagaa) = slowly. Said to Arjun before he rolls it to Mia.',
+        },
+        ta: {
+          script: 'மெதுவா உருட்டு',
+          roman: 'Medhuvaa uruttu',
+          means: 'Roll it slowly',
+          note: 'Composed from checked words; have a fluent speaker confirm. உருட்டு (uruttu) = to roll; மெதுவா (medhuvaa) = slowly, spoken form of மெதுவாக (medhuvaaga). Said to Arjun before he rolls it to Mia.',
+        },
+      },
+      {
         id: 'anna-roll-it-to-me-g3',
         te: {
           script: 'చూడు! బంతి!',
@@ -539,13 +554,13 @@ export const MOMENTS: readonly Moment[] = [
           script: 'ఇవ్వు!',
           roman: 'Ivvu!',
           means: 'Give it to me!',
-          note: 'Mia\'s line. ఇవ్వు (ivvu) = give, one word, with her open hands doing the rest; a two-year-old asks for the ball this way. Neither checked list has a word for rolling or for throwing, so the ask is simply "give". The respectful ఇవ్వండి (ivvandi) comes years later.',
+          note: 'Mia\'s line. ఇవ్వు (ivvu) = give, one word, with her open hands doing the rest; a two-year-old asks for the ball this way. At two, "give" is the whole request; "roll it" is a grown-up\'s line on this card. The respectful ఇవ్వండి (ivvandi) comes years later.',
         },
         ta: {
           script: 'குடு!',
           roman: 'Kudu!',
           means: 'Give it to me!',
-          note: 'Mia\'s line. குடு (kudu) = give, written கொடு (kodu), one word, with her open hands doing the rest. Neither checked list has a word for rolling or for throwing, so the ask is simply "give".',
+          note: 'Mia\'s line. குடு (kudu) = give, written கொடு (kodu), one word, with her open hands doing the rest. At two, "give" is the whole request; "roll it" is a grown-up\'s line on this card.',
         },
       },
       {
@@ -565,7 +580,7 @@ export const MOMENTS: readonly Moment[] = [
       },
     ],
     note: {
-      what: 'Rolling a ball between brother and sister on the lawn. Mia calls him "anna" and asks for the ball; he calls her over with it; the grown-up asks him to give it to Mia, by name, and points out the ball when it arrives.',
+      what: 'Rolling a ball between brother and sister on the lawn. Mia calls him "anna" and asks for the ball; he calls her over with it; the grown-up asks him to roll it slowly and give it to Mia, by name, and points out the ball when it arrives.',
       expect:
         'Mia may say "anna" or "annaa" long before any other word here, and may run off with the ball instead of rolling it back; that is her game, not a mistake. Arjun may roll too fast at first. He is likely to answer her in English, and that is fine between the two of them.',
       practising:
@@ -573,12 +588,14 @@ export const MOMENTS: readonly Moment[] = [
       ask: 'When the ball reaches Mia, ask Arjun in your language what his sister did. Any answer, in any language, gets "Choodu! Banti!" or "Paaru! Pandhu!" and a cheer.',
       next: 'Give Arjun the job of teaching Mia one word a day, in Nanna\'s or Amma\'s language, at the same time, for example at the front door: "raa" or "vaa". Big-brother jobs are likely to keep him using the word.',
       honest:
-        'Mia saying "anna" shows she has a name for her brother, not that she is learning Telugu or Tamil. Neither checked word list has a word for rolling, throwing or catching, so the game runs on "give it" and "come"; say the rest in your own words, however you say them. Between themselves the two of them will probably speak English most of the time; the research does not say this needs correcting. Each parent\'s own time with Mia, in their language, matters more.',
+        'Mia saying "anna" shows she has a name for her brother, not that she is learning Telugu or Tamil. "Roll it slowly" is put together from dictionary words, and a fluent speaker should confirm it. Between themselves the two of them will probably speak English most of the time; the research does not say this needs correcting. Each parent\'s own time with Mia, in their language, matters more.',
       easier: 'For Mia: sit facing her with legs apart, roll the ball into the space between her legs, and say "Anna!" each time Arjun rolls it.',
       harder: 'Arjun counts each roll aloud in your language, okati, rendu, moodu or onnu, rendu, moonu, and they try to reach ten without the ball leaving the lawn.',
       safety: 'Use a big, soft ball and roll it, never throw it at Mia\'s face. Keep the game on the grass, away from the raised beds\' edges.',
     },
     sources: [
+      { label: 'Wiktionary: దొరలించు (Telugu, to cause to roll; also దొర్లించు)', url: 'https://en.wiktionary.org/wiki/దొరలించు' },
+      { label: 'Wiktionary: உருட்டு (Tamil, to roll)', url: 'https://en.wiktionary.org/wiki/%E0%AE%89%E0%AE%B0%E0%AF%81%E0%AE%9F%E0%AF%8D%E0%AE%9F%E0%AF%81' },
       { label: 'Wiktionary: చెల్లి (chelli, little sister)', url: 'https://en.wiktionary.org/wiki/చెల్లి' },
       { label: 'Wiktionary: ఇచ్చు (ivvu, give)', url: 'https://en.wiktionary.org/wiki/ఇచ్చు' },
       { label: 'Wiktionary: చూడు (choodu, look)', url: 'https://en.wiktionary.org/wiki/చూడు' },
