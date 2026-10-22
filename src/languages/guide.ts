@@ -5,12 +5,17 @@ import type { Source } from '../learn/sources';
  * The grown-ups guide for Telugu & Tamil (advisor q8 ruling E: "ship with the
  * first release"), written to Amma and Nanna from
  * .redesign/v3/research/heritage-research.md and games-and-community.jsonl,
- * with ruling E's corrections: no validated universal exposure threshold,
+ * Order (the design review, 2026-10-22): the phone must open with something
+ * a parent can do today, so "Start today" leads and the evidence section
+ * runs last. Every qualification and source from the earlier order is kept.
+ * Ruling E's corrections hold throughout: no validated universal exposure threshold,
  * never pretend not to understand, never make speaking the price of
  * attention, "Who said it?" is not a language test, and the parents need not
  * police their own English.
  */
 export interface GuideSection {
+  /** A short stable anchor, so a link to a section survives reordering. */
+  readonly id?: string;
   readonly title: string;
   readonly body: readonly string[];
 }
@@ -21,35 +26,27 @@ export const GUIDE: {
   readonly sources: readonly Source[];
 } = {
   note: {
-    what: 'A guide for Amma and Nanna on keeping Telugu and Tamil going beside English: what the research does and does not say, who speaks what, what to do when Arjun answers in English, how Mia fits in, grandparents, books and screens, Bay Area classes, and your recordings.',
-    expect: 'About a fifteen-minute read. The first section is the evidence, with its limits; the rest is practical. Nothing here is a rule you can fail, and you do not need to do all of it.',
+    what: 'A guide for Amma and Nanna on keeping Telugu and Tamil going beside English: what to start today, what to do when Arjun answers in English, who speaks what, how Mia fits in, grandparents, books and screens, Bay Area classes, your recordings, and last of all what the research does and does not say.',
+    expect: 'About a fifteen-minute read, but the first section is the only part you need today. The rest fills in the detail, and the evidence, with its limits, is at the end. Nothing here is a rule you can fail, and you do not need to do all of it.',
     practising: 'Nothing for the children: this page is for you. The aim is more warm, ordinary conversation in Telugu and Tamil with Arjun and Mia, not a programme.',
     ask: 'Ask each other: over an ordinary week, when does each child get real back-and-forth talk in Telugu with Nanna, and in Tamil with Amma?',
     next: 'Pick one routine each this week, such as Nanna’s bath time or Amma’s bedtime song, and keep it in your own language.',
-    easier: 'Read only “When he answers in English” today; it is a change that costs no extra time.',
+    easier: 'Read only “Start today”. It is two things, and the second one costs no extra time at all.',
     honest:
       'No study gives this family a formula: almost none looked at two heritage languages with English between the parents. Arjun’s and Mia’s Telugu and Tamil will grow unevenly, and how each turns out is not a verdict on you.',
   },
   sections: [
     {
-      title: 'What the research actually says',
+      id: 'start-today',
+      title: 'Start today',
       body: [
-        'Annick De Houwer’s survey of 1,899 families in Belgium (2007) found that every child spoke the majority language, but not every child spoke the home language, and that “one parent, one language” on its own was neither necessary nor sufficient. Children most often spoke the home language when both parents used it with them and at most one of them also spoke the majority language. Your home has a different shape: each language has one parent, so Nanna’s Telugu and Amma’s Tamil to the children are each that language’s main daily source. De Houwer’s families had one home language each, so her survey cannot predict a home with two. Taken one language at a time, though, the nearest pattern she found (one parent speaks the home language, and both parents also speak the majority language with the child) was the least likely to produce a child who spoke it. That is why the talk aimed at the children matters more than any label for how the family does it.',
-        'How much a child hears a language goes with how much of it they learn (Barbara Pearson’s work, including a study of infants in Miami), and a child’s own talking builds his talking (Erika Hoff’s group). Exposure adds up over the years (Sharon Unsworth’s work on cumulative exposure); in a 2025 study by Pérez-Navarro and Lallier, which followed 71 Basque–Spanish children from four to six, the words children understood in the weaker language caught up by six once enough exposure had built up, while the words they could say still lagged behind. In Hoff’s US studies, time in the home language did not hold children’s English back; school supplied the English.',
-        'A 2025 Montreal study by Sander-Montant, Bissonnette and Byers-Heinlein found that what each parent actually spoke predicted a child’s exposure far better than the family’s named strategy. Mothers’ language counted about twice as much as fathers’, which the authors put down to caregiving time, not to being the mother. For you: whichever of you spends more waking hours with the children will tend to pull that language ahead.',
-        'Now the limits. Almost none of this research looked at a home like yours, with two heritage languages and English between the parents; most of it studied one home language beside one majority language, often Spanish beside English. You will see “20 per cent” or “a quarter of waking hours” quoted as a threshold, but there is no validated universal figure, and no count of minutes guarantees two heritage languages beside English. The plain finding is the useful one: more warm, two-way talk in a language, from more people, over more years, helps.',
+        'Two things, and they are the whole starting plan. The first: one stretch of ten to fifteen minutes a day each, playing or reading in your own language — Nanna in Telugu, Amma in Tamil — plus your own language inside a routine you already do every day. Pick the routine that is already yours: bath, the drive to school, watering the raised beds, breakfast, the bedtime song. Nothing else in this guide matters more than those two slots.',
+        'The second: when Arjun answers you in English, and he will, answer what he MEANT and keep going warmly in your language. He says “I want milk.” Nanna answers “పాలు కావాలా? (paalu kaavaalaa? You want milk?)” and pours it; Amma answers “பால் வேணுமா? (paal venumaa?)” and does the same. Do not pretend not to understand him, do not hold back the milk, the help or your attention until he says it in Telugu or Tamil, and do not make him repeat after you. An English reply or a mixed sentence is not misbehaviour.',
+        'That is a place to begin, not a dose that guarantees anything and not a cap. There is no validated number of minutes, and no percentage of the day, that secures two heritage languages beside English; Telugu and Tamil will also grow at different rates whatever you do, and that is not a verdict on either of you. The sections below fill in the detail — what to do with Mia, grandparents, books and screens, Bay Area classes, your recordings — and the evidence, with its limits, is at the end.',
       ],
     },
     {
-      title: 'Who speaks what',
-      body: [
-        'The default that suits your home is simple: Nanna speaks Telugu to the children and Amma speaks Tamil. It is a default, not a law. Nothing breaks when Nanna reads an English library book at bedtime or Amma answers a question about school in English, and nobody needs to stop mid-sentence to keep a language pure.',
-        'What helps most is your own language in the routines that already happen every day, because they add up without taking extra time. For example, Nanna might take bath time, the drive to school and watering the raised beds in Telugu; Amma breakfast, getting dressed and the bedtime song in Tamil. Choose the ones each of you actually does.',
-        'Your English with each other is yours. You do not need to police it or engineer a ratio for your marriage; the children will hear plenty of English whatever you do. What matters more is the talk aimed at them, so when you notice you are speaking English to Arjun or Mia out of habit rather than need, that is the easy place to move a few sentences into Telugu or Tamil.',
-        'Your ordinary everyday Telugu and Tamil, mixed words and all, is good input for them; it does not have to sound like a textbook. When Nanna speaks Telugu to Amma, the children see it is a real grown-up language and not only a children’s one. And if Amma tries a Telugu word back now and then, or Nanna a Tamil one, they see that trying each other’s language is fun.',
-      ],
-    },
-    {
+      id: 'answering-in-english',
       title: 'When he answers in English',
       body: [
         'Arjun will often answer your Telugu or Tamil in English. That is expected at five: English is the language of school and friends, and he is reaching for his strongest words. It is not rudeness and it is not refusal. What makes a difference is your next turn.',
@@ -59,6 +56,17 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'who-speaks-what',
+      title: 'Who speaks what',
+      body: [
+        'The default that suits your home is simple: Nanna speaks Telugu to the children and Amma speaks Tamil. It is a default, not a law. Nothing breaks when Nanna reads an English library book at bedtime or Amma answers a question about school in English, and nobody needs to stop mid-sentence to keep a language pure.',
+        'What helps most is your own language in the routines that already happen every day, because they add up without taking extra time. For example, Nanna might take bath time, the drive to school and watering the raised beds in Telugu; Amma breakfast, getting dressed and the bedtime song in Tamil. Choose the ones each of you actually does.',
+        'Your English with each other is yours. You do not need to police it or engineer a ratio for your marriage; the children will hear plenty of English whatever you do. What matters more is the talk aimed at them, so when you notice you are speaking English to Arjun or Mia out of habit rather than need, that is the easy place to move a few sentences into Telugu or Tamil.',
+        'Your ordinary everyday Telugu and Tamil, mixed words and all, is good input for them; it does not have to sound like a textbook. When Nanna speaks Telugu to Amma, the children see it is a real grown-up language and not only a children’s one. And if Amma tries a Telugu word back now and then, or Nanna a Tamil one, they see that trying each other’s language is fun.',
+      ],
+    },
+    {
+      id: 'making-time',
       title: 'Making time without making a chore',
       body: [
         'A practical starting point: one enjoyable stretch of ten to fifteen minutes a day for each of you, playing or reading in your own language, plus your language in a few routines you already do. That is somewhere to begin, not a dose that guarantees anything and not a ceiling. Some days it will be more and some days nothing; the weeks add up.',
@@ -68,6 +76,7 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'mia-at-two',
       title: 'Mia, at two',
       body: [
         'Mia is learning in a different way from her brother. At two, she learns from songs with actions, from gestures, from being handed the thing you are naming, and from the same short routine done the same way every day: shoes on, bath, the goodnight song.',
@@ -77,6 +86,7 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'grandparents',
       title: 'Nanamma, Tatayya, Paati and Thatha',
       body: [
         'The grandparents are a second voice for each language, and different people saying it matters: in toddler studies, hearing a language from more speakers went with knowing more of it. When Nanamma and Tatayya or Paati and Thatha stay for a few weeks, the house fills with Telugu or Tamil in a way no plan could manage.',
@@ -86,6 +96,7 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'books-and-screens',
       title: 'Books, songs and screens',
       body: [
         'Picture books in Telugu and Tamil help most when shared: you on the sofa with one child on each side, talking about the pictures, pausing to let them point. You do not have to read the printed words exactly; telling the story in your everyday speech is fine. The Santa Clara County and Alameda County libraries both keep Telugu and Tamil children’s books.',
@@ -94,6 +105,7 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'other-speakers',
       title: 'Other speakers, and the Bay Area',
       body: [
         'A language lives longer when it belongs to more than two parents. Children who use a heritage language with friends tend to keep it better, and time with friends in that language is one of the things that tends to fall away as children grow. Other Telugu and Tamil families, aunties and uncles, cousins, a babysitter who speaks one of the languages: each one makes Telugu or Tamil a language for children, not only a parents’ project.',
@@ -103,6 +115,7 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'what-to-expect',
       title: 'What to expect',
       body: [
         'Understanding comes before speaking, often by a long way. Arjun may follow everything Nanna says in Telugu and answer in English for months; Mia may fetch, point and laugh at the right moments long before she says much. That understanding is real progress, and it is the base speaking grows from.',
@@ -112,12 +125,23 @@ export const GUIDE: {
       ],
     },
     {
+      id: 'recording-voices',
       title: 'Recording your voices',
       body: [
         'The speaker buttons in this part play your recordings: Nanna’s Telugu and Amma’s Tamil, or a grandparent’s during a visit. They never play a computer voice. A child who taps a button hears someone they love saying the line, which is the whole point. With no recording, the speaker shows “Say it together” instead, as a reminder for you to say the line yourself.',
         'To record, open For Amma and Nanna, then Record voices, and hold the button for two seconds (so a child is unlikely to open it by accident). Choose Telugu or Tamil, type who is recording, then for each line press Record, speak, press Stop, listen back, and press Save. The first time you press Record, the browser asks to use the microphone. Saving over a line you recorded before asks first, and the old recording stays until the new one is saved. Start with the lines you actually say each day.',
         'Recognising Amma’s voice from Nanna’s is not understanding Tamil or Telugu, so the recordings are not there to test that. They let the children replay the words of a song or a routine, and they let the listening game ask for a word in your voice.',
         'Recordings stay on this device: nothing is uploaded or sent anywhere. Clearing this browser’s site data loses them, and they are not on any other device, so press “Save all to a file” now and then and keep that file somewhere safe and private, as you would family videos; “Load from a file” brings them back, and “Delete all” removes every recording from this device.',
+      ],
+    },
+    {
+      id: 'the-research',
+      title: 'What the research actually says',
+      body: [
+        'Annick De Houwer’s survey of 1,899 families in Belgium (2007) found that every child spoke the majority language, but not every child spoke the home language, and that “one parent, one language” on its own was neither necessary nor sufficient. Children most often spoke the home language when both parents used it with them and at most one of them also spoke the majority language. Your home has a different shape: each language has one parent, so Nanna’s Telugu and Amma’s Tamil to the children are each that language’s main daily source. De Houwer’s families had one home language each, so her survey cannot predict a home with two. Taken one language at a time, though, the nearest pattern she found (one parent speaks the home language, and both parents also speak the majority language with the child) was the least likely to produce a child who spoke it. That is why the talk aimed at the children matters more than any label for how the family does it.',
+        'How much a child hears a language goes with how much of it they learn (Barbara Pearson’s work, including a study of infants in Miami), and a child’s own talking builds his talking (Erika Hoff’s group). Exposure adds up over the years (Sharon Unsworth’s work on cumulative exposure); in a 2025 study by Pérez-Navarro and Lallier, which followed 71 Basque–Spanish children from four to six, the words children understood in the weaker language caught up by six once enough exposure had built up, while the words they could say still lagged behind. In Hoff’s US studies, time in the home language did not hold children’s English back; school supplied the English.',
+        'A 2025 Montreal study by Sander-Montant, Bissonnette and Byers-Heinlein found that what each parent actually spoke predicted a child’s exposure far better than the family’s named strategy. Mothers’ language counted about twice as much as fathers’, which the authors put down to caregiving time, not to being the mother. For you: whichever of you spends more waking hours with the children will tend to pull that language ahead.',
+        'Now the limits. Almost none of this research looked at a home like yours, with two heritage languages and English between the parents; most of it studied one home language beside one majority language, often Spanish beside English. You will see “20 per cent” or “a quarter of waking hours” quoted as a threshold, but there is no validated universal figure, and no count of minutes guarantees two heritage languages beside English. The plain finding is the useful one: more warm, two-way talk in a language, from more people, over more years, helps.',
       ],
     },
   ],

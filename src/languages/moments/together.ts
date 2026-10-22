@@ -8,8 +8,17 @@ import type { Moment } from '../types';
  * and every Tamil word from .redesign/v3/research/tamil-all.jsonl (a headword
  * or a form quoted in its note). Lines of more than one word are composed
  * from those words and say so in their note. The checked lists have no words
- * for "turn", "again", "won", "stir", "hot", "careful" or "thank you", so this
- * file does not print them; the notes ask Nanna and Amma to add their own.
+ * for "throw", "catch", "turn", "stir", "hot", "careful" or "thank you", so
+ * this file does not print them: each card says which words it is missing and
+ * leaves the parent to say those in their own way.
+ *
+ * Register: grown-ups use the familiar imperative to the children; the
+ * children use the familiar form to Amma and Nanna and the respectful form to
+ * Nanamma, Tatayya, Paati and Thatha (randi, choodandi; vaanga, paarunga).
+ * A grandparent's NAME never changes with the language toggle: in the Telugu
+ * grandparents' call both languages say Nanamma and Tatayya, and in the Tamil
+ * one both say Paati and Thatha, with the words around them in the language
+ * you chose.
  */
 export const MOMENTS: readonly Moment[] = [
   {
@@ -42,6 +51,21 @@ export const MOMENTS: readonly Moment[] = [
         te: { script: 'కాలు', roman: 'Kaalu', means: 'Leg, foot', note: 'One word for both. Two of them: కాళ్ళు (kaallu).' },
         ta: { script: 'காலு', roman: 'Kaalu', means: 'Leg, foot', note: 'Spoken form; written கால் (kaal). One word for both.' },
       },
+      {
+        id: 'bath-g5',
+        te: {
+          script: 'స్నానం చెయ్యి',
+          roman: 'Snaanam cheyyi',
+          means: 'Have your bath',
+          note: 'The whole phrase is in the checked list: స్నానం (snaanam, bath; written స్నానము) + చెయ్యి (cheyyi, "do!"). Cheyyi also spells the word for hand; what comes before it tells you which. A hair-wash bath is tala snaanam.',
+        },
+        ta: {
+          script: 'குளி',
+          roman: 'Kuli',
+          means: 'Have your bath',
+          note: 'குளி (kuli) is both the bath and "bathe!". It is not a headword in the checked list, which gives it inside thala kuli (a hair-wash bath); Wiktionary has both the noun and the verb. Have Amma confirm that this is what she says, and use her word if it is not.',
+        },
+      },
     ],
     child: [
       {
@@ -56,7 +80,7 @@ export const MOMENTS: readonly Moment[] = [
       },
     ],
     note: {
-      what: 'Bath words: come, then the parts of the body as they get washed. He names a part, or points at yours when he hears its name.',
+      what: 'Bath words: come, the parts of the body as they get washed, and the word for the bath itself. He names a part, or points at yours when he hears its name.',
       expect:
         'He will likely point at the right part before he says any word, and may answer in English ("nose!"). Pointing at Nanna\'s nose instead of his own is the joke that keeps it going.',
       practising:
@@ -64,7 +88,7 @@ export const MOMENTS: readonly Moment[] = [
       ask: 'Touch your own nose and ask him which word Nanna (or Amma) uses for it; whatever language he answers in, say the word back and wash his nose.',
       next: 'At the doctor or while getting dressed, name one body part in Telugu or Tamil and let him touch it.',
       honest:
-        'Naming body parts is vocabulary, not conversation. Nanna can add snaanam cheyyi (have your bath), which is in the checked Telugu list; the checked Tamil list has no single word for a bath, so ask Amma to record her own bath words.',
+        'Naming body parts is vocabulary, not conversation. The Telugu bath phrase, snaanam cheyyi, is in the checked list as it stands; the Tamil kuli is not a headword there, only part of thala kuli, so Amma should say whether it is her word before anyone records it. If she says it another way, hers is the right one.',
       easier: 'For Mia, do only "mukku" or "mookku" and touch her nose each time; she will touch yours back.',
       harder: 'Let Arjun be the one who calls out the next part, in Telugu or Tamil, and you wash it.',
       safety: 'Stay within arm\'s reach for the whole bath, and test the water with your wrist before he gets in.',
@@ -83,12 +107,13 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: கால் (Tamil, leg)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AE%BE%E0%AE%B2%E0%AF%8D' },
       { label: 'Wiktionary: மூக்கு (Tamil, nose)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AE%E0%AF%82%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81' },
       { label: 'Wiktionary: தண்ணி (Tamil, water)', url: 'https://en.wiktionary.org/wiki/%E0%AE%A4%E0%AE%A3%E0%AF%8D%E0%AE%A3%E0%AE%BF' },
+      { label: 'Wiktionary: குளி (Tamil, bathe; a bath)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AF%81%E0%AE%B3%E0%AE%BF' },
     ],
   },
   {
     id: 'play',
-    title: 'One, Two, Three, Throw!',
-    hook: 'A ball game in the backyard: count, throw, and ask for it back.',
+    title: 'One, Two, Three, and Again!',
+    hook: 'A ball game in the backyard: count to three, ask for the ball, and ask for one more go.',
     when: 'play',
     picture:
       'Arjun throws a red ball underarm across the backyard lawn towards Amma, who crouches on the grass with both hands out to catch it, while Mia, standing beside Amma, claps and laughs; raised vegetable beds and the wooden fence behind them. Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun\'s head about level with Mia\'s, sitting on his heels lower.',
@@ -129,6 +154,21 @@ export const MOMENTS: readonly Moment[] = [
         te: { script: 'చూడు', roman: 'Choodu!', means: 'Look!', note: 'Doubled for excitement: "Choodu, choodu!"' },
         ta: { script: 'பாரு', roman: 'Paaru!', means: 'Look!', note: 'Spoken form; written பார் (paar).' },
       },
+      {
+        id: 'play-g4',
+        te: {
+          script: 'నాకు ఇవ్వు',
+          roman: 'Naaku ivvu',
+          means: 'Give it to me',
+          note: 'Composed from checked words; have a fluent speaker confirm. నాకు (naaku) = to me, quoted in the research\'s note on prema ("naaku nuvvu chaala ishtam"); ఇవ్వు (ivvu) = give. This is as near as the checked words get to "my turn", which neither list has.',
+        },
+        ta: {
+          script: 'எனக்கு குடு',
+          roman: 'Enakku kudu',
+          means: 'Give it to me',
+          note: 'Composed from checked words; have a fluent speaker confirm. எனக்கு (enakku) = to me, the -ukku ending in the checked rhymes ("enakke", just for me; "ungalukkum", to you too); குடு (kudu) = give, written கொடு (kodu). This is as near as the checked words get to "my turn", which neither list has.',
+        },
+      },
     ],
     child: [
       {
@@ -141,17 +181,32 @@ export const MOMENTS: readonly Moment[] = [
         te: { script: 'రా', roman: 'Raa!', means: 'Come (and play)!' },
         ta: { script: 'வா', roman: 'Vaa!', means: 'Come (and play)!' },
       },
+      {
+        id: 'play-c3',
+        te: {
+          script: 'ఇంకొకటి!',
+          roman: 'Inkokati!',
+          means: 'One more!',
+          note: 'Composed from checked words; have a fluent speaker confirm. ఇంకొకటి = ఇంక (inka, more) + ఒకటి (okati, one). The research quotes the coaxing "tinu, tinu, inkokka mudda" (eat, one more mouthful), where inkokka is the same word before a noun. The line a game runs on: one more go.',
+        },
+        ta: {
+          script: 'இன்னும் ஒண்ணு!',
+          roman: 'Innum onnu!',
+          means: 'One more!',
+          note: 'From the checked rhymes: Valliappa\'s dosa song has இன்னும் ஒன்று (innum ondru, one more), and written ondru is spoken onnu. The line a game runs on: one more go.',
+        },
+      },
     ],
     note: {
-      what: 'A throwing game with a few fixed words: count to three, name the ball, throw, and ask for it back. Arjun can call a parent over and demand the ball in Telugu or Tamil.',
+      what: 'A throwing game with a few fixed words: count to three, name the ball, and ask for it: the grown-up asks for it back, Arjun asks for it and asks for one more go.',
       expect:
-        'He will probably count along before he says anything else, and may count in English the first few times. "Give it!" is the line most likely to come out on its own, because he wants the ball.',
+        'He will probably count along before he says anything else, and may count in English the first few times. "Give it!" is the line most likely to come out on its own, because he wants the ball; "one more" is the one that keeps the game going past three throws.',
       practising:
-        'Counting one to three aloud and making a real request ("give it!") that gets an immediate result.',
+        'Counting one to three aloud, and two real requests that get an immediate result: "give it (to me)" and "one more".',
       ask: 'Hold the ball behind your back and ask which colour it is; take his answer in either language and give the other back.',
-      next: 'Count three steps on the stairs, three idlis on a plate or three oranges in the bag, in the same words.',
+      next: 'Count three steps on the stairs, three idlis on a plate or three oranges in the bag, in the same words. Use "Inkokati!" or "Innum onnu!" at the table and on the swing, where it works just as well.',
       honest:
-        'The checked word lists have no words yet for "your turn", "my turn", "again" or "I won", so this card does not print them. Those are exactly the words a game needs: Nanna and Amma, record the ones you actually say and add them. Counting to three is not counting to ten.',
+        'The checked word lists have no words for "throw", "catch", "your turn", "my turn" or "I won", so this card does not print them. "Naaku ivvu" and "Enakku kudu" (give it to me) stand in for taking a turn; say the rest however you say it, in your own words. Counting to three is not counting to ten.',
       easier: 'For Mia, roll the ball along the grass and say only "Raa!" or "Vaa!" when it reaches her.',
       harder: 'Count to five before each throw (aidu in Telugu, anju in Tamil), or let Arjun do the counting and you do the throwing.',
     },
@@ -160,6 +215,8 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: ఎరుపు (Telugu, red)', url: 'https://en.wiktionary.org/wiki/ఎరుపు' },
       { label: 'Wiktionary: చూడు (Telugu, look)', url: 'https://en.wiktionary.org/wiki/చూడు' },
       { label: 'Wiktionary: ఇచ్చు (Telugu, give)', url: 'https://en.wiktionary.org/wiki/ఇచ్చు' },
+      { label: 'Wiktionary: తిను (Telugu, eat; inkokka mudda, one more mouthful)', url: 'https://en.wiktionary.org/wiki/తిను' },
+      { label: 'Wiktionary: ప్రేమ (Telugu, love; naaku, to me)', url: 'https://en.wiktionary.org/wiki/ప్రేమ' },
       { label: 'Wiktionary: ஒண்ணு (Tamil, one)', url: 'https://en.wiktionary.org/wiki/%E0%AE%92%E0%AE%A3%E0%AF%8D%E0%AE%A3%E0%AF%81' },
       { label: 'Wiktionary: ரெண்டு (Tamil, two)', url: 'https://en.wiktionary.org/wiki/%E0%AE%B0%E0%AF%86%E0%AE%A3%E0%AF%8D%E0%AE%9F%E0%AF%81' },
       { label: 'Wiktionary: மூணு (Tamil, three)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AE%E0%AF%82%E0%AE%A3%E0%AF%81' },
@@ -167,6 +224,7 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: பந்து (Tamil, ball)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AF%81' },
       { label: 'Tamil Wiktionary: பாரு (look)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BE%E0%AE%B0%E0%AF%81' },
       { label: 'Tamil Wiktionary: குடு (give)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%95%E0%AF%81%E0%AE%9F%E0%AF%81' },
+      { label: 'Tamil Wikisource: Azha. Valliappa, Chinnanjiru paadalgal (innum ondru, one more; enakke, just for me)', url: 'https://ta.wikisource.org/wiki/சின்னஞ்சிறு_பாடல்கள்' },
     ],
   },
   {
@@ -325,26 +383,41 @@ export const MOMENTS: readonly Moment[] = [
           script: 'నాన్న, చూడు!',
           roman: 'Naanna, choodu!',
           means: 'Look, Nanna!',
-          note: 'Composed from checked words; have a fluent speaker confirm. naanna (Dad; calling him, often stretched to "Naannaa!") + choodu (look). In Telugu he is talking to Nanna.',
+          note: 'Composed from checked words; have a fluent speaker confirm. naanna (Dad; calling him, often stretched to "Naannaa!") + choodu (look), the familiar form this family keeps for Amma and Nanna; to a grandparent he says choodandi. In Telugu he is talking to Nanna.',
         },
         ta: {
           script: 'அம்மா, பாரு!',
           roman: 'Amma, paaru!',
           means: 'Look, Amma!',
-          note: 'Composed from checked words; have a fluent speaker confirm. amma (Mom) + paaru (look; written பார், paar). In Tamil he is talking to Amma.',
+          note: 'Composed from checked words; have a fluent speaker confirm. amma (Mom) + paaru (look; written பார், paar), the familiar form kept for Amma and Nanna; to a grandparent he says paarunga. In Tamil he is talking to Amma.',
+        },
+      },
+      {
+        id: 'meals-b-c3',
+        te: {
+          script: 'పెరుగు ఇవ్వు',
+          roman: 'Perugu ivvu',
+          means: 'Give me some curd',
+          note: 'Composed from checked words; have a fluent speaker confirm. పెరుగు (perugu) = curd; ఇవ్వు (ivvu) = give. What he says when the bowl needs more curd, which is the one thing he really wants to ask for while he is mixing.',
+        },
+        ta: {
+          script: 'தயிரு குடு',
+          roman: 'Thayiru kudu',
+          means: 'Give me some curd',
+          note: 'Composed from checked words; have a fluent speaker confirm. தயிரு (thayiru) = curd, written தயிர் (thayir); குடு (kudu) = give, written கொடு (kodu). What he says when the bowl needs more curd.',
         },
       },
     ],
     note: {
-      what: 'Arjun helps make curd rice: he washes his hands, waits on the stool, and mixes curd into rice that has already cooled. He says he is hungry and calls a parent to look at what he made.',
+      what: 'Arjun helps make curd rice: he washes his hands, waits on the stool, and mixes curd into rice that has already cooled. He says he is hungry, asks for more curd, and calls a parent to look at what he made.',
       expect:
         'He will likely want to do all the mixing himself and spill a little. "Look!" comes out first, because he wants you to see; "hungry" comes when he tastes it.',
       practising:
-        'Following two short instructions he hears every day (wash, sit) and naming the dish he made, so the word is attached to his own work.',
+        'Following two short instructions he hears every day (wash, sit), asking for the next thing he needs, and naming the dish he made, so the word is attached to his own work.',
       ask: 'Before you serve, ask him who should get the first bowl, and take the answer in Telugu, Tamil or English.',
       next: 'At dinner, let him tell the other parent what he made: perugannam to Nanna, thayir saadham to Amma.',
       honest:
-        'The checked word lists have no words for "stir", "hot" or "careful", so this card does not print them; Nanna and Amma, record the ones you really say. Learning the name of a dish is not learning to talk about cooking.',
+        'The checked word lists have no words for "mix", "stir", "hot" or "careful", so this card does not print them, and the mixing itself goes unnamed. Say those words however you say them; the card is a prompt, not a script. Learning the name of a dish is not learning to talk about cooking.',
       easier: 'For Mia, give her a small bowl and a spoon of her own to mix, and say only "Perugannam" or "Thayir saadham" as she mixes.',
       harder: 'Let Arjun tell Mia "Chetulu kadukko!" or "Kai kazhuvu!" before she gets her spoon.',
       safety:
@@ -357,12 +430,14 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: అన్నము (Telugu, rice)', url: 'https://en.wiktionary.org/wiki/అన్నము' },
       { label: 'Wiktionary: ఆకలి (Telugu, hunger)', url: 'https://en.wiktionary.org/wiki/ఆకలి' },
       { label: 'Wiktionary: నాన్న (Telugu, father)', url: 'https://en.wiktionary.org/wiki/నాన్న' },
+      { label: 'Wiktionary: ఇచ్చు (Telugu, give)', url: 'https://en.wiktionary.org/wiki/ఇచ్చు' },
       { label: 'Wiktionary: கை (Tamil, hand)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AF%88' },
       { label: 'Wiktionary: உட்கார் (Tamil, sit)', url: 'https://en.wiktionary.org/wiki/%E0%AE%89%E0%AE%9F%E0%AF%8D%E0%AE%95%E0%AE%BE%E0%AE%B0%E0%AF%8D' },
       { label: 'Wiktionary: தயிர் (Tamil, curd)', url: 'https://en.wiktionary.org/wiki/%E0%AE%A4%E0%AE%AF%E0%AE%BF%E0%AE%B0%E0%AF%8D' },
       { label: 'Wiktionary: சாதம் (Tamil, cooked rice)', url: 'https://en.wiktionary.org/wiki/%E0%AE%9A%E0%AE%BE%E0%AE%A4%E0%AE%AE%E0%AF%8D' },
       { label: 'Wiktionary: பசி (Tamil, hunger)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%9A%E0%AE%BF' },
       { label: 'Wiktionary: அம்மா (Tamil, mother)', url: 'https://en.wiktionary.org/wiki/%E0%AE%85%E0%AE%AE%E0%AF%8D%E0%AE%AE%E0%AE%BE' },
+      { label: 'Tamil Wiktionary: குடு (Tamil, give)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%95%E0%AF%81%E0%AE%9F%E0%AF%81' },
     ],
   },
   {
@@ -378,21 +453,21 @@ export const MOMENTS: readonly Moment[] = [
         id: 'grandparents-te-g1',
         te: {
           script: 'నాన్నమ్మ',
-          roman: 'Naannamma',
+          roman: 'Nanamma',
           means: 'Grandma (Nanna\'s mother)',
-          note: 'Literally father\'s mother. Many families say నాయనమ్మ (naayanamma) or బామ్మ (baamma); use what Nanna\'s family says.',
+          note: 'Literally father\'s mother. Many families say నాయనమ్మ (naayanamma) or బామ్మ (baamma); use what Nanna\'s family says. The romanisation with both long vowels is naannamma; this family writes her Nanamma.',
         },
         ta: {
-          script: 'பாட்டி',
-          roman: 'Paati',
-          means: 'Grandma',
-          note: 'The everyday Tamil word for a grandmother. In this family the children say Paati to Amma\'s mother; Nanna\'s mother stays Nanamma in any language.',
+          script: 'நான்னம்மா',
+          roman: 'Nanamma',
+          means: 'Grandma (Nanna\'s mother)',
+          note: 'The same grandmother, the same name: a name does not change when you change language, so in Tamil she is still Nanamma, written in Tamil letters. She is not Paati; Paati is Amma\'s mother. Have a fluent speaker confirm the spelling.',
         },
       },
       {
         id: 'grandparents-te-g2',
-        te: { script: 'తాతయ్య', roman: 'Taatayya', means: 'Grandpa', note: 'The respectful, affectionate form of తాత (taata). The same word serves for both grandfathers.' },
-        ta: { script: 'தாத்தா', roman: 'Thatha', means: 'Grandpa', note: 'Same spoken and written.' },
+        te: { script: 'తాతయ్య', roman: 'Tatayya', means: 'Grandpa (Nanna\'s father)', note: 'The respectful, affectionate form of తాత (taata), romanised in full taatayya; this family writes him Tatayya.' },
+        ta: { script: 'தாதய்யா', roman: 'Tatayya', means: 'Grandpa (Nanna\'s father)', note: 'The same grandfather, the same name, written in Tamil letters. He is not Thatha; Thatha is Amma\'s father. Have a fluent speaker confirm the spelling.' },
       },
       {
         id: 'grandparents-te-g3',
@@ -402,42 +477,42 @@ export const MOMENTS: readonly Moment[] = [
     ],
     child: [
       {
-        id: 'grandparents-te-c1',
+        id: 'grandparents-te-c3',
         te: {
           script: 'నాన్నమ్మ, చూడండి! ఎర్ర బంతి!',
-          roman: 'Naannamma, choodandi! Erra banti!',
-          means: 'Look, Grandma! A red ball!',
-          note: 'Composed from checked words; have a fluent speaker confirm. naannamma (Grandma) + choodandi (look, the polite form used to elders) + erra (red) + banti (ball).',
+          roman: 'Nanamma, choodandi! Erra banti!',
+          means: 'Look, Nanamma! A red ball!',
+          note: 'Composed from checked words; have a fluent speaker confirm. Nanamma + చూడండి (choodandi, the respectful form of choodu, which this family keeps for grandparents) + erra (red) + banti (ball).',
         },
         ta: {
-          script: 'பாட்டி, பாரு! சிவப்பு பந்து!',
-          roman: 'Paati, paaru! Sivappu pandhu!',
-          means: 'Look, Grandma! A red ball!',
-          note: 'Composed from checked words; have a fluent speaker confirm. paati (Grandma) + paaru (look) + sivappu (red) + pandhu (ball). Many families add the respectful -unga ending when a child speaks to a grandparent (paarunga); that form is not in the checked list, so ask Amma.',
+          script: 'நான்னம்மா, பாருங்க! சிவப்பு பந்து!',
+          roman: 'Nanamma, paarunga! Sivappu pandhu!',
+          means: 'Look, Nanamma! A red ball!',
+          note: 'Composed from checked words; have a fluent speaker confirm. Her name stays Nanamma in Tamil too. பாருங்க (paarunga) is the respectful form of paaru: the checked list\'s key says the polite ending -ungal is spoken -unga. Have Amma confirm both the ending and the spelling of the name.',
         },
       },
       {
-        id: 'grandparents-te-c2',
+        id: 'grandparents-te-c4',
         te: {
           script: 'తాతయ్య, రండి!',
-          roman: 'Taatayya, randi!',
-          means: 'Come, Grandpa! (come and visit)',
-          note: 'Composed from checked words; have a fluent speaker confirm. taatayya (Grandpa) + randi (come, the polite form a child uses to an elder).',
+          roman: 'Tatayya, randi!',
+          means: 'Come, Tatayya! (come and visit)',
+          note: 'Composed from checked words; have a fluent speaker confirm. Tatayya + రండి (randi), the respectful form of raa, which the research gives for a child speaking to an elder.',
         },
         ta: {
-          script: 'தாத்தா, வா!',
-          roman: 'Thatha, vaa!',
-          means: 'Come, Grandpa! (come and visit)',
-          note: 'Composed from checked words; have a fluent speaker confirm. thatha (Grandpa) + vaa (come). The respectful form (vaanga) is not in the checked list; ask Amma which her family uses.',
+          script: 'தாதய்யா, வாங்க!',
+          roman: 'Tatayya, vaanga!',
+          means: 'Come, Tatayya! (come and visit)',
+          note: 'Composed from checked words; have a fluent speaker confirm. His name stays Tatayya in Tamil too. வாங்க (vaanga) is the respectful "come": the checked mango rhyme prints வாருங்கள் (vaarungal), the list\'s key makes that vaarunga in speech, and Chennai speech shortens it again to vaanga. Have Amma confirm which she says.',
         },
       },
     ],
     note: {
-      what: 'A video call with Nanna\'s parents, built around something to show (the red ball) rather than "say something to Nanamma". Nanna sits in, names the grandparents and helps Arjun show and ask.',
+      what: 'A video call with Nanna\'s parents, built around something to show (the red ball) rather than "say something to Nanamma". Nanna sits in, names the grandparents and helps Arjun show and ask. Nanamma and Tatayya keep their names whichever language is showing.',
       expect:
         'He may freeze or clown for the camera, and answer in English. Holding up the ball usually gets him talking; Nanamma and Tatayya asking about it in Telugu keeps it going.',
       practising:
-        'Calling a grandparent by the family word and using the polite verb form (choodandi, randi) that a child uses to elders, inside a real reason to talk.',
+        'Calling a grandparent by name and using the respectful verb form a child uses to elders (choodandi and randi in Telugu, paarunga and vaanga in Tamil), inside a real reason to talk.',
       ask: 'After the call, ask him what Tatayya said about the ball, and let him tell you in any language.',
       next: 'Before the next call, let him choose one thing to show: a lemon from the tree, a drawing, a new book. Tell the grandparents in advance so they can ask about it in Telugu.',
       honest:
@@ -453,8 +528,13 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: చూడు (Telugu, look; choodandi)', url: 'https://en.wiktionary.org/wiki/చూడు' },
       { label: 'Wiktionary: రా (Telugu, come; randi)', url: 'https://en.wiktionary.org/wiki/రా' },
       { label: 'Wiktionary: ఎరుపు (Telugu, red)', url: 'https://en.wiktionary.org/wiki/ఎరుపు' },
-      { label: 'Wiktionary: பாட்டி (Tamil, grandmother)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BE%E0%AE%9F%E0%AF%8D%E0%AE%9F%E0%AE%BF' },
-      { label: 'Wiktionary: தாத்தா (Tamil, grandfather)', url: 'https://en.wiktionary.org/wiki/%E0%AE%A4%E0%AE%BE%E0%AE%A4%E0%AF%8D%E0%AE%A4%E0%AE%BE' },
+      { label: 'Wiktionary: பாட்டி (Tamil, grandmother; the word this family keeps for Amma\'s mother)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BE%E0%AE%9F%E0%AF%8D%E0%AE%9F%E0%AE%BF' },
+      { label: 'Tamil Wiktionary: பாரு (Tamil, look; respectful paarunga)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BE%E0%AE%B0%E0%AF%81' },
+      { label: 'Wiktionary: வா (Tamil, come)', url: 'https://en.wiktionary.org/wiki/%E0%AE%B5%E0%AE%BE' },
+      { label: 'Tamil Wikisource: Azha. Valliappa, Chinnanjiru paadalgal (vaarungal, the respectful "come")', url: 'https://ta.wikisource.org/wiki/சின்னஞ்சிறு_பாடல்கள்' },
+      { label: 'Wiktionary: சிவப்பு (Tamil, red)', url: 'https://en.wiktionary.org/wiki/%E0%AE%9A%E0%AE%BF%E0%AE%B5%E0%AE%AA%E0%AF%8D%E0%AE%AA%E0%AF%81' },
+      { label: 'Wiktionary: பந்து (Tamil, ball)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AF%81' },
+      { label: 'Wiktionary: தாத்தா (Tamil, grandfather; the word this family keeps for Amma\'s father)', url: 'https://en.wiktionary.org/wiki/%E0%AE%A4%E0%AE%BE%E0%AE%A4%E0%AF%8D%E0%AE%A4%E0%AE%BE' },
       { label: 'Wiktionary: கேள் (Tamil, listen)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AF%87%E0%AE%B3%E0%AF%8D' },
       { label: 'Troseth et al. (2018), Let\'s chat: on-screen responsiveness and toddlers\' word learning', url: 'https://www.frontiersin.org/articles/10.3389/fpsyg.2018.02195/pdf' },
     ],
@@ -471,22 +551,22 @@ export const MOMENTS: readonly Moment[] = [
       {
         id: 'grandparents-ta-g1',
         te: {
-          script: 'అమ్మమ్మ',
-          roman: 'Ammamma',
+          script: 'పాట్టి',
+          roman: 'Paati',
           means: 'Grandma (Amma\'s mother)',
-          note: 'Literally mother\'s mother. In this family the children may say Paati to her even in Telugu; follow what she likes.',
+          note: 'The same grandmother, the same name: in Telugu she is still Paati, written in Telugu letters. She is not Ammamma or Nanamma. The Telugu word for Amma\'s mother, అమ్మమ్మ (ammamma), is what another family might use; this one says Paati. Have a fluent speaker confirm the spelling.',
         },
         ta: {
           script: 'பாட்டி',
           roman: 'Paati',
-          means: 'Grandma',
-          note: 'Same spoken and written. Some Tamil families say ammachi or aaya; use what Amma\'s family says.',
+          means: 'Grandma (Amma\'s mother)',
+          note: 'Same spoken and written; the fuller romanisation is paatti. Some Tamil families say ammachi or aaya; use what Amma\'s family says.',
         },
       },
       {
         id: 'grandparents-ta-g2',
-        te: { script: 'తాతయ్య', roman: 'Taatayya', means: 'Grandpa', note: 'Telugu uses the same word for both grandfathers.' },
-        ta: { script: 'தாத்தா', roman: 'Thatha', means: 'Grandpa', note: 'Same spoken and written; also a respectful way to address any elderly man.' },
+        te: { script: 'తాత్తా', roman: 'Thatha', means: 'Grandpa (Amma\'s father)', note: 'The same grandfather, the same name, written in Telugu letters. Telugu has its own near-identical word, తాత (taata), but he is Thatha; Tatayya is Nanna\'s father. Have a fluent speaker confirm the spelling.' },
+        ta: { script: 'தாத்தா', roman: 'Thatha', means: 'Grandpa (Amma\'s father)', note: 'Same spoken and written; also a respectful way to address any elderly man.' },
       },
       {
         id: 'grandparents-ta-g3',
@@ -496,18 +576,18 @@ export const MOMENTS: readonly Moment[] = [
     ],
     child: [
       {
-        id: 'grandparents-ta-c1',
+        id: 'grandparents-ta-c3',
         te: {
-          script: 'అమ్మమ్మ, చూడండి! నిమ్మకాయ!',
-          roman: 'Ammamma, choodandi! Nimmakaaya!',
-          means: 'Look, Grandma! A lemon!',
-          note: 'Composed from checked words; have a fluent speaker confirm. ammamma (Grandma) + choodandi (look, the polite form used to elders) + nimmakaaya (lemon).',
+          script: 'పాట్టి, చూడండి! నిమ్మకాయ!',
+          roman: 'Paati, choodandi! Nimmakaaya!',
+          means: 'Look, Paati! A lemon!',
+          note: 'Composed from checked words; have a fluent speaker confirm. Her name stays Paati in Telugu too + చూడండి (choodandi, the respectful form of choodu, kept for grandparents) + nimmakaaya (lemon).',
         },
         ta: {
-          script: 'பாட்டி, பாரு! எலுமிச்சம்பழம்!',
-          roman: 'Paati, paaru! Elumichampazham!',
-          means: 'Look, Grandma! A lemon!',
-          note: 'Composed from checked words; have a fluent speaker confirm. paati (Grandma) + paaru (look) + elumichampazham (lemon). The respectful paarunga is not in the checked list; ask Amma.',
+          script: 'பாட்டி, பாருங்க! எலுமிச்சம்பழம்!',
+          roman: 'Paati, paarunga! Elumichampazham!',
+          means: 'Look, Paati! A lemon!',
+          note: 'Composed from checked words; have a fluent speaker confirm. paati + பாருங்க (paarunga), the respectful form of paaru: the checked list\'s key says the polite ending -ungal is spoken -unga. Have Amma confirm it.',
         },
       },
       {
@@ -527,11 +607,11 @@ export const MOMENTS: readonly Moment[] = [
       },
     ],
     note: {
-      what: 'A video call with Amma\'s parents around a shared job: Arjun shows them lemons from the backyard tree and counts them with Thatha. Amma sits in, names the grandparents and helps him show and count.',
+      what: 'A video call with Amma\'s parents around a shared job: Arjun shows them lemons from the backyard tree and counts them with Thatha. Amma sits in, names the grandparents and helps him show and count. Paati and Thatha keep their names whichever language is showing.',
       expect:
         'Counting is the easiest way in: he may count along with Thatha before he says anything else. He may lose interest after a minute; a short, happy call beats a long one.',
       practising:
-        'Calling a grandparent by the family word, showing and naming a real object, and counting it out loud with someone who is not a parent.',
+        'Calling a grandparent by name with the respectful verb form (choodandi in Telugu, paarunga in Tamil), showing and naming a real object, and counting it out loud with someone who is not a parent.',
       ask: 'After the call, ask him how many lemons Thatha counted, and let him tell you in any language.',
       next: 'Ask Paati to show something from her side next time (a plant, a kolam at her door, a dish she made) so he gets to ask a question too.',
       honest:
@@ -547,6 +627,7 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: ஒண்ணு (Tamil, one)', url: 'https://en.wiktionary.org/wiki/%E0%AE%92%E0%AE%A3%E0%AF%8D%E0%AE%A3%E0%AF%81' },
       { label: 'Wiktionary: ரெண்டு (Tamil, two)', url: 'https://en.wiktionary.org/wiki/%E0%AE%B0%E0%AF%86%E0%AE%A3%E0%AF%8D%E0%AE%9F%E0%AF%81' },
       { label: 'Wiktionary: மூணு (Tamil, three)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AE%E0%AF%82%E0%AE%A3%E0%AF%81' },
+      { label: 'Wiktionary: அம்மம்மா (Tamil, maternal grandmother; the word another family might use)', url: 'https://en.wiktionary.org/wiki/%E0%AE%85%E0%AE%AE%E0%AF%8D%E0%AE%AE%E0%AE%AE%E0%AF%8D%E0%AE%AE%E0%AE%BE' },
       { label: 'Wiktionary: అమ్మమ్మ (Telugu, maternal grandmother)', url: 'https://en.wiktionary.org/wiki/అమ్మమ్మ' },
       { label: 'Wiktionary: తాత (Telugu, grandfather)', url: 'https://en.wiktionary.org/wiki/తాత' },
       { label: 'Wiktionary: చూడు (Telugu, look; choodandi)', url: 'https://en.wiktionary.org/wiki/చూడు' },
@@ -565,18 +646,18 @@ export const MOMENTS: readonly Moment[] = [
     cast: ['Arjun', 'Mia', 'Nanna'],
     grownUp: [
       {
-        id: 'praise-g1',
+        id: 'praise-g4',
         te: {
-          script: 'చెల్లికి ఇవ్వు',
-          roman: 'Chelliki ivvu',
-          means: 'Give it to your little sister',
-          note: 'Composed from checked words; have a fluent speaker confirm. chelli (little sister) + -ki (to) + ivvu (give). The research quotes this phrase as an example.',
+          script: 'మియాకి ఇవ్వు',
+          roman: 'Mia-ki ivvu',
+          means: 'Give it to Mia',
+          note: 'Composed from checked words; have a fluent speaker confirm. మియా (Mia) + -కి (-ki, to) + ఇవ్వు (ivvu, give). The research quotes the phrase with the word for little sister in it, "chelliki ivvu", and చెల్లి (chelli) is in the picture words; this family uses her name, because a name is the same word in Telugu, Tamil and English. Written out in full, miyaaki ivvu. Neither research file spells a child\'s name, so have a fluent speaker check మియా.',
         },
         ta: {
-          script: 'தங்கச்சிக்கு குடு',
-          roman: 'Thangachikku kudu',
-          means: 'Give it to your little sister',
-          note: 'Composed from checked words; have a fluent speaker confirm. thangachi (little sister, spoken; written தங்கை, thangai) + -kku (to) + kudu (give; written கொடு, kodu).',
+          script: 'மியாவுக்கு குடு',
+          roman: 'Mia-vukku kudu',
+          means: 'Give it to Mia',
+          note: 'Composed from checked words; have a fluent speaker confirm. மியா (Mia) + -வுக்கு (-vukku, to: the -ukku ending with the -v- a name ending in a vowel takes) + குடு (kudu, give; written கொடு, kodu). தங்கச்சி (thangachi, little sister) is in the picture words; this family uses her name. Written out in full, miyaavukku kudu. Have a fluent speaker check மியா.',
         },
       },
       {
@@ -585,13 +666,13 @@ export const MOMENTS: readonly Moment[] = [
           script: 'సంతోషం!',
           roman: 'Santosham!',
           means: 'I\'m so glad!',
-          note: 'Composed from checked words; have a fluent speaker confirm. santosham (happiness, gladness). Said to show pleasure or thanks; the fuller form the research records is "chaala santosham" (I\'m very glad).',
+          note: 'Composed from checked words; have a fluent speaker confirm. సంతోషం (santosham) = happiness, gladness. The research records it being said to show pleasure or thanks ("chaala santosham", I\'m very glad), so it is gladness at what he did, not a word of praise: neither checked list has one for "well done" or "good job". Say yours in your own words.',
         },
         ta: {
           script: 'சந்தோஷம்!',
           roman: 'Santhosham!',
           means: 'I\'m so glad!',
-          note: 'Composed from checked words; have a fluent speaker confirm. santhosham (happiness, gladness), used here as an exclamation.',
+          note: 'The checked Tamil list gives சந்தோஷம் (santhosham) only as the feeling "happy"; using it on its own as an exclamation of pleasure is this guide\'s extension of the Telugu use, so have Amma confirm it before recording, and use her words if she says it another way. Neither checked list has a word for "well done".',
         },
       },
       {
@@ -612,36 +693,36 @@ export const MOMENTS: readonly Moment[] = [
     ],
     child: [
       {
-        id: 'praise-c1',
+        id: 'praise-c3',
         te: {
-          script: 'చెల్లి, రా!',
-          roman: 'Chelli, raa!',
-          means: 'Come on, little sister! (come and play)',
-          note: 'Composed from checked words; have a fluent speaker confirm. chelli (little sister) + raa (come). He may well just say "Mia, raa!", which is fine.',
+          script: 'ఇటు రా!',
+          roman: 'Itu raa!',
+          means: 'Come here!',
+          note: 'A phrase from the checked list: ఇటు (itu, this way) + రా (raa, come). Arjun calling Mia over to play. Say her name with it, "Mia, itu raa!": a name is the same word in Telugu, Tamil and English, so he calls her Mia, not chelli.',
         },
         ta: {
-          script: 'தங்கச்சி, வா!',
-          roman: 'Thangachi, vaa!',
-          means: 'Come on, little sister! (come and play)',
-          note: 'Composed from checked words; have a fluent speaker confirm. thangachi (little sister) + vaa (come). "Mia, vaa!" works as well.',
+          script: 'இங்கே வா!',
+          roman: 'Inge vaa!',
+          means: 'Come here!',
+          note: 'Composed from checked words; have a fluent speaker confirm. இங்கே (inge, here), which the checked mango rhyme uses in "inge odi vaarungal" (come running here), + வா (vaa, come); in quick speech inga vaa. Say her name with it, "Mia, inge vaa!", rather than thangachi.',
         },
       },
       {
         id: 'praise-c2',
         te: { script: 'సంతోషం', roman: 'Santosham!', means: 'Happy!', note: 'He can say it back about himself, or about Mia.' },
-        ta: { script: 'சந்தோஷம்', roman: 'Santhosham!', means: 'Happy!', note: 'He can say it back about himself, or about Mia.' },
+        ta: { script: 'சந்தோஷம்', roman: 'Santhosham!', means: 'Happy!', note: 'He can say it back about himself, or about Mia. Here it is the plain feeling word, which the checked list does give.' },
       },
     ],
     note: {
-      what: 'Praise for something he did, not for speaking: he shares the ball with Mia, the parent says how glad they are and calls him in for a hug, and he invites Mia to play.',
+      what: 'Praise for something he did, not for speaking: he shares the ball with Mia, the parent says how glad they are and calls him in for a hug, and he invites Mia to come and play.',
       expect:
         'He will likely respond to the hug and the tone long before the words. Mia may hold on to the ball; that is part of sharing with a two-year-old, and his patience is the thing worth praising.',
       practising:
-        'Hearing warmth in Telugu and Tamil tied to a real moment, and an invitation of his own ("come on, little sister!") that he can use with Mia every day.',
+        'Hearing warmth in Telugu and Tamil tied to a real moment, and an invitation of his own ("come here!") that he can use with Mia every day, with her name in front of it.',
       ask: 'After the hug, ask him how Mia felt when she got the ball, in Telugu or Tamil, and take his answer in any language.',
       next: 'Notice the next time he shares or helps without being asked, and say the same words then; praise that names a real act means more than praise on a screen.',
       honest:
-        'Neither checked word list has a word for "thank you", "well done" or "good job", so this card prints only the checked ones; Nanna and Amma, record the praise and thanks you really say. The research notes that Telugu parents rarely say "I love you" literally and show affection with fond names such as naa bangaaram (my gold) and naa kanna (my dear); those appear here only in romanisation because their script was not checked. Never make praise, or your attention, the price of speaking Telugu or Tamil.',
+        'Neither checked word list has a word for "thank you", "well done" or "good job", so this card prints only the checked ones and leaves the praise to you, in whatever words you really use. The research notes that Telugu parents rarely say "I love you" literally and show affection with fond names such as naa bangaaram (my gold) and naa kanna (my dear); those appear here only in romanisation because their script was not checked. Never make praise, or your attention, the price of speaking Telugu or Tamil.',
       easier: 'For Mia, clap and say "Santosham!" or "Santhosham!" when she gives the ball back; she will clap too.',
       harder: 'Let Arjun be the one who says "Santosham!" or "Santhosham!" when Mia shares with him.',
     },
@@ -657,7 +738,7 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: சந்தோஷம் (Tamil, happiness)', url: 'https://en.wiktionary.org/wiki/%E0%AE%9A%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AF%8B%E0%AE%B7%E0%AE%AE%E0%AF%8D' },
       { label: 'Wiktionary: வா (Tamil, come)', url: 'https://en.wiktionary.org/wiki/%E0%AE%B5%E0%AE%BE' },
       { label: 'Wiktionary: கண் (Tamil, eye; en kannu, my darling)', url: 'https://en.wiktionary.org/wiki/%E0%AE%95%E0%AE%A3%E0%AF%8D' },
-      { label: 'Tamil Wikisource: Azha. Valliappa, Chinnanjiru paadalgal (en, my)', url: 'https://ta.wikisource.org/wiki/சின்னஞ்சிறு_பாடல்கள்' },
+      { label: 'Tamil Wikisource: Azha. Valliappa, Chinnanjiru paadalgal (en, my; inge, here)', url: 'https://ta.wikisource.org/wiki/சின்னஞ்சிறு_பாடல்கள்' },
       { label: 'Wang, Williams Tetteh & Dube (2023), parental emotion in heritage language maintenance', url: 'https://www.frontiersin.org/articles/10.3389/fpsyg.2023.1076418/full' },
     ],
   },

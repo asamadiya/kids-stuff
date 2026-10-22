@@ -35,6 +35,12 @@ export interface Pair {
   readonly id: string;
   readonly te: Said;
   readonly ta: Said;
+  /**
+   * Who says it, when it is not the child the page is written for. A moment's
+   * `child` lines are Arjun's unless this names someone else: Mia has lines of
+   * her own, and the page must not put her words under "He can say".
+   */
+  readonly by?: 'Mia';
 }
 
 /**

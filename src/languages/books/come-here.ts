@@ -7,9 +7,10 @@ import type { LangBook } from '../types';
  * Every Telugu and Tamil word is copied from .redesign/v3/research/
  * telugu-words.jsonl or tamil-all.jsonl, mostly from phrases those files
  * already quote ("Choodu, choodu!", "paalu taagu", "paalu kudi", "nidra
- * vastondaa?"). The children's names are left out of the script: neither
- * file spells them. Lines joined from those words carry a note asking a
- * fluent speaker to confirm them.
+ * vastondaa?"). Neither research file spells a child's name, so where a name
+ * is needed (Mia, in the dosa book) it is transliterated and its note says so.
+ * Lines joined from those words carry a note asking a fluent speaker to
+ * confirm them.
  */
 const SIZE =
   'Match the approved character lineup: Arjun 110 cm standing, Mia 87 cm standing (her crown at his upper chest); preserve their individual head, torso and limb proportions (Mia a toddler: large head, short legs; Arjun a five-year-old: longer legs); compare height only at equal depth; kneeling upright puts Arjun\'s head about level with Mia\'s, sitting on his heels lower.';
@@ -103,16 +104,16 @@ export const BOOK: LangBook = {
       picture: `Mia, standing on the patio by the potted curry-leaf plant, calls out with both arms stretched towards Arjun, who turns and runs back to her across the lawn, while Nanna, crouched by a raised vegetable bed with a watering can, looks up and smiles; late afternoon in the backyard. ${SIZE} No written words.`,
       cast: ['Mia', 'Arjun', 'Nanna'],
       te: {
-        script: 'అన్నయ్య! రా, రా!',
-        roman: 'Annayya! Raa, raa!',
-        means: 'Big brother! Come, come!',
-        note: `${C} Mia speaking. annayya = big brother, the form a younger child uses to call him (anna is the plain word); raa = come.`,
+        script: 'అన్నా! రా, రా!',
+        roman: 'Anna! Raa, raa!',
+        means: 'Anna! Come, come!',
+        note: `${C} Mia speaking. anna = big brother; calling him, the last vowel stretches, అన్నా. She says "Arjun anna", or just "anna"; many Telugu families use the longer అన్నయ్య (annayya), and this one does not. raa = come.`,
       },
       ta: {
         script: 'அண்ணா! வா, வா!',
         roman: 'Anna! Vaa, vaa!',
-        means: 'Big brother! Come, come!',
-        note: `${C} Mia speaking. anna = big brother, the form used to call him (annan when talking about him); vaa = come.`,
+        means: 'Anna! Come, come!',
+        note: `${C} Mia speaking. anna = big brother, the form used to call him (annan when talking about him); she says "Arjun anna", or just "anna". vaa = come.`,
       },
     },
     {
@@ -125,10 +126,10 @@ export const BOOK: LangBook = {
         note: `${C} snaanam cheyyi = have your bath (literally "do bath"; cheyyi here is "do", not the word for hand); raa = come.`,
       },
       ta: {
-        script: 'தண்ணி! மீன்! வா, வா!',
-        roman: 'Thanni! Meen! Vaa, vaa!',
-        means: 'Water! A fish! Come, come!',
-        note: `${C} thanni = water (spoken; written தண்ணீர், thanneer); meen = fish, the toy in the bath (often said "meenu"); vaa = come. The checked list has no Tamil script for "bath", so this line points at the water and the toy instead.`,
+        script: 'குளி! வா, வா!',
+        roman: 'Kuli! Vaa, vaa!',
+        means: 'Bath time! Come, come!',
+        note: `${C} kuli = bathe, and also a bath; வா (vaa) = come. குளி is not a headword in the checked list, which has it inside "thala kuli" (a hair-wash bath), and Wiktionary gives both the noun and the verb; have Amma confirm it is her word before you record this page.`,
       },
     },
     {
@@ -158,22 +159,22 @@ export const BOOK: LangBook = {
       },
       ta: {
         script: 'நிலா பாரு! தூங்கு, கண்ணு.',
-        roman: 'Nila paaru! Thoongu, kannu.',
+        roman: 'Nilaa paaru! Thoongu, kannu.',
         means: 'Look at the moon! Now sleep, darling.',
-        note: `${C} nila = moon (the everyday word, from "Nila nila odi vaa"); paaru = look; thoongu = sleep; kannu = darling (literally "eye").`,
+        note: `${C} nilaa = moon (the everyday word, from "Nilaa nilaa odi vaa"; the long final vowel is written aa throughout this part); paaru = look; thoongu = sleep; kannu = darling (literally "eye").`,
       },
     },
   ],
   note: {
     what: '"Nanna Says Raa, Amma Says Vaa": eight pages of one ordinary day (waking up, breakfast, a ball in the backyard, a bird in the lemon tree, Mia calling her brother, bath, a book, bed). Each page has one short line, once in Telugu and once in Tamil; both say the same thing, and each makes sense alone.',
     expect:
-      'Arjun is likely to hear that raa and vaa do the same job long before anyone says so, and may start calling "raa!" or "vaa!" himself in the backyard. Mia may say vaa or "anna" and point at the bird or the moon. He may answer in English; that is fine.',
+      'Arjun is likely to hear that raa and vaa do the same job long before anyone says so, and may start calling "raa!" or "vaa!" himself in the backyard. Mia may say vaa or "anna" (she calls him "Arjun anna", or just "anna") and point at the bird or the moon. He may answer in English; that is fine.',
     practising:
-      'Words this home already uses at those times of day: come (raa / vaa), look (choodu / paaru), eat and drink, sit, sleep, big brother, and the pet words for a little one (naanna in Telugu, kannu in Tamil). Hearing them while looking at a familiar room is the point, not reading them.',
+      'Words this home already uses at those times of day: come (raa / vaa), look (choodu / paaru), eat and drink, sit, sleep, anna (what Mia calls her brother), and the pet words for a little one (naanna in Telugu, kannu in Tamil). Hearing them while looking at a familiar room is the point, not reading them.',
     ask: 'On the bird page, stop and ask in your own language what the bird is doing in the lemon tree, then take his answer in Telugu, Tamil or English and say it back in yours.',
     next: 'Use the same lines for real tomorrow: "Choodu, choodu!" or "Paaru, paaru!" at the next bird in the backyard, "Raa!" or "Vaa!" at bath time. A book line he has heard and then hears at the real moment is worth more than another read.',
     honest:
-      'These lines were joined by an author from words checked in dictionaries, not recorded from this family, so have Nanna and Amma read them first and change anything that is not how they talk; your own wording wins. The lines are deliberately short, and the Tamil bath line points at the water and a toy fish because no checked Tamil word for "bath" was available. Knowing raa and vaa from a book is not holding a conversation, and the book does not teach reading.',
+      'These lines were joined by an author from words checked in dictionaries, not recorded from this family, so have Nanna and Amma read them first and change anything that is not how they talk; your own wording wins. The lines are deliberately short. Two words want a fluent ear before anyone records them: the Tamil kuli (bath), which the checked list gives only inside "thala kuli", and endhiri (get up). Knowing raa and vaa from a book is not holding a conversation, and the book does not teach reading.',
     easier:
       'For Mia, read only the last word or two of each line (raa, vaa, pitta, kuruvi, anna) and point at the picture. Let her shout "anna!" on page five.',
     harder:

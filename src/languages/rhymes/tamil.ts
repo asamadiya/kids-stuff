@@ -173,7 +173,7 @@ export const RHYMES: readonly Rhyme[] = [
       script: 'தோசை நல்ல தோசை',
       roman: 'Thosai nalla thosai',
       means: 'Dosa, good dosa',
-      note: 'Thosai is the written spelling; in speech it is often "dosai", and in English "dosa".',
+      note: 'Thosai is the written spelling, and this poem is printed in written Tamil, so its lines keep it; elsewhere in this part the same word is romanised dosai, the way it is said, and in English it is dosa.',
     },
     lines: [
       {

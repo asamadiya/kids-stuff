@@ -10,6 +10,13 @@ import type { Moment } from '../types';
  * words plus a common ending (-ki / -kku "to", -aa "?"), and their notes say
  * so: a fluent speaker should confirm them before recording. Tamil is the
  * spoken Chennai form; the written form is in the note where it differs.
+ *
+ * Register, applied the same way in both languages and in every file here:
+ * grown-ups use the familiar imperative to the children (raa, choodu, vaa,
+ * paaru); the children use the same familiar form to Amma and Nanna, and the
+ * respectful form to Nanamma, Tatayya, Paati and Thatha (randi, choodandi;
+ * vaanga, paarunga). Many families use the respectful form with parents too;
+ * each note says so, because this is a family choice, not a rule.
  */
 export const MOMENTS: readonly Moment[] = [
   {
@@ -66,16 +73,16 @@ export const MOMENTS: readonly Moment[] = [
       {
         id: 'up-sleepyhead-c1',
         te: {
-          script: 'నాన్న, రండి!',
-          roman: 'Naanna, randi!',
+          script: 'నాన్న, రా!',
+          roman: 'Naanna, raa!',
           means: 'Nanna, come!',
-          note: 'Composed from checked words; have a fluent speaker confirm. నాన్న (naanna) = Dad; రండి (randi) = come (the respectful form a child uses to a grown-up). For the mornings he wakes up first and fetches Nanna.',
+          note: 'Composed from checked words; have a fluent speaker confirm. నాన్న (naanna) = Dad; రా (raa) = come, the familiar form, which this family keeps for Amma and Nanna; the respectful రండి (randi) is for Nanamma, Tatayya, Paati and Thatha. Many families use randi with parents as well: use what yours says. For the mornings he wakes up first and fetches Nanna.',
         },
         ta: {
           script: 'அம்மா, வா!',
           roman: 'Amma, vaa!',
           means: 'Amma, come!',
-          note: 'Composed from checked words; have a fluent speaker confirm. அம்மா (amma) = Mom; வா (vaa) = come. For the mornings he wakes up first and fetches Amma.',
+          note: 'Composed from checked words; have a fluent speaker confirm. அம்மா (amma) = Mom; வா (vaa) = come, the familiar form this family keeps for Amma and Nanna; to a grandparent he says வாங்க (vaanga). For the mornings he wakes up first and fetches Amma.',
         },
       },
       {
@@ -95,7 +102,7 @@ export const MOMENTS: readonly Moment[] = [
       honest:
         'A routine line heard every day is easy to recognise and easy to mistake for knowing the language. He can come at "vaa" from your tone and your open arms. It says little about whether he understands an unfamiliar sentence, and nothing about speaking.',
       easier: 'Just "Raa!" or "Vaa!" with open arms. Open arms carry the meaning.',
-      harder: 'Swap roles on a weekend morning: Arjun wakes the grown-up with "Naanna, randi!" or "Amma, vaa!" and offers the milk himself: "Paalu kaavaalaa?" / "Paal venumaa?".',
+      harder: 'Swap roles on a weekend morning: Arjun wakes the grown-up with "Naanna, raa!" or "Amma, vaa!" and offers the milk himself: "Paalu kaavaalaa?" / "Paal venumaa?".',
     },
     sources: [
       { label: 'Wiktionary: రా (raa, come)', url: 'https://en.wiktionary.org/wiki/రా' },
@@ -144,9 +151,9 @@ export const MOMENTS: readonly Moment[] = [
         },
         ta: {
           script: 'தோசை வேணுமா?',
-          roman: 'Dose venumaa?',
+          roman: 'Dosai venumaa?',
           means: 'Do you want a dosa?',
-          note: 'Composed from checked words; have a fluent speaker confirm. தோசை (written dosai, said dose) + வேணுமா (venumaa, do you want?). Written form: தோசை வேண்டுமா? (dosai vendumaa?).',
+          note: 'Composed from checked words; have a fluent speaker confirm. தோசை (dosai) + வேணுமா (venumaa, do you want?). The last vowel softens in speech, so it sounds like "dose"; this guide romanises the script as dosai everywhere. Written form: தோசை வேண்டுமா? (dosai vendumaa?).',
         },
       },
       {
@@ -191,9 +198,9 @@ export const MOMENTS: readonly Moment[] = [
         },
         ta: {
           script: 'தோசை வேணும்!',
-          roman: 'Dose venum!',
+          roman: 'Dosai venum!',
           means: 'I want a dosa!',
-          note: 'Composed from checked words; have a fluent speaker confirm. தோசை (dose) + வேணும் (venum, want), written வேண்டும் (vendum). The answer to "Dose venumaa?" is the same words without the question ending.',
+          note: 'Composed from checked words; have a fluent speaker confirm. தோசை (dosai, said "dose") + வேணும் (venum, want), written வேண்டும் (vendum). The answer to "Dosai venumaa?" is the same words without the question ending.',
         },
       },
       {
@@ -222,8 +229,8 @@ export const MOMENTS: readonly Moment[] = [
       next: 'Use the same question at every meal for a week with a different food in front of it: idli, upma, toast, a banana. He hears one frame many times with many words in it.',
       honest:
         'Three of these lines are composed by this guide, not copied as whole phrases, and need a fluent speaker\'s ear before you record them. Counting to two at the table shows he knows the number words in that setting, not that he can count objects in Telugu or Tamil anywhere else.',
-      easier: 'Just the offer and a nod: hold up the dosa, say "Dosa kaavaalaa?" or "Dose venumaa?", and wait for the nod.',
-      harder: 'Let him serve: he asks Nanna or Amma "Dosa kaavaalaa?" / "Dose venumaa?" and counts the dosas onto their plate.',
+      easier: 'Just the offer and a nod: hold up the dosa, say "Dosa kaavaalaa?" or "Dosai venumaa?", and wait for the nod.',
+      harder: 'Let him serve: he asks Nanna or Amma "Dosa kaavaalaa?" / "Dosai venumaa?" and counts the dosas onto their plate.',
       safety: 'A dosa straight off the pan is hot. Count it onto the plate and let it sit a moment before small hands reach for it.',
     },
     sources: [
@@ -300,16 +307,16 @@ export const MOMENTS: readonly Moment[] = [
       {
         id: 'which-foot-first-c1',
         te: {
-          script: 'నాన్న, చూడండి!',
-          roman: 'Naanna, choodandi!',
+          script: 'నాన్న, చూడు!',
+          roman: 'Naanna, choodu!',
           means: 'Nanna, look!',
-          note: 'Composed from checked words; have a fluent speaker confirm. నాన్న (naanna) = Dad; చూడండి (choodandi) = look (the respectful form a child uses to a grown-up). For when both shoes are on and he did it himself.',
+          note: 'Composed from checked words; have a fluent speaker confirm. నాన్న (naanna) = Dad; చూడు (choodu) = look, the familiar form this family keeps for Amma and Nanna; to Nanamma, Tatayya, Paati or Thatha he says చూడండి (choodandi). Many families use choodandi with parents too: use what yours says. For when both shoes are on and he did it himself.',
         },
         ta: {
           script: 'அம்மா, பாரு!',
           roman: 'Amma, paaru!',
           means: 'Amma, look!',
-          note: 'Composed from checked words; have a fluent speaker confirm. அம்மா (amma) = Mom; பாரு (paaru) = look, written பார் (paar). For when both shoes are on and he did it himself.',
+          note: 'Composed from checked words; have a fluent speaker confirm. அம்மா (amma) = Mom; பாரு (paaru) = look, written பார் (paar), the familiar form kept for Amma and Nanna; to a grandparent he says பாருங்க (paarunga). For when both shoes are on and he did it himself.',
         },
       },
       {
@@ -478,78 +485,95 @@ export const MOMENTS: readonly Moment[] = [
     cast: ['Arjun', 'Mia', 'Amma'],
     grownUp: [
       {
-        id: 'anna-roll-it-to-me-g1',
+        id: 'anna-roll-it-to-me-g4',
         te: {
-          script: 'చెల్లికి ఇవ్వు',
-          roman: 'Chelliki ivvu',
-          means: 'Give it to your little sister',
-          note: 'Composed from checked words; have a fluent speaker confirm. చెల్లి (chelli) = little sister, + -కి (-ki, to); ఇవ్వు (ivvu) = give. The research word list gives "chelliki ivvu" in romanisation; the script spelling చెల్లికి is this guide\'s.',
+          script: 'మియాకి ఇవ్వు',
+          roman: 'Mia-ki ivvu',
+          means: 'Give it to Mia',
+          note: 'Composed from checked words; have a fluent speaker confirm. మియా (Mia) + -కి (-ki, to); ఇవ్వు (ivvu) = give. Her name is the same word in all three languages, so a grown-up talking about her uses it; written out in full, miyaaki ivvu. The research word list gives the phrase with the word for little sister instead, "chelliki ivvu", and చెల్లి (chelli) is in the picture words, but this family says her name. Neither research file spells a child\'s name, so have a fluent speaker check మియా.',
         },
         ta: {
-          script: 'தங்கச்சிக்கு குடு',
-          roman: 'Thangachikku kudu',
-          means: 'Give it to your little sister',
-          note: 'Composed from checked words; have a fluent speaker confirm. தங்கச்சி (thangachi, little sister, the spoken word) + -kku (to); குடு (kudu) = give, written கொடு (kodu). Written form: தங்கைக்குக் கொடு (thangaikku kodu).',
+          script: 'மியாவுக்கு குடு',
+          roman: 'Mia-vukku kudu',
+          means: 'Give it to Mia',
+          note: 'Composed from checked words; have a fluent speaker confirm. மியா (Mia) + -வுக்கு (-vukku, to: the -ukku ending with the -v- a name ending in a vowel takes); குடு (kudu) = give, written கொடு (kodu). Written out in full, miyaavukku kudu. தங்கச்சி (thangachi, little sister) is in the picture words; this family says her name. Have a fluent speaker check மியா.',
         },
       },
       {
-        id: 'anna-roll-it-to-me-g2',
+        id: 'anna-roll-it-to-me-g3',
         te: {
-          script: 'చెల్లి! చూడు!',
-          roman: 'Chelli! Choodu!',
-          means: 'Look at your little sister!',
-          note: 'Composed from checked words; have a fluent speaker confirm. చెల్లి (chelli) = little sister; చూడు (choodu) = look. Said when Mia catches the ball, or nearly does.',
+          script: 'చూడు! బంతి!',
+          roman: 'Choodu! Banti!',
+          means: 'Look! The ball!',
+          note: 'Composed from checked words; have a fluent speaker confirm. చూడు (choodu) = look; బంతి (banti) = ball. Said when the ball reaches Mia, or nearly does. Neither checked list gives a way to say "look at her" without the word for little sister in front, which sounds like calling to her instead, so this line names the ball both children are watching. Her name works in any language: "Mia! Choodu, Mia!"',
         },
         ta: {
-          script: 'தங்கச்சி! பாரு!',
-          roman: 'Thangachi! Paaru!',
-          means: 'Look at your little sister!',
-          note: 'Composed from checked words; have a fluent speaker confirm. தங்கச்சி (thangachi) = little sister; பாரு (paaru) = look, written பார் (paar). Said when Mia catches the ball, or nearly does.',
+          script: 'பாரு! பந்து!',
+          roman: 'Paaru! Pandhu!',
+          means: 'Look! The ball!',
+          note: 'Composed from checked words; have a fluent speaker confirm. பாரு (paaru) = look, written பார் (paar); பந்து (pandhu) = ball. Said when the ball reaches Mia, or nearly does. Her name works in any language: "Mia! Paaru, Mia!"',
         },
       },
     ],
     child: [
       {
         id: 'anna-roll-it-to-me-c1',
+        by: 'Mia',
         te: {
-          script: 'అన్న!',
+          script: 'అన్నా!',
           roman: 'Anna!',
-          means: 'Big brother!',
-          note: 'Mia\'s line, not Arjun\'s: what she calls him. Many Telugu families teach the fuller annayya (అన్నయ్య) for calling him; use what your family says.',
+          means: 'Anna! (big brother)',
+          note: 'Mia\'s line, not Arjun\'s: what she calls him. అన్న (anna) = big brother; calling him, the last vowel stretches, అన్నా. She says "Arjun anna", or just "anna". Many Telugu families use the longer అన్నయ్య (annayya) instead; this family does not.',
         },
         ta: {
           script: 'அண்ணா!',
           roman: 'Anna!',
-          means: 'Big brother!',
-          note: 'Mia\'s line, not Arjun\'s: what she calls him. அண்ணா (anna) is the calling form; talking about him, people say அண்ணன் (annan).',
+          means: 'Anna! (big brother)',
+          note: 'Mia\'s line, not Arjun\'s: what she calls him. அண்ணா (anna) is the calling form; talking about him, people say அண்ணன் (annan). She says "Arjun anna", or just "anna".',
         },
       },
       {
-        id: 'anna-roll-it-to-me-c2',
+        id: 'anna-roll-it-to-me-c3',
+        by: 'Mia',
         te: {
-          script: 'చెల్లి, రా!',
-          roman: 'Chelli, raa!',
-          means: 'Come on, little sister!',
-          note: 'Composed from checked words; have a fluent speaker confirm. చెల్లి (chelli) = little sister; రా (raa) = come. Arjun\'s answer when she calls "Anna!". "Mia, raa!" works just as well.',
+          script: 'ఇవ్వు!',
+          roman: 'Ivvu!',
+          means: 'Give it to me!',
+          note: 'Mia\'s line. ఇవ్వు (ivvu) = give, one word, with her open hands doing the rest; a two-year-old asks for the ball this way. Neither checked list has a word for rolling or for throwing, so the ask is simply "give". The respectful ఇవ్వండి (ivvandi) comes years later.',
         },
         ta: {
-          script: 'தங்கச்சி, வா!',
-          roman: 'Thangachi, vaa!',
-          means: 'Come on, little sister!',
-          note: 'Composed from checked words; have a fluent speaker confirm. தங்கச்சி (thangachi) = little sister; வா (vaa) = come. Arjun\'s answer when she calls "Anna!". "Mia, vaa!" works just as well.',
+          script: 'குடு!',
+          roman: 'Kudu!',
+          means: 'Give it to me!',
+          note: 'Mia\'s line. குடு (kudu) = give, written கொடு (kodu), one word, with her open hands doing the rest. Neither checked list has a word for rolling or for throwing, so the ask is simply "give".',
+        },
+      },
+      {
+        id: 'anna-roll-it-to-me-c4',
+        te: {
+          script: 'బంతి! రా!',
+          roman: 'Banti! Raa!',
+          means: 'The ball! Come on!',
+          note: 'Composed from checked words; have a fluent speaker confirm. బంతి (banti) = ball; రా (raa) = come. Arjun\'s answer when Mia calls "Anna!". Say her name with it, "Mia, raa!": a name is the same word in Telugu, Tamil and English.',
+        },
+        ta: {
+          script: 'பந்து! வா!',
+          roman: 'Pandhu! Vaa!',
+          means: 'The ball! Come on!',
+          note: 'Composed from checked words; have a fluent speaker confirm. பந்து (pandhu) = ball; வா (vaa) = come. Arjun\'s answer when Mia calls "Anna!". Say her name with it, "Mia, vaa!": a name is the same word in Telugu, Tamil and English.',
         },
       },
     ],
     note: {
-      what: 'Rolling a ball between brother and sister on the lawn. Mia calls him "anna"; he invites her to come; the grown-up asks him to give her the ball and points out what she just did.',
+      what: 'Rolling a ball between brother and sister on the lawn. Mia calls him "anna" and asks for the ball; he calls her over with it; the grown-up asks him to give it to Mia, by name, and points out the ball when it arrives.',
       expect:
         'Mia may say "anna" or "annaa" long before any other word here, and may run off with the ball instead of rolling it back; that is her game, not a mistake. Arjun may roll too fast at first. He is likely to answer her in English, and that is fine between the two of them.',
       practising:
-        'For Arjun, the words for the two of them, anna and chelli or thangachi, and the lines "come" and "give it to". For Mia, one word she can use for real: calling her brother.',
-      ask: 'When Mia catches the ball, ask Arjun in your language what his sister did. Any answer, in any language, gets "Chelli! Choodu!" or "Thangachi! Paaru!" and a cheer.',
+        'For Arjun, the ball word and the lines "come" and "give it to", both of them with Mia’s own name in them rather than the word for little sister. For Mia, two words she can use for real: calling her brother anna, and asking for the ball.',
+      ask: 'When the ball reaches Mia, ask Arjun in your language what his sister did. Any answer, in any language, gets "Choodu! Banti!" or "Paaru! Pandhu!" and a cheer.',
       next: 'Give Arjun the job of teaching Mia one word a day, in Nanna\'s or Amma\'s language, at the same time, for example at the front door: "raa" or "vaa". Big-brother jobs are likely to keep him using the word.',
       honest:
-        'Mia saying "anna" shows she has a name for her brother, not that she is learning Telugu or Tamil. Between themselves the two of them will probably speak English most of the time; the research does not say this needs correcting. Each parent\'s own time with Mia, in their language, matters more.',
+        'Mia saying "anna" shows she has a name for her brother, not that she is learning Telugu or Tamil. Neither checked word list has a word for rolling, throwing or catching, so the game runs on "give it" and "come"; say the rest in your own words, however you say them. Between themselves the two of them will probably speak English most of the time; the research does not say this needs correcting. Each parent\'s own time with Mia, in their language, matters more.',
       easier: 'For Mia: sit facing her with legs apart, roll the ball into the space between her legs, and say "Anna!" each time Arjun rolls it.',
       harder: 'Arjun counts each roll aloud in your language, okati, rendu, moodu or onnu, rendu, moonu, and they try to reach ten without the ball leaving the lawn.',
       safety: 'Use a big, soft ball and roll it, never throw it at Mia\'s face. Keep the game on the grass, away from the raised beds\' edges.',
@@ -558,9 +582,11 @@ export const MOMENTS: readonly Moment[] = [
       { label: 'Wiktionary: చెల్లి (chelli, little sister)', url: 'https://en.wiktionary.org/wiki/చెల్లి' },
       { label: 'Wiktionary: ఇచ్చు (ivvu, give)', url: 'https://en.wiktionary.org/wiki/ఇచ్చు' },
       { label: 'Wiktionary: చూడు (choodu, look)', url: 'https://en.wiktionary.org/wiki/చూడు' },
+      { label: 'Wiktionary: ఎరుపు (erupu, red; erra banti, a red ball)', url: 'https://en.wiktionary.org/wiki/ఎరుపు' },
       { label: 'Wiktionary: అన్న (anna, elder brother)', url: 'https://en.wiktionary.org/wiki/అన్న' },
       { label: 'Wiktionary: రా (raa, come)', url: 'https://en.wiktionary.org/wiki/రా' },
       { label: 'Wiktionary: தங்கச்சி (thangachi, little sister)', url: 'https://en.wiktionary.org/wiki/%E0%AE%A4%E0%AE%99%E0%AF%8D%E0%AE%95%E0%AE%9A%E0%AF%8D%E0%AE%9A%E0%AE%BF' },
+      { label: 'Wiktionary: பந்து (pandhu, ball)', url: 'https://en.wiktionary.org/wiki/%E0%AE%AA%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AF%81' },
       { label: 'Tamil Wiktionary: குடு (kudu, give)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%95%E0%AF%81%E0%AE%9F%E0%AF%81' },
       { label: 'Tamil Wiktionary: பாரு (paaru, look)', url: 'https://ta.wiktionary.org/wiki/%E0%AE%AA%E0%AE%BE%E0%AE%B0%E0%AF%81' },
       { label: 'Wiktionary: அண்ணா (anna, elder brother)', url: 'https://en.wiktionary.org/wiki/%E0%AE%85%E0%AE%A3%E0%AF%8D%E0%AE%A3%E0%AE%BE' },

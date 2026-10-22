@@ -58,13 +58,13 @@ export const WORDS: readonly Word[] = [
       script: 'అన్న',
       roman: 'anna',
       means: 'big brother',
-      note: 'When calling him, children often say the respectful అన్నయ్య (annayya).',
+      note: 'What Mia calls Arjun: "Arjun anna", or just "anna". Calling him, the last vowel stretches, అన్నా. Many Telugu families use the longer అన్నయ్య (annayya) instead; this family does not.',
     },
     ta: {
       script: 'அண்ணா',
       roman: 'anna',
       means: 'big brother',
-      note: 'The form used to call him. Talking about him, people also say அண்ணன் (annan).',
+      note: 'The form used to call him; Mia says "Arjun anna", or just "anna". Talking about him, people also say அண்ணன் (annan).',
     },
     picture:
       'a smiling five-year-old Indian boy with short tousled black hair, in a dark green T-shirt, waist up, on a plain cream background',
@@ -336,9 +336,9 @@ export const WORDS: readonly Word[] = [
     },
     ta: {
       script: 'நிலா',
-      roman: 'nila',
+      roman: 'nilaa',
       means: 'the moon',
-      note: 'The everyday word, from the song "Nilaa nilaa odi vaa" (moon, moon, come running). The formal word is சந்திரன் (chandhiran).',
+      note: 'The everyday word, from the song "Nilaa nilaa odi vaa" (moon, moon, come running). The research word list prints it nila; the same file\'s romanisation key doubles long vowels, and நிலா ends in a long aa, so this part writes nilaa everywhere. The formal word is சந்திரன் (chandhiran).',
     },
     picture: 'a round full moon, pale yellow, alone in a plain dark blue night sky',
   },

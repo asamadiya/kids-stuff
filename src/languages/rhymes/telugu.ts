@@ -100,22 +100,22 @@ export const RHYMES: readonly Rhyme[] = [
       },
     ],
     actions:
-      'Question and answer. Nanna asks each question; the "parrot" answers "avunu!" (yes) and acts it out: flies to the garden, picks a fruit, tucks it away. On "gutukkuna mingaavaa" Nanna does a big pretend gulp, or tickles the parrot\'s tummy. Gestures vary by family; there is no fixed set.',
+      'This family\'s way, and the one to start with: Nanna sings the first line himself, as the song\'s opening, and the questions to the parrot begin at "thotakellaavaa?". The child is the parrot and answers "avunu!" (yes) to each of those, acting it out: flies to the garden, picks a fruit, tucks it into the nest. On "gutukkuna mingaavaa" Nanna does a big pretend gulp, or tickles the parrot\'s tummy. The traditional game asks every line, including the first, and the parrot says yes to that one too; this version leaves it unanswered, so that no "yes" agrees to being smacked. Gestures vary by family; there is no fixed set.',
     origin:
       'Traditional Telugu nursery rhyme from oral tradition, no known author; Telugu Wikipedia lists it among folk children\'s songs. Public domain. A film song with the same name (Leelamahal Center) is a separate, copyrighted work.',
     picture:
       'Arjun runs back across the backyard lawn from the lemon tree, flapping one arm like a parrot\'s wing and holding up a lemon in the other hand, while Nanna, sitting on the patio step with Mia beside him, opens his mouth wide for a pretend gulp.',
     cast: ['Arjun', 'Nanna', 'Mia'],
     note: {
-      what: 'A Telugu question-and-answer rhyme. Nanna asks a little parrot where it went and what it did with the fruit; the child is the parrot and answers each question.',
+      what: 'A Telugu question-and-answer rhyme. Nanna asks a little parrot where it went and what it did with the fruit; the child is the parrot and answers the questions about the garden, the fruit and the nest.',
       expect:
         'Arjun is likely to enjoy being the parrot and may soon know the order of the questions. Mia may laugh at the gulp and the tickle long before she follows any words, and may nod for "avunu".',
       practising:
-        'Telugu yes-no questions. Four of the five questions end in -aavaa ("did you ...?") and the first in -indaa ("did she ...?"), so he hears one question shape again and again and can answer each with one word, avunu.',
+        'Telugu yes-no questions. The four the parrot answers all end in -aavaa ("did you ...?"), so he hears one question shape again and again and can answer each with one word, avunu.',
       ask: 'After "pandu thechchaavaa?", ask Arjun which fruit the parrot brought, and let him answer in Telugu or English.',
       next: 'In the garden or at the shops, ask Arjun "pandu thechchaavaa?" when he brings you a lemon or a banana. "Avunu" or "yes", either answer keeps the game going.',
       honest:
-        'The first line asks "did Mother smack you?". That is the traditional wording. For a toddler you may prefer to sing "amma pilichindaa?" (did Mother call you?); that change is this guide\'s suggestion, not a recorded folk version. Answering "avunu" in the game does not show that he understands the questions.',
+        'The words printed here are the traditional ones, and the first line really does ask "did Mother smack you?" (amma kottindaa). What this guide changed is the game, not the song: the parrot is asked only the four gentle questions, so that nothing in the play has a child say yes to being hit. That adaptation is ours, and it is not a recorded folk version; neither is the gentler wording some families sing, "amma pilichindaa?" (did Mother call you?). Sing it whichever way you want, and know which part is traditional. Answering "avunu" in the game does not show that he understands the questions.',
       easier: 'For Mia, sing only the last line and do the gulp and the tummy tickle. She joins by laughing or opening her mouth.',
       harder:
         'Swap roles: Arjun asks the questions and Nanna is the parrot. Then the parrot sometimes says "ledu!" (no) and Arjun has to ask something else.',
