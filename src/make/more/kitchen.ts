@@ -37,7 +37,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Lid back on. Keep shaking until it suddenly sloshes and a lump knocks inside.',
-        art: 'Arjun sits on a chair at the kitchen table and shakes the clear plastic jar hard with both hands, eyes wide, and through its sides one rough pale-yellow lump of butter swirls in thin watery liquid, while Mummy sits beside him with one hand cupped behind her ear, listening to the slosh.',
+        art: 'Arjun sits on a wooden chair at the kitchen table and shakes, with both hands, a light, thin-walled clear plastic jar with soft rounded shoulders and a wide white plastic screw lid, eyes wide; through its sides one rough pale-yellow lump of butter swirls in thin, milky-white liquid, the lid screwed tight and the outside of the jar dry. Mummy sits on a chair beside him with one hand cupped behind her ear, listening to the slosh.',
       },
       {
         text: 'Pour it through the sieve. The lump is makkhan; the thin liquid is buttermilk.',
@@ -66,7 +66,7 @@ export const MORE: readonly Activity[] = [
       honest: 'This shows that shaking turned cream into two different things; it does not show that he understands fat drops, and “I shook it so it turned into butter” is a good place for him to stop. The liquid is sweet buttermilk, a cousin of the sour chaas left after churning dahi, not the same thing.',
       easier: 'You do most of the shaking and he takes the last turns, when the lump arrives, then pours it through the sieve.',
       harder: 'Shake two small jars, one with cream straight from the fridge and one left out for half an hour. You each shake one jar, then swap every turn so both get the same shaking, and count the turns each one takes.',
-      safety: 'Use a food-safe plastic jar, not glass, and check the lid before he shakes. Use pasteurised cream, keep it out of the fridge for no more than two hours in all, and keep this jar and its bowls for food only, never for experiments. He washes his hands before he touches the butter. Refrigerate the butter in a covered dish and eat it within a day or two; drink or throw away the buttermilk the same day. Check for a dairy allergy first; the two-year-old can taste a little butter on roti if she already has dairy.',
+      safety: 'Use a food-safe plastic jar, not glass, and check the lid before he shakes. Use pasteurised cream within its date; if it smells sour when you open it, throw it away untasted. Keep it out of the fridge for no more than two hours in all, and keep this jar and its bowls for food only, never for experiments. He washes his hands before he touches the butter. Refrigerate the butter in a covered dish at once and eat it within a day or two; keep the buttermilk in the fridge and drink it the same day, or throw it away. Check for a dairy allergy first; the two-year-old can taste a little butter on roti if she already has dairy.',
     },
   },
   {
@@ -101,7 +101,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Spoon two teaspoons of lemon juice into the second cup. Leave the third cup plain, to compare.',
-        art: 'Arjun spoons pale lemon juice from a small bowl into the middle one of three clear cups of haldi water on white paper; that cup stays yellow, the cup on its left glows orange-red, and the cup on its right is plain yellow, while Papa points from the orange-red cup to the yellow one.',
+        art: 'Kneeling on the floor beside the white paper, Arjun tips a teaspoon of pale, almost colourless lemon juice into the middle cup of three clear plastic cups, the tip of the spoon right over that cup’s rim; his other hand holds a small steel bowl of lemon juice with half a cut lemon in it. The left cup is orange-red, and the middle and right cups are yellow. Papa sits on the floor beside him with both hands resting on his knees and watches the middle cup.',
       },
       {
         text: 'Now add lemon juice to the red cup, one spoon at a time. Watch it fizz and change.',
@@ -109,7 +109,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Line up all three cups on the white paper. Which ones match the plain cup now?',
-        art: 'On the tray, Arjun slides three clear cups of yellow haldi water into a neat row against the white paper and runs his finger along them, while Papa bends down beside him, his eyes level with the cups, and looks along the row with him.',
+        art: 'On the white paper in the tray on the kitchen table, Arjun, standing on the floor, runs one finger along three clear plastic cups of yellow haldi water: a left cup, a middle cup and a right cup, with a hand’s width of white paper between each one. Papa crouches beside the table with his eyes level with the cups and both hands resting on the table edge, and looks along the cups with him.',
       },
     ],
     notice: 'The baking-soda water turns the yellow haldi orange-red within seconds. Lemon juice keeps it yellow, and a few spoons of lemon fizz and turn the red cup back to yellow.',
@@ -150,7 +150,7 @@ export const MORE: readonly Activity[] = [
     steps: [
       {
         text: 'Put the cornflour in the bowl. Add the water slowly while you stir with your hand.',
-        art: 'At the patio table, Arjun stirs white cornflour with his bare hand in a wide steel bowl while Papa pours a thin stream of water into it from a small jug; the bowl sits on a large baking tray over spread newspaper printed only with blurred grey lines.',
+        art: 'At the patio table, Arjun, standing on the paving, stirs white cornflour with his bare hand in a wide steel bowl while Papa pours a thin stream of water into it from a small steel jug; the bowl sits on a large steel baking tray lined with a sheet of plain brown paper.',
       },
       {
         text: 'Stop adding water when stirring fast feels stiff and stirring slowly feels runny.',
@@ -162,7 +162,7 @@ export const MORE: readonly Activity[] = [
       },
       {
         text: 'Scoop up a handful and squeeze it hard into a ball. Now open your hand and watch.',
-        art: 'At the patio table, Arjun stands on the ground and holds his open palm over the steel bowl, and the white ball of cornflour he just squeezed melts into a runny drip between his fingers, while Papa cups his own hands under Arjun’s to catch the drips.',
+        art: 'Seen from across the patio table, Arjun stands on the paving on the far side of the table, the table top at his waist so only his upper body shows above it. He holds his open palm over the steel bowl on the baking tray, and the white ball of cornflour he has just squeezed melts into a runny drip between his fingers. Papa sits on a chair beside him and cups both his hands under Arjun’s hand to catch the drips.',
       },
       {
         text: 'Decide together: is it a solid, a liquid, or something in between? Each give one reason.',
@@ -197,67 +197,68 @@ export const MORE: readonly Activity[] = [
   {
     id: 'set-dahi-overnight',
     area: 'kitchen',
-    title: 'Set Dahi Overnight',
-    hook: 'A spoon of dahi, two bowls of milk, one warm night.',
+    title: 'Warm or Cold: Which Milk Sets into Dahi?',
+    hook: 'A spoon of dahi, two katoris of milk, and one warm corner.',
     where: 'kitchen',
     places: ['table'],
     minutes: 15,
-    span: 'Evening set, morning check',
+    span: 'Afternoon set, morning check',
     need: [
-      '400 ml pasteurised whole milk, warmed by the grown-up to just lukewarm',
-      '2 teaspoons of plain dahi with live cultures: from the last batch, or a shop tub whose label says live cultures',
-      'a small steel jug, for carrying the lukewarm milk to the table',
-      'two steel katoris or bowls with lids, the same size, each holding at least 250 ml',
-      'a teaspoon',
+      'a kitchen thermometer: without one, do not do this activity, because a wrist or finger cannot tell you the milk is at 40 to 45 °C',
+      '400 ml pasteurised whole milk, brought to the boil by the grown-up and cooled until the thermometer reads 40 to 45 °C',
+      '3 teaspoons of starter, kept in the fridge until needed: plain shop-bought live yoghurt or dahi (the label says live cultures) within its date, or dahi you set this same way in the last 3 days',
+      'a small steel pan to boil the milk in and a small steel jug to pour it from, both for the grown-up only',
+      'two steel katoris with lids, the same size, each holding at least 250 ml, and a small steel katori for the starter',
+      'two teaspoons',
       'a thick kitchen towel',
-      'a warm spot: a closed cupboard on a warm night, or a switched-off oven with only its light on (no towel inside it)',
+      'a warm, steady spot for 6 to 8 hours: an oven switched off with only its light on (no towel inside it), or a cupboard, with the katori wrapped in the towel',
       'space on a fridge shelf',
     ],
     steps: [
       {
-        text: 'The grown-up warms the milk and checks a drop on the wrist: warm, not hot. You wait at the table.',
-        art: 'Beside the switched-off stove, Mummy holds a small steel pan of milk and tests its warmth against the inside of her forearm, while Arjun sits waiting across the room at the kitchen table with two empty steel katoris and a teaspoon in front of him.',
+        text: 'The grown-up boils the milk and cools it until the thermometer reads 40 to 45 °C. You wait at the table.',
+        art: 'Mummy holds a slim steel kitchen thermometer upright in a small steel pan of milk cooling on the counter, well away from the switched-off stove, and watches it closely, while Arjun sits on a chair across the room at the kitchen table, waiting, with two empty steel katoris and a teaspoon in front of him.',
       },
       {
-        text: 'Put one teaspoon of dahi into each katori. The grown-up brings the lukewarm milk in a jug and pours.',
-        art: 'Arjun tips a heaped teaspoon of thick white dahi into the second of two steel katoris on the kitchen table, the first already holding its spoonful, while Mummy stands beside him holding a small steel jug of lukewarm milk ready to pour.',
+        text: 'The grown-up pours the cooled milk into the two katoris. Add one teaspoon of starter to each.',
+        art: 'Arjun tips a heaped teaspoon of thick white dahi from a small steel katori into the second of two larger steel katoris of milk on the kitchen table, the first already holding its spoonful, while Mummy stands beside him holding the small steel jug she has just poured the milk from.',
       },
       {
         text: 'Stir each katori gently, ten times round. Put the lids on.',
         art: 'Arjun stirs a steel katori of milk slowly round with a teaspoon, his other hand holding the katori still on the kitchen table, while Mummy presses a steel lid onto the second katori beside it.',
       },
       {
-        text: 'Guess which will set. Then put one katori somewhere warm, wrapped in the towel, and the other in the fridge.',
+        text: 'Guess which will set. One goes to the warm spot for 6 to 8 hours, the other straight into the fridge.',
         art: 'Arjun holds a lidded steel katori out towards an open fridge shelf, while Mummy, beside him, holds the second katori bundled in a thick folded kitchen towel against her chest; they look at each other, each making a guess.',
       },
       {
-        text: 'In the morning, take off the lids. Tilt each katori slowly. Which one stays put?',
-        art: 'In the morning light at the kitchen table, Arjun tilts an uncovered steel katori and the white dahi inside holds firm in one piece, while Mummy tilts the second katori beside it and thin milk runs to its rim.',
+        text: 'In the morning, take both katoris out of the fridge. Lids off, tilt each slowly. Which one stays put?',
+        art: 'At the kitchen table in the morning, Arjun holds one steel katori tipped right over on its side towards the viewer: the thick white dahi inside has set firm with a smooth flat top and does not slide at all, and a steel spoon stands upright in it. Beside him Mummy holds the second steel katori, from the fridge, tilted a little: it holds thin runny milk that slides to the rim. Both of them stand on the floor.',
       },
       {
-        text: 'Smell the set dahi, then taste one spoonful. Is it a little sour? Then it goes in the fridge.',
-        art: 'Arjun holds a teaspoon of thick, set white dahi up near his nose to sniff it before tasting, his eyes on Mummy, who holds the steel katori it came from and its lid in her two hands at the kitchen table.',
+        text: 'If it set in time, hold a spoon of starter beside a spoon of new dahi. Look, then taste: are they alike?',
+        art: 'Arjun holds up a teaspoon of thick white new dahi beside a teaspoon of starter dahi that Mummy holds out, the two spoons side by side as he looks closely from one to the other at the kitchen table, with the set steel katori of new dahi and a small steel katori of starter between them.',
       },
     ],
-    notice: 'By morning the warm katori has usually turned from runny milk into thick, slightly sour dahi. The fridge katori is still milk.',
-    ask: 'Same milk, same spoon of dahi. What did the warm one have that the cold one didn’t?',
+    notice: 'The katori that spent 6 to 8 hours somewhere warm has set into thick, slightly sour dahi that holds when tilted. The katori that went straight into the fridge is still runny milk.',
+    ask: 'Same milk, same spoon of starter. What did the warm one have that the cold one didn’t?',
     pairsWith: 'what-does-this-seed-need',
-    trial: 'Set one katori alone first, in the warm spot you plan to use, and check it after 6 hours and again in the morning. If it has not set by morning, the spot is too cool or the starter has no live cultures: try a warmer spot or a fresh tub before doing it with him.',
+    trial: 'First test the warm spot: fill a katori with water at 45 °C, wrap it as you will wrap the dahi, and leave it there for an hour. If the thermometer then reads below 35 °C or above 45 °C, use the other spot; if neither holds, do not do this activity. Then set one katori alone the same way, check it from 6 hours, and chill it the moment it holds when tilted. If it has not set by 10 hours, bin it: the spot is too cool or too hot, or the starter has no live cultures. Try the other warm spot or a fresh tub on another day, and do it with him only after a trial has set in time.',
     sources: [
       { label: 'Wikipedia: Dahi (curd)', url: 'https://en.wikipedia.org/wiki/Dahi_(curd)' },
       { label: 'Wikipedia: Yogurt, how it is made', url: 'https://en.wikipedia.org/wiki/Yogurt' },
     ],
-    tags: ['dahi', 'curd', 'yogurt', 'bacteria', 'overnight', 'Indian kitchen', 'warm and cold', 'fair test'],
+    tags: ['dahi', 'curd', 'yogurt', 'yoghurt', 'bacteria', 'overnight', 'thermometer', 'Indian kitchen', 'warm and cold', 'fair test'],
     note: {
-      what: 'He spoons a little dahi into two katoris of milk that you have warmed and checked are only lukewarm, stirs, and leaves one wrapped up somewhere warm and one in the fridge overnight. In the morning he tilts both to see which has set.',
-      expect: 'The warm katori is usually set in 6 to 10 hours; overnight is fine, it is just a little more sour. It holds together when tilted, often with a thin layer of yellowish whey on top, which is normal. The fridge katori is still runny milk. He may expect the cold one to be thicker, because cold butter and ice are hard. A cool night or a weak starter can leave even the warm one half-set; give it a few more hours somewhere warm. Shop milk that is only warmed sets a little softer than milk the grown-up has boiled and cooled first, as many Indian kitchens do; both make dahi.',
-      practising: 'Living things at work: tiny bacteria in the spoon of dahi feed on the milk, multiply in the warmth and make it sour, and the sourness thickens the milk. Warmth lets them work; cold slows them almost to a stop. Also a fair test: same milk, same starter, one change.',
-      ask: 'When he tilts the fridge katori: “Same milk, same dahi. What did the warm one have that this one didn’t?”',
-      next: 'Take the fridge katori out and leave it in the warm spot the next night; it often sets too, which points to the cold having stopped it, but a long night in the fridge can leave it half-set or not set at all, so taste it only if it smells and looks like the first batch. Keep a spoonful of the new dahi to start the next batch, and ask Dadi on the next call how she sets hers and where her warm spot is.',
-      honest: 'He sees that warmth matters; he cannot see the bacteria, so “tiny living things did it” is something he takes on trust, not something this shows him. One pair of katoris is one trial, and an old starter, or a tub without live cultures, may set neither.',
-      easier: 'Set just one katori in the warm spot, and let him tilt it and taste it in the morning.',
-      harder: 'Stand a third katori of lukewarm milk with no dahi beside the warm one, and ask him beforehand which will set. In the morning it is usually still runny, or lumpy and sour-smelling; either way, pour it away without tasting it.',
-      safety: 'Only the grown-up heats the milk; he waits at the table, away from the stove, and you bring the milk to him in a jug only after it feels lukewarm on the inside of your wrist. Keep the pan and the stove away from him and the two-year-old. Use pasteurised milk and plain dahi with live cultures. If the oven is the warm spot, it stays switched off with only its light on, the towel stays out of it, and tell everyone in the house so nobody turns it on. Once set, keep the dahi in the fridge and eat it within two or three days. If any katori smells bad, or shows pink, orange or fuzzy spots, throw the whole batch away without tasting. Check for a dairy allergy first.',
+      what: 'You bring milk to the boil and cool it until a thermometer reads 40 to 45 °C, then pour it into two katoris. He adds a teaspoon of starter to each and stirs. One katori sits wrapped up somewhere warm for 6 to 8 hours and then goes into the fridge; the other goes straight into the fridge. In the morning he tilts both to see which has set, and compares the new dahi with a spoon of the starter.',
+      expect: 'Boiled milk can take half an hour or more to cool to 45 °C in the pan; standing the pan in a bowl of cold water and stirring makes it much quicker, so bring him to the table for the last few minutes. Stir before you read the thermometer, and if it drops below 40 °C, warm it gently and check again. Start in the early afternoon, so that even the 10-hour limit ends before your own bedtime: you, not he, check the warm katori from 6 hours. Once it holds together when tilted, usually by 8 hours, it goes straight into the fridge; a thin layer of yellowish whey on top is normal. If it has not set by 10 hours after the starter went in, it goes in the bin, however close it looks. In the morning the fridge katori is still runny milk. He may expect the cold one to be thicker, because cold butter and ice are hard. The new dahi is a little sour, much like the starter; a shop starter can give a softer or sharper dahi than Dadi’s.',
+      practising: 'Living things at work: bacteria from the spoon of starter feed on the sugar in the milk and turn it into acid, and the acid thickens the milk into dahi. Warmth lets them multiply and work; the fridge slows them almost to a stop. Also a fair test: same milk, same starter, one change.',
+      ask: 'When he tilts the fridge katori: “Same milk, same starter. What did the warm one have that this one didn’t?”',
+      next: 'Keep a spoonful of the new dahi in the fridge to start the next batch, made the same way with the thermometer, within 3 days; after that, start again from a fresh shop tub. On the next call, ask Dadi how she sets hers and where her warm spot is.',
+      honest: 'He sees that warmth matters; he cannot see the bacteria, so “tiny living things did it” is something he takes on trust, not something this shows him. One pair of katoris is one trial. An old starter, or a tub without live cultures, may set neither; then both go in the bin, and the result tells you about the starter, not about warmth.',
+      easier: 'Skip the fridge katori: set one katori in the warm spot, and in the morning let him tilt it and compare it with a spoon of the starter.',
+      harder: 'Boil 600 ml of milk instead, and stand a third lidded katori of the same cooled milk with no starter beside the warm one, and ask him beforehand which will set. It goes into the fridge with the warm one at your check. In the morning it is usually still runny; whatever it looks like, you pour it away without anyone tasting it and wash the katori in hot soapy water.',
+      safety: 'If you have no kitchen thermometer, do not do this activity: a wrist or finger cannot tell you the milk is between 40 and 45 °C, milk that is too hot kills the starter, and milk that is too cool sets slowly, which gives unwanted bacteria time to grow. Only the grown-up brings the milk to the boil, cools it and pours it; he waits at the table, away from the stove, and never handles the hot pan or jug. Keep the pan, the jug and the stove away from the two-year-old too. Use pasteurised milk, and a starter of plain shop-bought live yoghurt or dahi, or your own dahi set this way in the last 3 days. Wash the katoris, lids, spoons and thermometer in hot soapy water and dry them first; he washes his hands before he touches the starter, and the rest of the starter goes back in the fridge as soon as both katoris have theirs. The warm katori stays somewhere warm and steady; you check it from 6 hours, and the moment it holds when tilted, usually by 8 hours, it goes straight into the fridge. If it has not set by 10 hours after the starter went in, or it smells off, or looks pink, slimy or fuzzy, the whole katori goes in the bin: no more time somewhere warm, no rescue, and nobody tastes a doubtful batch to check. Smell and looks can only send a batch to the bin; they never clear it to eat. Eat only a batch that set within the time and was then chilled, and finish it within 3 days. Pour away the fridge katori once he has tilted it. If the oven is the warm spot, it stays switched off with only its light on, the towel stays out of it, and tell everyone in the house so nobody turns it on. Check for a dairy allergy first.',
     },
   },
 ];

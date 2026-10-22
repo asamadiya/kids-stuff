@@ -125,7 +125,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'Ten minutes to draw the board together',
-    players: 'You and him, or more',
+    players: 'You and him, or more; Mia asleep or with another grown-up',
     need: [
       'a big sheet of paper (A4 or larger) and a pen (or a bought Snakes and Ladders board)',
       'one die (or six paper slips numbered 1 to 6, drawn from a cup)',
@@ -240,14 +240,14 @@ export const IDEAS: readonly PlayIdea[] = [
     players: 'Three or four',
     need: ['a sheet of paper torn into four small chits', 'a pencil', 'a bowl (or a cap)'],
     steps: [
-      'Draw a picture and points on each chit: Mantri 500 (a scroll), Sipahi 300 (a stick), Chor 0 (a bag). With four players, add Raja 1000 (a crown).',
+      'Draw one picture on each chit: a scroll for the Mantri, a stick for the Sipahi, a bag for the Chor. With four players, add a crown for the Raja.',
       'Fold the chits, shake them in the bowl, and each take one. Look in secret and keep it in your fist.',
       'Everyone asks, “Mantri kaun hai?” (with four, the Raja asks “Mera Mantri kaun hai?”). The Mantri says “Main!” and points at whoever he thinks is the Chor.',
-      'Right guess: everyone keeps their points. Wrong guess: the Mantri’s points go to the Chor. Open every chit and talk about whose face gave them away.',
-      'Write each round’s points in a column. After five rounds, add them up together.',
+      'Everyone opens their chit to see if the Mantri found the Chor. Right or wrong, talk about what gave the Chor away, or what fooled the Mantri.',
+      'Fold the chits, shake them back into the bowl and pick again, so everyone has a new secret. Nobody counts points; play until he has had enough.',
     ],
     hisWay:
-      'He draws the chits and can add characters, such as a Rani or a villager, with points he chooses. He can also switch to the way some families play, where the Sipahi does the guessing, and decide how many rounds make a game.',
+      'He draws the chits and can add characters, such as a Rani or a villager, and decide which one the guesser has to find. He can also switch to the way some families play, where the Sipahi does the guessing.',
     mia: {
       way: 'alongside',
       text: 'Mia gets her own bowl of big folded half-sheets of paper with scribbles on them to open, shut and share out to anyone she likes. Hers stay out of the real bowl.',
@@ -256,7 +256,7 @@ export const IDEAS: readonly PlayIdea[] = [
       'In the Jaipur courtyard, Arjun sits on a cotton durrie and points one finger across at Dada with narrowed, suspicious eyes, with his own opened paper chit lying in his lap. Dada keeps a perfectly straight face, both hands pressing his folded chit flat against his chest. Dadi, beside them, hides her chit inside one closed fist and watches. A pencil, a sheet of paper and an empty steel bowl sit on the durrie by Dadi’s knee.',
     cast: ['Arjun', 'Dadi', 'Dada'],
     tradition:
-      'Raja, Mantri, Chor, Sipahi (King, Minister, Thief, Soldier), a chit game played across India by four players. Sources differ: D’Source gives Raja 1000, Mantri 500, Sipahi 300 and Chor 0, with the Mantri finding the Chor; Wikipedia records other points and a version where the Sipahi guesses. This family version uses D’Source’s rules and, with three players, leaves out the Raja chit, so everyone asks the question together.',
+      'Raja, Mantri, Chor, Sipahi (King, Minister, Thief, Soldier), a chit game played across India by four players. Traditionally it is scored: in D’Source’s version the chits are worth Raja 1000, Mantri 500, Sipahi 300 and Chor 0, a Mantri who guesses wrong hands his points to the Chor, and after several rounds the highest total wins. Wikipedia records other points and a version where the Sipahi guesses. This family version keeps D’Source’s guessing but leaves the points out altogether, and with three players it drops the Raja chit, so everyone asks the question together.',
     sources: [
       {
         label: 'D’Source (IDC, IIT Bombay), Indian Games: Raja, Mantri, Chor, Sipahi',
@@ -268,15 +268,15 @@ export const IDEAS: readonly PlayIdea[] = [
     note: {
       what: 'A guessing game with folded chits. Each player secretly becomes the Mantri, the Sipahi or the Chor (and the Raja, with four); the Mantri owns up and has to point out the Chor by watching faces.',
       expect:
-        'When he is the Chor he will probably give himself away: a giggle, a hand over his mouth, or simply telling you. As Mantri he may point at random at first, then start studying faces. Losing his 500 to a grinning grown-up can sting.',
+        'When he is the Chor he will probably give himself away: a giggle, a hand over his mouth, or simply telling you. As Mantri he may point at random at first, then start studying faces. Guessing wrong while a grown-up grins at him can sting.',
       practising:
-        'Keeping a secret and a straight face, and looking at faces for a clue. If he wants to, adding round numbers: 500 and 300 as five hundreds and three hundreds.',
+        'Keeping a secret and a straight face, and looking at faces for a clue. As the Sipahi, working out who the Chor must be once the Mantri has owned up.',
       ask: 'After a round where he guessed right as Mantri: “What gave the Chor away?”',
-      next: 'Ask the grandparents which version they played as children and what their points were. Families differ, and he may like theirs better.',
+      next: 'Ask the grandparents which version they played as children and who did the guessing. Families differ, and he may like theirs better.',
       honest:
-        'With three or four players the Mantri always chooses between only two people, so half of all guesses would be right by chance; it is not a test of how well he reads faces. D’Source places the game at 6 to 12, so expect the points and adding to be your job at first.',
-      easier: 'Leave out the points and play only “Who is the Chor?”. Help him read his chit quietly if the picture is not clear to him.',
-      harder: 'Play with four and the Raja, or add a Rani chit. He keeps the score sheet and does the adding, in hundreds.',
+        'In the main game, with three or four players, the Mantri always chooses between only two people, so half of all guesses would be right by chance; it is not a test of how well he reads faces. D’Source places the game at 6 to 12, so expect to remind him who asks and who points for the first few rounds.',
+      easier: 'Play one practice round with the chits open, so he sees who asks, who answers and who points, then fold them for real. Help him read his chit quietly if the picture is not clear to him.',
+      harder: 'With four players, use a Rani chit instead of the Raja. The Rani stays hidden like the Chor and everyone asks the question together, so the Mantri chooses from three faces, not two. Or, when he is the Chor, he tries to keep a straight face while the Mantri stares at him for a slow count of ten.',
       safety: 'Paper and a pencil only. If Mia is near, keep the pencil out of her reach and the chits out of her mouth.',
     },
   },
@@ -290,7 +290,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 15,
     setup: 'Two minutes to count out the seeds',
-    players: 'You and him',
+    players: 'You and him; Mia asleep or with another grown-up',
     need: [
       'a 12-cup egg box (or two 6-cup boxes side by side, or a 12-cup bun tray)',
       '36 tamarind seeds (or large dried beans such as rajma)',

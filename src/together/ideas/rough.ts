@@ -17,7 +17,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: true,
     minutes: 5,
     setup: 'Two minutes to clear a space',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [
       'a big floor or sofa cushion (or a folded quilt)',
       'a rug, mattress or soft carpet to fall on',
@@ -71,7 +71,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: true,
     minutes: 5,
     setup: 'Two minutes to clear a space',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [
       'one sock each, loose enough to pull off (old ones are best)',
       'a rug, mattress or futon, with sofa cushions round the edge',
@@ -90,7 +90,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia is with Papa or another grown-up in the kitchen or the garden while the two of you wrestle, outside the play area. If she wants a turn afterwards, she can pull a sock off that grown-up slowly on the sofa.',
     },
     picture:
-      "Arjun, kneeling on the living-room rug, leans round beside Mummy and pulls with one hand at the toe of a striped sock on Mummy’s foot, stretching it half off her heel, laughing; he wears a matching striped sock on one of his own feet and his other foot is bare. Mummy kneels upright on the rug with her lower legs folded under her and her sock foot poking out behind her, soles showing; she is barefoot apart from that one sock, with no sandals; she keeps one hand tucked behind her back and twists to reach her free hand towards the striped sock on Arjun’s foot. Each of them has two legs and two feet. Sofa cushions ring the rug in the sunny California living room.",
+      "Side view on the living-room rug: Arjun and Mummy kneel facing each other, an arm’s length apart, both laughing. Mummy’s right foot is stretched out behind her on the rug wearing one long striped sock, and Arjun leans round her side, both hands gripping the loose toe of that sock and pulling it halfway off her foot. Arjun’s own right foot, tucked under him, wears a plain red sock. Cushions are piled round the edge of the rug, and the coffee table is pushed back against the wall.",
     cast: ['Arjun', 'Mummy'],
     sources: [
       {
@@ -129,7 +129,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: true,
     minutes: 15,
     setup: 'Two minutes to clear a space',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [
       'a pair of socks rolled into a ball, for the mango (or a soft toy)',
       'a big floor cushion for the cave (or a folded blanket)',
@@ -145,11 +145,11 @@ export const IDEAS: readonly PlayIdea[] = [
     hisWay:
       'He decides how fast the tiger may move (sleepy, slow, very slow), where the cave and the mango go, or adds a second mango. When he is the tiger, he decides what the tiger does when it reaches the thief: a roar, a sniff or a loose hug.',
     mia: {
-      way: 'alongside',
-      text: 'Mia sits on the sofa on Papa\'s (or another grown-up\'s) lap with her own soft toy, growling along, well away from the floor where the chase happens. She is never chased, and does not come down during the game.',
+      way: 'apart',
+      text: 'Mia is with Papa or another grown-up, so he has you to himself. She can watch from a lap on the sofa and growl along with her own soft toy, well away from the floor where the chase happens. She never comes down into the play area and is never chased; if she wriggles to get down, the grown-up takes her off to play somewhere else.',
     },
     picture:
-      'Arjun runs barefoot across the living-room rug towards a big orange floor cushion lying on the rug ahead of him on the left side of the picture, hugging a round yellow ball of rolled-up socks to his chest with both hands and grinning back over his shoulder. Behind him on the right, far from the cushion, Mummy crawls slowly on her hands and knees with a playful sleepy-tiger face, mouth open in a soft growl, one hand lifted off the rug like a paw. The furniture is pushed back against the walls of the sunny California living room.',
+      'Arjun runs barefoot across the living-room rug towards a big orange floor cushion lying on the rug ahead of him on the left side of the picture, hugging a round yellow ball of rolled-up socks to his chest with both hands and grinning back over his shoulder. Behind him on the right, far from the cushion, Mummy crawls slowly on her hands and knees with a playful sleepy-tiger face, mouth open in a soft growl, one hand lifted off the rug like a paw. The furniture is pushed back against the walls of the sunny California living room. Mummy’s face is playful and smiling, a pretend-tiger grin, never cross or fierce.',
     cast: ['Arjun', 'Mummy'],
     sources: [
       {
@@ -184,7 +184,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: true,
     minutes: 15,
     setup: 'Two minutes to mark a line',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [
       'something flat to mark a line: a row of chappals on the grass, or masking tape on the carpet',
       'a cushion for your knees',
@@ -198,8 +198,8 @@ export const IDEAS: readonly PlayIdea[] = [
     hisWay:
       "He chooses where the line goes, what counts as a touch (knee only, or both shoulders), and when to swap. He can set your raiding rule too: 'You have to raid with your hands on your head.'",
     mia: {
-      way: 'alongside',
-      text: "Mia sits on the back step (or the sofa, indoors) with Mummy or another grown-up, chanting 'kabaddi' and clapping along, outside the play area. She does not cross the line or stand where he runs back.",
+      way: 'apart',
+      text: "Mia is with Mummy or another grown-up, so he has you to himself. She can watch from a lap on the back step (or the sofa, indoors), chanting 'kabaddi' and clapping along. She never crosses the line or comes into the play area; if she wriggles to get down, the grown-up takes her off to play somewhere else.",
     },
     picture:
       "In the sunny back garden of the California home, a straight row of chappals lies on the lawn between Arjun and Papa as a dividing line. Arjun, mouth open mid-chant, leans across the row of chappals from his own side and touches Papa’s forearm with one open hand, his back foot still on his own side and already turning for home. Papa kneels on a flat cushion on the grass just past the chappals and reaches one open hand round to tap Arjun lightly on the back; his other hand rests on his knee.",

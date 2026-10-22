@@ -65,7 +65,7 @@ export const IDEAS: readonly PlayIdea[] = [
     id: 'antakshari-for-two',
     group: 'music',
     title: 'Antakshari for Two',
-    hook: 'The next song starts with the last sound of the one before.',
+    hook: 'Each new song starts where the one before it ended.',
     where: 'either',
     energy: 'quiet',
     contact: false,
@@ -75,12 +75,13 @@ export const IDEAS: readonly PlayIdea[] = [
     need: [],
     steps: [
       "Warm up with words. Say \"aam\" and stretch the last sound, mmm. He finds a word starting with it, like \"mor\". Now you need an r word.",
-      'Sing two lines of a song that starts with m, the usual opening sound, such as "Machhli jal ki rani hai". Stop, and say its last sound together: h.',
-      'He sings anything he knows that starts with that sound: a nursery rhyme, a film song, a bhajan. Then it is your turn with his last sound.',
+      'Sing two lines starting with m, the usual opening: "Machhli jal ki rani hai, jeevan uska paani hai". In Hindi the last consonant letter passes on: "hai" passes h.',
+      'An English rhyme passes on the last sound he hears instead: "Baa, baa, black sheep", sung to the end, finishes "down the lane", which passes n, not e.',
+      'You say which letter or sound is passed on. He sings anything he knows starting with it: a nursery rhyme, a film song, a bhajan. Then it is your turn.',
       'If he is stuck, count slowly to five. Then a made-up line starting with that sound counts, or you hum the start of a song that fits. Nobody is out.',
     ],
     hisWay:
-      'He can change the rule: the next song starts with the first sound instead of the last, or only songs about animals count, or only songs in Hindi. He can also be the judge who says the last sound out loud and decides whether a song fits.',
+      'He can change the rule: the next song starts with the first sound instead of the last, or only songs about animals count, or only songs in Hindi. He can also be the judge who decides whether a new song starts with the right sound.',
     mia: {
       way: 'alongside',
       text: 'Mia sits nearby with a rattle, or a steel katori and a spoon, and plays along to any song she likes. She does not take a turn, so his chain never has to start again for her.',
@@ -89,7 +90,7 @@ export const IDEAS: readonly PlayIdea[] = [
       'Arjun sits cross-legged on a charpai in the sunlit Jaipur courtyard, singing with one hand raised to keep time, while Dadi sits beside him with her palms together in a soft clap, leaning in to catch the last sound of his song.',
     cast: ['Arjun', 'Dadi'],
     tradition:
-      "Antakshari, from the Sanskrit antya (end) and akshara (letter), is a singing game played in India at family gatherings and on journeys, and made widely known by radio and television shows. In the usual game, two or more players or teams take turns with Hindi film songs or Hindustani classical songs, each starting with the last consonant of the song before; no song may be repeated, and a side that cannot sing is out. This version has two players, accepts any song or rhyme he knows in any language, matches English songs by the sound heard rather than the spelling, allows repeats, accepts a made-up line or a hummed hint after a count of five, and has no winner and nobody out.",
+      "Antakshari, from the Sanskrit antya (end) and akshara (letter), is a singing game played in India at family gatherings and on journeys, and made widely known by radio and television shows. In the usual game, two or more players or teams take turns with Hindi film songs or Hindustani classical songs, each starting with the last consonant of the song before; no song may be repeated, and a side that cannot sing is out. This version has two players, accepts any song or rhyme he knows in any language, keeps the last-consonant rule for Hindi songs but matches English rhymes by the last sound heard rather than the spelling, allows repeats, accepts a made-up line or a hummed hint after a count of five, and has no winner and nobody out.",
     sources: [
       { label: 'Wikipedia: Antakshari', url: 'https://en.wikipedia.org/wiki/Antakshari' },
       {
@@ -103,15 +104,15 @@ export const IDEAS: readonly PlayIdea[] = [
     ],
     tags: ['songs', 'singing', 'car journey', 'no equipment', 'Hindi', 'grandparents', 'word game', 'sounds'],
     note: {
-      what: 'A song chain: each new song or rhyme has to begin with the last sound of the one before. Two of you take turns, and any song he already knows counts.',
+      what: 'A song chain: each new song or rhyme has to begin where the one before ended. A Hindi song passes on its last consonant letter, as in the traditional game; an English rhyme passes on the last sound he hears. Two of you take turns, and any song he already knows counts.',
       expect:
-        'He will probably hear the last sound easily in short words and lose it at the end of a long line. He may sing the same three songs again and again; repeats are allowed in this version. Expect friendly arguments over close sounds, such as k and kh, or b and bh.',
+        'Expect to name the passed-on letter or sound for him each time; finding a song that starts with it is his part. English lines that end on a vowel, such as "sky", are awkward to pass on, so stop at a line that ends on a clear consonant. He may sing the same three songs again and again; repeats are allowed in this version. Expect friendly arguments over close sounds, such as k and kh, or b and bh.',
       practising:
-        'Hearing the last sound of a word and finding another word that begins with it, which is part of the sound awareness that comes before reading. Also pulling songs out of memory when he needs them.',
+        'Hearing the sound a word begins with and finding a song that starts with it; Understood.org says sound awareness, the groundwork for reading, starts with rhyming and beginning sounds. Also pulling songs out of memory when he needs them. Working out the last consonant letter of a Hindi line is a rule of the grown-ups\' game: you call it, and he is not expected to.',
       ask: 'When he finds a song for a hard sound: "How did you think of that one?"',
       next: 'Play it on the next long car journey, or on a video call to Jaipur: Dadi and Dada\'s old film songs against his rhymes.',
       honest:
-        'Doing well shows he can hear end sounds in songs he knows; it does not mean he is ready to read, and finding it hard does not mean he is behind. English spelling often hides the sound a word ends on, so judge by ear, and do not correct his singing.',
+        'Finding a song for a sound shows he can hear how familiar words begin and recall a song to fit; it does not mean he is ready to read, and finding it hard does not mean he is behind. English spelling often hides the sound a word ends on ("lane" passes n, not e), so judge English rhymes by ear, and do not correct his singing.',
       easier: 'Play with single words only, no songs, and offer him a choice of two: "Does mor or kela start with mmm?"',
       harder:
         'Bring back one of the real rules: no song can be used twice, or each singer must manage a whole verse rather than two lines.',
@@ -148,7 +149,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia dances and freezes in any shape she likes; the cards are for him and you. Whatever she does when the music stops counts as her statue.',
     },
     picture:
-      'Arjun balances on his left foot beside the sofa in the cleared California living room. His right foot is lifted with its sole pressed against his left knee, and both arms are stretched straight up above his head with his palms pressed together like a tree. On the rug in front of his feet lies a white paper card with a simple black stick figure drawn in the same tree pose: standing on one leg, the other leg bent, both arms straight up. Mummy stands a few steps away holding up a phone in her right hand, her other hand at her side, counting aloud. Mia stands on the rug with both arms stretched out wide to the sides, frozen and smiling.',
+      'Arjun stands frozen in a star shape on the rug of the cleared California living room: both feet planted wide apart on the rug, both arms stretched up and out wide above his shoulders with open hands, grinning and holding still. On the rug in front of his feet lies a white paper card with a simple black stick figure drawn in the same star shape: a round head, both arms stretched up and out wide, both legs spread wide apart. Mummy stands a few steps away, holding up a phone in her right hand with her other hand at her side, counting aloud. Mia stands on the rug a little way off with both hands on top of her head, frozen and smiling. No writing anywhere in the picture.',
     cast: ['Arjun', 'Mummy', 'Mia'],
     sources: [
       {
@@ -203,7 +204,7 @@ export const IDEAS: readonly PlayIdea[] = [
       text: 'Mia stomps along as the elephant or a slow tortoise at her own pace, on the side away from the frog jumps. She does not have to copy his animal, and he does not wait for her.',
     },
     picture:
-      'Arjun crab-walks sideways across the back lawn of the California home. His tummy faces the sky, his two hands are flat on the grass behind his shoulders, his two feet are flat on the grass in front, and his bottom is lifted clear off the ground. Papa kneels on the grass nearby and drums on the flat bottom of a steel pot turned upside down on the lawn, striking it from above with a wooden spoon in his right hand, his left hand resting on his knee. Mia stomps along a few steps behind Papa, bending forward with one straight arm hanging down in front of her chest and swinging like an elephant’s trunk, her other arm at her side.',
+      'On the back lawn, Arjun stomps along on all fours with his bottom high in the air and his arms and legs straight, walking like a bear, grinning, while Papa kneels on the grass beating an upturned steel cooking pot with a wooden spoon, and Mia waddles beside Arjun flapping her arms like a duck.',
     cast: ['Arjun', 'Papa', 'Mia'],
     sources: [
       { label: 'Zero to Three: A Year of Play (walk and talk like an animal)', url: 'https://www.zerotothree.org/resource/a-year-of-play/' },
@@ -238,7 +239,7 @@ export const IDEAS: readonly PlayIdea[] = [
     contact: false,
     minutes: 5,
     setup: 'No setup',
-    players: 'You and him',
+    players: 'You and him; another grown-up with Mia',
     need: [],
     steps: [
       'Sit facing each other. Clap a short pattern, such as clap, clap, knees, and he claps it straight back.',
@@ -262,6 +263,7 @@ export const IDEAS: readonly PlayIdea[] = [
         label: 'Harvard Center on the Developing Child: Executive Function Activities for 5- to 7-Year-Olds',
         url: 'https://developingchild.harvard.edu/wp-content/uploads/2024/10/Executive-Function-Activities-for-5-to-7-year-olds.pdf',
       },
+      { label: 'NAEYC for Families: Playing Music at Home', url: 'https://www.naeyc.org/our-work/families/playing-music-home' },
       { label: "D'Source, IIT Bombay, Indian Games: January February", url: 'https://www.dsource.in/resource/indian-games/indoor-games/january-february' },
       { label: 'Wikipedia: Hindu calendar (the lunar months)', url: 'https://en.wikipedia.org/wiki/Hindu_calendar' },
     ],
@@ -269,13 +271,13 @@ export const IDEAS: readonly PlayIdea[] = [
     note: {
       what: 'Copying games with claps: you clap a pattern and he claps it back, one clap longer each round. Then a clapping rhyme with crossed hands, right to right and left to left.',
       expect:
-        'He will probably copy how many claps before he copies their order, and the crossed hands will tangle him at first: he may reach with the wrong hand because he is mirroring you. Speeding up breaks the pattern long before he loses interest.',
+        'He will probably copy how many claps before he copies their order, and the crossed hands will tangle him at first: he may reach with the wrong hand because he is mirroring you. Speeding up is usually what breaks the pattern, and the muddle is often the funny part.',
       practising:
-        "Holding a short sequence in mind long enough to play it back, and keeping his hands to a pattern while he says the words. Harvard's guide for ages 5 to 7 lists clapping rhythms as practice for memory and self-control.",
+        "Holding a short sequence in mind long enough to play it back, and keeping his hands to a pattern while he says the words. Harvard's activity guide for ages 5 to 7 suggests complicated clapping rhythms as practice for working memory, self-control and flexible thinking; the copying rounds here are a simpler start, and a game is practice, not a measure of any of these.",
       ask: 'After he makes up a pattern that catches you out: "Can you teach me that one slowly?"',
       next: 'On a video call, ask Dadi or Dada for a clapping rhyme from their own childhood and learn it together, or he teaches them his.',
       honest:
-        'Losing a pattern longer than about five claps is common at this age and says nothing about musical ability. Clapping right palm to right palm does not show he knows left from right; he may simply be following your hand across.',
+        'Losing the pattern once it grows long is part of the game, not a measure of musical ability; NAEYC suggests starting with five beats or fewer before longer patterns. Clapping right palm to right palm does not show he knows left from right; he may simply be following your hand across.',
       easier: 'Copy only two or three claps, all on his own hands, with no crossing. Or clap a rhyme on your own knees side by side.',
       harder:
         'Play January February: he rests his hands palm up on yours, and you take turns tapping a hand and naming the next month. On December, the one being tapped snatches a hand away. Then try the Hindu months, with Phalgun as the snatch: Chaitra, Vaishakh, Jyeshtha, Ashadh, Shravan, Bhadrapad, Ashwin, Kartik, Margashirsha, Paush, Magh, Phalgun.',
