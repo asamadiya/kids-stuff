@@ -10,7 +10,7 @@ import { Voice } from './Voice';
 import { Recorder } from './Recorder';
 import { pickRound } from './deck';
 import { GUIDE } from './guide';
-import { allKeys, clearAll, clipKey, commitImport, exportAll, onVoicesChange, readImport, voicesChanged } from './voices';
+import { allScripts, clearAll, clipKey, commitImport, exportAll, onVoicesChange, readImport, voicesChanged } from './voices';
 import { altText } from '../learn/alt';
 
 const BASE = import.meta.env.BASE_URL;
@@ -56,7 +56,7 @@ function Line({ id, lang, said, big = false }: { readonly id: string; readonly l
       <p className="line__script" lang={lang}>
         {said.script}
       </p>
-      <Voice id={id} lang={lang} label={said.means} />
+      <Voice id={id} lang={lang} script={said.script} label={said.means} />
       <details className="line__aid">
         <summary>For the grown-up</summary>
         <p className="line__roman">{said.roman}</p>
@@ -226,15 +226,15 @@ const WORDS_NOTE: GrownUpNote = {
 
 export function WordsPage() {
   const [lang, setLang] = useLang();
-  const [have, setHave] = useState<Set<string>>(new Set());
+  const [have, setHave] = useState<Map<string, string>>(new Map());
   const [round, setRound] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   useEffect(() => {
-    const load = () => allKeys().then(setHave).catch(() => setHave(new Set()));
+    const load = () => allScripts().then(setHave).catch(() => setHave(new Map()));
     load();
     return onVoicesChange(load);
   }, []);
-  const recorded = useMemo(() => WORDS.filter((w) => have.has(clipKey(w.id, lang))), [have, lang]);
+  const recorded = useMemo(() => WORDS.filter((w) => have.get(clipKey(w.id, lang)) === w[lang].script), [have, lang]);
   const deckKey = recorded.map((w) => w.id).join(',') + lang;
   useEffect(() => {
     setRound(0);
@@ -249,7 +249,7 @@ export function WordsPage() {
         {game ? (
           <>
             <div className="listen__ask">
-              <Voice id={game.target.id} lang={lang} label="the word to find" />
+              <Voice id={game.target.id} lang={lang} script={game.target[lang].script} label="the word to find" />
               <span>Which picture?</span>
             </div>
             <div className="listen__choices">
@@ -319,7 +319,7 @@ const RECORD_NOTE: GrownUpNote = {
   practising: 'Nothing for him: this page is for you.',
   ask: 'Record the moments you actually use first. Ten lines you say every day are worth more than a hundred you never will.',
   next: 'Save a copy with "Save all to a file" now and then, and load it on another device with "Load from a file".',
-  honest: 'Clearing this browser’s site data, or using another device, loses the recordings unless you saved a copy. They are not backed up anywhere.',
+  honest: 'Clearing this browser’s site data, or using another device, loses the recordings unless you saved a copy. They are not backed up anywhere. If a line’s words are corrected in a later version of this app, its old recording stops playing and the line here says to record it again.',
 };
 
 export function RecordPage() {
@@ -450,7 +450,7 @@ export function RecordPage() {
                   </p>
                   <p className="line__roman">{it.said[lang].roman}</p>
                 </div>
-                <Recorder id={it.id} lang={lang} who={who || LANG_PARENT[lang]} text={it.said[lang].roman} />
+                <Recorder id={it.id} lang={lang} who={who || LANG_PARENT[lang]} script={it.said[lang].script} text={it.said[lang].roman} />
               </li>
             ))}
           </ul>

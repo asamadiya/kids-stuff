@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Lang } from './types';
 import { LANG_NAME } from './types';
-import { clipKey, deleteClip, getClip, onVoicesChange, recordingType, saveClip, voicesChanged } from './voices';
+import { clipKey, deleteClip, getClip, isCurrent, onVoicesChange, recordingType, saveClip, voicesChanged } from './voices';
 
 /**
  * The grown-up's recorder for one line in one language (advisor q8 ruling E):
@@ -23,9 +23,10 @@ import { clipKey, deleteClip, getClip, onVoicesChange, recordingType, saveClip, 
  */
 let active: { readonly owner: object; readonly stop: () => void } | null = null;
 
-export function Recorder({ id, lang, who, text }: { readonly id: string; readonly lang: Lang; readonly who: string; readonly text: string }) {
+export function Recorder({ id, lang, who, script, text }: { readonly id: string; readonly lang: Lang; readonly who: string; readonly script: string; readonly text: string }) {
   const key = clipKey(id, lang);
-  const [have, setHave] = useState(false);
+  /** 'old': a recording exists but was made from words this line no longer has. */
+  const [have, setHave] = useState<'none' | 'old' | 'yes'>('none');
   const [state, setState] = useState<'idle' | 'asking' | 'recording' | 'review' | 'error'>('idle');
   const [take, setTake] = useState<{ blob: Blob; url: string } | null>(null);
   const [error, setError] = useState('');
@@ -70,12 +71,12 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
   useEffect(() => {
     const refresh = () => {
       getClip(key)
-        .then((c) => mounted.current && setHave(Boolean(c)))
-        .catch(() => mounted.current && setHave(false));
+        .then((c) => mounted.current && setHave(!c ? 'none' : isCurrent(c, script) ? 'yes' : 'old'))
+        .catch(() => mounted.current && setHave('none'));
     };
     refresh();
     return onVoicesChange(refresh);
-  }, [key]);
+  }, [key, script]);
 
   useEffect(() => {
     mounted.current = true;
@@ -158,15 +159,15 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
 
   const save = async () => {
     if (!take) return;
-    if (have && !window.confirm(`Replace the saved ${LANG_NAME[lang]} recording of “${text}”?`)) return;
+    if (have === 'yes' && !window.confirm(`Replace the saved ${LANG_NAME[lang]} recording of “${text}”?`)) return;
     try {
-      await saveClip({ key, blob: take.blob, type: take.blob.type, who: who.trim() || 'Grown-up', at: Date.now() });
+      await saveClip({ key, blob: take.blob, type: take.blob.type, who: who.trim() || 'Grown-up', at: Date.now(), script });
     } catch {
       setError('The recording could not be saved. The browser may be out of space, or storage may be blocked. Your take is still here.');
       return;
     }
     setError('');
-    setHave(true);
+    setHave('yes');
     setTake(null);
     setState('idle');
     voicesChanged();
@@ -181,7 +182,7 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
       return;
     }
     setError('');
-    setHave(false);
+    setHave('none');
     voicesChanged();
   };
 
@@ -206,14 +207,14 @@ export function Recorder({ id, lang, who, text }: { readonly id: string; readonl
       ) : (
         <>
           <button type="button" className="btn" onClick={() => void start()}>
-            <span className="recorder__dot" aria-hidden="true" /> {have ? 'Record again' : 'Record'}
+            <span className="recorder__dot" aria-hidden="true" /> {have === 'none' ? 'Record' : 'Record again'}
           </button>
-          {have ? (
+          {have !== 'none' ? (
             <button type="button" className="btn btn--quiet" onClick={() => void remove()}>
               Delete
             </button>
           ) : null}
-          <span className="recorder__status">{have ? 'Saved' : 'Not recorded yet'}</span>
+          <span className="recorder__status">{have === 'yes' ? 'Saved' : have === 'old' ? 'The words changed since this was recorded; record it again' : 'Not recorded yet'}</span>
         </>
       )}
       {error ? <p className="recorder__error" role="alert">{error}</p> : null}

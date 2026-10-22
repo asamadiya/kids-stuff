@@ -8,7 +8,10 @@
  * with export, import and delete. Clearing site data or changing device
  * loses them, and the grown-ups screen says so.
  *
- * A key is `${itemId}:${lang}`, e.g. `bath-time.g0:te`.
+ * A key is `${itemId}:${lang}`, e.g. `bath-time.g0:te`. Ids follow a line's
+ * place in its moment, rhyme or book, so each clip also keeps the exact script
+ * it was recorded from: when the words are rewritten, the old recording no
+ * longer matches and is not played (design review, round 3 confirm).
  */
 import type { Lang } from './types';
 
@@ -22,7 +25,12 @@ export interface Clip {
   /** Who recorded it, as the grown-up typed it ("Nanna", "Paati"). */
   readonly who: string;
   readonly at: number;
+  /** The script of the line when it was recorded. A clip without one predates this check. */
+  readonly script?: string;
 }
+
+/** A clip may be played for a line only if it was recorded from the same words. */
+export const isCurrent = (c: Pick<Clip, 'script'> | undefined, script: string): boolean => c?.script === script;
 
 export const clipKey = (id: string, lang: Lang) => `${id}:${lang}`;
 
@@ -50,7 +58,8 @@ function tx<T>(mode: IDBTransactionMode, run: (s: IDBObjectStore) => IDBRequest<
 }
 
 export const getClip = (key: string) => tx<Clip | undefined>('readonly', (s) => s.get(key) as IDBRequest<Clip | undefined>);
-export const allKeys = () => tx<IDBValidKey[]>('readonly', (s) => s.getAllKeys()).then((ks) => new Set(ks.map(String)));
+/** Every clip's key and the script it was recorded from. */
+export const allScripts = () => allClips().then((cs) => new Map(cs.map((c) => [c.key, c.script ?? ''])));
 export const saveClip = (c: Clip) => tx<IDBValidKey>('readwrite', (s) => s.put(c));
 export const deleteClip = (key: string) => tx<undefined>('readwrite', (s) => s.delete(key));
 export const allClips = () => tx<Clip[]>('readonly', (s) => s.getAll() as IDBRequest<Clip[]>);
@@ -70,7 +79,7 @@ export const voicesChanged = () => listeners.forEach((f) => f());
 export async function exportAll(): Promise<Blob> {
   const clips = await allClips();
   const enc = await Promise.all(
-    clips.map(async (c) => ({ key: c.key, type: c.type, who: c.who, at: c.at, data: await blobToBase64(c.blob) })),
+    clips.map(async (c) => ({ key: c.key, type: c.type, who: c.who, at: c.at, script: c.script, data: await blobToBase64(c.blob) })),
   );
   return new Blob([JSON.stringify({ kind: 'rlc-voices', version: 1, clips: enc })], { type: 'application/json' });
 }
@@ -90,7 +99,7 @@ const KEY = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*:(te|ta)$/;
  */
 export async function readImport(file: File): Promise<PendingImport> {
   const clips = parseImport(await file.text());
-  const have = await allKeys();
+  const have = await allScripts();
   return { clips, replaces: clips.map((c) => c.key).filter((k) => have.has(k)) };
 }
 
@@ -112,6 +121,7 @@ export function parseImport(text: string): Clip[] {
       typeof c.key === 'string' && KEY.test(c.key) && !seen.has(c.key) &&
       typeof c.type === 'string' && c.type.startsWith('audio/') &&
       typeof c.who === 'string' && typeof c.at === 'number' && Number.isFinite(c.at) &&
+      (c.script === undefined || typeof c.script === 'string') &&
       typeof c.data === 'string' && c.data.length > 0;
     if (!ok) throw new Error(`Recording ${i + 1} in that file is damaged, so nothing was loaded.`);
     seen.add(c.key as string);
@@ -121,7 +131,7 @@ export function parseImport(text: string): Clip[] {
     } catch {
       throw new Error(`Recording ${i + 1} in that file is damaged, so nothing was loaded.`);
     }
-    return { key: c.key as string, type: c.type as string, who: (c.who as string).slice(0, 40), at: c.at as number, blob };
+    return { key: c.key as string, type: c.type as string, who: (c.who as string).slice(0, 40), at: c.at as number, blob, ...(typeof c.script === 'string' ? { script: c.script } : {}) };
   });
 }
 

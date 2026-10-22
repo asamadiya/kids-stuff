@@ -58,7 +58,7 @@ const live = () => tracks.filter((t) => !t.stopped).length;
 
 describe('recorder releases the microphone', () => {
   it('stops the tracks when the recorder is unmounted mid-recording', async () => {
-    const { unmount } = render(<Recorder id="a" lang="te" who="Nanna" text="raa" />);
+    const { unmount } = render(<Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />);
     fireEvent.click(screen.getByRole('button', { name: /record/i }));
     await act(async () => answer(stream()));
     expect(screen.getByRole('button', { name: /stop/i })).toBeTruthy();
@@ -68,7 +68,7 @@ describe('recorder releases the microphone', () => {
   });
 
   it('stops a stream that arrives after the recorder has gone', async () => {
-    const { unmount } = render(<Recorder id="a" lang="te" who="Nanna" text="raa" />);
+    const { unmount } = render(<Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />);
     fireEvent.click(screen.getByRole('button', { name: /record/i }));
     unmount();
     await act(async () => answer(stream()));
@@ -78,7 +78,7 @@ describe('recorder releases the microphone', () => {
   });
 
   it('stops the tracks when the page is hidden', async () => {
-    render(<Recorder id="a" lang="te" who="Nanna" text="raa" />);
+    render(<Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />);
     fireEvent.click(screen.getByRole('button', { name: /record/i }));
     await act(async () => answer(stream()));
     act(() => {
@@ -90,8 +90,8 @@ describe('recorder releases the microphone', () => {
   it('lets only one line record at a time', async () => {
     render(
       <>
-        <Recorder id="a" lang="te" who="Nanna" text="raa" />
-        <Recorder id="b" lang="te" who="Nanna" text="po" />
+        <Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />
+        <Recorder id="b" lang="te" who="Nanna" script="రా" text="po" />
       </>,
     );
     const [first, second] = screen.getAllByRole('button', { name: /record/i });
@@ -112,8 +112,8 @@ describe('recorder releases the microphone', () => {
     });
     render(
       <>
-        <Recorder id="a" lang="te" who="Nanna" text="raa" />
-        <Recorder id="b" lang="te" who="Nanna" text="po" />
+        <Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />
+        <Recorder id="b" lang="te" who="Nanna" script="రా" text="po" />
       </>,
     );
     const [first, second] = screen.getAllByRole('button', { name: /record/i });
@@ -130,7 +130,7 @@ describe('recorder releases the microphone', () => {
   });
 
   it('stops the tracks when Stop is pressed and offers the take for review', async () => {
-    render(<Recorder id="a" lang="te" who="Nanna" text="raa" />);
+    render(<Recorder id="a" lang="te" who="Nanna" script="రా" text="raa" />);
     fireEvent.click(screen.getByRole('button', { name: /record/i }));
     await act(async () => answer(stream()));
     fireEvent.click(screen.getByRole('button', { name: /stop/i }));
@@ -156,5 +156,24 @@ describe('import checks the whole file before writing', () => {
     expect(() => parseImport(file([entry('../evil:ta')]))).toThrow(/Recording 1/);
     expect(() => parseImport('{"kind":"other"}')).toThrow(/not a saved set/);
     expect(() => parseImport('not json')).toThrow(/not a saved set/);
+  });
+});
+
+describe('a recording plays only for the words it was made from', () => {
+  it('matches on the exact script, and treats a clip with no script as out of date', async () => {
+    const { isCurrent } = await import('../languages/voices');
+    expect(isCurrent({ script: 'చూడు' }, 'చూడు')).toBe(true);
+    expect(isCurrent({ script: 'చెల్లికి ఇవ్వు' }, 'మియాకి ఇవ్వు')).toBe(false);
+    expect(isCurrent({}, 'చూడు')).toBe(false);
+    expect(isCurrent(undefined, 'చూడు')).toBe(false);
+  });
+
+  it('keeps the script through an export file, and rejects a script that is not text', async () => {
+    const { parseImport } = await import('../languages/voices');
+    const file = (extra: Record<string, unknown>) =>
+      JSON.stringify({ kind: 'rlc-voices', version: 1, clips: [{ key: 'w-amma:ta', type: 'audio/webm', who: 'Amma', at: 1, data: btoa('abc'), ...extra }] });
+    expect(parseImport(file({ script: 'அம்மா' }))[0].script).toBe('அம்மா');
+    expect(parseImport(file({}))[0].script).toBeUndefined();
+    expect(() => parseImport(file({ script: 7 }))).toThrow(/Recording 1/);
   });
 });

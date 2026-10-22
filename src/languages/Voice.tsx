@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Lang } from './types';
 import { LANG_PARENT } from './types';
-import { clipKey, getClip, onVoicesChange } from './voices';
+import { clipKey, getClip, isCurrent, onVoicesChange } from './voices';
 
 /**
  * Play a parent's recording of one line. A child-facing control: play and
  * replay only (advisor q8 ruling E). With no recording, it says nothing to the
- * child and asks the grown-up to say the line together instead.
+ * child and asks the grown-up to say the line together instead. A recording
+ * made from different words (the line was rewritten since) is not played.
  */
-export function Voice({ id, lang, label }: { readonly id: string; readonly lang: Lang; readonly label: string }) {
+export function Voice({ id, lang, script, label }: { readonly id: string; readonly lang: Lang; readonly script: string; readonly label: string }) {
   const [url, setUrl] = useState<string | null>(null);
   const [who, setWho] = useState('');
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -21,9 +22,9 @@ export function Voice({ id, lang, label }: { readonly id: string; readonly lang:
         .then((c) => {
           if (!alive) return;
           if (made) URL.revokeObjectURL(made);
-          made = c ? URL.createObjectURL(c.blob) : null;
+          made = c && isCurrent(c, script) ? URL.createObjectURL(c.blob) : null;
           setUrl(made);
-          setWho(c?.who ?? '');
+          setWho(made ? (c?.who ?? '') : '');
         })
         .catch(() => alive && setUrl(null));
     load();
@@ -33,7 +34,7 @@ export function Voice({ id, lang, label }: { readonly id: string; readonly lang:
       off();
       if (made) URL.revokeObjectURL(made);
     };
-  }, [id, lang]);
+  }, [id, lang, script]);
 
   if (!url) {
     return (
