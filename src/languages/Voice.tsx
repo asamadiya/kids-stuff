@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Lang } from './types';
 import { LANG_PARENT } from './types';
 import { clipKey, getClip, isCurrent, onVoicesChange } from './voices';
+import { ReadAloud } from '../audio/ReadAloud';
+import { playUrl, stop, usePlaying } from '../audio/readAloud';
 
 /**
  * Play a parent's recording of one line. A child-facing control: play and
@@ -9,10 +11,23 @@ import { clipKey, getClip, isCurrent, onVoicesChange } from './voices';
  * child and asks the grown-up to say the line together instead. A recording
  * made from different words (the line was rewritten since) is not played.
  */
-export function Voice({ id, lang, script, label }: { readonly id: string; readonly lang: Lang; readonly script: string; readonly label: string }) {
+export function Voice({
+  id,
+  lang,
+  script,
+  label,
+  computerLabel = 'Computer voice',
+}: {
+  readonly id: string;
+  readonly lang: Lang;
+  readonly script: string;
+  readonly label: string;
+  /** The fallback button's words; a rhyme says "Listen to the words", because a computer voice speaks it, it does not sing it (a9 point 4). */
+  readonly computerLabel?: string;
+}) {
   const [url, setUrl] = useState<string | null>(null);
   const [who, setWho] = useState('');
-  const audio = useRef<HTMLAudioElement | null>(null);
+  const playing = usePlaying();
 
   useEffect(() => {
     let alive = true;
@@ -37,26 +52,29 @@ export function Voice({ id, lang, script, label }: { readonly id: string; readon
   }, [id, lang, script]);
 
   if (!url) {
+    // No family recording: the grown-up is invited to say it together, and a
+    // computer voice can read it, marked as one (advisor a9 point 4).
     return (
-      <span className="voice voice--none" title={`No recording yet. ${LANG_PARENT[lang]} can record it under For grown-ups → Record voices.`}>
-        <SpeakerGlyph off />
-        <span className="voice__say">Say it together</span>
+      <span className="voice-pair">
+        <span className="voice voice--none" title={`No recording yet. ${LANG_PARENT[lang]} can record it under For grown-ups → Record voices.`}>
+          <SpeakerGlyph off />
+          <span className="voice__say">Say it together</span>
+        </span>
+        <ReadAloud id={`langs/${id}:${lang}`} texts={[script]} lang={lang} label={computerLabel} />
       </span>
     );
   }
+  const on = playing?.id === `own/${id}:${lang}`;
   return (
     <button
       type="button"
-      className="voice"
-      aria-label={`Play ${who || LANG_PARENT[lang]} saying ${label}`}
-      onClick={() => {
-        audio.current?.pause();
-        audio.current = new Audio(url);
-        void audio.current.play();
-      }}
+      className={`voice${on ? ' is-on' : ''}`}
+      aria-label={on ? 'Stop' : `Play ${who || LANG_PARENT[lang]} saying ${label}`}
+      aria-pressed={on}
+      onClick={() => (on ? stop() : void playUrl(`own/${id}:${lang}`, url))}
     >
       <SpeakerGlyph />
-      <span className="voice__who">{who || LANG_PARENT[lang]}</span>
+      <span className="voice__who">{who ? `${who}’s recording` : `${LANG_PARENT[lang]}’s recording`}</span>
     </button>
   );
 }

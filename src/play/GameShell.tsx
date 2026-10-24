@@ -6,6 +6,8 @@ import type { ProblemResult } from './progress';
 import { finishSet, loadRecord, recordProblem, saveRecord, setLevel } from './progress';
 import { GrownUps } from '../learn/GrownUps';
 import { HomeLink } from '../learn/PartNav';
+import { ReaderSwitch } from '../audio/ReaderSwitch';
+import { ReadAloud } from '../audio/ReadAloud';
 
 /**
  * The frame every game sits in. A board draws and answers; this owns the rest:
@@ -192,6 +194,23 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
   // through the hint: the outcome is the worked answer.
   const reveal = isInvestigate && (stage === 'solved' || stage === 'worked');
 
+  // The feedback the child can see, as lines to read aloud: the same
+  // conditions as the feedback block below, so it reads exactly what shows.
+  const feedback: string[] = done
+    ? []
+    : [
+        ...(nudged && waiting ? ['First choose what you think will happen.'] : []),
+        ...(stage === 'hint' && hint ? [hint] : []),
+        ...(stage === 'worked' && game.kind === 'solve' ? ['Here is how it works.'] : []),
+        ...(stage === 'solved' && game.kind === 'solve' ? [...(misses === 0 ? ['Yes.'] : []), game.explain(round)] : []),
+        ...(reveal && game.kind === 'investigate'
+          ? [
+              stage === 'solved' && predicted ? (game.matches(round, answer) ? 'Just as you said.' : 'Not what you said — look.') : 'Here is what happens.',
+              game.why(round),
+            ]
+          : []),
+      ];
+
   return (
     <main id="main-content" className={`shell shell--${isInvestigate ? 'science' : 'maths'}`}>
       <header className="shell__bar">
@@ -200,6 +219,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
           <span aria-hidden="true">←</span> {backLabel}
         </a>
         <h1 className="shell__title">{game.title}</h1>
+        <ReaderSwitch />
         <GrownUps note={game.note} title={game.title} />
       </header>
 
@@ -239,7 +259,10 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
         </section>
       ) : (
         <>
-          <p className="shell__prompt">{game.prompt(round)}</p>
+          <div className="shell__ask">
+            <p className="shell__prompt">{game.prompt(round)}</p>
+            <ReadAloud key={`p${serial}`} id={`game/${game.id}/prompt`} texts={[game.prompt(round)]} label="Read it" />
+          </div>
 
           <div className={`shell__board stage-${stage}`}>
             {reveal && game.kind === 'investigate' ? (
@@ -259,6 +282,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
           </div>
 
           <div className="shell__feedback" aria-live="polite">
+            {feedback.length ? <ReadAloud key={`f${serial}${stage}`} id={`game/${game.id}/feedback`} texts={feedback} label="Read it" compact /> : null}
             {nudged && waiting ? <p className="feedback feedback--hint">First choose what you think will happen.</p> : null}
             {stage === 'hint' && hint ? <p className="feedback feedback--hint">{hint}</p> : null}
             {stage === 'worked' && game.kind === 'solve' ? <p className="feedback feedback--worked">Here is how it works.</p> : null}

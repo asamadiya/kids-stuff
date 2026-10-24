@@ -16,6 +16,7 @@ import { playedBefore } from '../play/progress';
 import type { AnyGame } from '../play/types';
 import { ENTRIES, PARTS, cardSrc, counts, directory, thumbSrc } from './catalog';
 import type { Entry, Part } from './catalog';
+import { ReaderSwitch } from '../audio/ReaderSwitch';
 
 /**
  * The listing screens: home, the five part hubs, the shelves and the library.
@@ -78,6 +79,7 @@ const HOME_NOTE: GrownUpNote = {
   ask: '"Which one do you want to show me?" — let him lead you to something he has done before.',
   next: 'Make & Do and Play with Dad & Mom are meant to end a session: something real, with your hands, after the screen.',
   honest: 'Nothing here is scored and nothing claims mastery. Games stop after five problems on purpose. The best of it happens when you are sitting next to him.',
+  easier: 'Read aloud: the speaker buttons read the words on the screen in a computer voice — Mom voice (the default) or Dad voice, switched at the top of every screen and remembered on this device. They never start on their own; pressing again stops them. They read the child’s words only, not these notes or the safety lines: those are for you to read. The voices are Indian English computer voices, not your recordings; in Telugu & Tamil your own recordings always come first.',
 };
 
 export function Home() {
@@ -90,6 +92,7 @@ export function Home() {
           Rikki&rsquo;s <span>Learning Center</span>
         </h1>
         <div className="lc-top__tools">
+          <ReaderSwitch />
           <EverythingLink />
           <GrownUps note={HOME_NOTE} title="Rikki's Learning Center" />
         </div>

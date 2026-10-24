@@ -7,6 +7,8 @@ import type { GrownUpNote } from '../notes/types';
 import { IDEAS, MIA_LABEL, PLAY_GROUPS, WHERE_LABEL, getIdea } from './index';
 import type { PlayIdea } from './types';
 import { altText } from '../learn/alt';
+import { ReadAloud } from '../audio/ReadAloud';
+import { ideaLead, ideaStep } from '../audio/lines';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -152,6 +154,9 @@ export function IdeaPage({ id, back }: { readonly id: string; readonly back: { r
       <div className="idea">
         <figure className="idea__picture">
           <img src={`${BASE}art/together/${x.id}.webp`} alt={altText(x.picture)} width={1152} height={896} />
+          <figcaption className="idea__read">
+            <ReadAloud id={`together/${x.id}/lead`} texts={ideaLead(x)} />
+          </figcaption>
         </figure>
         <div className="idea__side">
           <dl className="idea__facts">
@@ -212,6 +217,7 @@ export function IdeaPage({ id, back }: { readonly id: string; readonly back: { r
                 {i + 1}
               </span>
               <p>{s}</p>
+              <ReadAloud id={`together/${x.id}/${i}`} texts={ideaStep(x, i)} label={`Read step ${i + 1}`} compact />
             </li>
           ))}
         </ol>

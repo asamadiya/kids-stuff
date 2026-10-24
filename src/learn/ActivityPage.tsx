@@ -5,6 +5,8 @@ import { markRead } from './screens';
 import { ENTRIES } from './catalog';
 import { MakeFigure } from '../make/figures';
 import { altText } from './alt';
+import { ReadAloud } from '../audio/ReadAloud';
+import { activityLead, activityStep } from '../audio/lines';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -36,6 +38,7 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
         )}
         <div>
           <p className="activity__invite">{a.hook}</p>
+          <ReadAloud id={`make/${a.id}/lead`} texts={activityLead(a)} />
           <p className="activity__when">{a.span ?? `About ${a.minutes} minutes`}</p>
           <nav className="activity__jumps" aria-label="On this page">
             <a className="jumps__link" href="#need" onClick={(e) => jump(e, 'need')}>
@@ -83,6 +86,7 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
               <span className="activity__n" aria-hidden="true">{i + 1}</span>
               {s.text}
             </p>
+            <ReadAloud id={`make/${a.id}/${i}`} texts={activityStep(a, i)} label={`Read step ${i + 1}`} compact />
           </li>
         ))}
       </ol>

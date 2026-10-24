@@ -3,6 +3,7 @@ import type { Known, Route } from './routes';
 import { DEPTH, isDescent, parentOf, parseHash, toHash } from './routes';
 import { BOOKS, getBook, getShelf } from '../books/registry';
 import { BookReader } from '../books/BookReader';
+import { stop as stopReading } from '../audio/readAloud';
 import { SHELVES } from '../books/registry';
 import { ARCHIVE, SUBJECTS, archiveStory, subjectOfStory } from './library';
 import { SITUATIONS, getSituation } from './situations';
@@ -110,6 +111,9 @@ export function LearningCenter() {
     const canonical = toHash(route);
     if (window.location.hash !== canonical) window.history.replaceState(null, '', canonical);
   }, [route]);
+
+  // Read-aloud never carries over to another screen or another page (advisor a9 point 2).
+  useEffect(() => stopReading(), [route]);
 
   // A new screen starts at the top with focus on its heading — except a
   // listing you are coming back to, which returns to where you left it, with

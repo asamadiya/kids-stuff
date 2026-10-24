@@ -24,7 +24,7 @@ const BASE = import.meta.env.BASE_URL;
 
 export const LANGS_NOTE: GrownUpNote = {
   what: 'Things to say and sing in Telugu and Tamil, for Nanna and Amma to use with the children every day: short routine and play moments, traditional rhymes, two shared picture books, a few picture words, and a guide for this family.',
-  expect: 'Pick Telugu or Tamil at the top; the page shows that language only. The script is beside each picture, and "For the grown-up" opens the romanisation and meaning. The speaker buttons play YOUR recordings: record them once under Record voices. With no recording, the button says "Say it together".',
+  expect: 'Pick Telugu or Tamil at the top; the page shows that language only. The script is beside each picture, and "For the grown-up" opens the romanisation and meaning. The speaker buttons play YOUR recordings: record them once under Record voices. With no recording, the line says "Say it together", and a "Computer voice" button reads it instead (on a rhyme it says "Listen to the words": the computer speaks it, it does not sing it), with the reader you chose at the top.',
   practising: 'Hearing and using Telugu and Tamil in real moments with the people who speak them, which is what keeps a heritage language alive. Recognising the scripts in passing.',
   ask: 'Use the phrases during the day, not as a quiz: say Nanna’s line at bath time, sing the rhyme at bedtime.',
   next: 'Read the guide once: what helps, what to do when he answers in English, and how Mia fits in.',
@@ -50,13 +50,13 @@ function LangToggle({ lang, onLang }: { readonly lang: Lang; readonly onLang: (l
 }
 
 /** One line: script large, a voice button, and the grown-up's aid folded away. */
-function Line({ id, lang, said, big = false }: { readonly id: string; readonly lang: Lang; readonly said: Said; readonly big?: boolean }) {
+function Line({ id, lang, said, big = false, sung = false }: { readonly id: string; readonly lang: Lang; readonly said: Said; readonly big?: boolean; readonly sung?: boolean }) {
   return (
     <div className={`line line--${lang}${big ? ' line--big' : ''}`}>
       <p className="line__script" lang={lang}>
         {said.script}
       </p>
-      <Voice id={id} lang={lang} script={said.script} label={said.means} />
+      <Voice id={id} lang={lang} script={said.script} label={said.means} computerLabel={sung ? 'Listen to the words' : undefined} />
       <details className="line__aid">
         <summary>For the grown-up</summary>
         <p className="line__roman">{said.roman}</p>
@@ -162,9 +162,9 @@ export function RhymePage({ id, back }: { readonly id: string; readonly back: { 
           <img src={`${BASE}art/langs/${r.id}.webp`} alt={altText(r.picture)} width={1152} height={896} />
         </figure>
         <div className="moment__lines">
-          <Line id={`${r.id}.title`} lang={r.lang} said={r.title} big />
+          <Line id={`${r.id}.title`} lang={r.lang} said={r.title} big sung />
           {r.lines.map((l, i) => (
-            <Line key={i} id={`${r.id}.l${i}`} lang={r.lang} said={l} />
+            <Line key={i} id={`${r.id}.l${i}`} lang={r.lang} said={l} sung />
           ))}
           {r.actions ? (
             <p className="rhyme__actions">
@@ -217,11 +217,11 @@ export function LangBookPage({ id, page, back, onPage }: { readonly id: string; 
 
 const WORDS_NOTE: GrownUpNote = {
   what: 'Picture words taken from the moments and books, in the language you chose, with your recordings, and a listening game: hear a word, find its picture.',
-  expect: 'The listening game needs your recordings; without them it asks you to say the word. Two-year-olds can point; five-year-olds can play it alone once you have recorded the words.',
+  expect: 'The listening game plays your recordings once you have three words recorded; until then a computer voice reads the word, marked as one. Two-year-olds can point; five-year-olds can play it alone.',
   practising: 'Recognising spoken words in each language, and the scripts in passing.',
   ask: 'After the game, use two of the words at dinner.',
   next: 'Record a few more words he asks for; the most useful words are the ones he wants.',
-  honest: 'Recognising a word on a screen is not using it. Words stick when they are said in real moments with the people who speak them.',
+  honest: 'Recognising a word on a screen is not using it. Words stick when they are said in real moments with the people who speak them. The computer voice is a stand-in: it is not Amma or Nanna, and its pronunciation has not been checked by a fluent speaker.',
 };
 
 export function WordsPage() {
@@ -235,17 +235,25 @@ export function WordsPage() {
     return onVoicesChange(load);
   }, []);
   const recorded = useMemo(() => WORDS.filter((w) => have.get(clipKey(w.id, lang)) === w[lang].script), [have, lang]);
-  const deckKey = recorded.map((w) => w.id).join(',') + lang;
+  // Family recordings when there are enough; otherwise every word, read by the
+  // computer voice where a recording is missing (advisor a9 point 4).
+  const deck = recorded.length >= 3 ? recorded : WORDS;
+  const deckKey = deck.map((w) => w.id).join(',') + lang;
   useEffect(() => {
     setRound(0);
     setPicked(null);
   }, [deckKey]);
-  const game = recorded.length >= 3 ? pickRound(recorded, round) : null;
+  const game = pickRound(deck, round);
   return (
     <Page title="Words" back={{ href: '#/langs', label: 'Telugu & Tamil' }} note={WORDS_NOTE} expect="Picture words and a listening game.">
       <LangToggle lang={lang} onLang={setLang} />
       <section className="listen" aria-labelledby="listen-h">
         <h2 id="listen-h">Listen and find</h2>
+        {recorded.length < 3 ? (
+          <p className="listen__note">
+            Fewer than three words have a family recording, so a computer voice reads the word. Record words in {LANG_NAME[lang]} under <a href="#/langs/record">Record voices</a> and the game uses your voices instead.
+          </p>
+        ) : null}
         {game ? (
           <>
             <div className="listen__ask">
@@ -272,11 +280,7 @@ export function WordsPage() {
               </button>
             ) : null}
           </>
-        ) : (
-          <p className="listen__empty">
-            The listening game uses your voices. Record at least three words in {LANG_NAME[lang]} under <a href="#/langs/record">Record voices</a>, or play it by saying the word yourself and letting him point.
-          </p>
-        )}
+        ) : null}
       </section>
       <div className="words">
         {WORDS.map((w) => (
