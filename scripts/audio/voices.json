@@ -1,5 +1,5 @@
 {
- "_doc": "Read-aloud voice presets, used by make-clips.py. Chosen by measurement (.redesign/v4): bake/ (STT round-trip of 13 en-IN, 2 te-IN, 2 ta-IN voices), research/pace.md (rate per voice for ~143 wpm), research/lexicon.md (139 Indian words, native-recogniser judged). Mom = en-IN Meera HD (best plain pronunciation of names among the female HD voices); Dad = en-IN Arjun HD (cleanest English around names, 138/139 words OK after the lexicon). Telugu/Tamil: mom uses the native te-IN Shruti / ta-IN Pallavi voices (no female multilingual voice was clear in both); dad uses PrabhatIndic, which matched the native male voices in both languages.",
+ "_doc": "Read-aloud voice presets, used by make-clips.py. Chosen by measurement (.redesign/v4): bake/ (STT round-trip of 13 en-IN, 2 te-IN, 2 ta-IN voices), research/pace.md (rate per voice for ~143 wpm), research/lexicon.md (139 Indian words, native-recogniser judged). Mom = en-IN Meera HD (best plain pronunciation of names among the female HD voices); Dad = en-IN Arjun HD (cleanest English around names, 138/139 words OK after the lexicon). Telugu/Tamil: mom uses the native te-IN Shruti / ta-IN Pallavi voices (no female multilingual voice was clear in both); dad uses the native te-IN Mohan / ta-IN Valluvar voices: on every Telugu/Tamil line on the site (119 te, 134 ta; .redesign/v4/telta-full.json) they beat the multilingual PrabhatIndic (te 0.053 vs 0.066 mean CER; ta 0.047 vs 0.084).",
  "readers": {
   "mom": {
    "en": {
@@ -301,15 +301,15 @@
     }
    },
    "te": {
-    "voice": "en-IN-PrabhatIndicNeural",
+    "voice": "te-IN-MohanNeural",
     "rate": "",
-    "wpm": 60,
+    "wpm": 66,
     "lexicon": {}
    },
    "ta": {
-    "voice": "en-IN-PrabhatIndicNeural",
+    "voice": "ta-IN-ValluvarNeural",
     "rate": "",
-    "wpm": 65,
+    "wpm": 78,
     "lexicon": {}
    }
   }

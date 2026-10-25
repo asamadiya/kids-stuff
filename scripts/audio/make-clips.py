@@ -196,8 +196,17 @@ def plausible(text: str, lang: str, seconds: float, wpm: float) -> bool:
     if lang == 'en':
         expect = spoken_words(text) / wpm * 60
     else:
-        expect = max(1, len(re.sub(r'\W', '', text))) / 9.0  # about 9 letters a second for te/ta voices
-    return 0.45 * expect - 0.3 <= seconds <= 1.7 * expect + 1.0
+        # Syllables, not letters: one per consonant or independent vowel (a vowel
+        # sign or virama rides on its consonant; Python's \W would drop the signs).
+        # About 4 a second, plus a measured ~0.45 s for each ! ? , or full stop.
+        syll = sum(1 for ch in text if unicodedata.category(ch) == 'Lo')
+        pauses = sum(text.count(c) for c in '!?,.')
+        expect = max(1, syll) / 4.0 + 0.45 * pauses
+    # The upper bound catches run-on speech; the lower bound only an empty or cut
+    # clip (a one-syllable Tamil word is a genuine 0.2 s, and native voices read
+    # short lines fast, so te/ta get a loose floor).
+    floor = max(0.12, 0.45 * expect - 0.3) if lang == 'en' else min(0.15, 0.25 * expect)
+    return floor <= seconds <= 1.7 * expect + 1.0
 
 
 def encode(wav_bytes: bytes, dest: Path) -> None:
@@ -207,7 +216,13 @@ def encode(wav_bytes: bytes, dest: Path) -> None:
                         '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame', '-b:a', '32k', '-f', 'mp3', str(tmp)],
                        input=wav_bytes, capture_output=True)
     if p.returncode:
-        raise RuntimeError(p.stderr.decode()[:300])
+        # silenceremove + areverse can leave the graph with no input on an
+        # unusual clip; encode it untrimmed rather than lose the line.
+        p = subprocess.run([ffmpeg(), '-hide_banner', '-loglevel', 'error', '-y', '-f', 'wav', '-i', 'pipe:0',
+                            '-af', 'loudnorm=I=-18:TP=-2:LRA=11', '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame',
+                            '-b:a', '32k', '-f', 'mp3', str(tmp)], input=wav_bytes, capture_output=True)
+        if p.returncode:
+            raise RuntimeError(p.stderr.decode()[:300])
     tmp.replace(dest)
 
 
