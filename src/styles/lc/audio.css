@@ -72,3 +72,7 @@
 }
 @media print { .readaloud, .readerswitch { display: none; } }
 .shell__boardread { display: flex; justify-content: flex-end; margin: calc(-1 * var(--s2)) 0 var(--s2); }
+
+/* The exercises' stage rule (.bench__stage svg: block, full width) would blow
+   the speaker glyph up to the button's width; a read button's icon stays an icon. */
+.bench .readaloud svg, .bench__stage .readaloud svg { display: inline; width: 22px; height: 22px; max-width: none; flex: none; }
