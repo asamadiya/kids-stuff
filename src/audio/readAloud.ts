@@ -180,7 +180,14 @@ function one(url: string, make: () => HTMLAudioElement): Promise<boolean> {
  * or is interrupted. 'missing' means at least one line has no clip for this
  * reader (nothing is played, so the child never hears half a page).
  */
-export async function play(id: string, texts: readonly string[], lang: ReadLang = 'en', make: () => HTMLAudioElement = () => new Audio()): Promise<PlayResult> {
+export async function play(
+  id: string,
+  texts: readonly string[],
+  lang: ReadLang = 'en',
+  make: () => HTMLAudioElement = () => new Audio(),
+  /** Read the lines that have a clip and skip the rest (a hint's number sentence, which the board draws). */
+  skipMissing = false,
+): Promise<PlayResult> {
   stop();
   const mine = run;
   playing = { id };
@@ -193,8 +200,9 @@ export async function play(id: string, texts: readonly string[], lang: ReadLang 
     return 'failed';
   }
   if (mine !== run) return 'stopped';
-  const urls = texts.map((t) => clipUrl(m, reader, lang, t));
-  if (urls.some((u) => u === null)) {
+  const all = texts.map((t) => clipUrl(m, reader, lang, t));
+  const urls = skipMissing ? all.filter((u) => u !== null) : all;
+  if (!urls.length || urls.some((u) => u === null)) {
     stop();
     return 'missing';
   }

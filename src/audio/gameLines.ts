@@ -13,7 +13,8 @@
 import type { AnyGame, Level } from '../play/types';
 
 const LEVELS: readonly Level[] = [1, 2, 3];
-const INDEXES = 400;
+/** The round tables cycle by index 8 (measured); 40 leaves room for longer tables. */
+const INDEXES = 40;
 
 /** The shell's own lines, as GameShell shows them (without trailing spaces). */
 export const SHELL_LINES: readonly string[] = [
@@ -25,17 +26,26 @@ export const SHELL_LINES: readonly string[] = [
   'Here is what happens.',
 ];
 
+const STAGES = ['answering', 'hint', 'worked', 'solved'] as const;
+
+/** A hint, sentence by sentence: one clip each, so a sentence with an unlisted number can be skipped. */
+export function sentences(text: string): string[] {
+  return text.split(/(?<=[.!?])\s+(?=[A-Z0-9“"])/).map((s) => s.trim()).filter(Boolean);
+}
+
 export function gameLines(g: AnyGame): string[] {
   const out = new Set<string>();
   for (const level of LEVELS) {
     for (let i = 0; i < INDEXES; i++) {
       const round = g.generate(level, i);
       out.add(g.prompt(round));
+      if (g.board) for (const stage of STAGES) for (const line of g.board(round, level, stage)) out.add(line);
       if (g.kind === 'solve') {
         out.add(g.explain(round));
+        if (g.hints) for (const h of g.hints(round)) for (const x of sentences(h)) out.add(x);
         try {
           const v = g.check(round, g.emptyAnswer(round));
-          if (!v.ok && v.hint) out.add(v.hint);
+          if (!v.ok && v.hint) for (const x of sentences(v.hint)) out.add(x);
         } catch {
           /* a check that needs a real answer: its hints are answer-dependent */
         }

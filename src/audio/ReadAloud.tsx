@@ -17,6 +17,7 @@ export function ReadAloud({
   lang = 'en',
   label = 'Read it to me',
   compact = false,
+  partial = false,
 }: {
   readonly id: string;
   readonly texts: readonly string[];
@@ -24,6 +25,8 @@ export function ReadAloud({
   readonly label?: string;
   /** Icon only, for a button beside a single short line (a step, an answer choice). */
   readonly compact?: boolean;
+  /** Read the lines that have a clip and skip the others (see `play`). */
+  readonly partial?: boolean;
 }) {
   const playing = usePlaying();
   const reader = useReader();
@@ -40,7 +43,7 @@ export function ReadAloud({
       return;
     }
     setProblem('');
-    const r = await play(id, texts, lang);
+    const r = await play(id, texts, lang, undefined, partial);
     if (r === 'missing' || r === 'failed') setProblem(r);
   };
 

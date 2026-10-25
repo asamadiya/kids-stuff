@@ -71,3 +71,4 @@
   .lc-top__tools .readerswitch { order: 9; }
 }
 @media print { .readaloud, .readerswitch { display: none; } }
+.shell__boardread { display: flex; justify-content: flex-end; margin: calc(-1 * var(--s2)) 0 var(--s2); }

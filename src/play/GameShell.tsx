@@ -8,6 +8,7 @@ import { GrownUps } from '../learn/GrownUps';
 import { HomeLink } from '../learn/PartNav';
 import { ReaderSwitch } from '../audio/ReaderSwitch';
 import { ReadAloud } from '../audio/ReadAloud';
+import { sentences } from '../audio/gameLines';
 
 /**
  * The frame every game sits in. A board draws and answers; this owns the rest:
@@ -200,7 +201,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
     ? []
     : [
         ...(nudged && waiting ? ['First choose what you think will happen.'] : []),
-        ...(stage === 'hint' && hint ? [hint] : []),
+        ...(stage === 'hint' && hint ? sentences(hint) : []),
         ...(stage === 'worked' && game.kind === 'solve' ? ['Here is how it works.'] : []),
         ...(stage === 'solved' && game.kind === 'solve' ? [...(misses === 0 ? ['Yes.'] : []), game.explain(round)] : []),
         ...(reveal && game.kind === 'investigate'
@@ -264,6 +265,9 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
             <ReadAloud key={`p${serial}`} id={`game/${game.id}/prompt`} texts={[game.prompt(round)]} label="Read it" />
           </div>
 
+          {game.board && !(reveal && game.kind === 'investigate') ? (
+            <BoardWords key={`b${serial}${stage}`} id={`game/${game.id}/board`} lines={game.board(round, level, stage)} />
+          ) : null}
           <div className={`shell__board stage-${stage}`}>
             {reveal && game.kind === 'investigate' ? (
               <div className="evidence">
@@ -282,7 +286,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
           </div>
 
           <div className="shell__feedback" aria-live="polite">
-            {feedback.length ? <ReadAloud key={`f${serial}${stage}`} id={`game/${game.id}/feedback`} texts={feedback} label="Read it" compact /> : null}
+            {feedback.length ? <ReadAloud key={`f${serial}${stage}`} id={`game/${game.id}/feedback`} texts={feedback} label="Read it" compact partial={stage === 'hint'} /> : null}
             {nudged && waiting ? <p className="feedback feedback--hint">First choose what you think will happen.</p> : null}
             {stage === 'hint' && hint ? <p className="feedback feedback--hint">{hint}</p> : null}
             {stage === 'worked' && game.kind === 'solve' ? <p className="feedback feedback--worked">Here is how it works.</p> : null}
@@ -340,6 +344,16 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
         </>
       )}
     </main>
+  );
+}
+
+/** One read-aloud button for the words on the board at this stage, when there are any. */
+function BoardWords({ id, lines }: { readonly id: string; readonly lines: readonly string[] }) {
+  if (!lines.length) return null;
+  return (
+    <div className="shell__boardread">
+      <ReadAloud id={id} texts={lines} label="Read the board" />
+    </div>
   );
 }
 
