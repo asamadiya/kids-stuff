@@ -1,0 +1,317 @@
+{
+ "_doc": "Read-aloud voice presets, used by make-clips.py. Chosen by measurement (.redesign/v4): bake/ (STT round-trip of 13 en-IN, 2 te-IN, 2 ta-IN voices), research/pace.md (rate per voice for ~143 wpm), research/lexicon.md (139 Indian words, native-recogniser judged). Mom = en-IN Meera HD (best plain pronunciation of names among the female HD voices); Dad = en-IN Arjun HD (cleanest English around names, 138/139 words OK after the lexicon). Telugu/Tamil: mom uses the native te-IN Shruti / ta-IN Pallavi voices (no female multilingual voice was clear in both); dad uses PrabhatIndic, which matched the native male voices in both languages.",
+ "readers": {
+  "mom": {
+   "en": {
+    "voice": "en-IN-Meera:DragonHDLatestNeural",
+    "rate": "-18%",
+    "wpm": 143,
+    "lexicon": {
+     "Anna": {
+      "method": "lang",
+      "value": "అన్నా",
+      "locale": "te-IN"
+     },
+     "Aryabhatiya": {
+      "method": "lang",
+      "value": "आर्यभटीय",
+      "locale": "hi-IN"
+     },
+     "Jahanpanah": {
+      "method": "lang",
+      "value": "जहाँपनाह",
+      "locale": "hi-IN"
+     },
+     "Krishnan": {
+      "method": "phoneme",
+      "value": "ˈkɾɪʂɳən"
+     },
+     "Nanna": {
+      "method": "sub",
+      "value": "Naanna"
+     },
+     "Nilaa nilaa odi vaa": {
+      "method": "lang",
+      "value": "நிலா நிலா ஓடி வா",
+      "locale": "ta-IN"
+     },
+     "Paati": {
+      "method": "sub",
+      "value": "Paatti"
+     },
+     "Pallanguzhi": {
+      "method": "lang",
+      "value": "பல்லாங்குழி",
+      "locale": "ta-IN"
+     },
+     "Rajasaurus": {
+      "method": "sub",
+      "value": "Raa-jaa-sor-us"
+     },
+     "Raman": {
+      "method": "sub",
+      "value": "Raaman"
+     },
+     "Tatayya": {
+      "method": "sub",
+      "value": "Thaathayya"
+     },
+     "Thai": {
+      "method": "sub",
+      "value": "Tha-ee"
+     },
+     "Thatha": {
+      "method": "sub",
+      "value": "Thah-thah"
+     },
+     "Vraj": {
+      "method": "sub",
+      "value": "Braj"
+     },
+     "anna": {
+      "method": "lang",
+      "value": "అన్నా",
+      "locale": "te-IN"
+     },
+     "bobbatlu": {
+      "method": "lang",
+      "value": "బొబ్బట్లు",
+      "locale": "te-IN"
+     },
+     "chamgadar": {
+      "method": "lang",
+      "value": "चमगादड़",
+      "locale": "hi-IN"
+     },
+     "chapatis": {
+      "method": "lang",
+      "value": "चपातीस",
+      "locale": "hi-IN"
+     },
+     "chappals": {
+      "method": "lang",
+      "value": "चप्पल्स",
+      "locale": "hi-IN"
+     },
+     "cheepuru": {
+      "method": "lang",
+      "value": "చీపురు",
+      "locale": "te-IN"
+     },
+     "dosa": {
+      "method": "phoneme",
+      "value": "ˈd̪oːsaː"
+     },
+     "dosas": {
+      "method": "phoneme",
+      "value": "ˈd̪oːsaːz"
+     },
+     "moonu": {
+      "method": "lang",
+      "value": "மூணு",
+      "locale": "ta-IN"
+     },
+     "pachadi": {
+      "method": "lang",
+      "value": "పచ్చడి",
+      "locale": "te-IN"
+     },
+     "shata": {
+      "method": "phoneme",
+      "value": "ˈʃət̪ə"
+     },
+     "ta ka dhi mi": {
+      "method": "sub",
+      "value": "tha ka dhee mee"
+     },
+     "vaa": {
+      "method": "sub",
+      "value": "vaah"
+     }
+    }
+   },
+   "te": {
+    "voice": "te-IN-ShrutiNeural",
+    "rate": "",
+    "wpm": 72,
+    "lexicon": {}
+   },
+   "ta": {
+    "voice": "ta-IN-PallaviNeural",
+    "rate": "",
+    "wpm": 77,
+    "lexicon": {}
+   }
+  },
+  "dad": {
+   "en": {
+    "voice": "en-IN-Arjun:DragonHDLatestNeural",
+    "rate": "-18%",
+    "wpm": 143,
+    "lexicon": {
+     "Anna": {
+      "method": "lang",
+      "value": "అన్నా",
+      "locale": "te-IN"
+     },
+     "Aryabhatiya": {
+      "method": "lang",
+      "value": "आर्यभटीय",
+      "locale": "hi-IN"
+     },
+     "Choodu": {
+      "method": "sub",
+      "value": "Choodoo"
+     },
+     "Diyas": {
+      "method": "lang",
+      "value": "दियास",
+      "locale": "hi-IN"
+     },
+     "Nanamma": {
+      "method": "sub",
+      "value": "Naanamma"
+     },
+     "Nanna": {
+      "method": "sub",
+      "value": "Naanna"
+     },
+     "Nilaa nilaa odi vaa": {
+      "method": "lang",
+      "value": "நிலா நிலா ஓடி வா",
+      "locale": "ta-IN"
+     },
+     "Paati": {
+      "method": "phoneme",
+      "value": "ˈpaːʈːi"
+     },
+     "Pallanguzhi": {
+      "method": "lang",
+      "value": "பல்லாங்குழி",
+      "locale": "ta-IN"
+     },
+     "Pournami": {
+      "method": "lang",
+      "value": "పౌర్ణమి",
+      "locale": "te-IN"
+     },
+     "Puthandu": {
+      "method": "sub",
+      "value": "Puthaandu"
+     },
+     "Rajasaurus": {
+      "method": "sub",
+      "value": "Raa-jaa-sor-us"
+     },
+     "Raman": {
+      "method": "sub",
+      "value": "Raaman"
+     },
+     "Tatayya": {
+      "method": "lang",
+      "value": "తాతయ్య",
+      "locale": "te-IN"
+     },
+     "Thai": {
+      "method": "lang",
+      "value": "தை",
+      "locale": "ta-IN"
+     },
+     "Thatha": {
+      "method": "sub",
+      "value": "Thah-thah"
+     },
+     "Vraj": {
+      "method": "sub",
+      "value": "Braj"
+     },
+     "anna": {
+      "method": "lang",
+      "value": "అన్నా",
+      "locale": "te-IN"
+     },
+     "bobbatlu": {
+      "method": "lang",
+      "value": "బొబ్బట్లు",
+      "locale": "te-IN"
+     },
+     "chamgadar": {
+      "method": "lang",
+      "value": "चमगादड़",
+      "locale": "hi-IN"
+     },
+     "chapatis": {
+      "method": "phoneme",
+      "value": "t͡ʃəˈpaːt̪iːz"
+     },
+     "chappals": {
+      "method": "lang",
+      "value": "चप्पल्स",
+      "locale": "hi-IN"
+     },
+     "chembu": {
+      "method": "phoneme",
+      "value": "ˈt͡ʃembʊ"
+     },
+     "dal": {
+      "method": "lang",
+      "value": "दाल",
+      "locale": "hi-IN"
+     },
+     "diyas": {
+      "method": "lang",
+      "value": "दियास",
+      "locale": "hi-IN"
+     },
+     "dosa": {
+      "method": "phoneme",
+      "value": "ˈd̪oːsaː"
+     },
+     "dosas": {
+      "method": "phoneme",
+      "value": "ˈd̪oːsaːz"
+     },
+     "moodu": {
+      "method": "sub",
+      "value": "moodoo"
+     },
+     "moonu": {
+      "method": "lang",
+      "value": "மூணு",
+      "locale": "ta-IN"
+     },
+     "naalu": {
+      "method": "lang",
+      "value": "நாலு",
+      "locale": "ta-IN"
+     },
+     "pachadi": {
+      "method": "phoneme",
+      "value": "ˈpət͡ʃt͡ʃəɖi"
+     },
+     "sahasra": {
+      "method": "lang",
+      "value": "सहस्रा",
+      "locale": "hi-IN"
+     },
+     "ta ka dhi mi": {
+      "method": "sub",
+      "value": "tha ka dhee mee"
+     }
+    }
+   },
+   "te": {
+    "voice": "en-IN-PrabhatIndicNeural",
+    "rate": "",
+    "wpm": 60,
+    "lexicon": {}
+   },
+   "ta": {
+    "voice": "en-IN-PrabhatIndicNeural",
+    "rate": "",
+    "wpm": 65,
+    "lexicon": {}
+   }
+  }
+ }
+}

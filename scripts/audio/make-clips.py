@@ -62,12 +62,47 @@ def text_key(text: str) -> str:
     return re.sub(r'\s+', ' ', unicodedata.normalize('NFC', text)).strip()
 
 
+# Visible text -> what the voice should say. The clip is still keyed by the
+# visible text; only the speech is rewritten. Each rule is from a measured
+# failure (.redesign/v4/hazard/probe*.py, research/pace.md "Text problems"):
+#   "4 − 1" (U+2212) was read "four when one" / "foremen"; "minus" fixes it.
+#   "floor −2" was read "floors two"; "minus 2" fixes it.
+#   "4 o'clock" lost "o'clock" in 2 of 3 Meera takes; <sub alias="o clock"> kept it in 8 of 8.
+#   "58 g" was read "fifty eight g"; units are spelled out.
+#   "Thatha's number: 14" made Meera insert a word at the colon; "number is 14" did not.
+SPEECH: list[tuple[str, str]] = [
+    (r'(\d)\s*−\s*(\d)', r'\1 minus \2'),
+    (r'−\s*(\d)', r'minus \1'),
+    (r'(\d)\s*×\s*(\d)', r'\1 times \2'),
+    (r'(\d)\s*÷\s*(\d)', r'\1 divided by \2'),
+    (r'(\d)\s*–\s*(\d)', r'\1 to \2'),
+    (r'\b(\d+(?:\.\d+)?)\s?cm\b', r'\1 centimetres'),
+    (r'\b1\s?m\b', r'1 metre'),
+    (r'\b(\d+(?:\.\d+)?)\s?m\b', r'\1 metres'),
+    (r'\b1\s?g\b', r'1 gram'),
+    (r'\b(\d+(?:\.\d+)?)\s?g\b', r'\1 grams'),
+    (r'\b1\s?s\b', r'1 second'),
+    (r'\b(\d+(?:\.\d+)?)\s?s\b(?![\'’])', r'\1 seconds'),
+    (r'\b1\s?h\b', r'1 hour'),
+    (r'\b(\d+)\s?h\b', r'\1 hours'),
+    (r"number:\s*(\d)", r'number is \1'),
+]
+OCLOCK = re.compile(r"o['’]clock")
+
+
+def speakable(text: str) -> str:
+    for pat, rep in SPEECH:
+        text = re.sub(pat, rep, text)
+    return text
+
+
 def apply_lexicon(text: str, lexicon: dict[str, dict]) -> str:
     """Escape the line for SSML and replace each lexicon word with its markup.
 
     Longest words first, whole words only, case-sensitive (names are capitalised).
     """
-    out = escape(text)
+    out = escape(speakable(text))
+    out = OCLOCK.sub('<sub alias="o clock">o\'clock</sub>', out)
     for word in sorted(lexicon, key=len, reverse=True):
         rule = lexicon[word]
         method, value = rule['method'], rule.get('value', '')
@@ -98,7 +133,7 @@ def ssml(preset: dict, lang: str, text: str) -> str:
 
 def stem_for(preset: dict, doc: str) -> str:
     # The voice, rate and the exact SSML decide the sound; the lexicon is inside the SSML.
-    sig = json.dumps({'voice': preset['voice'], 'format': preset.get('format', 'mp3-48k')}, sort_keys=True) + '\n' + doc
+    sig = json.dumps({'voice': preset['voice'], 'format': 'mp3-32k-loudnorm-18'}, sort_keys=True) + '\n' + doc
     return hashlib.sha256(sig.encode()).hexdigest()[:16]
 
 
@@ -141,22 +176,35 @@ def speech_seconds(wav_bytes: bytes) -> float:
     return (loud[-1] - loud[0] + win) / rate if loud else 0.0
 
 
-def plausible(text: str, lang: str, seconds: float) -> bool:
-    """A loose band: made-up run-on speech is several times too long; a cut clip is far too short."""
+def spoken_words(text: str) -> int:
+    """Words as spoken: "152" is three ("one hundred fifty-two"), not one."""
+    n = 0
+    for tok in speakable(text).split():
+        digits = re.sub(r'\D', '', tok)
+        n += 1 + (len(digits) - 1 if len(digits) > 1 else 0)
+    return max(1, n)
+
+
+def plausible(text: str, lang: str, seconds: float, wpm: float) -> bool:
+    """Spoken length against what this voice's measured pace predicts.
+
+    A run-on (an HD voice inventing speech after the line) or a cut clip falls
+    outside 0.45x..1.7x of the expected duration, plus a second for the shortest
+    lines. research/lexicon.md measured Meera running on 5-60 s in ~0.3% of clips;
+    the earlier band let a short run-on through on a long line.
+    """
     if lang == 'en':
-        units = max(1, len(text.split()))
-        lo, hi = units / 6.0, 1.6 + units / 1.4  # 360 wpm .. ~85 wpm plus a pause allowance
+        expect = spoken_words(text) / wpm * 60
     else:
-        units = max(1, len(re.sub(r'\W', '', text)))  # letters, for scripts without English word spacing
-        lo, hi = units / 30.0, 1.8 + units / 3.0
-    return lo <= seconds <= hi
+        expect = max(1, len(re.sub(r'\W', '', text))) / 9.0  # about 9 letters a second for te/ta voices
+    return 0.45 * expect - 0.3 <= seconds <= 1.7 * expect + 1.0
 
 
 def encode(wav_bytes: bytes, dest: Path) -> None:
     tmp = dest.with_suffix('.part')
     p = subprocess.run([ffmpeg(), '-hide_banner', '-loglevel', 'error', '-y', '-f', 'wav', '-i', 'pipe:0',
                         '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,loudnorm=I=-18:TP=-2:LRA=11',
-                        '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame', '-b:a', '48k', '-f', 'mp3', str(tmp)],
+                        '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame', '-b:a', '32k', '-f', 'mp3', str(tmp)],
                        input=wav_bytes, capture_output=True)
     if p.returncode:
         raise RuntimeError(p.stderr.decode()[:300])
@@ -174,7 +222,7 @@ def make_one(reader: str, lang: str, text: str, preset: dict, dry: bool) -> tupl
     for attempt in range(5):
         wav_bytes = synth(doc)
         secs = speech_seconds(wav_bytes)
-        if plausible(text, lang, secs):
+        if plausible(text, lang, secs, preset.get('wpm', 145)):
             encode(wav_bytes, dest)
             return reader, lang, text, stem
         with _lock:
