@@ -47,6 +47,7 @@ import { Piece } from '../../play/parts';
 
 export type Kind = 'make' | 'share' | 'group';
 export type Layout = 'nests' | 'rows';
+type Stage = BoardProps<Round, Answer>['stage'];
 
 export interface Round {
   readonly kind: Kind;
@@ -154,6 +155,11 @@ function basketFact(left: number): string {
   return left === 1 ? '1 egg is still in the basket.' : `${left} eggs are still in the basket.`;
 }
 
+const allEmpty = (n: string) => `Every ${n} is empty.`;
+/** `count` nests that each hold `each`, and what they make: "3 nests of 4: that is 12." */
+const groupsOf = (count: number, n: string, each: number) =>
+  `${count} ${n}${count === 1 ? '' : 's'} of ${each}: that is ${count * each}.`;
+
 function check(round: Round, answer: Answer): Verdict {
   const t = totalsOf(round, answer);
   const left = basketLeft(round, answer);
@@ -164,19 +170,54 @@ function check(round: Round, answer: Answer): Verdict {
     const full = t.filter((x) => x === size).length;
     if (t.every((x) => x === 0 || x === size) && full === filled) return { ok: true };
     const used = t.filter((x) => x > 0);
-    if (used.length === 0) return { ok: false, hint: `Every ${n} is empty. ${basketFact(left)}` };
-    if (used.every((x) => x === size)) {
-      return { ok: false, hint: `${full} ${n}${full === 1 ? '' : 's'} of ${size}: that is ${full * size}. ${basketFact(left)}` };
-    }
+    if (used.length === 0) return { ok: false, hint: `${allEmpty(n)} ${basketFact(left)}` };
+    if (used.every((x) => x === size)) return { ok: false, hint: `${groupsOf(full, n, size)} ${basketFact(left)}` };
     return { ok: false, hint: `The ${n}s with eggs hold ${list(used)}. ${basketFact(left)}` };
   }
 
   if (t.every((x) => x === size)) return { ok: true };
   const same = t.every((x) => x === t[0]);
   const tail = round.kind === 'share' ? ` ${basketFact(left)}` : '';
-  if (same && t[0] === 0) return { ok: false, hint: `Every ${n} is empty.${tail}` };
-  if (same) return { ok: false, hint: `${round.nests} ${n}s of ${t[0]}: that is ${round.nests * t[0]}.${tail}` };
+  if (same && t[0] === 0) return { ok: false, hint: `${allEmpty(n)}${tail}` };
+  if (same) return { ok: false, hint: `${groupsOf(round.nests, n, t[0])}${tail}` };
   return { ok: false, hint: `The ${n}s hold ${list(t)} eggs, not all the same.${tail}` };
+}
+
+/**
+ * Read-aloud: the hint sentences `check` can give for this round, over every
+ * answer the board lets him make (each nest from its brown eggs up to the
+ * nest's cap; in share and group rounds, no more than the basket holds). Each
+ * sentence on its own line:
+ *  - "Every nest is empty.", when every nest can be empty (no brown eggs);
+ *  - every "N nests of K: that is M." the board can reach: in make and share
+ *    rounds every nest holding the same wrong K, in group rounds 1 up to one
+ *    fewer than the full nests of the right size;
+ *  - share and group: every basket fact from the full basket down to empty;
+ *  - make with brown eggs: the hint for Check before any tap, which names the
+ *    brown eggs' counts.
+ * Left out: "The nests hold 1, 0 and 4 eggs, not all the same." and "The nests
+ * with eggs hold 3 and 5.", whose lists of counts run to hundreds of thousands
+ * of answers. The board draws each nest's count under it on the hint stage.
+ */
+function hints(round: Round): readonly string[] {
+  const n = noun(round);
+  const cap = capOf(round);
+  const { size, filled } = shape(round);
+  const out = new Set<string>();
+  if (sum(round.start) === 0) out.add(allEmpty(n));
+  if (round.kind === 'group') {
+    for (let full = 1; full < filled; full += 1) out.add(groupsOf(full, n, size));
+  } else {
+    const most = round.kind === 'make' ? cap : Math.min(cap, Math.floor(round.eggs / round.nests));
+    for (let each = Math.max(1, ...round.start); each <= most; each += 1) if (each !== size) out.add(groupsOf(round.nests, n, each));
+  }
+  if (round.kind === 'make') {
+    const { hint } = check(round, zeros(round.nests));
+    if (hint) out.add(hint);
+  } else {
+    for (let left = round.eggs; left >= 0; left -= 1) out.add(basketFact(left));
+  }
+  return [...out];
 }
 
 /**
@@ -208,11 +249,55 @@ function explain(round: Round): string {
   return `${lead}. ${equation(round)}, because ${filled} × ${size} = ${round.eggs}.${down}`;
 }
 
+/* ----------------------------------------------------- the board's words -- */
+
+/** Under the pattern nest (or beside the pattern row). */
+const patternWords = (n: string) => `every ${n} like this`;
+const BROWN_STAY = 'Brown eggs were already there. They stay.';
+const TAP_PLUS = 'Tap + to put an egg in that row.';
+/** The two labels under the finished tray drawn as rows and as columns. */
+const rowsOf = (rows: number, cols: number) => `${rows} rows of ${cols}`;
+const columnsOf = (rows: number, cols: number) => `${cols} columns of ${rows}`;
+
+/** The caption under the worked board's equation. */
+function workedCaption(round: Round): string {
+  const { size, filled } = shape(round);
+  return round.layout === 'rows'
+    ? `${rowsOf(filled, size)}. Read down: ${columnsOf(filled, size)}.`
+    : `${filled} ${noun(round)}s of ${size} eggs.`;
+}
+
+/** The tray, finished, drawn as rows and as columns: on 'worked' and 'solved'. */
+const showsRowsAndColumns = (round: Round, stage: Stage) =>
+  round.layout === 'rows' && (stage === 'worked' || stage === 'solved') && shape(round).filled > 0;
+
+/**
+ * Read-aloud: the board's words at this stage, in screen order — the pattern
+ * nest's label (make and group), the brown-eggs caption, the tray's "Tap +"
+ * line, the finished tray's two labels on 'solved', and on 'worked' the
+ * equation and its caption. Left to the picture: the basket's "empty" and
+ * "6 in the basket", and every count tag. On 'worked' the finished tray's two
+ * labels are left out too: the caption under them says the same words.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const { size, filled } = shape(round);
+  const out: string[] = [];
+  if (round.kind !== 'share') out.push(patternWords(noun(round)));
+  if (stage === 'worked') return [...out, equation(round), workedCaption(round)];
+  if (sum(round.start) > 0) out.push(BROWN_STAY);
+  if (round.layout === 'rows' && stage !== 'solved') out.push(TAP_PLUS);
+  if (showsRowsAndColumns(round, stage)) out.push(rowsOf(filled, size), columnsOf(filled, size));
+  return out;
+}
+
 /* --------------------------------------------------------------- drawing -- */
 
 /** Most eggs one nest (or one tray row) takes, so a nest never outgrows the board. */
 const NEST_MAX = 10;
 const ROW_MAX = 8;
+function capOf(round: Round): number {
+  return round.layout === 'rows' ? ROW_MAX : NEST_MAX;
+}
 const INK = '#24170f';
 const WHITE_EGG = '#fbf3e4';
 const BROWN_EGG = '#c98a4e';
@@ -365,7 +450,7 @@ function PatternNest({ each, showCount }: { readonly each: number; readonly show
       </div>
       <Twigs />
       {showCount ? <p style={count}>{each}</p> : null}
-      <p style={patternLabel}>every nest like this</p>
+      <p style={patternLabel}>{patternWords('nest')}</p>
     </div>
   );
 }
@@ -380,7 +465,7 @@ function PatternRow({ each, showCount }: { readonly each: number; readonly showC
         </span>
       ))}
       {showCount ? <span style={rowCount}>{each}</span> : null}
-      <span style={patternLabel}>every row like this</span>
+      <span style={patternLabel}>{patternWords('row')}</span>
     </div>
   );
 }
@@ -479,8 +564,8 @@ function RowsAndColumns({ rows, cols }: { readonly rows: number; readonly cols: 
         <rect key={`c${c}`} x={w + gap + pad + c * step + 2} y={pad + 2} width={step - 4} height={rows * step - 4} rx="11" style={{ ...ring, stroke: 'var(--ones)' }} />
       ))}
       {eggs(w + gap)}
-      <text x={w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{`${rows} rows of ${cols}`}</text>
-      <text x={w + gap + w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{`${cols} columns of ${rows}`}</text>
+      <text x={w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{rowsOf(rows, cols)}</text>
+      <text x={w + gap + w / 2} y={height - 6} textAnchor="middle" fontSize="16" fontWeight="600" fill={INK}>{columnsOf(rows, cols)}</text>
     </svg>
   );
 }
@@ -493,7 +578,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const added = worked ? solution(round) : round.start.map((_, i) => answer[i] ?? 0);
   const left = round.eggs - sum(added);
   const hasBasket = round.kind !== 'make';
-  const cap = round.layout === 'rows' ? ROW_MAX : NEST_MAX;
+  const cap = capOf(round);
 
   const views: NestView[] = round.start.map((given, i) => ({
     i,
@@ -508,11 +593,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   }));
 
   const given = sum(round.start) > 0;
-  const n = noun(round);
   const { size, filled } = shape(round);
   // The question's group size, drawn, whenever the question gives it.
   const pattern = round.kind !== 'share';
-  const finishedTray = round.layout === 'rows' && (worked || stage === 'solved');
 
   return (
     <div className="board">
@@ -536,17 +619,13 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           ))}
         </div>
       )}
-      {given && !worked ? <p className="board-caption">Brown eggs were already there. They stay.</p> : null}
-      {round.layout === 'rows' && !locked ? <p className="board-caption">Tap + to put an egg in that row.</p> : null}
-      {finishedTray && filled > 0 ? <RowsAndColumns rows={filled} cols={size} /> : null}
+      {given && !worked ? <p className="board-caption">{BROWN_STAY}</p> : null}
+      {round.layout === 'rows' && !locked ? <p className="board-caption">{TAP_PLUS}</p> : null}
+      {showsRowsAndColumns(round, stage) ? <RowsAndColumns rows={filled} cols={size} /> : null}
       {worked ? (
         <>
           <p style={equationStyle}>{equation(round)}</p>
-          <p className="board-caption">
-            {round.layout === 'rows'
-              ? `${filled} ${n}s of ${size}. Read down: ${size} columns of ${filled}.`
-              : `${filled} ${n}s of ${size} eggs.`}
-          </p>
+          <p className="board-caption">{workedCaption(round)}</p>
         </>
       ) : null}
     </div>
@@ -565,7 +644,9 @@ export const fillEveryNest: SolveGame<Round, Answer> = {
   emptyAnswer: (round) => zeros(round.nests),
   Board,
   check,
+  hints,
   explain,
+  board,
   cover: 'art/games/fill-every-nest.png',
   note: {
     what: "Nests (at level 3, the rows of an egg tray) and, in most rounds, a basket of eggs. He taps the egg under a nest, or an empty cup in a tray row, to put one in, and taps an egg to take it out. Some rounds give the nests and the eggs per nest; some give the eggs and the nests; some give the eggs and the size of each nest.",

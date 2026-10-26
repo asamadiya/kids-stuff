@@ -86,6 +86,10 @@ export type Round =
 
 export type Answer = ThingId | 'same' | number | null;
 
+type CompareRound = Exclude<Round, { readonly mode: 'count' }>;
+type CountRound = Extract<Round, { readonly mode: 'count' }>;
+type Stage = BoardProps<Round, Answer>['stage'];
+
 const lane = (id: ThingId, start: number): Lane => ({ id, start });
 const len = (l: Lane) => THINGS[l.id].metres;
 const end = (l: Lane) => l.start + len(l);
@@ -557,6 +561,67 @@ function Mark({ f, i, x }: { readonly f: Frame; readonly i: number; readonly x: 
 
 const tag = (id: ThingId) => (id === 'child' ? 'Child, lying down' : THINGS[id].label);
 
+/* ------------------------------------------------------ words on boards -- */
+
+/** The frame's note, under the ruler. */
+const NOTE = 'Drawn to one scale.';
+/** The word under the level-1 picture of two equal bars. */
+const SAME = 'Same length';
+
+/** How the units lie in a row: children head to toe, everything else end to end. */
+const along = (unit: ThingId) => (unit === 'child' ? 'head to toe' : 'end to end');
+
+/** The label over the big thing in a count round; with its length once the units are laid out. */
+function bigLabel(round: CountRound, measured: boolean): string {
+  return measured ? `${tag(round.big)}: ${THINGS[round.big].metres} m` : tag(round.big);
+}
+
+/** The label over the units in a count round: one unit and its length, or `total` of them in a row. */
+function unitLabel(round: CountRound, total: number): string {
+  const u = THINGS[round.unit];
+  return total > 1 ? `${total} ${u.plural}, ${along(round.unit)}` : `One ${u.noun}: ${u.metres} m`;
+}
+
+/** The caption under the board after Help, sentence by sentence. */
+function hintCaption(round: Round): readonly string[] {
+  if (round.mode !== 'count') return ['Dashed lines: where each one starts and ends on the ruler.'];
+  const u = THINGS[round.unit];
+  const big = THINGS[round.big];
+  return [`One ${u.noun} ends at ${u.metres} m.`, `The ${big.noun} ends at ${big.metres} m.`];
+}
+
+/** The caption under the board at the worked stage, sentence by sentence. */
+function workedCaption(round: Round): readonly string[] {
+  if (round.mode !== 'count') return ['Pale outlines: each one moved to start at 0.', 'Compare where they end.'];
+  return [`Pale ${THINGS[round.unit].plural}, ${along(round.unit)}, from 0 to the end of the ${THINGS[round.big].noun}.`];
+}
+
+/** The words under the choice pictures, in button order; a count round's choices are digits. */
+const choiceWords = (round: CompareRound): readonly string[] => [
+  ...round.lanes.map((l) => THINGS[l.id].label),
+  ...(round.mode === 'longer' ? [SAME] : []),
+];
+
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order. A count
+ * round: the labels over the big thing and over the units (one unit and its
+ * length, or at 'worked' how many lie in the row), then the frame's note; its
+ * choices are digits under tiny units, which the picture carries. A compare
+ * round: the note, then the choice words; the names over the lanes are not
+ * read, since the choices under them name the same things in the same order.
+ * Then the caption, sentence by sentence, at 'hint' or 'worked'. The ruler's
+ * numbers, the count under each laid-out unit and the guess box's digit are
+ * left out.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const caption = stage === 'hint' ? hintCaption(round) : stage === 'worked' ? workedCaption(round) : [];
+  const setup =
+    round.mode === 'count'
+      ? [bigLabel(round, false), unitLabel(round, stage === 'worked' ? round.answer : 1), NOTE]
+      : [NOTE, ...choiceWords(round)];
+  return [...setup, ...caption];
+}
+
 /**
  * Compare rounds: every thing in its lane, starting at `starts` (metres); ghosts lined up from 0.
  * Drawn in layers — gold rings, things, then ghosts, then dashed marks, then labels — so a
@@ -605,8 +670,8 @@ function Units({ round, solid, ghosts, marks }: { readonly round: Round; readonl
   const u = THINGS[round.unit];
   const total = solid + ghosts;
   const g = f.grounds[1];
-  const bigText = solid > 1 ? `${tag(round.big)}: ${big.metres} m` : tag(round.big);
-  const unitText = total > 1 ? `${total} ${u.plural}, ${round.unit === 'child' ? 'head to toe' : 'end to end'}` : `One ${u.noun}: ${u.metres} m`;
+  const bigText = bigLabel(round, solid > 1);
+  const unitText = unitLabel(round, total);
   return (
     <g>
       {marks ? <Mark f={f} i={0} x={px(f, big.metres)} /> : null}
@@ -653,7 +718,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     const said = n === null ? 'Your guess: empty.' : `Your guess: ${n} small ${n === 1 ? u.noun : u.plural}.`;
     return (
       <div className="board board--scale">
-        <FrameSvg round={round} label={altText(round, false)} note="Drawn to one scale.">
+        <FrameSvg round={round} label={altText(round, false)} note={NOTE}>
           <Units round={round} solid={1} ghosts={worked ? round.answer - 1 : 0} marks={marks} />
         </FrameSvg>
         <Guess unit={round.unit} options={round.options} n={n} label={said} />
@@ -667,50 +732,39 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             </Choice>
           ))}
         </div>
-        {marks ? (
-          <p className="board-caption">
-            {worked
-              ? `Pale ${u.plural}, ${round.unit === 'child' ? 'head to toe' : 'end to end'}, from 0 to the end of the ${THINGS[round.big].noun}.`
-              : `One ${u.noun} ends at ${u.metres} m. The ${THINGS[round.big].noun} ends at ${THINGS[round.big].metres} m.`}
-          </p>
-        ) : null}
+        {marks ? <p className="board-caption">{(worked ? workedCaption(round) : hintCaption(round)).join(' ')}</p> : null}
       </div>
     );
   }
 
   const ids = round.lanes.map((l) => l.id);
+  const words = choiceWords(round);
   const said =
     answer === 'same' ? ' Every lane is ringed in gold.' : typeof answer === 'string' ? ` The ${THINGS[answer].noun} is ringed in gold.` : '';
   return (
     <div className="board board--scale">
-      <FrameSvg round={round} label={altText(round, false) + said} note="Drawn to one scale.">
+      <FrameSvg round={round} label={altText(round, false) + said} note={NOTE}>
         <Lanes round={round} starts={round.lanes.map((l) => l.start)} measured={false} marks={marks && !worked} ghosts={worked} chosen={answer} />
       </FrameSvg>
       <div className="choices" role="group" aria-label="Your guess">
-        {round.lanes.map((l) => (
-          <Choice key={l.id} selected={answer === l.id} onTap={pick(l.id)} disabled={locked} ariaLabel={THINGS[l.id].label}>
+        {round.lanes.map((l, i) => (
+          <Choice key={l.id} selected={answer === l.id} onTap={pick(l.id)} disabled={locked} ariaLabel={words[i]}>
             <span style={FACE}>
               <Icon id={l.id} />
-              <span style={WORD}>{THINGS[l.id].label}</span>
+              <span style={WORD}>{words[i]}</span>
             </span>
           </Choice>
         ))}
         {round.mode === 'longer' ? (
-          <Choice selected={answer === 'same'} onTap={pick('same')} disabled={locked} ariaLabel="Same length">
+          <Choice selected={answer === 'same'} onTap={pick('same')} disabled={locked} ariaLabel={SAME}>
             <span style={FACE}>
               <SameIcon ids={ids} />
-              <span style={WORD}>Same length</span>
+              <span style={WORD}>{SAME}</span>
             </span>
           </Choice>
         ) : null}
       </div>
-      {marks ? (
-        <p className="board-caption">
-          {worked
-            ? 'Pale outlines: each one moved to start at 0. Compare where they end.'
-            : 'Dashed lines: where each one starts and ends on the ruler.'}
-        </p>
-      ) : null}
+      {marks ? <p className="board-caption">{(worked ? workedCaption(round) : hintCaption(round)).join(' ')}</p> : null}
     </div>
   );
 }
@@ -735,7 +789,7 @@ function why(round: Round): string {
   if (round.mode === 'count') {
     const u = THINGS[round.unit];
     const big = THINGS[round.big];
-    const row = round.unit === 'child' ? 'head to toe' : 'end to end';
+    const row = along(round.unit);
     const each = u.metres === 1 ? `Each ${u.noun} is 1 m, so ${round.answer} make ${big.metres} m.` : `Each ${u.noun} is ${u.metres} m: ${skip(u.metres, round.answer)}.`;
     return `${round.answer} ${u.plural}, ${row}, reach from 0 to ${big.metres} m, the end of the ${big.noun}. ${each}`;
   }
@@ -765,6 +819,7 @@ export const aTrexBesideABus: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === round.answer,
   why,

@@ -138,6 +138,21 @@ export function bandsHigh(round: Round): number {
   return Math.max(1, Math.round(round.count / perBand(round.jar)));
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/** The worked answer and a right answer draw the same reveal. */
+const revealed = (stage: Stage) => stage === 'worked' || stage === 'solved';
+
+/** An amount in words, as the buttons, the card and the number line all write it. */
+const about = (n: number) => `about ${n}`;
+
+/** The caption under the board at the hint stage. */
+function hintCaption(round: Round): string {
+  return round.jar === 'wide'
+    ? 'Each gold band of one thin half holds as many as the jar of 10.'
+    : 'Each gold band holds as many as the jar of 10.';
+}
+
 function prompt(round: Round): string {
   return round.jar === 'wide'
     ? 'Thin jar: 10 beans. About how many in the wide jar?'
@@ -155,6 +170,30 @@ function check(round: Round, answer: Answer): Verdict {
   if (answer === null) return { ok: false, hint: `No amount chosen yet. The jar of 10 fills one band.${wide}` };
   const side = answer < round.count ? 'higher' : 'lower';
   return { ok: false, hint: `The dashed line is where ${answer} beans would reach. The beans stand ${side}.${wide}` };
+}
+
+/** Every answer the board can hold: nothing yet, or one of the three amounts (a second tap keeps it). */
+const offered = (round: Round): readonly Answer[] => [null, ...round.choices];
+
+/** Read-aloud: every hint check() can give on this round, over every answer the board can hold. */
+function hints(round: Round): readonly string[] {
+  return [...new Set(offered(round).flatMap((a) => check(round, a).hint ?? []))];
+}
+
+/**
+ * Read-aloud: the board's words in screen order. On the worked answer (and a
+ * right answer) the card names the closest amount first; then the three
+ * amounts under the buttons; at 'hint' the caption under them. The jar tags,
+ * the dashed line's number, the count-on and the number line's ticks are
+ * numbers the picture carries. The card before the reveal shows his own tap,
+ * which the board's words never depend on.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [
+    ...(revealed(stage) ? [about(nearest(round))] : []),
+    ...round.choices.map(about),
+    ...(stage === 'hint' ? [hintCaption(round)] : []),
+  ];
 }
 
 /**
@@ -403,7 +442,7 @@ function GuessCard({ x, n, places, bean, shown }: { readonly x: number; readonly
         fill={shown ? TENS_DEEP : INK}
         style={DISPLAY}
       >
-        {n === null ? '?' : `about ${n}`}
+        {n === null ? '?' : about(n)}
       </text>
     </g>
   );
@@ -519,7 +558,7 @@ function AnswerLine({ g, n, bean }: { readonly g: Geom; readonly n: number; read
 /** The kitchen shelf at home, the jar of 10, the jar he estimates and his amount — one SVG, one scale. */
 function Shelf({ round, stage, answer, tapped }: {
   readonly round: Round;
-  readonly stage: BoardProps<Round, Answer>['stage'];
+  readonly stage: Stage;
   /** The amount he checked: where the hint's dashed line stays. */
   readonly answer: Answer;
   /** The amount he has tapped now: what the card shows. */
@@ -528,7 +567,7 @@ function Shelf({ round, stage, answer, tapped }: {
   const ref = geom(REF_X, 'thin');
   const g = targetGeom(round);
   const hint = stage === 'hint';
-  const shown = stage === 'worked' || stage === 'solved';
+  const shown = revealed(stage);
   const card = shown ? nearest(round) : tapped;
   const what = `${round.bean === 'rajma' ? 'Red rajma' : 'Black-eyed'} beans. A thin jar holding 10, ringed as one ten, and a ${round.jar} jar of the same beans.`;
   const cardSays = card === null ? ' No amount on the card yet.' : ` The card shows about ${card}: ${card / 10} rings of ten.`;
@@ -593,7 +632,7 @@ function NumberLine({ round }: { readonly round: Round }) {
           <line x1={x(n)} x2={x(n)} y1={Y + 48} y2={TY + TH + 6} stroke={n === best ? TENS_DEEP : INK} strokeWidth={n === best ? 3 : 2} strokeDasharray={n === best ? undefined : '5 4'} />
           <line x1={x(n)} x2={x(n)} y1={Y - 16} y2={Y + 16} stroke={n === best ? TENS_DEEP : INK} strokeWidth="4" />
           <text x={x(n)} y={Y + 40} textAnchor="middle" fontSize="22" fontWeight={n === best ? 700 : 600} fill={n === best ? TENS_DEEP : INK} style={DISPLAY}>
-            {`about ${n}`}
+            {about(n)}
           </text>
         </g>
       ))}
@@ -621,7 +660,7 @@ const FACE = { display: 'flex', flexDirection: 'column', alignItems: 'center', g
 const WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--ink-soft)', lineHeight: 1.1 } as const;
 
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
-  const shown = stage === 'worked' || stage === 'solved';
+  const shown = revealed(stage);
   const best = nearest(round);
   // The dashed line stays on the amount he CHECKED. If it followed his taps
   // during the hint, tapping all three amounts would slide a labelled line
@@ -645,18 +684,12 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           >
             <span style={FACE}>
               <AmountPicture n={n} places={places} bean={round.bean} />
-              <span style={WORD}>about {n}</span>
+              <span style={WORD}>{about(n)}</span>
             </span>
           </Choice>
         ))}
       </div>
-      {stage === 'hint' ? (
-        <p className="board-caption">
-          {round.jar === 'wide'
-            ? 'Each gold band of one thin half holds as many as the jar of 10.'
-            : 'Each gold band holds as many as the jar of 10.'}
-        </p>
-      ) : null}
+      {stage === 'hint' ? <p className="board-caption">{hintCaption(round)}</p> : null}
       {shown ? <NumberLine round={round} /> : null}
     </div>
   );
@@ -673,7 +706,9 @@ export const aboutHowMany: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/about-how-many.png',
   note: {

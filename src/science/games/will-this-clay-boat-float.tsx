@@ -332,8 +332,33 @@ function SameClay({ tx, ty }: { readonly tx: number; readonly ty: number }) {
   );
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * Help's caption under the choices, one sentence per entry; the board shows
+ * them as one paragraph at 'hint' and 'worked'. Level 3 points at the dashed
+ * line; the others at the thing's shape.
+ */
+function captionLines(round: Round, stage: Stage): readonly string[] {
+  if (stage !== 'hint' && stage !== 'worked') return [];
+  return round.thing === 'loaded-boat'
+    ? [`The dashed line: where the water comes with ${CAPACITY} marbles in.`, 'Every marble takes the boat deeper.', 'Past the line, the rim goes under.']
+    : ['Look at its shape.', 'Is it tight and small for its weight, or wide and full of air?'];
+}
+
+/**
+ * Read-aloud: the board's words in screen order — the word under each guess
+ * picture, then Help's caption sentence by sentence. Left out: the "5" tag on
+ * the dashed line, a number the picture draws; and the tub's description and
+ * the guess, which are aria-labels only.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [...GUESSES.map(([, text]) => text), ...captionLines(round, stage)];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
+  const caption = captionLines(round, stage);
   return (
     <div className="board board--float">
       <Tub label={`${nameOf(round)}, held above a tub of water${answer ? `; your guess: it ${answer}` : ''}`}>
@@ -351,14 +376,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Choice>
         ))}
       </div>
-      {(stage === 'hint' || stage === 'worked') && round.thing === 'loaded-boat' ? (
-        <p className="board-caption">
-          The dashed line: where the water comes with {CAPACITY} marbles in. Every marble takes the boat deeper. Past the line, the rim goes under.
-        </p>
-      ) : null}
-      {(stage === 'hint' || stage === 'worked') && round.thing !== 'loaded-boat' ? (
-        <p className="board-caption">Look at its shape. Is it tight and small for its weight, or wide and full of air?</p>
-      ) : null}
+      {caption.length ? <p className="board-caption">{caption.join(' ')}</p> : null}
     </div>
   );
 }
@@ -397,6 +415,7 @@ export const willThisClayBoatFloat: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => (prediction === 'floats') === round.floats,
   why,

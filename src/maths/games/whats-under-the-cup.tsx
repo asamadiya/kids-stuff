@@ -48,6 +48,8 @@ export interface Round {
 /** How many he says are under the cup. */
 export type Answer = number;
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
 /** [whole, hidden] per level, walked by index. */
 const TABLE: Record<Level, readonly (readonly [number, number])[]> = {
   1: [[6, 2], [5, 3], [6, 4], [4, 1], [5, 2], [6, 1], [4, 3]],
@@ -81,6 +83,19 @@ export function partsLine(round: Round, answer: Answer): string {
 function check(round: Round, answer: Answer): Verdict {
   if (answer === round.hidden) return { ok: true };
   return { ok: false, hint: partsLine(round, answer) };
+}
+
+/** The most the Stepper sets under the cup: every mango there is. Its least is 0. */
+const most = (round: Round) => round.whole;
+
+/**
+ * Read-aloud: every hint `check` gives for this round. The Stepper holds 0 up
+ * to `most`, so that is the whole answer domain; the right answer gives none.
+ */
+function hints(round: Round): readonly string[] {
+  return Array.from({ length: most(round) + 1 }, (_, a) => a)
+    .filter((a) => a !== round.hidden)
+    .map((a) => partsLine(round, a));
 }
 
 function explain(round: Round): string {
@@ -392,15 +407,35 @@ export function workedLine(round: Round): string {
   return `${out} + ${round.hidden} = ${round.whole}, so ${round.whole} − ${out} = ${round.hidden} are under the cup.`;
 }
 
+/** The line under the board: the worked answer, on 'worked' only. */
+function caption(round: Round, stage: Stage): string | null {
+  return stage === 'worked' ? workedLine(round) : null;
+}
+
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order: the
+ * worked caption, on 'worked'. Left out: "Before", "Now" and "Under the cup"
+ * name what the arrow, the cup and the dashed-mango key already show; the
+ * slate and the Stepper are numerals; the strip's two labels are its counts in
+ * words. At 'hint' the strip's second label is his own answer (the hint
+ * sentence reads the same parts and total); at 'worked' both labels say what
+ * the caption says.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const line = caption(round, stage);
+  return line ? [line] : [];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const worked = stage === 'worked';
   const lifted = worked || stage === 'solved';
   const under = worked ? round.hidden : answer;
+  const line = caption(round, stage);
   return (
     <div className="board board--cup">
       <Scene round={round} guess={under} lifted={lifted} />
       {stage === 'hint' || worked ? <Strip round={round} under={under} worked={worked} /> : null}
-      {worked ? <p className="board-caption">{workedLine(round)}</p> : null}
+      {line ? <p className="board-caption">{line}</p> : null}
       <div className="board-row">
         {/* The key to the buttons: the cup, and a dashed mango, the mark each press puts on Now. */}
         <svg viewBox="-100 -145 330 150" width="104" height="48" aria-hidden="true">
@@ -411,7 +446,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </g>
         </svg>
         <span className="board-caption">Under the cup</span>
-        <Stepper value={under} onChange={setAnswer} min={0} max={round.whole} label="Mangoes under the cup" disabled={lifted} />
+        <Stepper value={under} onChange={setAnswer} min={0} max={most(round)} label="Mangoes under the cup" disabled={lifted} />
       </div>
     </div>
   );
@@ -428,7 +463,9 @@ export const whatsUnderTheCup: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => 0,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/whats-under-the-cup.png',
   note: {

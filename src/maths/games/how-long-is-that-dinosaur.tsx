@@ -277,6 +277,38 @@ function caption(round: Round): string {
   return 'Two kinds of block: big and small.';
 }
 
+/** Level 3's key, as its two labels read: one big block, then the small blocks it equals. */
+const keyWords = (ratio: 2 | 3) => ['1 big block', `${ratio} small blocks`] as const;
+
+/** Level 3's choices, in button order. */
+const SIDES: readonly Side[] = ['top', 'bottom', 'same'];
+
+/** The word under a level-3 choice's picture. */
+const sideWord = (round: CompareRound, side: Side) => (side === 'same' ? 'Same length' : NAME[round[side].species]);
+
+/**
+ * Read-aloud: the board's words in screen order. The caption over the
+ * picture; at level 3 the key's two labels and the three choices (the level
+ * 1-2 choices are digits under rows of blocks, which the picture carries);
+ * the worked line under the board at 'worked'.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [
+    caption(round),
+    ...(round.kind === 'compare' ? [...keyWords(round.ratio), ...SIDES.map((side) => sideWord(round, side))] : []),
+    ...(stage === 'worked' ? [workedLine(round)] : []),
+  ];
+}
+
+/** Every answer the board can hold: nothing yet (a choice tapped twice clears), or one of its choices. */
+const offered = (round: Round): readonly Answer[] => [null, ...(round.kind === 'compare' ? SIDES : round.options)];
+
+/** Read-aloud: every hint check() can give on this round, over every answer the board can hold. */
+function hints(round: Round): readonly string[] {
+  const sol = solution(round);
+  return [...new Set(offered(round).filter((a) => a !== sol).map((a) => hintFor(round, a)))];
+}
+
 /* ------------------------------------------------------------- drawing -- */
 
 const INK = '#24170f';
@@ -789,14 +821,15 @@ function CompareScene({ round, stage, chosen }: SceneProps<CompareRound>) {
 function Key({ ratio }: { readonly ratio: 2 | 3 }) {
   const w = ratio * U3;
   const tx = w + 30;
+  const [big, small] = keyWords(ratio);
   return (
     <svg viewBox={`0 0 ${tx + 200} 100`} role="img" aria-label={`One big block is as long as ${ratio} small blocks.`} style={{ display: 'block', width: '100%', maxWidth: 420, height: 'auto' }}>
       <Block x={6} y={6} w={w} h={BH3} look="teak" />
       {range(ratio).map((i) => (
         <Block key={i} x={6 + i * U3} y={56} w={U3} h={BH3} look="wood" />
       ))}
-      <text x={tx} y={30} fontSize="22" fontWeight="600" fill={INK} fontFamily={FONT}>1 big block</text>
-      <text x={tx} y={80} fontSize="22" fontWeight="600" fill={INK} fontFamily={FONT}>{`${ratio} small blocks`}</text>
+      <text x={tx} y={30} fontSize="22" fontWeight="600" fill={INK} fontFamily={FONT}>{big}</text>
+      <text x={tx} y={80} fontSize="22" fontWeight="600" fill={INK} fontFamily={FONT}>{small}</text>
     </svg>
   );
 }
@@ -832,7 +865,6 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       <span style={WORD}>{word}</span>
     </span>
   );
-  const dino = (m: Measured, side: Side) => choice(side, face(<MiniDino species={m.species} />, NAME[m.species]), `The ${NAME[m.species]} is longer`);
 
   return (
     <div className="board board--measure">
@@ -855,11 +887,11 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       ) : null}
       <div className="choices" role="group" aria-label={round.kind === 'compare' ? 'Which is longer' : 'Length in blocks'}>
         {round.kind === 'compare'
-          ? [
-              dino(round.top, 'top'),
-              dino(round.bottom, 'bottom'),
-              choice('same', face(<SameIcon ratio={round.ratio} />, 'Same length'), 'They are the same length'),
-            ]
+          ? SIDES.map((side) =>
+              side === 'same'
+                ? choice(side, face(<SameIcon ratio={round.ratio} />, sideWord(round, side)), 'They are the same length')
+                : choice(side, face(<MiniDino species={round[side].species} />, sideWord(round, side)), `The ${NAME[round[side].species]} is longer`),
+            )
           : round.options.map((n) => choice(n, face(<BlockRow n={n} />, <span style={DIGIT}>{n}</span>), blocks(n)))}
       </div>
       {stage === 'worked' ? <p className="board-caption">{workedLine(round)}</p> : null}
@@ -878,7 +910,9 @@ export const howLongIsThatDinosaur: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/how-long-is-that-dinosaur.png',
   note: {

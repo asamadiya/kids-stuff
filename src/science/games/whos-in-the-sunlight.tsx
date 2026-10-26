@@ -752,18 +752,44 @@ const HINT: Record<Round['kind'], string> = {
   moon: 'Gold marks the half of the Moon that faces Earth. Only that half can be seen.',
 };
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/** The answer choices, in screen order. */
+const optionsFor = (round: Round): readonly Exclude<Answer, null>[] => (round.kind === 'moon' ? PHASES : ['day', 'night']);
+
+/** The caption under the choices: the Help fact at 'hint', the why at 'worked', none otherwise. */
+const captionFor = (round: Round, stage: Stage): string | null =>
+  stage === 'hint' ? HINT[round.kind] : stage === 'worked' ? why(round) : null;
+
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order — the word
+ * under each answer picture, then the caption (the Help fact at 'hint', the
+ * why at 'worked'), from the same helpers the board draws with. Left out: the
+ * picture's tags — Sun, Earth, Moon, From Earth, the pin names and their
+ * Day/Night, Day half and Night half, Now or After N hours, Spins this way,
+ * the turn meter's "N hours" and "1 turn = 24 h", the shape named in the
+ * worked window, and the frame's "Looking down on the North Pole" and
+ * "Model · not to scale" — which the prompt, the gold ring and `why` already
+ * carry; and "Your guess" over the guess, which on level 3 shows only once he
+ * has guessed.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const caption = captionFor(round, stage);
+  return [...optionsFor(round).map((o) => CHOICE_LABEL[o]), ...(caption ? [caption] : [])];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
   const help: Help = stage === 'hint' ? 'hint' : stage === 'worked' ? 'worked' : null;
-  const options: readonly Exclude<Answer, null>[] = round.kind === 'moon' ? PHASES : ['day', 'night'];
   const side: Side = round.kind === 'moon' ? litSide(round.at) : 'right';
+  const caption = captionFor(round, stage);
   // 'worked' is the only place a child who pressed Help twice sees the answer
   // (the shell goes straight to Next), so it draws the result itself, labelled.
   return (
     <div className="board board--sunlight">
       <Scene round={round} after={stage === 'worked'} help={help} guess={answer} />
       <div className="choices" role="group" aria-label="Your guess">
-        {options.map((o) => (
+        {optionsFor(round).map((o) => (
           <Choice key={o} selected={answer === o} onTap={() => setAnswer(o)} disabled={locked} ariaLabel={CHOICE_LABEL[o]}>
             <span style={CHOICE_FACE}>
               <Icon answer={o} side={side} />
@@ -772,7 +798,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Choice>
         ))}
       </div>
-      {help ? <p className="board-caption">{help === 'worked' ? why(round) : HINT[round.kind]}</p> : null}
+      {caption ? <p className="board-caption">{caption}</p> : null}
     </div>
   );
 }
@@ -828,6 +854,7 @@ export const whosInTheSunlight: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === truth(round),
   why,

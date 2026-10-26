@@ -534,8 +534,67 @@ const changeTag: CSSProperties = { color: GOLD, marginLeft: 6, fontSize: 'var(--
 
 const signed = (d: number) => (d > 0 ? `+${d}` : `−${-d}`);
 
+// ------------------------------------------------------- words on the board --
+
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/** Once checked, or shown worked, the board takes no taps and draws the answer. */
+const locks = (stage: Stage) => stage === 'worked' || stage === 'solved';
+
+/** The tray's instruction, over the things he picks from. */
+const PICK = 'Pick one, then tap a space';
+
+/** The line under a repeating row at 'hint': how long the unit is. */
+const repeatsEvery = (round: RepeatRound) => `It repeats every ${round.unit.length}.`;
+
+/** The line under the steps once locked: the counts, and the change that is the rule. */
+const growLine = (round: GrowRound) => `${round.steps.join(', ')}: ${signed(stepChange(round))} each step.`;
+
+/**
+ * Read-aloud: the board's words in screen order. While he can tap, the line
+ * under a repeating row at 'hint', then the tray's instruction; once locked,
+ * a growing pattern's rule line (the other kinds draw their worked answer as
+ * things, letters and numbers only). Left to the picture: the A B B letters,
+ * space and step numbers, counts and +2 tags, "Step 1" to "Step 4", and the
+ * translate round's "The pattern" / "Your row" (the prompt names the bottom row).
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  if (locks(stage)) return round.kind === 'grow' ? [growLine(round)] : [];
+  return [...(stage === 'hint' && round.kind === 'repeat' ? [repeatsEvery(round)] : []), PICK];
+}
+
+/** The spaces he can fill, by position. */
+function openSpaces(round: RepeatRound | TranslateRound | FarRound): readonly number[] {
+  if (round.kind === 'repeat') return round.open;
+  if (round.kind === 'far') return [round.target];
+  return Array.from({ length: round.bottom }, (_, i) => i);
+}
+
+/** Every way the open spaces can be left: each empty, or holding one thing from the tray. */
+const fillings = (spaces: readonly number[], tray: readonly Thing[]): Answer['placed'][] =>
+  spaces.reduce<Answer['placed'][]>((acc, i) => acc.flatMap((p) => [p, ...tray.map((t) => ({ ...p, [i]: t }))]), [{}]);
+
+/**
+ * Read-aloud: every hint `check` gives for this round, over every answer the
+ * board can hold. A tap only puts the thing in hand into an open space or
+ * takes it off, so that is every filling of the open spaces from the tray; a
+ * growing step is 0 to CELLS of its one thing, and `check` reads only how many.
+ */
+function hints(round: Round): readonly string[] {
+  const placements =
+    round.kind === 'grow'
+      ? Array.from({ length: CELLS + 1 }, (_, k) => Object.fromEntries(Array.from({ length: k }, (_, i) => [i, round.thing])))
+      : fillings(openSpaces(round), round.tray);
+  const out = new Set<string>();
+  for (const placed of placements) {
+    const { hint } = check(round, { placed, picked: null });
+    if (hint) out.add(hint);
+  }
+  return [...out];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
-  const locked = stage === 'worked' || stage === 'solved';
+  const locked = locks(stage);
   const worked = stage === 'worked';
   const shown = stage !== 'answering';
   const holding = locked ? null : answer.picked;
@@ -579,7 +638,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   );
 
   const tray = (things: readonly Thing[]) => (
-    <Tray label="Pick one, then tap a space">
+    <Tray label={PICK}>
       {things.map((t) => (
         <Piece
           key={t}
@@ -612,7 +671,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         {locked ? (
           <UnitPicture unit={round.unit} label={`The unit: ${list(round.unit)}, ${spaced(letters(round.unit))}`} />
         ) : shown ? (
-          <p style={unitLine}>{`It repeats every ${round.unit.length}.`}</p>
+          <p style={unitLine}>{repeatsEvery(round)}</p>
         ) : null}
         {tray(round.tray)}
       </div>
@@ -732,7 +791,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           );
         })}
       </div>
-      {locked ? <p style={unitLine}>{`${round.steps.join(', ')}: ${signed(d)} each step.`}</p> : null}
+      {locked ? <p style={unitLine}>{growLine(round)}</p> : null}
       {tray([round.thing])}
     </div>
   );
@@ -749,7 +808,9 @@ export const whatComesNext: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => ({ placed: {}, picked: null }),
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/what-comes-next.png',
   note: {

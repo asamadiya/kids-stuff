@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Choice } from '../../play/parts';
+import { sentences } from '../../audio/gameLines';
 
 /**
  * Where Does That Number Go? — maths game 13 (advisor catalogue).
@@ -58,6 +59,8 @@ export interface Round {
 
 /** The index of the tick he tapped (0 is the left end), or nothing yet. */
 export type Answer = number | null;
+
+type Stage = BoardProps<Round, Answer>['stage'];
 
 const L1_TARGETS = [7, 3, 8, 2, 6, 5, 4] as const;
 const L2_TARGETS = [14, 6, 18, 4, 12, 16, 8] as const;
@@ -145,6 +148,16 @@ export function hintFor(r: Round, tick: Answer): string {
 function check(round: Round, answer: Answer): Verdict {
   if (answer !== null && answer * round.step === round.target) return { ok: true };
   return { ok: false, hint: hintFor(round, answer) };
+}
+
+/**
+ * Read-aloud: every hint check() can give for this round, sentence by
+ * sentence as the shell reads them. The board's only answers are no spot or
+ * one of the eleven spots, so the whole set is listed.
+ */
+function hints(r: Round): string[] {
+  const said = [null, ...range(0, tickCount(r))].flatMap((t) => check(r, t).hint ?? []);
+  return [...new Set(said.flatMap(sentences))];
 }
 
 /**
@@ -379,8 +392,22 @@ function BeadTrays({ value }: { value: number }) {
   );
 }
 
+/** The words under the road: the worked jumps, on 'worked' only. */
+const caption = (round: Round, stage: Stage): string | null => (stage === 'worked' ? workedLine(round) : null);
+
+/**
+ * Read-aloud: the caption is the only words the board shows. Left to the
+ * picture: the stone numbers, the "+2" / "−5" jump marks and the numbers
+ * written under the worked landings; the arrows carry no words.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const line = caption(round, stage);
+  return line === null ? [] : [line];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const n = tickCount(round);
+  const line = caption(round, stage);
   const targetTick = round.target / round.step;
   const locked = stage === 'worked' || stage === 'solved';
   // The tap row shares the picture's eleven columns. Eleven 64px targets do
@@ -421,7 +448,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </div>
         </div>
       </div>
-      {stage === 'worked' ? <p className="board-caption">{workedLine(round)}</p> : null}
+      {line === null ? null : <p className="board-caption">{line}</p>}
     </div>
   );
 }
@@ -437,7 +464,9 @@ export const whereDoesThatNumberGo: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/where-does-that-number-go.png',
   note: {

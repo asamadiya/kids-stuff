@@ -372,11 +372,16 @@ function Badge({ n, x, y, r }: { readonly n: 1 | 2; readonly x: number; readonly
   );
 }
 
+const RULER = 'Ruler';
+/** A ruler's name: the row's tag beside its badge, and the word on its answer button. */
+const rulerName = (n: 1 | 2) => `${RULER} ${n}`;
+
 function RowLabel({ n }: { readonly n: 1 | 2 }) {
   return (
     <g>
+      {/* The trailing space keeps tag and badge one name, "Ruler 1", in the board's text; the drawing drops it. */}
       <text x="12" y="28" fontSize="15" fontWeight="600" fill={INK_SOFT}>
-        Ruler
+        {`${RULER} `}
       </text>
       <Badge n={n} x={74} y={22} r={15} />
     </g>
@@ -539,19 +544,22 @@ function OutcomeFrame({ round, focus, pick = null }: { readonly round: Round; re
   );
 }
 
-/** A fact about the board, pointing at the one thing that decides the answer. */
-function hintLine(r: Round): string {
+/**
+ * Facts about the board, pointing at the one thing that decides the answer,
+ * one sentence per entry. The hint caption shows them joined by a space.
+ */
+function hintLines(r: Round): readonly string[] {
   const [a, b] = two(r);
   switch (focusOf(r.ask)) {
     case 'finger':
-      return `Ruler ${a.held ? 2 : 1} is let go. Ruler ${a.held ? 1 : 2} is held down.`;
+      return [`Ruler ${a.held ? 2 : 1} is let go.`, `Ruler ${a.held ? 1 : 2} is held down.`];
     case 'length':
       return a.out === b.out
-        ? `Both rulers stick out ${a.out} cm past the table.`
-        : `Ruler 1 sticks out ${a.out} cm. Ruler 2 sticks out ${b.out} cm.`;
+        ? [`Both rulers stick out ${a.out} cm past the table.`]
+        : [`Ruler 1 sticks out ${a.out} cm.`, `Ruler 2 sticks out ${b.out} cm.`];
     case 'push': {
       const hard = a.pluck === 'hard' ? 1 : 2;
-      return `Both stick out ${a.out} cm. Ruler ${hard} is pushed down further.`;
+      return [`Both stick out ${a.out} cm.`, `Ruler ${hard} is pushed down further.`];
     }
   }
 }
@@ -723,16 +731,36 @@ function Face({ pic, word }: { readonly pic: ReactNode; readonly word: string })
   );
 }
 
+/** The answer buttons in order, each with the word under its picture. */
+function choices(r: Round): ReadonlyArray<readonly [Pick, string]> {
+  const same = r.allowSame ? SAME[r.ask] : null;
+  return [['a', rulerName(1)], ['b', rulerName(2)], ...(same ? [['same', same] as const] : [])];
+}
+
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * Read-aloud: the board's words in screen order. Before the outcome: each
+ * row's name (the "Ruler" tag and its badge) and its pluck sentence, then the
+ * word under each answer picture, then at 'hint' the caption sentence by
+ * sentence. At 'worked' the frame is the outcome: the answer words, then the
+ * worked caption (`why`). Left out: the "16 cm" tags, which the centimetre
+ * blocks draw and the hint caption says, and the outcome frame's short labels
+ * ("higher note", "faster swings"), which `why` says in full.
+ */
+function board(r: Round, _level: Level, stage: Stage): readonly string[] {
+  const words = choices(r).map(([, w]) => w);
+  if (stage === 'worked') return [...words, why(r)];
+  const rows = two(r).flatMap((s, i) => [rulerName(i === 0 ? 1 : 2), PLUCK_WORDS(s)]);
+  return [...rows, ...words, ...(stage === 'hint' ? hintLines(r) : [])];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
   const help = stage === 'hint' || stage === 'worked';
   const focus: Focus = help ? focusOf(round.ask) : null;
-  const same = round.allowSame ? SAME[round.ask] : null;
-  const opts: ReadonlyArray<readonly [Pick, string, ReactNode]> = [
-    ['a', 'Ruler 1', <RulerThumb key="a" s={round.a} n={1} />],
-    ['b', 'Ruler 2', <RulerThumb key="b" s={round.b} n={2} />],
-    ...(same ? [['same', same, <SameThumb key="same" ask={round.ask} />] as const] : []),
-  ];
+  const pic = (v: Pick): ReactNode =>
+    v === 'same' ? <SameThumb ask={round.ask} /> : <RulerThumb s={v === 'a' ? round.a : round.b} n={v === 'a' ? 1 : 2} />;
   return (
     <div className="board board--sound">
       {stage === 'worked' ? (
@@ -741,7 +769,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         <SetupFrame round={round} focus={focus} pick={answer} />
       )}
       <div className="choices" role="group" aria-label="Your guess">
-        {opts.map(([v, text, pic]) => (
+        {choices(round).map(([v, text]) => (
           <Choice
             key={v}
             selected={answer === v}
@@ -749,11 +777,11 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
             disabled={locked}
             ariaLabel={text}
           >
-            <Face pic={pic} word={text} />
+            <Face pic={pic(v)} word={text} />
           </Choice>
         ))}
       </div>
-      {stage === 'hint' ? <p className="board-caption">{hintLine(round)}</p> : null}
+      {stage === 'hint' ? <p className="board-caption">{hintLines(round).join(' ')}</p> : null}
       {stage === 'worked' ? <p className="board-caption">{why(round)}</p> : null}
     </div>
   );
@@ -774,6 +802,7 @@ export const whereDoesSoundComeFrom: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === round.truth,
   why,

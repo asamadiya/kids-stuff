@@ -118,18 +118,39 @@ function prompt(round: Round): string {
 }
 
 /**
- * What one more does to a number ending in 9s: each full place turns to 0.
- * Empty when the number does not end in 9.
+ * What one more does to a number ending in 9s, as two sentences: each full
+ * place turns to 0. None when the number does not end in 9.
  */
-export function rollover(start: number): string {
+function rolloverSentences(start: number): string[] {
   const k = trailingNines(start);
-  if (k === 0) return '';
+  if (k === 0) return [];
   const full = PLACE_NAMES.slice(0, k);
   const names = k === 1 ? full[0] : `${full.slice(0, -1).join(', ')} and ${full[k - 1]}`;
   const digits = k === 1 ? `The ${names} digit is 9` : `The ${names} digits are all 9`;
   const them = k === 1 ? 'it' : 'them';
   const then = k === placesIn(start) ? `starts the ${PLACE_NAMES[k]} place` : `adds 1 to the ${PLACE_NAMES[k]}`;
-  return ` ${digits}. One more turns ${them} to 0 and ${then}.`;
+  return [`${digits}.`, `One more turns ${them} to 0 and ${then}.`];
+}
+
+/** The roll-over sentences as the hint's tail: empty, or each sentence after a space. */
+export function rollover(start: number): string {
+  return rolloverSentences(start).map((s) => ` ${s}`).join('');
+}
+
+const NO_CARDS = 'No cards yet.';
+
+/**
+ * The one-more hint's sentences that name only Thatha's number. The sentence
+ * naming his number ("Your cards say 15.") is the one left out of `hints`: the
+ * line draws his pin, and his number can be any of a million.
+ */
+function oneLines(start: number) {
+  return {
+    next: `One more than ${start} is the next mark on the line.`,
+    same: "That is Thatha's number.",
+    before: `That comes before Thatha's ${start}.`,
+    past: `That is past the next mark after ${start}.`,
+  };
 }
 
 /**
@@ -139,26 +160,27 @@ export function rollover(start: number): string {
 function hintOne(round: Round, answer: Answer): string {
   const { start } = round;
   const v = valueOf(answer);
+  const t = oneLines(start);
   const roll = rollover(start);
-  if (v === null) return `No cards yet. One more than ${start} is the next mark on the line.${roll}`;
+  if (v === null) return `${NO_CARDS} ${t.next}${roll}`;
   const say = leadingZero(answer) ? `Your cards say ${written(answer)}, which is ${v}: a 0 in front adds nothing.` : `Your cards say ${v}.`;
-  if (v === start) return `${say} That is Thatha's number.${roll}`;
-  if (v < start) return `${say} That comes before Thatha's ${start}.${roll}`;
-  return `${say} That is past the next mark after ${start}.${roll}`;
+  return `${say} ${v === start ? t.same : v < start ? t.before : t.past}${roll}`;
 }
 
-/** Make a bigger one: a fact about places, which on 'hint' the chart writes beside each row. */
-function hintDigit(round: Round, answer: Answer): string {
+/** Make a bigger one, sentence by sentence: a fact about places, which on 'hint' the chart writes beside each row. */
+function hintDigitSentences(round: Round, answer: Answer): string[] {
   const { start } = round;
   const q = placesIn(start);
   const v = valueOf(answer);
-  if (v === null) return `No cards yet. Thatha's ${start} has ${placesWord(q)}.`;
-  const front = leadingZero(answer) ? `A 0 in front adds no place: ${written(answer)} is ${v}. ` : '';
-  if (v === start) return `${front}Your ${v} is the same as Thatha's ${start}.`;
+  if (v === null) return [NO_CARDS, `Thatha's ${start} has ${placesWord(q)}.`];
+  const front = leadingZero(answer) ? [`A 0 in front adds no place: ${written(answer)} is ${v}.`] : [];
+  if (v === start) return [...front, `Your ${v} is the same as Thatha's ${start}.`];
   const p = placesIn(v);
-  if (p < q) return `${front}Your ${v} has ${placesWord(p)}. Thatha's ${start} has ${placesWord(q)}.`;
-  return `${front}Your ${v} and Thatha's ${start} both have ${placesWord(q)}. ${start} is bigger.`;
+  if (p < q) return [...front, `Your ${v} has ${placesWord(p)}.`, `Thatha's ${start} has ${placesWord(q)}.`];
+  return [...front, `Your ${v} and Thatha's ${start} both have ${placesWord(q)}.`, `${start} is bigger.`];
 }
+
+const hintDigit = (round: Round, answer: Answer) => hintDigitSentences(round, answer).join(' ');
 
 /**
  * Judged by value, so every correct form passes: any 1-and-0 number past
@@ -174,6 +196,34 @@ function check(round: Round, answer: Answer): Verdict {
   }
   if (v !== null && v > round.start) return { ok: true };
   return { ok: false, hint: hintDigit(round, answer) };
+}
+
+/** Every answer a tray of `cards` can make: no cards up to MAX_CARDS, any card in any place. */
+function answersFrom(cards: readonly number[]): Answer[] {
+  const out: Answer[] = [];
+  let layer: Answer[] = [[]];
+  for (let n = 0; n <= MAX_CARDS; n += 1) {
+    out.push(...layer);
+    layer = layer.flatMap((a) => cards.map((d) => [...a, d]));
+  }
+  return out;
+}
+
+/**
+ * Every hint sentence a Check can show this round. Place-move rounds: all of
+ * them, from every row of 1s and 0s the tray can make (127 rows). One-more
+ * rounds: the sentences that name only Thatha's number. The sentence that
+ * names his ("Your cards say 15.") has a million forms, and on 'hint' the line
+ * already draws his pin.
+ */
+function hints(round: Round): string[] {
+  if (round.move === 'one') {
+    const t = oneLines(round.start);
+    return [NO_CARDS, t.next, t.same, t.before, t.past, ...rolloverSentences(round.start)];
+  }
+  const out = new Set<string>();
+  for (const a of answersFrom(ONE_ZERO)) if (!check(round, a).ok) for (const s of hintDigitSentences(round, a)) out.add(s);
+  return [...out];
 }
 
 function explain(round: Round): string {
@@ -634,6 +684,23 @@ function chartRows(round: Round, answer: Answer, stage: Stage): { readonly rows:
 /** The swaps the key draws: enough to explain every block in the round's answer. */
 const swapsFor = (round: Round) => placesIn(round.move === 'one' ? round.start + 1 : 10 ** placesIn(round.start)) - 1;
 
+/** Over the cards: his number, or on 'worked' the answer drawn for him. */
+const slotCaption = (stage: Stage) => (stage === 'worked' ? 'The answer' : 'Your number');
+const trayLabel = (round: Round) => (round.move === 'one' ? 'Digit cards' : 'Only 1s and 0s');
+
+/**
+ * Read the board: the place chart's row names (what each row of blocks is,
+ * and on 'hint' and 'worked' the rows that carry the hint and the answer), the
+ * caption over the cards, and the tray's label, in screen order. Row names do
+ * not depend on his cards, so the empty answer gives them. Left out: place
+ * names over the columns, "3 places" counts, the number line's tags (on 'hint'
+ * "Thatha's" becomes "Thatha's and yours" and his pin is labelled with his
+ * number), and "tap a card", which goes once a card is down.
+ */
+function board(round: Round, _level: Level, stage: Stage): string[] {
+  return [...chartRows(round, [], stage).rows.map((r) => r.name), slotCaption(stage), trayLabel(round)];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'worked' || stage === 'solved';
   const worked = stage === 'worked' ? workedDigits(round) : null;
@@ -641,13 +708,14 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const full = answer.length >= MAX_CARDS;
   const cards = round.move === 'one' ? ALL_DIGITS : ONE_ZERO;
   const chart = chartRows(round, answer, stage);
+  const caption = slotCaption(stage);
   return (
     <div className="board">
       {round.move === 'one' ? <NumberLine round={round} answer={answer} stage={stage} /> : null}
       <PlaceChart rows={chart.rows} cols={chart.cols} />
       <SwapKey swaps={swapsFor(round)} />
-      <p className="board-caption">{worked ? 'The answer' : 'Your number'}</p>
-      <Slot ariaLabel={`${worked ? 'The answer' : 'Your number'}: ${shown.length ? written(shown) : 'no cards yet'}`} filled={shown.length > 0} wide>
+      <p className="board-caption">{caption}</p>
+      <Slot ariaLabel={`${caption}: ${shown.length ? written(shown) : 'no cards yet'}`} filled={shown.length > 0} wide>
         {shown.map((d, i) => (
           <Piece
             key={`${i}-${d}`}
@@ -661,7 +729,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         ))}
         {shown.length === 0 ? <span className="board-caption">tap a card</span> : null}
       </Slot>
-      <Tray label={round.move === 'one' ? 'Digit cards' : 'Only 1s and 0s'}>
+      <Tray label={trayLabel(round)}>
         {cards.map((d) => (
           <Piece
             key={d}
@@ -688,7 +756,9 @@ export const canYouMakeABiggerNumber: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => [],
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/can-you-make-a-bigger-number.png',
   note: {

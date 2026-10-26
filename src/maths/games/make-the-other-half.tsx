@@ -59,6 +59,8 @@ export interface Round {
 /** The squares he has filled on the open side, ascending. */
 export type Answer = readonly number[];
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
 /** Rangoli powder colours: warm, saturated, and each distinct from the white grid. */
 const HUE = {
   marigold: '#e0700a',
@@ -259,6 +261,57 @@ function tally(round: Round, filled: ReadonlySet<number>): string {
   if (round.lines === 'v') return `Left half ${n(0, rows, 0, hc)} squares, right half ${n(0, rows, hc, cols)}.`;
   if (round.lines === 'h') return `Above the line ${n(0, hr, 0, cols)} squares, below it ${n(hr, rows, 0, cols)}.`;
   return `Top left ${n(0, hr, 0, hc)}, top right ${n(0, hr, hc, cols)}, bottom left ${n(hr, rows, 0, hc)}, bottom right ${n(hr, rows, hc, cols)}.`;
+}
+
+/** The line over the grid at every stage, sentence by sentence: which part is drawn, and how to tap. */
+function setup(round: Round): string[] {
+  return [
+    round.lines === 'both' ? 'The top-left quarter is drawn.' : `The ${round.from} half is drawn.`,
+    'Tap a square to fill it; tap again to clear it.',
+  ];
+}
+
+/** What the dots drawn from 'hint' on count: one sentence per mirror line, opening the line under the grid. */
+function dots(round: Round): string[] {
+  return [
+    ...(hasV(round) ? ['The dots count squares from the down line.'] : []),
+    ...(hasH(round) ? ['The dots count squares from the line across.'] : []),
+  ];
+}
+
+/**
+ * Read-aloud: every hint `check` can give for this round. The hint names the
+ * first open square, in reading order, that differs from its partner. Every
+ * open square before it matches, which fixes its partner: a drawn square, or
+ * (with two lines) a top-right square that must already be right because the
+ * whole top half is checked first. So each open square gives exactly one
+ * sentence, the one for the finished picture with that square alone flipped.
+ */
+function hints(round: Round): readonly string[] {
+  const solution = required(round);
+  const out = new Set<string>();
+  for (let i = 0; i < round.rows * round.cols; i += 1) {
+    if (inGiven(round, Math.floor(i / round.cols), i % round.cols)) continue;
+    const flipped = solution.includes(i) ? solution.filter((x) => x !== i) : [...solution, i].sort((a, b) => a - b);
+    const miss = firstMismatch(round, flipped);
+    if (miss) out.add(miss.sentence);
+  }
+  return [...out];
+}
+
+/**
+ * Read-aloud: the board's words in screen order. The setup line at every
+ * stage; from 'hint' on, what the dots count; on 'worked' and 'solved', the
+ * tally of the finished picture. On 'hint' the tally counts his own squares,
+ * so it depends on his answer and is left to the screen (the hint sentence
+ * names the pair to look at). A solved board always holds the finished
+ * picture, since `check` accepts only the required squares, so its tally is
+ * the worked one. The pips and cells carry their numbers in aria-labels only.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  if (stage === 'answering') return setup(round);
+  const lines = [...setup(round), ...dots(round)];
+  return stage === 'hint' ? lines : [...lines, tally(round, new Set([...round.given, ...required(round)]))];
 }
 
 /** One filled square: a block of rangoli colour with a paper-white diamond, the same either way up. */
@@ -505,11 +558,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
 
   return (
     <div className="board">
-      <p className="board-caption">
-        {round.lines === 'both'
-          ? 'The top-left quarter is drawn. Tap a square to fill it; tap again to clear it.'
-          : `The ${round.from} half is drawn. Tap a square to fill it; tap again to clear it.`}
-      </p>
+      <p className="board-caption">{setup(round).join(' ')}</p>
       <div style={gridWrap}>
         <div style={gridStyle} role="group" aria-label={label}>
           {labels}
@@ -517,13 +566,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           {cells}
         </div>
       </div>
-      {evidence ? (
-        <p className="board-caption">
-          {v ? 'The dots count squares from the down line. ' : ''}
-          {h ? 'The dots count squares from the line across. ' : ''}
-          {tally(round, shown)}
-        </p>
-      ) : null}
+      {evidence ? <p className="board-caption">{[...dots(round), tally(round, shown)].join(' ')}</p> : null}
     </div>
   );
 }
@@ -539,7 +582,9 @@ export const makeTheOtherHalf: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => [],
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/make-the-other-half.png',
   note: {

@@ -417,6 +417,19 @@ function coverage(round: Round, turns: readonly number[], at: readonly (Pt | nul
 }
 
 /**
+ * The places the board tries for a turned piece whose box is `w` by `h`, row
+ * by row: inside the outline's box, or overhanging it when the piece is bigger.
+ */
+function places(round: Round, w: number, h: number): Pt[] {
+  const { w: W, h: H } = box(round.outline);
+  const out: Pt[] = [];
+  for (let dy = Math.min(0, H - h); dy <= Math.max(0, H - h); dy += 1) {
+    for (let dx = Math.min(0, W - w); dx <= Math.max(0, W - w); dx += 1) out.push([dx, dy]);
+  }
+  return out;
+}
+
+/**
  * Where the board puts piece `i`, at its current turn, when he taps the
  * outline. If the turn can fit, the place it fits — preferring a place that
  * still lets the other tray pieces fill the rest. If not, the place it covers
@@ -437,19 +450,17 @@ export function placeFor(round: Round, answer: Answer, i: number): Pt {
 
   let fitting: Pt | null = null;
   let best: { at: Pt; hit: number; miss: number } | null = null;
-  for (let dy = Math.min(0, H - h); dy <= Math.max(0, H - h); dy += 1) {
-    for (let dx = Math.min(0, W - w); dx <= Math.max(0, W - w); dx += 1) {
-      const ks = covers(p.shape, turn, [dx, dy]);
-      const hit = ks.filter((k) => free.has(k)).length;
-      if (hit === ks.length) {
-        const rest = new Set(free);
-        ks.forEach((k) => rest.delete(k));
-        if (cover(rest, round.pieces, others, W, H)) return [dx, dy];
-        fitting ??= [dx, dy];
-      }
-      const miss = ks.length - hit;
-      if (!best || hit > best.hit || (hit === best.hit && miss < best.miss)) best = { at: [dx, dy], hit, miss };
+  for (const where of places(round, w, h)) {
+    const ks = covers(p.shape, turn, where);
+    const hit = ks.filter((k) => free.has(k)).length;
+    if (hit === ks.length) {
+      const rest = new Set(free);
+      ks.forEach((k) => rest.delete(k));
+      if (cover(rest, round.pieces, others, W, H)) return where;
+      fitting ??= where;
     }
+    const miss = ks.length - hit;
+    if (!best || hit > best.hit || (hit === best.hit && miss < best.miss)) best = { at: where, hit, miss };
   }
   return fitting ?? best?.at ?? [0, 0];
 }
@@ -466,6 +477,19 @@ function prompt(round: Round): string {
   return `Turn and fit ${COUNT[round.pieces.length]} pieces into the ${round.name}.`;
 }
 
+/** The hints, one builder per kind, so `check` and `hints` say the same words. */
+const HINT = {
+  empty: (round: Round) =>
+    round.pieces.length === 1
+      ? `The outline is empty. The ${round.pieces[0].name} is still in the tray.`
+      : `The outline is empty. ${round.pieces.length} pieces are in the tray.`,
+  overlap: (a: PieceDef, b: PieceDef) => `The ${a.name} and the ${b.name} overlap. The gold part is empty.`,
+  out: (names: readonly string[]) =>
+    `${cap(`the ${listNames(names)}`)} ${names.length === 1 ? 'sticks' : 'stick'} out (red). The gold part is empty.`,
+  waiting: (names: readonly string[]) =>
+    `The ${listNames(names)} ${names.length === 1 ? 'is' : 'are'} still in the tray. The gold part is empty.`,
+};
+
 /**
  * Any exact fill is right, not only the drawn one. A miss names what the board
  * now marks: a piece still in the tray, two pieces on top of each other, or a
@@ -474,23 +498,56 @@ function prompt(round: Round): string {
 function check(round: Round, answer: Answer): Verdict {
   const c = coverage(round, answer.turns, answer.at);
   const waiting = round.pieces.filter((_, i) => !answer.at[i]).map((p) => p.name);
-  if (waiting.length === round.pieces.length) {
-    return { ok: false, hint: waiting.length === 1 ? `The outline is empty. The ${waiting[0]} is still in the tray.` : `The outline is empty. ${waiting.length} pieces are in the tray.` };
-  }
+  if (waiting.length === round.pieces.length) return { ok: false, hint: HINT.empty(round) };
   if (waiting.length === 0 && c.gap.length === 0 && c.outside.length === 0 && c.overlap.length === 0) return { ok: true };
   // A piece on the board that is wrong matters more than one not yet tried.
   if (c.clashes.length > 0) {
     const [a, b] = c.clashes[0];
-    return { ok: false, hint: `The ${round.pieces[a].name} and the ${round.pieces[b].name} overlap. The gold part is empty.` };
+    return { ok: false, hint: HINT.overlap(round.pieces[a], round.pieces[b]) };
   }
   const out = round.pieces.filter((_, i) => c.sticksOut[i]).map((p) => p.name);
-  if (out.length > 0) {
-    return { ok: false, hint: `${cap(`the ${listNames(out)}`)} ${out.length === 1 ? 'sticks' : 'stick'} out (red). The gold part is empty.` };
-  }
-  if (waiting.length > 0) {
-    return { ok: false, hint: `The ${listNames(waiting)} ${waiting.length === 1 ? 'is' : 'are'} still in the tray. The gold part is empty.` };
-  }
+  if (out.length > 0) return { ok: false, hint: HINT.out(out) };
+  if (waiting.length > 0) return { ok: false, hint: HINT.waiting(waiting) };
   return { ok: false, hint: 'The gold part of the outline is empty.' };
+}
+
+/** Every non-empty subset of `pieces`, each in tray order, as their names. */
+function subsets(pieces: readonly PieceDef[]): string[][] {
+  return Array.from({ length: 2 ** pieces.length - 1 }, (_, m) => pieces.filter((_, i) => ((m + 1) >> i) & 1).map((p) => p.name));
+}
+
+/**
+ * Can piece `p` ever stick out? `placeFor` only puts a piece at one of
+ * `places`, so a piece that lies inside the outline at every turn and every
+ * one of those places never does: a triangle in the square, an L-shape in the
+ * rectangle.
+ */
+function canStickOut(round: Round, p: PieceDef): boolean {
+  const outline = outlineKeys(round);
+  return [0, 1, 2, 3].some((t) => {
+    const { w, h } = pose(p.shape, t);
+    return places(round, w, h).some((at) => covers(p.shape, t, at).some((k) => !outline.has(k)));
+  });
+}
+
+/**
+ * For read-aloud: every hint `check` can give in this round. Overlaps come in
+ * tray order (the earlier piece first), so one line per pair; any set of the
+ * pieces that can stick out at all can stick out together; any set short of
+ * all can wait in the tray (all of them waiting is the empty outline). The
+ * last line of `check` is left out: the pieces' quarters add up to the
+ * outline's exactly, so with all of them in, nothing sticking out and nothing
+ * overlapping, nothing is empty.
+ */
+function hints(round: Round): string[] {
+  const { pieces } = round;
+  const pairs = pieces.flatMap((a, i) => pieces.slice(i + 1).map((b) => HINT.overlap(a, b)));
+  return [
+    HINT.empty(round),
+    ...pairs,
+    ...subsets(pieces.filter((p) => canStickOut(round, p))).map(HINT.out),
+    ...subsets(pieces).filter((s) => s.length < pieces.length).map(HINT.waiting),
+  ];
 }
 
 function explain(round: Round): string {
@@ -529,6 +586,19 @@ function margin(round: Round): number {
 }
 
 const turnWords = (n: number) => (n === 0 ? 'no turn' : n === 1 ? '1 quarter turn' : n === 2 ? '2 quarter turns (a half turn)' : '3 quarter turns');
+
+/** The worked caption, one sentence a piece: how many quarter turns each takes from how it started. */
+const workedLines = (round: Round) =>
+  round.pieces.map((p, i) => `${cap(p.name)}: ${turnWords(turnsNeeded(p, round.solution[i].turn))}.`);
+
+/**
+ * For read-aloud: the worked caption, sentence by sentence. Nothing else: the
+ * caption under the tray at the other stages says which piece is in his hand,
+ * so it depends on his answer, and the tray label and the hint key's
+ * "empty" / "sticks out" are legends the picture carries.
+ */
+const board = (round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] =>
+  stage === 'worked' ? workedLines(round) : [];
 
 const frameStyle: CSSProperties = { display: 'block', background: 'var(--raised)', borderRadius: 'var(--radius-sm)' };
 
@@ -714,9 +784,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </div>
       {marks ? <Key hatch={hatch} /> : null}
       {worked ? (
-        <p className="board-caption">
-          {round.pieces.map((p, i) => `${cap(p.name)}: ${turnWords(turnsNeeded(p, round.solution[i].turn))}.`).join(' ')}
-        </p>
+        <p className="board-caption">{workedLines(round).join(' ')}</p>
       ) : null}
       <SameAs round={round} />
       <Tray label="Pieces">
@@ -768,7 +836,9 @@ export const turnItDoesItFit: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: (round) => ({ turns: round.pieces.map((p) => mod4(p.start)), at: round.pieces.map(() => null), holding: null }),
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/turn-it-does-it-fit.png',
   note: {

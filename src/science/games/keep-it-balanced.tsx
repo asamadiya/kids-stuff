@@ -674,11 +674,32 @@ const TOWER_CHOICES: ReadonlyArray<readonly [Fall, string]> = [
   ['orange', 'Orange falls'],
 ];
 
-/** On 'hint': a fact about this board, pointing at what the hint stage adds. */
-function hintLine(round: Round): string {
+/** The words under the choice pictures, in button order. */
+const choiceWords = (round: Round): readonly string[] =>
+  (round.kind === 'lever' ? LEVER_CHOICES : TOWER_CHOICES).map(([, words]) => words);
+
+/**
+ * On 'hint': facts about this board, pointing at what the hint stage adds, one
+ * sentence per entry. The caption shows them joined by a space.
+ */
+function hintLines(round: Round): readonly string[] {
   return round.kind === 'lever'
-    ? `The gold numbers count steps from the middle. Left: ${sideText(round.left)}. Right: ${sideText(round.right)}.`
-    : 'Each dot is the balance point of the blocks above the gold bar. The gold bar is where they rest.';
+    ? ['The gold numbers count steps from the middle.', `Left: ${sideText(round.left)}.`, `Right: ${sideText(round.right)}.`]
+    : ['Each dot is the balance point of the blocks above the gold bar.', 'The gold bar is where they rest.'];
+}
+
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * Read-aloud: the board's words in screen order. The three words under the
+ * choice pictures at every stage; then the hint caption at 'hint', sentence by
+ * sentence, and the worked caption (`why`) at 'worked'. Left out: the floor
+ * names (Left, Right, Green, Orange), which the picture and the choice words
+ * carry; the step numbers and the "1 + 3 = 4" totals, numbers the picture
+ * draws; and the setup's description, which is an aria-label only.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [...choiceWords(round), ...(stage === 'hint' ? hintLines(round) : stage === 'worked' ? [round.why] : [])];
 }
 
 function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
@@ -730,7 +751,7 @@ function Board({ round, level, answer, setAnswer, stage }: BoardProps<Round, Ans
               </Choice>
             ))}
       </div>
-      {stage === 'hint' ? <p className="board-caption">{hintLine(round)}</p> : null}
+      {stage === 'hint' ? <p className="board-caption">{hintLines(round).join(' ')}</p> : null}
       {worked ? <p className="board-caption">{round.why}</p> : null}
     </div>
   );
@@ -751,6 +772,7 @@ export const keepItBalanced: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === outcome(round),
   why: (round) => round.why,
