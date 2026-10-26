@@ -1,16 +1,17 @@
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
-  CHOICES, ONE_SWING_TWO_KIDS_META, SCENARIOS,
+  CHOICES, LISTEN, ONE_SWING_TWO_KIDS_META, SCENARIOS,
   addPlayed, choiceLabel, choose, coverageText, framesOf, isSettled, pathText, pictureOf,
-  plateLines, replyOf, saidLine, scenarioById, storyLines,
+  plateLines, replyOf, scenarioById, storyLine, trayLine,
 } from '../../sel/one-swing-two-kids';
 import type { ChoiceId, Scenario, Thing, Who } from '../../sel/one-swing-two-kids';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptRound extends Kept {
   readonly scenario: string;
@@ -229,6 +230,8 @@ export function OneSwingTwoKids() {
     shelf.list().reduce<readonly string[]>((acc, k) => addPlayed(acc, k.scenario), []));
   const [kept, setKept] = useState<readonly KeptRound[]>(() => shelf.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const s: Scenario = scenarioById(scenarioId) ?? SCENARIOS[0];
   const settled = isSettled(s, tried);
@@ -238,7 +241,6 @@ export function OneSwingTwoKids() {
   const begin = (next: Scenario): void => {
     setScenarioId(next.id);
     setTried([]);
-    say(next.where);
   };
 
   const pick = (c: ChoiceId): void => {
@@ -247,7 +249,6 @@ export function OneSwingTwoKids() {
     setTried(next);
     const reply = replyOf(s, c);
     pluck(step(reply.settled ? -7 : 2), reply.settled ? 0.6 : 0.22);
-    say(`${saidLine(s, c)} ${reply.says}`);
     if (reply.settled) setPlayed((p) => addPlayed(p, s.id));
   };
 
@@ -255,7 +256,6 @@ export function OneSwingTwoKids() {
     if (!settled) return;
     shelf.add({ scenario: s.id, tried });
     setKept(shelf.list());
-    say('kept in the drawer');
   };
 
   const drop = (id: string): void => {
@@ -289,22 +289,31 @@ export function OneSwingTwoKids() {
   });
 
   return (
-    <section className="bench" aria-labelledby="one-swing-two-kids-title">
+    <section ref={benchRef} className="bench" aria-labelledby="one-swing-two-kids-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{ONE_SWING_TWO_KIDS_META.eyebrow}</p>
           <h2 id="one-swing-two-kids-title" className="bench__title">{ONE_SWING_TWO_KIDS_META.title}</h2>
           <p className="bench__note">{ONE_SWING_TWO_KIDS_META.note}</p>
+          <ReadAloud id="sel/one-swing-two-kids/head" texts={LISTEN.head()} />
         </div>
         <p className="bench__readout">{coverageText(played)}</p>
       </div>
 
       <div className="bench__stage">
         <div className="bench__row">
-          <figure className="bench__figure">
-            <img src={`${BASE}games/sel/${s.setup}.png`} alt={s.setupAlt} style={PICTURE} />
-            <figcaption className="bench__figure-caption">{s.where}</figcaption>
-          </figure>
+          <div style={{ display: 'grid', justifyItems: 'center', gap: '0.35rem' }}>
+            <figure className="bench__figure">
+              <img src={`${BASE}games/sel/${s.setup}.png`} alt={s.setupAlt} style={PICTURE} />
+              <figcaption className="bench__figure-caption">{s.where}</figcaption>
+            </figure>
+            <ReadAloud
+              id={`sel/one-swing-two-kids/${s.id}/setup`}
+              texts={LISTEN.setup(s)}
+              label="Read what is happening"
+              compact
+            />
+          </div>
           {after && (
             <figure className="bench__figure">
               <img src={`${BASE}games/sel/${after.src}.png`} alt={after.alt} style={PICTURE} />
@@ -333,16 +342,23 @@ export function OneSwingTwoKids() {
 
       <p className="bench__note">{s.about}</p>
       {s.guide !== null && <p className="bench__note">{s.guide}</p>}
-      {storyLines(s, tried).map((line) => <p className="bench__note" key={line}>{line}</p>)}
+      {tried.map((c) => (
+        <div key={c} className="bench__row" style={{ flexWrap: 'nowrap' }}>
+          <p className="bench__note">{storyLine(s, c)}</p>
+          <ReadAloud
+            id={`sel/one-swing-two-kids/${s.id}/story/${c}`}
+            texts={LISTEN.story(s, c)}
+            label="Read this line"
+            compact
+          />
+        </div>
+      ))}
 
       <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
-        <p className="bench__tray-label">
-          {tried.length === 0
-            ? 'What will you say? Pick a plan.'
-            : settled
-              ? 'That is what happened.'
-              : `${s.other} did not go along with it. Pick another plan, or ask a grown-up.`}
-        </p>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>{trayLine(s, tried)}</p>
+          <ReadAloud id={`sel/one-swing-two-kids/${s.id}/plans`} texts={LISTEN.plans(s, tried)} label="Read these out" />
+        </div>
         {CHOICES.map((c) => {
           const chosen = tried.includes(c);
           const refused = chosen && !replyOf(s, c).settled;

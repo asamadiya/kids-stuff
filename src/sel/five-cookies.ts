@@ -49,7 +49,7 @@ export interface Claimant {
    * number — it asks to end up with more than anybody else — and carries 0.
    */
   readonly asks: number;
-  /** Said once, plainly, when the board opens. Never ranked against the others. */
+  /** Shown under "What each person says", each with its own read button. Never ranked against the others. */
   readonly claim: string;
   readonly portrait: Readonly<Record<'waiting' | Outcome, FaceId>>;
   /** World-state, second person where he is in it. No praise, no gloss. */
@@ -67,7 +67,7 @@ export interface Scenario {
   readonly units: number;
   readonly unit: string;
   readonly unitPlural: string;
-  /** Spoken when the board opens, before any claim. */
+  /** Shown under the board picture, with its own read button. */
   readonly setting: string;
   readonly claimants: readonly Claimant[];
 }
@@ -369,7 +369,7 @@ export const people = (n: number): string =>
 export const splitLine = (shares: Shares): string =>
   `${capitalise(shares.map((n) => word(n)).join(', '))}.`;
 
-/** The spoken opener: the board, then each claim once, unranked. */
+/** The board, then each claim once, unranked. */
 export const claimLines = (s: Scenario): string[] => [s.setting, ...s.claimants.map((c) => c.claim)];
 
 /** What the board looks like after it was served. World-state only. */
@@ -421,3 +421,77 @@ export function plateLines(s: Scenario, first: Shares, second: Shares | null): s
 
 export const plateTitle = (s: Scenario): string =>
   `${capitalise(word(s.units))} ${s.units === 1 ? s.unit : s.unitPlural}`;
+
+/* ----------------------------------------------------------------- listen -- */
+
+/** The caption's first sentence: which way is on the table. */
+export const WAYS = ['First way.', 'Second way.'] as const;
+
+/** The tray label once the board is served. */
+export const SERVED_LINE = 'Served. Nothing left to move on this one.';
+
+/**
+ * Which way is on the table: the second once the first has been served and the
+ * board laid again. Until then, the served first way is still the first way.
+ */
+export const wayIndex = (first: Shares | null, second: Shares | null, served: boolean): 0 | 1 =>
+  (served ? second !== null : first !== null) ? 1 : 0;
+
+/** "Two cookies still to hand out." "No cookies still to hand out." */
+export const leftLine = (s: Scenario, n: number): string =>
+  n === 0
+    ? `No ${s.unitPlural} still to hand out.`
+    : `${capitalise(word(n))} ${n === 1 ? s.unit : s.unitPlural} still to hand out.`;
+
+/** The tray's instruction, before the count. */
+export const dragLine = (s: Scenario): string => `Drag a ${s.unit} onto a plate, or use plus and minus.`;
+
+/** The tray's count: "Five left." "None left." */
+export const leftCount = (n: number): string => `${capitalise(word(n))} left.`;
+
+/**
+ * What each read-aloud button reads, one atom per sentence, in screen order.
+ * The component displays these same atoms joined with a space, so the screen
+ * and the clip cannot differ, and nothing is spoken unless the child presses
+ * the button (advisor a9).
+ */
+export const LISTEN = {
+  /** Under the note. */
+  head: (): readonly string[] => [FIVE_COOKIES_META.title, FIVE_COOKIES_META.note],
+  /** Under the board picture. */
+  setting: (s: Scenario): readonly string[] => [s.setting],
+  /** Beside the caption under the board: which way, then what is left or how it was split. */
+  caption: (s: Scenario, shares: Shares, way: 0 | 1, served: boolean): readonly string[] => [
+    WAYS[way],
+    served ? splitLine(shares) : leftLine(s, remaining(s, shares)),
+  ],
+  /** Beside each claim under "What each person says". */
+  claim: (c: Claimant): readonly string[] => [c.claim],
+  /** Under each person's reaction once the board is served. */
+  reaction: (c: Claimant, o: Outcome): readonly string[] => [c.reaction[o]],
+  /** Beside the tray label. */
+  tray: (s: Scenario, left: number, served: boolean): readonly string[] =>
+    served ? [SERVED_LINE] : [dragLine(s), leftCount(left)],
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all: string[] = [...LISTEN.head()];
+  for (const s of SCENARIOS) {
+    const n = s.claimants.length;
+    all.push(...LISTEN.setting(s));
+    for (const c of s.claimants) all.push(...LISTEN.claim(c));
+    for (const way of [0, 1] as const) {
+      for (let left = 0; left <= s.units; left += 1) {
+        const laid = [s.units - left, ...Array.from({ length: n - 1 }, () => 0)];
+        all.push(...LISTEN.caption(s, laid, way, false), ...LISTEN.tray(s, left, false));
+      }
+      for (const shares of allAllocations(s.units, n)) {
+        all.push(...LISTEN.caption(s, shares, way, true), ...LISTEN.tray(s, 0, true));
+        const o = outcomes(s, shares);
+        s.claimants.forEach((c, i) => all.push(...LISTEN.reaction(c, o[i])));
+      }
+    }
+  }
+  return [...new Set(all)];
+}

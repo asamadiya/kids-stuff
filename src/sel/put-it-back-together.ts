@@ -413,3 +413,41 @@ export function plateLines(scenario: Scenario, order: readonly PanelRole[]): rea
 }
 
 export const plateTitle = (scenario: Scenario): string => `${PUT_IT_BACK_TOGETHER_META.title} — ${scenario.title}`;
+
+/* ------------------------------------------------------------ read aloud -- */
+
+/** The loose-tray label while any panel is still on the paper. */
+export const LOOSE_LABEL = 'Five panels are loose on the paper. Put them in the order you want.';
+/** The loose-tray label once all five are in the slots. */
+export const ALL_IN_LABEL = 'All five are in. Run it and see how it ends.';
+/** The caption of the faded strip below his. */
+export const ALT_LABEL = 'Some people do it this way.';
+
+export const trayLabel = (slots: Slots): string => (looseRoles(slots).length > 0 ? LOOSE_LABEL : ALL_IN_LABEL);
+
+/**
+ * What each read-aloud button reads, in order: the words on the screen beside
+ * it and nothing else (advisor a9). The component takes every button's lines
+ * from here and `listenLines()` enumerates the same sources, so a button can
+ * never ask for a clip the build did not make.
+ */
+export const LISTEN = {
+  title: (): readonly string[] => [PUT_IT_BACK_TOGETHER_META.title],
+  opening: (scenario: Scenario): readonly string[] => [scenario.opening.line],
+  /** Under a loose panel and under a filled slot. */
+  panel: (scenario: Scenario, role: PanelRole): readonly string[] => [panelOf(scenario, role).line],
+  tray: (slots: Slots): readonly string[] => [trayLabel(slots)],
+  /** Under the frame the strip is showing now. */
+  frame: (shown: Frame): readonly string[] => [shown.line],
+  alternative: (scenario: Scenario): readonly string[] => [ALT_LABEL, ...alternativeFrames(scenario).map((f) => f.line)],
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  return [
+    ...new Set([
+      PUT_IT_BACK_TOGETHER_META.title, LOOSE_LABEL, ALL_IN_LABEL, ALT_LABEL,
+      ...SCENARIOS.flatMap((s) => [s.opening, ...s.panels, ...s.accepted, ...s.turnedAway].map((f) => f.line)),
+    ]),
+  ];
+}

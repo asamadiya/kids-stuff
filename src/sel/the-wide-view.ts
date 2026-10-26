@@ -123,9 +123,18 @@ export function sentenceFor(p: Person): string {
   return `${who} ${POSE_CLAUSE[p.pose]} ${placeClause(p)}, ${FACING_CLAUSE[p.facing]}.`;
 }
 
+/**
+ * The people with these ids, in census order. The return renders its two lists
+ * from this, keyed by person: several rooms hold two or three people whose
+ * sentences are identical, so a sentence is not a key.
+ */
+export function peopleIn(room: Room, ids: readonly string[]): Person[] {
+  return room.people.filter((p) => ids.includes(p.id));
+}
+
 /** One line per person, in census order. Used for both accounts in the return. */
 export function accountOf(room: Room, ids: readonly string[]): string[] {
-  return room.people.filter((p) => ids.includes(p.id)).map(sentenceFor);
+  return peopleIn(room, ids).map(sentenceFor);
 }
 
 /** The people he did not keep. Order preserved, so the two accounts line up. */
@@ -329,4 +338,66 @@ export function keptLine(kept: readonly string[]): string {
   const n = kept.length;
   if (n === 0) return 'You have not kept anybody yet.';
   return `You kept ${n} ${n === 1 ? 'person' : 'people'}.`;
+}
+
+/* ----------------------------------------------------------------- listen -- */
+
+/** Above the crops in the recall beat. */
+export const RECALL_PROMPT = 'Which of these stayed with you? Every one of them was in the room.';
+
+/** Under the crops while the return is shut: nobody kept yet, or everybody. */
+export const KEEP_HINT = 'Keep some of them, but not all of them.';
+
+/** The two tray labels in the return. */
+export const KEPT_LABEL = 'The room from the ones you kept';
+export const REST_LABEL = 'The room from the ones you did not';
+
+/** Every line `shapeOf` can return: two per feature, and the refusal. */
+export const SHAPE_LINES: readonly string[] = [...FEATURES.flatMap((f) => LINES[f]), NO_SHAPE];
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per line, in screen order. Nothing is spoken unless the child presses that
+ * button (advisor a9): picking a card, opening the return and changing room
+ * are silent. The component reads only through these, and `listenLines`
+ * enumerates them, so a button cannot ask for a clip the build did not make.
+ */
+export const LISTEN = {
+  /** Under the note. */
+  head: (): readonly string[] => [THE_WIDE_VIEW_META.title, THE_WIDE_VIEW_META.note],
+  /** Beside the recall prompt. */
+  prompt: (): readonly string[] => [RECALL_PROMPT],
+  /** Under each crop card, outside the card's own button. */
+  person: (p: Person): readonly string[] => [sentenceFor(p)],
+  /** Beside the keep hint. */
+  hint: (): readonly string[] => [KEEP_HINT],
+  /** Beside the one interpretive line in the return. */
+  shape: (s: Shape): readonly string[] => [s.line],
+  /** "Read this one out" in the first tray: its label, then its list. */
+  mine: (room: Room, kept: readonly string[]): readonly string[] => [KEPT_LABEL, ...accountOf(room, kept)],
+  /** "Read this one out" in the second tray. */
+  theirs: (room: Room, kept: readonly string[]): readonly string[] => [
+    REST_LABEL,
+    ...accountOf(room, complementOf(room, kept)),
+  ],
+  /** Beside the closing line. */
+  closing: (): readonly string[] => [CLOSING_LINE],
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.head(),
+    ...LISTEN.prompt(),
+    ...LISTEN.hint(),
+    ...ROOMS.flatMap((room) => [
+      ...room.people.flatMap((p) => LISTEN.person(p)),
+      // Each tray's label plus every sentence it can ever list.
+      ...LISTEN.mine(room, room.people.map((p) => p.id)),
+      ...LISTEN.theirs(room, []),
+    ]),
+    ...SHAPE_LINES,
+    ...LISTEN.closing(),
+  ];
+  return [...new Set(all)];
 }

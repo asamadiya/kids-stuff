@@ -1,7 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   ACTION_FIELD,
+  LISTEN,
   PALM,
+  ROAD_NOT_TAKEN,
   STRIPS,
   THINGS,
   WHATHAPPENSNEXT_META,
@@ -16,16 +18,16 @@ import {
   plateFilename,
   plateLines,
   roadKey,
-  roadOf,
   stripById,
   stripLine,
 } from '../../sel/what-happens-next';
 import type { Panel, Road, RoadId, Strip } from '../../sel/what-happens-next';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptRoad extends Kept {
   readonly key: string;
@@ -108,13 +110,14 @@ export function WhatHappensNext() {
   const [walked, setWalked] = useState<string[]>(() => roadRack.list().map((r) => r.key));
   const [kept, setKept] = useState<KeptPlate[]>(() => plateRack.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const strip: Strip = stripById(stripId) ?? STRIPS[0];
   const complete = bothWalked(walked, strip);
   const lines = useMemo(() => plateLines(strip), [strip]);
 
   const walk = (id: RoadId) => {
-    const road = roadOf(strip, id);
     setChosen(id);
     setExtended(false);
     const key = roadKey(strip.id, id);
@@ -123,14 +126,12 @@ export function WhatHappensNext() {
       setWalked((w) => [...w, key]);
     }
     pluck(step(-5));
-    say(`${actionWordOf(strip, road)} ${road.afterWord}`);
   };
 
   const extend = () => {
     if (!chosen) return;
     setExtended(true);
     pluck(step(-12), 0.6);
-    say(roadOf(strip, chosen).laterWord);
   };
 
   const goToStrip = (id: string) => {
@@ -138,7 +139,6 @@ export function WhatHappensNext() {
     setStripId(next.id);
     setChosen(null);
     setExtended(false);
-    say(next.setupWord);
   };
 
   const keepPlate = () => {
@@ -160,23 +160,28 @@ export function WhatHappensNext() {
     const isChosen = chosen === road.id;
     const faded = chosen !== null && !isChosen;
     const word = actionWordOf(strip, road);
+    // The road fades; its read button does not, so it stays easy to find.
+    const fade = faded ? { opacity: 0.3, filter: 'grayscale(1)' } : undefined;
     return (
-      <div
-        className="bench__figure"
-        key={road.id}
-        style={faded ? { opacity: 0.3, filter: 'grayscale(1)' } : undefined}
-      >
+      <div className="bench__figure" key={road.id}>
         <button
           type="button"
           className={`bench-part${isChosen ? ' is-set' : ''}`}
+          style={fade}
           aria-pressed={isChosen}
           aria-label={word}
           onClick={() => walk(road.id)}
         >
           <Action strip={strip} road={road} />
         </button>
-        <p className="bench__figure-caption">{word}</p>
-        {faded && <p className="bench__figure-caption">the road not taken</p>}
+        <p className="bench__figure-caption" style={fade}>{word}</p>
+        {faded && <p className="bench__figure-caption" style={fade}>{ROAD_NOT_TAKEN}</p>}
+        <ReadAloud
+          id={`sel/what-happens-next/road/${road.id}`}
+          texts={LISTEN.road(strip, road, faded)}
+          label="Read this road"
+          compact
+        />
       </div>
     );
   };
@@ -190,12 +195,13 @@ export function WhatHappensNext() {
   const beats = ['then', 'and then', 'later'] as const;
 
   return (
-    <section className="bench" aria-labelledby="what-happens-next-title">
+    <section ref={benchRef} className="bench" aria-labelledby="what-happens-next-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{WHATHAPPENSNEXT_META.eyebrow}</p>
           <h2 id="what-happens-next-title" className="bench__title">{WHATHAPPENSNEXT_META.title}</h2>
           <p className="bench__note">{WHATHAPPENSNEXT_META.note}</p>
+          <ReadAloud id="sel/what-happens-next/head" texts={LISTEN.head()} />
         </div>
         <p className="bench__readout">{coverageLine(walked)}</p>
       </div>
@@ -211,6 +217,12 @@ export function WhatHappensNext() {
               style={{ display: 'block', border: `1px solid ${RULE}` }}
             />
             <p className="bench__figure-caption">{strip.setupWord}</p>
+            <ReadAloud
+              id="sel/what-happens-next/setup"
+              texts={LISTEN.setup(strip)}
+              label="Read what is happening"
+              compact
+            />
           </div>
         </div>
 
@@ -227,6 +239,12 @@ export function WhatHappensNext() {
                 style={{ display: 'block', border: `1px solid ${RULE}` }}
               />
               <p className="bench__figure-caption">{walkedRoad.afterWord}</p>
+              <ReadAloud
+                id="sel/what-happens-next/after"
+                texts={LISTEN.after(walkedRoad)}
+                label="Read what happened next"
+                compact
+              />
             </div>
 
             {extended && (
@@ -239,6 +257,12 @@ export function WhatHappensNext() {
                   style={{ display: 'block', border: `1px solid ${RULE}` }}
                 />
                 <p className="bench__figure-caption">{walkedRoad.laterWord}</p>
+                <ReadAloud
+                  id="sel/what-happens-next/later"
+                  texts={LISTEN.later(walkedRoad)}
+                  label="Read later that day"
+                  compact
+                />
               </div>
             )}
           </div>

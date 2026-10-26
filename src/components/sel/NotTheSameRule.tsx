@@ -1,16 +1,17 @@
 import { useMemo, useRef, useState } from 'react';
 import {
-  CHIPS, COLUMNS, KEY_STANDS, NOT_THE_SAME_RULE_META, RULE_CARDS, SLOTS,
-  cardsIn, chipById, chipsFor, coverage, describeKey, divergenceLine,
-  pickChip, picksComplete, picksSet, place, plateLines, rackCards, rackEmpty,
-  reverseLine, ruleSentence, sortedCount, unplace, wrapLines,
+  BUILDER_HEAD, CHIPS, COLUMNS, LISTEN, NOT_THE_SAME_RULE_META, RULE_CARDS, SLOTS, WHERE_PROMPT,
+  cardsIn, chipById, chipsFor, coverage, describeKey,
+  pickChip, picksComplete, picksSet, place, plateLines, rackCards, rackEmpty, rackLabel,
+  sortedCount, unplace, wrapLines,
 } from '../../sel/not-the-same-rule';
 import type { ChipMark, ColumnId, Picks, Placements, RuleCard } from '../../sel/not-the-same-rule';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptRule extends Kept {
   readonly sentence: string;
@@ -21,6 +22,13 @@ const rack = drawer<KeptRule>('not-the-same-rule');
 const BASE = import.meta.env.BASE_URL;
 const PAPER = '#f4f0e6', SUNKEN = '#eae4d5', INK = '#22211b', FAINT = '#6b6757';
 const RULE = '#ddd6c4', TERRACOTTA = '#9e4b27', OCHRE = '#8a6416', TEAL = '#2a5957';
+
+/** Read-button ids on this screen: sel/not-the-same-rule/<slot>[/<which>]. */
+const READ = 'sel/not-the-same-rule';
+/** A label and the speaker that reads it, on one line. */
+const LABEL_ROW = { width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' } as const;
+/** A block of text and its speaker, wrapping under it on a narrow screen. */
+const TEXT_ROW = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--space-3)' } as const;
 
 /** A hairline glyph, so a chip can be told apart without reading it. */
 function Mark({ mark, size = 16, color = TEAL }: { mark: ChipMark; size?: number; color?: string }) {
@@ -60,11 +68,16 @@ export function NotTheSameRule() {
   const [picks, setPicks] = useState<Picks>({});
   const [rules, setRules] = useState<KeptRule[]>(() => rack.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const rackLeft = useMemo(() => rackCards(placements), [placements]);
-  const sentence = useMemo(() => ruleSentence(picks), [picks]);
+  const rule = useMemo(() => LISTEN.rule(picks), [picks]);
+  const sentence = rule.length > 0 ? rule.join(' ') : null;
   const turnedCard = turned ? RULE_CARDS.find((c) => c.id === turned) : undefined;
+  const back = turnedCard ? LISTEN.back(turnedCard, placements[turnedCard.id]) : null;
   const showNotice = rackEmpty(placements) && !noticed;
+  const notice = showNotice ? LISTEN.notice(placements) : null;
 
   const putDown = (cardId: string, column: ColumnId) => {
     setPlacements((p) => place(p, cardId, column));
@@ -75,20 +88,15 @@ export function NotTheSameRule() {
 
   const holdCard = (card: RuleCard) => {
     setHeld(card.id);
-    say(card.front);
     pluck(step(0), 0.16);
   };
 
   const turnOver = (card: RuleCard) => {
-    if (turned === card.id) { setTurned(null); return; }
-    setTurned(card.id);
-    say(reverseLine(card, placements[card.id]));
+    setTurned(turned === card.id ? null : card.id);
   };
 
   const takeChip = (chipId: string) => {
     setPicks((p) => pickChip(p, chipId));
-    const chip = chipById(chipId);
-    if (chip) say(chip.label);
     pluck(step(4), 0.14);
   };
 
@@ -98,18 +106,20 @@ export function NotTheSameRule() {
     rack.add({ sentence, where });
     setRules(rack.list());
     setPicks({});
-    say(sentence);
   };
 
   const lines = plateLines(placements, sentence);
   const sentenceLines = sentence ? wrapLines(sentence, 58).slice(0, 4) : ['No rule written yet.'];
 
   return (
-    <section className="bench" aria-labelledby="not-the-same-rule-title">
+    <section ref={benchRef} className="bench" aria-labelledby="not-the-same-rule-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{NOT_THE_SAME_RULE_META.eyebrow}</p>
-          <h2 id="not-the-same-rule-title" className="bench__title">{NOT_THE_SAME_RULE_META.title}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <h2 id="not-the-same-rule-title" className="bench__title">{NOT_THE_SAME_RULE_META.title}</h2>
+            <ReadAloud id={`${READ}/head`} texts={LISTEN.head()} compact />
+          </div>
           <p className="bench__note">{NOT_THE_SAME_RULE_META.note}</p>
         </div>
         <p className="bench__readout">{coverage(placements, rules.length)}</p>
@@ -198,25 +208,30 @@ export function NotTheSameRule() {
       </div>
 
       <div className="bench__tray">
-        <p className="bench__tray-label">
-          {rackLeft.length > 0
-            ? 'Take a card, then drop it in a column. Drag it, or tap it and tap a column.'
-            : 'Every card is in a column. Turn one over to read the reason on the back.'}
-        </p>
+        <div style={LABEL_ROW}>
+          <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>{rackLabel(placements)}</p>
+          <ReadAloud id={`${READ}/rack`} texts={LISTEN.rack(placements)} compact />
+        </div>
         {rackLeft.map((card) => (
-          <button key={card.id} type="button" draggable
-            className={`bench-part${held === card.id ? ' is-set' : ''}`}
-            onDragStart={(e) => { e.dataTransfer.setData('text/plain', card.id); setHeld(card.id); }}
-            onClick={() => holdCard(card)}>
-            <CardPicture card={card} width={116} />
-            <span style={{ display: 'block', marginTop: '0.35rem' }}>{card.short}</span>
-          </button>
+          <div key={card.id} className="bench__figure" style={{ alignContent: 'start' }}>
+            <button type="button" draggable
+              className={`bench-part${held === card.id ? ' is-set' : ''}`}
+              onDragStart={(e) => { e.dataTransfer.setData('text/plain', card.id); setHeld(card.id); }}
+              onClick={() => holdCard(card)}>
+              <CardPicture card={card} width={116} />
+              <span style={{ display: 'block', marginTop: '0.35rem', maxWidth: '116px' }}>{card.front}</span>
+            </button>
+            <ReadAloud id={`${READ}/card/${card.id}`} texts={LISTEN.card(card)} label="Read this card" compact />
+          </div>
         ))}
       </div>
 
       {held && (
         <div className="bench__tray" style={{ marginTop: '0.75rem' }}>
-          <p className="bench__tray-label">Where does this one go?</p>
+          <div style={LABEL_ROW}>
+            <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>{WHERE_PROMPT}</p>
+            <ReadAloud id={`${READ}/where`} texts={LISTEN.where()} label="Read these out" />
+          </div>
           {COLUMNS.map((col) => (
             <button key={col.id} type="button" className="bench-part"
               onClick={() => putDown(held, col.id)}>{col.label}</button>
@@ -226,16 +241,22 @@ export function NotTheSameRule() {
       )}
 
       <div aria-live="polite">
-        {turnedCard && (
+        {back && (
           <div className="bench__shelf">
             <p className="bench__shelf-title">The back of the card</p>
-            <p className="bench__note">{reverseLine(turnedCard, placements[turnedCard.id])}</p>
+            <div style={TEXT_ROW}>
+              <p className="bench__note">{back.join(' ')}</p>
+              <ReadAloud id={`${READ}/back`} texts={back} />
+            </div>
           </div>
         )}
-        {showNotice && (
+        {notice && (
           <div className="bench__shelf">
             <p className="bench__shelf-title">Two keys, side by side</p>
-            <p className="bench__note">{divergenceLine(placements)} {KEY_STANDS}</p>
+            <div style={TEXT_ROW}>
+              <p className="bench__note">{notice.join(' ')}</p>
+              <ReadAloud id={`${READ}/notice`} texts={notice} />
+            </div>
             <div className="bench__actions">
               <button type="button" className="bench-btn" onClick={() => setNoticed(true)}>Put that away</button>
             </div>
@@ -244,10 +265,16 @@ export function NotTheSameRule() {
       </div>
 
       <div className="bench__shelf">
-        <p className="bench__shelf-title">The last card is blank. Build a rule of your own.</p>
+        <div style={LABEL_ROW}>
+          <p className="bench__shelf-title">{BUILDER_HEAD}</p>
+          <ReadAloud id={`${READ}/builder`} texts={LISTEN.builder()} compact />
+        </div>
         {SLOTS.map((slot) => (
           <div key={slot.id} className="bench__tray">
-            <p className="bench__tray-label">{slot.label} — {slot.ask}</p>
+            <div style={LABEL_ROW}>
+              <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>{slot.label} — {slot.ask}</p>
+              <ReadAloud id={`${READ}/slot/${slot.id}`} texts={LISTEN.slot(slot)} label="Read these out" />
+            </div>
             {chipsFor(slot.id).map((chip) => (
               <button key={chip.id} type="button"
                 className={`bench-part${picks[slot.id] === chip.id ? ' is-set' : ''}`}
@@ -262,7 +289,12 @@ export function NotTheSameRule() {
         <p className="bench__readout" style={{ marginTop: '0.5rem' }}>
           {picksSet(picks)} of {SLOTS.length} parts chosen · {CHIPS.length} chips on the bench
         </p>
-        {sentence && <p className="bench__note">{sentence}</p>}
+        {sentence && (
+          <div style={TEXT_ROW}>
+            <p className="bench__note">{sentence}</p>
+            <ReadAloud id={`${READ}/rule`} texts={rule} />
+          </div>
+        )}
       </div>
 
       <div className="bench__actions">

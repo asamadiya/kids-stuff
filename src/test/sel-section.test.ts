@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
@@ -85,12 +85,17 @@ describe('it is built on the bench, not on the quiz shell', () => {
     }
   });
 
-  it('marks every line that should have a recorded clip', () => {
-    // Browser speech was cut (advisor ruling RULINGS-2: the voice was rejected as
-    // robotic). `say` is now a silent seam in src/lib/say.ts; these call sites
-    // are where recorded clips will go, so each exercise must still have them.
-    const mute = components.filter((c) => !/\bsay\(/.test(c.text)).map((c) => c.file);
-    expect(mute).toEqual([]);
+  it('reads aloud only when pressed, from a read button in every exercise', () => {
+    // Advisor a9 point 5: the old say() calls fired on selection, step and
+    // navigation; none may come back as unsolicited speech. Each exercise has
+    // read buttons instead, and stops reading on any other press.
+    const said = components.filter((c) => /\bsay\(/.test(c.text)).map((c) => c.file);
+    expect(said).toEqual([]);
+    const silent = components.filter((c) => !/<ReadAloud\b/.test(c.text)).map((c) => c.file);
+    expect(silent).toEqual([]);
+    const unscoped = components.filter((c) => !/useStopOnInteraction\(/.test(c.text)).map((c) => c.file);
+    expect(unscoped).toEqual([]);
+    expect(existsSync('src/lib/say.ts')).toBe(false);
   });
 
   it('leaves the old quiz shell deleted', () => {

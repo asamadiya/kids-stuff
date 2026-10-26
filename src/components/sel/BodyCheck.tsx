@@ -1,35 +1,40 @@
 import { useMemo, useRef, useState } from 'react';
 import { PAINT_ORDER, VIEW, regionPath } from '../../sel/body-figure';
 import { drawer } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 import {
   BODYCHECK_META,
   BREATH_CARDS,
   CHECKS,
   COUNT_LENGTHS,
   DOTS_PER_ROW,
+  FIGURE_ASK,
+  LISTEN,
   PALETTE,
   REGIONS,
+  REMEDY_NAME,
+  TRAY_LABEL,
   WAIT_THINGS,
   breathAt,
   checkById,
+  countCue,
   countOne,
   countWord,
   coverage,
   coverageLine,
-  describeMarks,
   formatDay,
   markPhrase,
   plateLines,
-  readingLines,
   regionById,
   toggleCheck,
   toggleRegion,
   waitThingById,
   type BodyCheckRecord,
   type CheckId,
+  type FigureAsk,
   type RegionId,
   type RemedyRun,
   type WaitThingId,
@@ -56,10 +61,20 @@ const SANS = 'Inter, system-ui, sans-serif';
 const PLATE_FIGURE_TOP = 76;
 const PLATE_FIGURE_SCALE = (326 - PLATE_FIGURE_TOP) / VIEW.height;
 
+/** The name under a picture or glyph choice: the words its read button says, now on screen. */
+const CHOICE = { display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' } as const;
+const CHOICE_NAME = { display: 'block', maxWidth: '7rem', fontSize: 'var(--step--1)', lineHeight: 1.25, textAlign: 'center' } as const;
 
+/** A tray's label with the button that reads the label and every choice under it. */
+function TrayHead(props: { readonly id: string; readonly label: string; readonly texts: readonly string[] }) {
+  return (
+    <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
+      <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 16rem' }}>{props.label}</p>
+      <ReadAloud id={props.id} texts={props.texts} label="Read these out" />
+    </div>
+  );
+}
 
-
-/** The painted figure with the ink marks laid over it. */
 /**
  * The figure, drawn by the code.
  *
@@ -76,9 +91,10 @@ const PLATE_FIGURE_SCALE = (326 - PLATE_FIGURE_TOP) / VIEW.height;
 function FigurePlate(props: {
   readonly marks: readonly RegionId[];
   readonly onTap: ((id: RegionId) => void) | null;
-  readonly caption: string;
+  /** The question he is answering on this figure, or the first reading shown beside the second. */
+  readonly label: FigureAsk | 'before';
 }) {
-  const { marks, onTap, caption } = props;
+  const { marks, onTap, label } = props;
   return (
     <div className="bench__figure">
       <svg
@@ -123,7 +139,14 @@ function FigurePlate(props: {
           );
         })}
       </svg>
-      <p className="bench__figure-caption">{caption}</p>
+      {label === 'before' ? (
+        <p className="bench__figure-caption">Before</p>
+      ) : (
+        <div className="bench__row" style={{ justifyContent: 'center' }}>
+          <p className="bench__figure-caption">{FIGURE_ASK[label]}</p>
+          <ReadAloud id={`sel/body-check/ask/${label}`} texts={LISTEN.ask(label)} label="Read the question" compact />
+        </div>
+      )}
     </div>
   );
 }
@@ -190,10 +213,13 @@ export function BodyCheck() {
   const [kept, setKept] = useState<BodyCheckRecord[]>(() => rack.list());
   const [shown, setShown] = useState<BodyCheckRecord | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const breath = breathAt(breathTaps);
   const card = BREATH_CARDS[breath.phase];
   const countDone = counted >= countTo;
+  const cue = countCue(countThing !== null, counted, countTo);
   const cover = useMemo(() => coverage(kept), [kept]);
 
   const draft: BodyCheckRecord = useMemo(() => {
@@ -227,7 +253,6 @@ export function BodyCheck() {
     const next = breathAt(breathTaps + 1);
     setBreathTaps(breathTaps + 1);
     pluck(step(next.phase === 'in' ? -5 : 2), 0.3);
-    say(BREATH_CARDS[next.phase].title);
   };
 
   /** One number said out loud: the next dot fills. */
@@ -236,20 +261,17 @@ export function BodyCheck() {
     const next = countOne(counted, countTo);
     setCounted(next);
     pluck(step(next % DOTS_PER_ROW === 0 ? 4 : -2), 0.2);
-    say(String(next));
   };
 
   const tapBefore = (id: RegionId) => {
     const next = toggleRegion(before, id);
     setBefore(next);
     pluck(step(-9), 0.22);
-    say(describeMarks(next));
   };
   const tapAfter = (id: RegionId) => {
     const next = toggleRegion(after, id);
     setAfter(next);
     pluck(step(-9), 0.22);
-    say(describeMarks(next));
   };
 
   const keep = () => {
@@ -269,12 +291,13 @@ export function BodyCheck() {
   const breathCount = breath.whole === 1 ? 'one slow breath' : `${countWord(breath.whole)} slow breaths`;
 
   return (
-    <section className="bench" aria-labelledby="body-check-title">
+    <section ref={benchRef} className="bench" aria-labelledby="body-check-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{BODYCHECK_META.eyebrow}</p>
           <h2 id="body-check-title" className="bench__title">{BODYCHECK_META.title}</h2>
           <p className="bench__note">{BODYCHECK_META.note}</p>
+          <ReadAloud id="sel/body-check/head" texts={LISTEN.head()} />
         </div>
         <p className="bench__readout">{coverageLine(cover)}</p>
       </div>
@@ -282,14 +305,14 @@ export function BodyCheck() {
       <div className="bench__stage">
         {(phase === 'before' || phase === 'checks') && (
           <div className="bench__row" style={{ justifyContent: 'center' }}>
-            <FigurePlate marks={before} onTap={phase === 'before' ? tapBefore : null} caption="Where is it right now?" />
+            <FigurePlate marks={before} onTap={phase === 'before' ? tapBefore : null} label="first" />
           </div>
         )}
 
         {phase === 'after' && (
           <div className="bench__row" style={{ justifyContent: 'center' }}>
-            <FigurePlate marks={before} onTap={null} caption="Before" />
-            <FigurePlate marks={after} onTap={tapAfter} caption="Where is it now?" />
+            <FigurePlate marks={before} onTap={null} label="before" />
+            <FigurePlate marks={after} onTap={tapAfter} label="again" />
           </div>
         )}
 
@@ -332,6 +355,7 @@ export function BodyCheck() {
             </svg>
             <h3 className="bench__title" style={{ margin: 0 }}>{card.title}</h3>
             <p className="bench__note" style={{ textAlign: 'center', marginTop: 0 }}>{card.how}</p>
+            <ReadAloud id="sel/body-check/breath" texts={LISTEN.breath(breath.phase)} />
             <button
               type="button"
               className="bench-btn bench-btn--primary"
@@ -400,24 +424,23 @@ export function BodyCheck() {
                 );
               })}
             </svg>
-            {countThing === null ? (
-              <p className="bench__figure-caption">Choose what you will do while you count, below.</p>
-            ) : countDone ? (
-              <p className="bench__figure-caption">{`You counted to ${countTo}.`}</p>
-            ) : (
-              <>
-                <p className="bench__note" style={{ textAlign: 'center', marginTop: 0, maxWidth: 'none' }}>
-                  Say the next number out loud with your grown-up, slowly. Then tap.
-                </p>
-                <button
-                  type="button"
-                  className="bench-btn bench-btn--primary"
-                  style={{ minHeight: '4rem', minWidth: '14rem', fontSize: 'var(--step-1)' }}
-                  onClick={countedOne}
-                >
-                  {`I said ${counted + 1}`}
-                </button>
-              </>
+            <div className="bench__row" style={{ justifyContent: 'center' }}>
+              {cue.kind === 'say' ? (
+                <p className="bench__note" style={{ textAlign: 'center', marginTop: 0, maxWidth: 'none' }}>{cue.line}</p>
+              ) : (
+                <p className="bench__figure-caption">{cue.line}</p>
+              )}
+              <ReadAloud id="sel/body-check/count" texts={LISTEN.count(cue)} compact />
+            </div>
+            {cue.kind === 'say' && (
+              <button
+                type="button"
+                className="bench-btn bench-btn--primary"
+                style={{ minHeight: '4rem', minWidth: '14rem', fontSize: 'var(--step-1)' }}
+                onClick={countedOne}
+              >
+                {`I said ${counted + 1}`}
+              </button>
             )}
           </div>
         )}
@@ -475,12 +498,13 @@ export function BodyCheck() {
 
       {phase === 'before' && (
         <div className="bench__tray">
-          <p className="bench__tray-label">Or tap the picture that matches. As many as are true.</p>
+          <TrayHead id="sel/body-check/places" label={TRAY_LABEL.places} texts={LISTEN.places()} />
           {REGIONS.map((r) => (
             <button
               key={r.id}
               type="button"
               className={`bench-part${before.includes(r.id) ? ' is-set' : ''}`}
+              style={CHOICE}
               aria-pressed={before.includes(r.id)}
               aria-label={r.signal}
               onClick={() => tapBefore(r.id)}
@@ -490,6 +514,7 @@ export function BodyCheck() {
                 alt={r.alt}
                 style={{ display: 'block', width: '5rem', height: '5rem', border: `1px solid ${PALETTE.rule}` }}
               />
+              <span style={CHOICE_NAME}>{r.signal}</span>
             </button>
           ))}
         </div>
@@ -497,22 +522,22 @@ export function BodyCheck() {
 
       {phase === 'checks' && (
         <div className="bench__tray">
-          <p className="bench__tray-label">What is true right now? Any of them, or none.</p>
+          <TrayHead id="sel/body-check/checks" label={TRAY_LABEL.checks} texts={LISTEN.checks()} />
           {CHECKS.map((c) => (
             <button
               key={c.id}
               type="button"
               className={`bench-part${checks.includes(c.id) ? ' is-set' : ''}`}
+              style={CHOICE}
               aria-pressed={checks.includes(c.id)}
               aria-label={c.label}
               onClick={() => {
-                const next = toggleCheck(checks, c.id);
-                setChecks(next);
+                setChecks(toggleCheck(checks, c.id));
                 pluck(step(-4), 0.2);
-                say(c.label);
               }}
             >
               <Glyph paths={c.glyph} />
+              <span style={CHOICE_NAME}>{c.label}</span>
             </button>
           ))}
         </div>
@@ -520,14 +545,14 @@ export function BodyCheck() {
 
       {phase === 'remedy' && (
         <div className="bench__tray">
-          <p className="bench__tray-label">Do one of these. Each card or dot changes only when you tap it.</p>
+          <TrayHead id="sel/body-check/remedy" label={TRAY_LABEL.remedy} texts={LISTEN.remedy()} />
           <button
             type="button"
             className={`bench-part bench-part--wide${remedy === 'breath' ? ' is-set' : ''}`}
             aria-pressed={remedy === 'breath'}
-            onClick={() => { setRemedy('breath'); say(BREATH_CARDS[breath.phase].title); }}
+            onClick={() => setRemedy('breath')}
           >
-            Slow breaths
+            {REMEDY_NAME.breath}
           </button>
           <button
             type="button"
@@ -535,7 +560,7 @@ export function BodyCheck() {
             aria-pressed={remedy === 'count'}
             onClick={() => { setRemedy('count'); setCounted(0); }}
           >
-            A slow count
+            {REMEDY_NAME.count}
           </button>
         </div>
       )}
@@ -543,7 +568,7 @@ export function BodyCheck() {
       {phase === 'remedy' && remedy === 'count' && (
         <>
           <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
-            <p className="bench__tray-label">Count to?</p>
+            <TrayHead id="sel/body-check/count-to" label={TRAY_LABEL.countTo} texts={LISTEN.countTo()} />
             {COUNT_LENGTHS.map((n) => (
               <button
                 key={n}
@@ -558,17 +583,19 @@ export function BodyCheck() {
             ))}
           </div>
           <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
-            <p className="bench__tray-label">What will you do while you count?</p>
+            <TrayHead id="sel/body-check/wait" label={TRAY_LABEL.wait} texts={LISTEN.wait()} />
             {WAIT_THINGS.map((w) => (
               <button
                 key={w.id}
                 type="button"
                 className={`bench-part${w.id === countThing ? ' is-set' : ''}`}
+                style={CHOICE}
                 aria-pressed={w.id === countThing}
                 aria-label={w.label}
-                onClick={() => { setCountThing(w.id); say(w.label); }}
+                onClick={() => setCountThing(w.id)}
               >
                 <Glyph paths={w.glyph} />
+                <span style={CHOICE_NAME}>{w.label}</span>
               </button>
             ))}
           </div>
@@ -577,7 +604,7 @@ export function BodyCheck() {
 
       <div className="bench__actions">
         {phase === 'before' && (
-          <button type="button" className="bench-btn bench-btn--primary" onClick={() => { setPhase('checks'); say(describeMarks(before)); }}>
+          <button type="button" className="bench-btn bench-btn--primary" onClick={() => setPhase('checks')}>
             Next
           </button>
         )}
@@ -638,10 +665,11 @@ export function BodyCheck() {
         <div className="bench__shelf">
           <p className="bench__shelf-title">The reading so far</p>
           <ul className="bench__shelf-list" style={{ display: 'block' }}>
-            {readingLines(before, checks).map((l) => (
+            {LISTEN.reading(before, checks).map((l) => (
               <li key={l} className="bench__kept-meta" style={{ display: 'block', marginTop: '0.35rem' }}>{l}</li>
             ))}
           </ul>
+          <ReadAloud id="sel/body-check/reading" texts={LISTEN.reading(before, checks)} />
         </div>
       )}
 

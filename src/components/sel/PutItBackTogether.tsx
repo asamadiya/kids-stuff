@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
-  EMPTY_SLOTS, PUT_IT_BACK_TOGETHER_META, ROLE_WORD, SCENARIOS,
-  alternativeFrames, coverageOf, endingKey, isAccepted, isFull, lastLineOf, lift, looseRoles, orderOf, panelOf, place, placeAt, plateLines, plateTitle, runOf, scatterOf, shift,
+  ALT_LABEL, EMPTY_SLOTS, LISTEN, PUT_IT_BACK_TOGETHER_META, ROLE_WORD, SCENARIOS,
+  alternativeFrames, coverageOf, endingKey, isAccepted, isFull, lastLineOf, lift, looseRoles, orderOf, panelOf, place, placeAt, plateLines, plateTitle, runOf, scatterOf, shift, trayLabel,
 } from '../../sel/put-it-back-together';
 import type { Frame, PanelRole, Scenario, Slots } from '../../sel/put-it-back-together';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptStrip extends Kept {
   readonly scenario: string;
@@ -24,6 +25,9 @@ const src = (image: string) => `${BASE}games/sel/${image}.png`;
 
 const INK = '#22211b', FAINT = '#6b6757', RULE = '#ddd6c4', PAPER = '#f4f0e6';
 const TEAL = '#2a5957', TERRA = '#9e4b27';
+/** A panel's width on the bench; its caption wraps to it so five fit in a row. */
+const PANEL = '7.5rem';
+const LISTEN_ID = 'sel/put-it-back-together';
 
 /** A small ink mark for each move, so the plate reads without letters. */
 function RoleMark({ role, x, y }: { role: PanelRole; x: number; y: number }) {
@@ -68,6 +72,8 @@ export function PutItBackTogether() {
   const [seen, setSeen] = useState<string[]>([]);
   const [saved, setSaved] = useState<string>('');
   const plateRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const loose = looseRoles(slots);
   const order = orderOf(slots);
@@ -78,20 +84,15 @@ export function PutItBackTogether() {
   );
 
   // ------------------------------------------------------------ playback --
-  // The strip is stepped by hand, one panel per tap. It used to turn itself
-  // every 2.2 seconds; nothing on the screen may change without a tap.
-  useEffect(() => {
-    if (phase !== 'running') return;
-    const frame = run[at];
-    if (!frame) return;
-    say(frame.line);
-    pluck(step(at * 2 - 5), 0.28);
-  }, [phase, at, run]);
-
+  // The strip is stepped by hand, one panel per tap: nothing on the screen
+  // changes without a tap. A step makes a soft tone and no words; the frame's
+  // words are heard only from the read button under it (advisor a9: no
+  // narration nobody asked for).
   const nextPanel = () => {
     if (phase !== 'running') return;
     if (at + 1 < run.length) {
       setAt(at + 1);
+      pluck(step((at + 1) * 2 - 5), 0.28);
       return;
     }
     setPhase('done');
@@ -114,14 +115,12 @@ export function PutItBackTogether() {
     if (phase === 'running') return;
     backToBench();
     setSlots((s) => place(s, role));
-    say(panelOf(scenario, role).line);
     pluck(step(2), 0.22);
   };
   const drop = (index: number, role: PanelRole) => {
     if (phase === 'running') return;
     backToBench();
     setSlots((s) => placeAt(s, index, role));
-    say(panelOf(scenario, role).line);
   };
   const takeOut = (index: number) => {
     if (phase === 'running') return;
@@ -147,13 +146,13 @@ export function PutItBackTogether() {
     setRun([]);
     setAt(0);
     setSaved('');
-    say(next.opening.line);
   };
   const runIt = () => {
     if (!order) return;
     setRun(runOf(scenario, order));
     setAt(0);
     setPhase('running');
+    pluck(step(-5), 0.28);
   };
   const keep = () => {
     if (!order || phase !== 'done') return;
@@ -185,11 +184,14 @@ export function PutItBackTogether() {
   const played = phase === 'done' ? run.length : at + 1;
 
   return (
-    <section className="bench" aria-labelledby="put-it-back-together-title">
+    <section ref={benchRef} className="bench" aria-labelledby="put-it-back-together-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{PUT_IT_BACK_TOGETHER_META.eyebrow}</p>
-          <h2 id="put-it-back-together-title" className="bench__title">{PUT_IT_BACK_TOGETHER_META.title}</h2>
+          <div className="bench__row">
+            <h2 id="put-it-back-together-title" className="bench__title">{PUT_IT_BACK_TOGETHER_META.title}</h2>
+            <ReadAloud id={`${LISTEN_ID}/title`} texts={LISTEN.title()} compact />
+          </div>
           <p className="bench__note">{PUT_IT_BACK_TOGETHER_META.note}</p>
         </div>
         <p className="bench__readout">{coverage.line}</p>
@@ -203,6 +205,7 @@ export function PutItBackTogether() {
             style={{ display: 'block', width: '100%', maxWidth: '20rem', border: `1px solid ${RULE}` }}
           />
           <p className="bench__figure-caption">{scenario.opening.line}</p>
+          <ReadAloud id={`${LISTEN_ID}/opening`} texts={LISTEN.opening(scenario)} />
         </div>
 
         {phase !== 'building' && shown && (
@@ -213,6 +216,7 @@ export function PutItBackTogether() {
               style={{ display: 'block', width: '100%', maxWidth: '26rem', border: `1px solid ${RULE}` }}
             />
             <p className="bench__figure-caption" aria-live="polite">{shown.line}</p>
+            <ReadAloud id={`${LISTEN_ID}/frame`} texts={LISTEN.frame(shown)} />
             <p className="bench__figure-caption">{played} of {run.length}</p>
             {phase === 'running' && (
               <button type="button" className="bench-btn bench-btn--primary" onClick={nextPanel}>
@@ -244,7 +248,7 @@ export function PutItBackTogether() {
                     <img
                       src={src(panelOf(scenario, role).image)}
                       alt={panelOf(scenario, role).alt}
-                      style={{ display: 'block', width: '7.5rem', border: `1px solid ${RULE}` }}
+                      style={{ display: 'block', width: PANEL, border: `1px solid ${RULE}` }}
                     />
                   ) : (
                     <svg viewBox="0 0 120 94" width="120" height="94" role="img" aria-hidden="true">
@@ -255,6 +259,12 @@ export function PutItBackTogether() {
                     </svg>
                   )}
                 </button>
+                {role && (
+                  <>
+                    <p className="bench__figure-caption" style={{ maxWidth: PANEL }}>{panelOf(scenario, role).line}</p>
+                    <ReadAloud id={`${LISTEN_ID}/slot/${i}`} texts={LISTEN.panel(scenario, role)} compact />
+                  </>
+                )}
                 {role && (
                   <span className="bench__row">
                     <button type="button" className="bench-part" aria-label={`Move ${ROLE_WORD[role]} earlier`}
@@ -301,19 +311,24 @@ export function PutItBackTogether() {
               </text>
             </svg>
 
-            <div className="bench__row" aria-label="Some people do it this way" style={{ opacity: 0.45, marginTop: '1rem' }}>
+            <div className="bench__row" style={{ marginTop: '1rem' }}>
+              <p className="bench__figure-caption" style={{ opacity: 0.6 }}>{ALT_LABEL}</p>
+              <ReadAloud id={`${LISTEN_ID}/alternative`} texts={LISTEN.alternative(scenario)} label="Read these out" />
+            </div>
+            {/* Faded: one road among sixty. Its words are on the paper because they are read out. */}
+            <div className="bench__row" aria-label={ALT_LABEL}>
               {alt.map((frame, i) => (
                 <div key={frame.image} className="bench__figure">
                   <img
                     src={src(frame.image)}
                     alt={`${i + 1}. ${frame.alt}`}
-                    style={{ display: 'block', width: '6rem', border: `1px solid ${RULE}`, filter: 'grayscale(1)' }}
+                    style={{ display: 'block', width: '6rem', border: `1px solid ${RULE}`, filter: 'grayscale(1)', opacity: 0.45 }}
                   />
-                  <span className="bench__figure-caption">{i + 1}</span>
+                  <span className="bench__figure-caption" style={{ opacity: 0.6 }}>{i + 1}</span>
+                  <span className="bench__figure-caption" style={{ maxWidth: '6rem', opacity: 0.6 }}>{frame.line}</span>
                 </div>
               ))}
             </div>
-            <p className="bench__figure-caption" style={{ opacity: 0.6 }}>Some people do it this way.</p>
           </>
         )}
       </div>
@@ -341,30 +356,33 @@ export function PutItBackTogether() {
       {phase !== 'running' && (
         <div className="bench__tray">
           <p className="bench__tray-label">
-            {loose.length > 0
-              ? 'Five panels are loose on the paper. Put them in the order you want.'
-              : 'All five are in. Run it and see how it ends.'}
+            {trayLabel(slots)}
+            {' '}
+            <ReadAloud id={`${LISTEN_ID}/tray`} texts={LISTEN.tray(slots)} compact />
           </p>
           {loose.map((role) => {
             const p = panelOf(scenario, role);
             const s = scatterOf(scenario.id, role);
             return (
-              <button
-                key={role}
-                type="button"
-                className="bench-part"
-                aria-label={p.line}
-                draggable
-                onDragStart={(e) => e.dataTransfer.setData('text/plain', role)}
-                onClick={() => pick(role)}
-                style={{ transform: `translate(${s.dx}px, ${s.dy}px) rotate(${s.rot}deg)` }}
-              >
-                <img
-                  src={src(p.image)}
-                  alt={p.alt}
-                  style={{ display: 'block', width: '7.5rem', border: `1px solid ${RULE}` }}
-                />
-              </button>
+              <div key={role} className="bench__figure">
+                <button
+                  type="button"
+                  className="bench-part"
+                  aria-label={p.line}
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData('text/plain', role)}
+                  onClick={() => pick(role)}
+                  style={{ transform: `translate(${s.dx}px, ${s.dy}px) rotate(${s.rot}deg)` }}
+                >
+                  <img
+                    src={src(p.image)}
+                    alt={p.alt}
+                    style={{ display: 'block', width: PANEL, border: `1px solid ${RULE}` }}
+                  />
+                </button>
+                <p className="bench__figure-caption" style={{ maxWidth: PANEL }}>{p.line}</p>
+                <ReadAloud id={`${LISTEN_ID}/loose/${role}`} texts={LISTEN.panel(scenario, role)} compact />
+              </div>
             );
           })}
         </div>

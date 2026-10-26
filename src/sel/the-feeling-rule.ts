@@ -20,9 +20,20 @@ export const THE_FEELING_RULE_META = {
   note: 'He slides a marker along a family of feelings, then puts real events of his own on the same rule and sees which one is bigger.',
 } as const;
 
-/** Said once, at the start of a rule, and never again. */
-export const AMBIGUITY_NOTE =
-  'Two people would put the same event at different stops. This rule is yours.';
+/** Its two sentences, one read-aloud clip each. */
+const AMBIGUITY_PARTS = [
+  'Two people would put the same event at different stops.',
+  'This rule is yours.',
+] as const;
+
+/** Shown at the start of a rule, until the first event goes on it. Read only when the child asks. */
+export const AMBIGUITY_NOTE = AMBIGUITY_PARTS.join(' ');
+
+/* Labels on the bench, read by its buttons exactly as they are shown. */
+export const FAMILY_LABEL = 'Which family of feelings';
+export const SIZE_HINT = 'small on the left, big on the right';
+export const MARKER_LABEL = 'The marker — drag it on the rule, or nudge it';
+export const EVENT_LABEL = 'This happened — tap it to put it where the marker is';
 
 /* ------------------------------------------------------------------ rules -- */
 
@@ -214,18 +225,27 @@ export function pinLines(rule: FeelingRule, pins: readonly Pin[]): readonly stri
   );
 }
 
-/** The differential between the last two pins. A measurement, never a comment. */
+/**
+ * The measurement between the last two pins, and nothing else: the reading
+ * just above it already names both, so the bench shows and reads only this.
+ */
+export function compareLine(pins: readonly Pin[]): string {
+  if (pins.length < 2) return '';
+  const a = pins[pins.length - 2];
+  const b = pins[pins.length - 1];
+  const gap = b.stop - a.stop;
+  if (gap === 0) return 'They sit at the same stop for you.';
+  const bigger = cardById(gap > 0 ? b.eventId : a.eventId).label;
+  return `${capitalise(bigger)} is ${stopsWord(gap)} bigger for you.`;
+}
+
+/** The differential between the last two pins, restating both. For the plate. A measurement, never a comment. */
 export function differenceLine(rule: FeelingRule, pins: readonly Pin[]): string {
   if (pins.length < 2) return '';
   const a = pins[pins.length - 2];
   const b = pins[pins.length - 1];
-  const cardA = cardById(a.eventId);
-  const cardB = cardById(b.eventId);
-  const said = `You put ${cardA.label} at ${stopAt(rule, a.stop).label.toLowerCase()} and ${cardB.label} at ${stopAt(rule, b.stop).label.toLowerCase()}.`;
-  const gap = b.stop - a.stop;
-  if (gap === 0) return `${said} They sit at the same stop for you.`;
-  const bigger = gap > 0 ? cardB.label : cardA.label;
-  return `${said} ${capitalise(bigger)} is ${stopsWord(gap)} bigger for you.`;
+  const said = `You put ${cardById(a.eventId).label} at ${stopAt(rule, a.stop).label.toLowerCase()} and ${cardById(b.eventId).label} at ${stopAt(rule, b.stop).label.toLowerCase()}.`;
+  return `${said} ${compareLine(pins)}`;
 }
 
 /** Coverage, never a ratio of right to wrong. */
@@ -242,7 +262,7 @@ export function plateLines(rule: FeelingRule, pins: readonly Pin[]): readonly st
   return diff ? [head, ...body, diff] : [head, ...body];
 }
 
-/** Spoken and used as the drawing's description. */
+/** The drawing's description, for someone who cannot see it. Not read aloud: a read button reads only what is on screen. */
 export function ruleSummary(rule: FeelingRule, pins: readonly Pin[]): string {
   const stops = rule.stops.map((s) => s.label.toLowerCase()).join(', ');
   if (!pins.length) return `The ${rule.label.toLowerCase()} rule: ${stops}. Nothing pinned yet.`;
@@ -251,6 +271,64 @@ export function ruleSummary(rule: FeelingRule, pins: readonly Pin[]): string {
 
 export function keptSummary(rule: FeelingRule, pins: readonly Pin[]): string {
   return `${rule.label} · ${pins.length} ${pins.length === 1 ? 'mark' : 'marks'}`;
+}
+
+/* ---------------------------------------------------------------- listen -- */
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per sentence or label, in screen order. Nothing is spoken unless the child
+ * presses that button (advisor a9). The bench reads and shows only through
+ * these, and `listenLines` enumerates them, so a button cannot ask for a clip
+ * the build did not make.
+ */
+export const LISTEN = {
+  /** L1, beside the title. The note is for the grown-up and is not read. */
+  title: (): readonly string[] => [THE_FEELING_RULE_META.title],
+  /** L2, in the family tray: its label, then each family in tray order. */
+  families: (): readonly string[] => [FAMILY_LABEL, ...FEELING_RULES.map((r) => r.label)],
+  /** L3, under the faces: the family, the size hint, then each stop small to big. */
+  rule: (rule: FeelingRule): readonly string[] => [
+    rule.label,
+    SIZE_HINT,
+    ...rule.stops.map((s) => s.label),
+  ],
+  /** L4, beside the marker: its label, then the word under it now. */
+  marker: (rule: FeelingRule, value: number): readonly string[] => [MARKER_LABEL, markerWord(rule, value)],
+  /** L5, beside the event card: its label, then the card's caption. */
+  event: (card: EventCard): readonly string[] => [EVENT_LABEL, card.label],
+  /** L6, beside the note shown until the first event goes on: its two sentences. */
+  note: (): readonly string[] => AMBIGUITY_PARTS,
+  /** L7, beside the reading: one line per event on the rule. */
+  reading: (rule: FeelingRule, pins: readonly Pin[]): readonly string[] => pinLines(rule, pins),
+  /** L8, beside the difference: empty until there are two events to compare. */
+  difference: (pins: readonly Pin[]): readonly string[] => {
+    const line = compareLine(pins);
+    return line ? [line] : [];
+  },
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all: string[] = [...LISTEN.title(), ...LISTEN.families(), ...LISTEN.note()];
+  for (const card of EVENT_DECK) all.push(...LISTEN.event(card));
+  for (const rule of FEELING_RULES) {
+    all.push(...LISTEN.rule(rule));
+    rule.stops.forEach((_, i) => all.push(...LISTEN.marker(rule, i)));
+    // A reading is one atom per pin, and a difference depends only on the last
+    // two pins, so every pin and every ordered pair of pins covers them all.
+    for (const a of EVENT_DECK) {
+      rule.stops.forEach((_, i) => {
+        const first: Pin = { eventId: a.id, stop: i };
+        all.push(...LISTEN.reading(rule, [first]));
+        for (const b of EVENT_DECK) {
+          if (b.id === a.id) continue;
+          rule.stops.forEach((__, j) => all.push(...LISTEN.difference([first, { eventId: b.id, stop: j }])));
+        }
+      });
+    }
+  }
+  return [...new Set(all)];
 }
 
 /* ------------------------------------------------------------- geometry -- */

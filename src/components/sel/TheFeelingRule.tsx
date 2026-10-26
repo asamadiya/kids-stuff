@@ -1,16 +1,18 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  AMBIGUITY_NOTE, FEELING_RULES, THE_FEELING_RULE_META,
-  addPin, cardAt, cardById, clampPos, coverageLine, differenceLine, faceStrength,
-  facePath, keptSummary, markerWord, nearestStop, pinLines, plateLines, posFromFraction,
+  AMBIGUITY_NOTE, EVENT_LABEL, FAMILY_LABEL, FEELING_RULES, LISTEN, MARKER_LABEL, SIZE_HINT,
+  THE_FEELING_RULE_META,
+  addPin, cardAt, cardById, clampPos, coverageLine, faceStrength,
+  facePath, markerWord, nearestStop, plateLines, posFromFraction,
   removePin, ruleById, ruleSummary, scenePath, stopAt, stopX,
 } from '../../sel/the-feeling-rule';
 import type { FeelingRule, Pin } from '../../sel/the-feeling-rule';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
 import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptRule extends Kept {
   readonly ruleId: string;
@@ -34,6 +36,9 @@ const X1 = 686;
 const RULE_Y = 128;
 
 const BASE = `${import.meta.env.BASE_URL}`;
+const READ = 'sel/the-feeling-rule';
+/** A line and the speaker button that reads it, side by side. */
+const BESIDE: React.CSSProperties = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-3)' };
 const trim = (s: string, n = 26): string => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 export function TheFeelingRule() {
@@ -45,15 +50,17 @@ export function TheFeelingRule() {
   const [told, setTold] = useState(false);
   const [kept, setKept] = useState<readonly KeptRule[]>(() => shelf.list());
   const svgRef = useRef<SVGSVGElement>(null);
-  const spokenRef = useRef(0);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
+  const pluckedRef = useRef(0);
 
   const rule: FeelingRule = useMemo(() => ruleById(ruleId), [ruleId]);
   const card = useMemo(() => cardAt(ruleId, cursor), [ruleId, cursor]);
   const here = nearestStop(rule, pos);
   const word = markerWord(rule, pos);
   const lines = useMemo(() => plateLines(rule, pins), [rule, pins]);
-  const reading = useMemo(() => pinLines(rule, pins), [rule, pins]);
-  const difference = useMemo(() => differenceLine(rule, pins), [rule, pins]);
+  const reading = useMemo(() => LISTEN.reading(rule, pins), [rule, pins]);
+  const difference = useMemo(() => LISTEN.difference(pins), [pins]);
   const marked = useMemo(() => {
     const ids = new Set(kept.map((k) => k.ruleId));
     if (pins.length) ids.add(ruleId);
@@ -62,15 +69,14 @@ export function TheFeelingRule() {
 
   /* --------------------------------------------------------------- moving */
 
-  /** Naming each stop as the marker passes under it; sound is incidental. */
+  /** A note for each stop as the marker passes under it; sound is incidental, and nothing is spoken. */
   const land = useCallback(
-    (next: number, spoken: boolean) => {
+    (next: number, sounded: boolean) => {
       const p = clampPos(rule, next);
       setPos(p);
       const i = nearestStop(rule, p);
-      if (spoken && i !== spokenRef.current) {
-        spokenRef.current = i;
-        say(stopAt(rule, i).label);
+      if (sounded && i !== pluckedRef.current) {
+        pluckedRef.current = i;
         pluck(step(-4 + i * 3), 0.28);
       }
     },
@@ -104,9 +110,7 @@ export function TheFeelingRule() {
     setPos(0);
     setPins([]);
     setCursor(0);
-    spokenRef.current = 0;
-    const r = ruleById(id);
-    say(`${r.label}. ${r.stops.map((s) => s.label).join(', ')}.`);
+    pluckedRef.current = 0;
   };
 
   const dropPin = (): void => {
@@ -115,13 +119,10 @@ export function TheFeelingRule() {
     setTold(true);
     setCursor((c) => c + 1);
     pluck(step(2 + here * 2), 0.36);
-    const after = differenceLine(rule, next);
-    say(after ? `${word}. ${after}` : word);
   };
 
   const dealAnother = (): void => {
     setCursor((c) => c + 1);
-    say(cardAt(ruleId, cursor + 1).label);
   };
 
   const takeOff = (eventId: string): void => {
@@ -132,7 +133,6 @@ export function TheFeelingRule() {
     if (!pins.length) return;
     shelf.add({ ruleId, pins });
     setKept(shelf.list());
-    say('kept on the shelf');
   };
 
   const load = (k: KeptRule): void => {
@@ -141,7 +141,6 @@ export function TheFeelingRule() {
     setPos(k.pins.length ? k.pins[k.pins.length - 1].stop : 0);
     setCursor(0);
     setTold(true);
-    say(keptSummary(ruleById(k.ruleId), k.pins));
   };
 
   const savePicture = (): void => {
@@ -159,11 +158,14 @@ export function TheFeelingRule() {
   const rows = new Map<number, number>();
 
   return (
-    <section className="bench" aria-labelledby="the-feeling-rule-title">
+    <section ref={benchRef} className="bench" aria-labelledby="the-feeling-rule-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{THE_FEELING_RULE_META.eyebrow}</p>
-          <h2 id="the-feeling-rule-title" className="bench__title">{THE_FEELING_RULE_META.title}</h2>
+          <div style={BESIDE}>
+            <h2 id="the-feeling-rule-title" className="bench__title">{LISTEN.title().join(' ')}</h2>
+            <ReadAloud id={`${READ}/title`} texts={LISTEN.title()} compact />
+          </div>
           <p className="bench__note">{THE_FEELING_RULE_META.note}</p>
         </div>
         <p className="bench__readout">{coverageLine(marked, pins.length)}</p>
@@ -189,6 +191,7 @@ export function TheFeelingRule() {
             </button>
           ))}
         </div>
+        <ReadAloud id={`${READ}/rule`} texts={LISTEN.rule(rule)} label="Read these out" />
 
         <svg
           ref={svgRef}
@@ -201,7 +204,7 @@ export function TheFeelingRule() {
             {rule.label.toUpperCase()}
           </text>
           <text x={X0} y="60" fontFamily="Inter, sans-serif" fontSize="13" fill={FAINT}>
-            small on the left, big on the right
+            {SIZE_HINT}
           </text>
 
           {/* the rule itself */}
@@ -276,7 +279,8 @@ export function TheFeelingRule() {
       </div>
 
       <div className="bench__tray">
-        <p className="bench__tray-label">Which family of feelings</p>
+        <p className="bench__tray-label">{FAMILY_LABEL}</p>
+        <ReadAloud id={`${READ}/families`} texts={LISTEN.families()} label="Read these out" />
         {FEELING_RULES.map((r) => (
           <button
             key={r.id}
@@ -289,7 +293,7 @@ export function TheFeelingRule() {
           </button>
         ))}
 
-        <p className="bench__tray-label">The marker — drag it on the rule, or nudge it</p>
+        <p className="bench__tray-label">{MARKER_LABEL}</p>
         <button
           type="button"
           className="bench-part bench-part--wide is-set"
@@ -300,12 +304,12 @@ export function TheFeelingRule() {
           aria-valuenow={here + 1}
           aria-valuetext={word}
           onKeyDown={onRuleKey}
-          onClick={() => say(word)}
         >
           {word}
         </button>
+        <ReadAloud id={`${READ}/marker`} texts={LISTEN.marker(rule, pos)} compact />
 
-        <p className="bench__tray-label">This happened — tap it to put it where the marker is</p>
+        <p className="bench__tray-label">{EVENT_LABEL}</p>
         <button
           type="button"
           className="bench-part bench-part--wide"
@@ -319,19 +323,31 @@ export function TheFeelingRule() {
           />
           <span className="bench__figure-caption">{card.label}</span>
         </button>
+        <ReadAloud id={`${READ}/event`} texts={LISTEN.event(card)} compact />
         <button type="button" className="bench-btn" onClick={dealAnother}>
           A different one
         </button>
       </div>
 
-      {!told && <p className="bench__note">{AMBIGUITY_NOTE}</p>}
+      {!told && (
+        <div style={BESIDE}>
+          <p className="bench__note">{AMBIGUITY_NOTE}</p>
+          <ReadAloud id={`${READ}/note`} texts={LISTEN.note()} compact />
+        </div>
+      )}
 
       {reading.length > 0 && (
         <div className="bench__row">
           <p className="bench__readout">{reading.join(' ')}</p>
+          <ReadAloud id={`${READ}/reading`} texts={reading} />
         </div>
       )}
-      {difference && <p className="bench__note">{difference}</p>}
+      {difference.length > 0 && (
+        <div style={BESIDE}>
+          <p className="bench__note">{difference.join(' ')}</p>
+          <ReadAloud id={`${READ}/difference`} texts={difference} compact />
+        </div>
+      )}
 
       <div className="bench__actions">
         <button type="button" className="bench-btn bench-btn--primary" onClick={dropPin}>

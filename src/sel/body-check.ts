@@ -493,3 +493,100 @@ export function formatDay(made: string): string {
   const month = MONTHS[Number(m[2]) - 1] ?? '';
   return `${Number(m[3])} ${month} ${m[1]}`;
 }
+
+/* ------------------------------------------------------------------- listen */
+
+/** The question under the figure he marks: the first reading, then the second. */
+export const FIGURE_ASK = {
+  first: 'Where is it right now?',
+  again: 'Where is it now?',
+} as const;
+export type FigureAsk = keyof typeof FIGURE_ASK;
+
+/** The label over each tray, as shown. */
+export const TRAY_LABEL = {
+  places: 'Or tap the picture that matches. As many as are true.',
+  checks: 'What is true right now? Any of them, or none.',
+  remedy: 'Do one of these. Each card or dot changes only when you tap it.',
+  countTo: 'Count to?',
+  wait: 'What will you do while you count?',
+} as const;
+
+/** The two remedy buttons. */
+export const REMEDY_NAME = { breath: 'Slow breaths', count: 'A slow count' } as const;
+
+export const COUNT_CHOOSE = 'Choose what you will do while you count, below.';
+export const COUNT_SAY = 'Say the next number out loud with your grown-up, slowly. Then tap.';
+
+/** The line under the counting card: pick a thing to do, say the next number, or the count is done. */
+export interface CountCue {
+  readonly kind: 'choose' | 'say' | 'done';
+  readonly line: string;
+}
+
+export function countCue(chosen: boolean, counted: number, to: number): CountCue {
+  if (!chosen) return { kind: 'choose', line: COUNT_CHOOSE };
+  if (counted >= to) return { kind: 'done', line: `You counted to ${to}.` };
+  return { kind: 'say', line: COUNT_SAY };
+}
+
+/**
+ * What each read-aloud button reads: the visible words beside it, one atom per
+ * label or sentence, in screen order. Nothing is spoken unless the child
+ * presses that button (advisor a9). The component reads only through these and
+ * `listenLines` enumerates them, so no button can ask for a clip the build did
+ * not make.
+ */
+export const LISTEN = {
+  /** L1: the title and the note. */
+  head: (): readonly string[] => [BODYCHECK_META.title, BODYCHECK_META.note],
+  /** L2: the question under the figure he is marking. */
+  ask: (which: FigureAsk): readonly string[] => [FIGURE_ASK[which]],
+  /** L3: the picture tray, label then each signal under its picture. */
+  places: (): readonly string[] => [TRAY_LABEL.places, ...REGIONS.map((r) => r.signal)],
+  /** L4: the check tray. */
+  checks: (): readonly string[] => [TRAY_LABEL.checks, ...CHECKS.map((c) => c.label)],
+  /** L5: the remedy tray. */
+  remedy: (): readonly string[] => [TRAY_LABEL.remedy, REMEDY_NAME.breath, REMEDY_NAME.count],
+  /** L6: the breath card that is up. The breath count under it is a counter and is not read. */
+  breath: (phase: BreathPhase): readonly string[] => [BREATH_CARDS[phase].title, BREATH_CARDS[phase].how],
+  /** L7: the line under the counting card. */
+  count: (cue: CountCue): readonly string[] => [cue.line],
+  /** L8: the "Count to?" tray. */
+  countTo: (): readonly string[] => [TRAY_LABEL.countTo, ...COUNT_LENGTHS.map(String)],
+  /** L9: the tray of things to do while counting. */
+  wait: (): readonly string[] => [TRAY_LABEL.wait, ...WAIT_THINGS.map((w) => w.label)],
+  /** L10: the reading so far. */
+  reading: (marks: readonly RegionId[], checks: readonly CheckId[]): readonly string[] =>
+    readingLines(marks, checks),
+} as const;
+
+/** Every subset of `xs`, each in the order of `xs`. */
+export function subsetsOf<T>(xs: readonly T[]): T[][] {
+  return xs.reduce<T[][]>((all, x) => [...all, ...all.map((s) => [...s, x])], [[]]);
+}
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.head(),
+    ...LISTEN.ask('first'),
+    ...LISTEN.ask('again'),
+    ...LISTEN.places(),
+    ...LISTEN.checks(),
+    ...LISTEN.remedy(),
+    ...LISTEN.breath('in'),
+    ...LISTEN.breath('out'),
+    ...COUNT_LENGTHS.flatMap((to) => [
+      ...LISTEN.count(countCue(false, 0, to)),
+      ...LISTEN.count(countCue(true, 0, to)),
+      ...LISTEN.count(countCue(true, to, to)),
+    ]),
+    ...LISTEN.countTo(),
+    ...LISTEN.wait(),
+    // The two halves of the reading vary independently, so each is enumerated on its own.
+    ...subsetsOf(REGIONS.map((r) => r.id)).map((s) => LISTEN.reading(s, [])[0]),
+    ...subsetsOf(CHECKS.map((c) => c.id)).map((s) => LISTEN.reading([], s)[1]),
+  ];
+  return [...new Set(all)];
+}

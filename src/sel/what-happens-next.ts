@@ -680,3 +680,46 @@ export const nextStripId = (id: string): string => {
   const i = STRIPS.findIndex((s) => s.id === id);
   return STRIPS[(i + 1 + STRIPS.length) % STRIPS.length].id;
 };
+
+/* ----------------------------------------------------------------- listen -- */
+
+/** The second caption under the road that was not walked. Shown and read as written. */
+export const ROAD_NOT_TAKEN = 'the road not taken';
+
+/**
+ * What each read-aloud button reads: the captions on screen beside it, one
+ * atom per caption, in screen order. Nothing here is spoken unless the child
+ * presses that button (advisor a9). The component reads only through these,
+ * and `listenLines` enumerates them, so a button cannot ask for a clip the
+ * build did not make.
+ */
+export const LISTEN = {
+  /** L1, under the note. */
+  head: (): readonly string[] => [WHATHAPPENSNEXT_META.title, WHATHAPPENSNEXT_META.note],
+  /** L2, under the setup picture. */
+  setup: (s: Strip): readonly string[] => [s.setupWord],
+  /** L3, under each road's drawing. The faded road also carries its second caption. */
+  road: (s: Strip, road: Road, faded: boolean): readonly string[] =>
+    faded ? [actionWordOf(s, road), ROAD_NOT_TAKEN] : [actionWordOf(s, road)],
+  /** L4, under what followed. */
+  after: (road: Road): readonly string[] => [road.afterWord],
+  /** L5, under the same place later that day. */
+  later: (road: Road): readonly string[] => [road.laterWord],
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.head(),
+    ...STRIPS.flatMap((s) => [
+      ...LISTEN.setup(s),
+      ...s.roads.flatMap((r) => [
+        ...LISTEN.road(s, r, false),
+        ...LISTEN.road(s, r, true),
+        ...LISTEN.after(r),
+        ...LISTEN.later(r),
+      ]),
+    ]),
+  ];
+  return [...new Set(all)];
+}

@@ -356,9 +356,49 @@ export function choose(s: Scenario, tried: readonly ChoiceId[], c: ChoiceId): re
   return [...tried, c];
 }
 
+/** One story line as its two sentences: what he said or did, then what the other child did. */
+export function storyParts(s: Scenario, c: ChoiceId): readonly [string, string] {
+  return [saidLine(s, c), replyOf(s, c).says];
+}
+
+/** One story line, as it is shown under the pictures. */
+export const storyLine = (s: Scenario, c: ChoiceId): string => storyParts(s, c).join(' ');
+
 /** Each thing he chose, followed by what came of it. */
 export function storyLines(s: Scenario, tried: readonly ChoiceId[]): readonly string[] {
-  return tried.map((c) => `${saidLine(s, c)} ${replyOf(s, c).says}`);
+  return tried.map((c) => storyLine(s, c));
+}
+
+/** The plan tray's label before anything is chosen. */
+export const TRAY_PICK = 'What will you say? Pick a plan.';
+/** The plan tray's label once a plan has gone ahead. */
+export const TRAY_SETTLED = 'That is what happened.';
+/** The plan tray's label after a plan the other child did not take. */
+export const trayRefused = (s: Scenario): string =>
+  `${s.other} did not go along with it. Pick another plan, or ask a grown-up.`;
+
+/** The line above the plans, for where he is in the scene. */
+export function trayLine(s: Scenario, tried: readonly ChoiceId[]): string {
+  if (tried.length === 0) return TRAY_PICK;
+  return isSettled(s, tried) ? TRAY_SETTLED : trayRefused(s);
+}
+
+/**
+ * Every path he can take in one place: plans in any order, each at most once,
+ * until one goes ahead. The empty path is the scene before he chooses.
+ */
+export function reachablePaths(s: Scenario): (readonly ChoiceId[])[] {
+  const out: (readonly ChoiceId[])[] = [];
+  const walk = (tried: readonly ChoiceId[]): void => {
+    out.push(tried);
+    if (isSettled(s, tried)) return;
+    for (const c of CHOICES) {
+      const next = choose(s, tried, c);
+      if (next !== tried) walk(next);
+    }
+  };
+  walk([]);
+  return out;
 }
 
 /** The lines that go on the plate. */
@@ -381,4 +421,42 @@ export function coverageText(played: readonly string[]): string {
 
 export function addPlayed(played: readonly string[], id: string): readonly string[] {
   return played.includes(id) ? played : [...played, id];
+}
+
+/* ---------------------------------------------------------------- read aloud */
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per sentence or label, in screen order. Nothing is spoken unless he presses
+ * that button (advisor a9). Not read: the grown-up's `guide`, the "Later"
+ * picture label, the plate, the drawer, the coverage line and the situation
+ * pictures (a grown-up usually picks the situation). The component reads only
+ * through these, and `listenLines` enumerates them, so a button cannot ask for
+ * a clip the build did not make.
+ */
+export const LISTEN = {
+  /** L1, under the note. */
+  head: (): readonly string[] => [ONE_SWING_TWO_KIDS_META.title, ONE_SWING_TWO_KIDS_META.note],
+  /** L2, under the situation picture: its caption, then who the other child is. */
+  setup: (s: Scenario): readonly string[] => [s.where, s.about],
+  /** L3, in the plan tray: its line, then the four choices in the order they are drawn. */
+  plans: (s: Scenario, tried: readonly ChoiceId[]): readonly string[] =>
+    [trayLine(s, tried), ...CHOICES.map((c) => choiceLabel(s, c))],
+  /** L4, beside each story line. */
+  story: (s: Scenario, c: ChoiceId): readonly string[] => storyParts(s, c),
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.head(),
+    ...SCENARIOS.flatMap((s) => [
+      ...LISTEN.setup(s),
+      ...reachablePaths(s).flatMap((tried) => [
+        ...LISTEN.plans(s, tried),
+        ...tried.flatMap((c) => LISTEN.story(s, c)),
+      ]),
+    ]),
+  ];
+  return [...new Set(all)];
 }

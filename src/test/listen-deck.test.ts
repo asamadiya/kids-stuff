@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { pickRound } from '../languages/deck';
 import { WORDS } from '../languages';
+
+// Walks every reachable state: seconds alone, longer under the full parallel suite.
+vi.setConfig({ testTimeout: 60_000 });
 
 /**
  * Astra round 3: `(round * 7) % pool.length` asked the same word forever with

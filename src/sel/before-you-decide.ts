@@ -53,7 +53,7 @@ export type GlyphId = 'point' | 'ask' | 'mend' | 'wait' | 'tell';
 
 export interface Chip {
   readonly kind: ChipKind;
-  /** Read aloud when the chip is tapped. */
+  /** The chip's accessible name. Never spoken on a tap: the rack's read button reads the questions as shown. */
   readonly label: string;
   /** A single stroked path, drawn in a 24 x 24 box. */
   readonly path: string;
@@ -128,7 +128,7 @@ export interface Case {
   readonly choices: readonly Choice[];
   /** Whether the three facts together say what happened. */
   readonly settles: boolean;
-  /** Said after the unasked questions are turned over. */
+  /** Shown after the unasked questions are turned over. */
   readonly closing: string;
 }
 
@@ -482,14 +482,21 @@ export const factFor = (subject: Case, kind: QuestionKind): Fact => {
 /* ------------------------------------------------------------ the timeline -- */
 
 /**
- * What the clock question buys, read aloud. Derived from `Case.timeline`, which
- * is the same array `timelineMarks` draws, so the sentence and the strip cannot
- * come apart. There is no stored clock sentence to disagree with.
+ * Drawn under the picture's stop on the strip, and read straight after that
+ * stop. One string, so the strip and its read-aloud cannot say different things.
  */
-export const clockLine = (subject: Case): string =>
-  subject.timeline
-    .map((stop, i) => (i === subject.pictureAt ? `${stop.says} That is what the picture shows.` : stop.says))
-    .join(' ');
+export const PICTURE_MARK = 'That is what the picture shows.';
+
+/**
+ * What the clock question buys, as the strip shows it top to bottom: each stop,
+ * with `PICTURE_MARK` after the picture's stop. Derived from `Case.timeline`,
+ * which is the same array `timelineMarks` draws, so the words and the strip
+ * cannot come apart. There is no stored clock sentence to disagree with.
+ */
+export const clockParts = (subject: Case): readonly string[] =>
+  subject.timeline.flatMap((stop, i) => (i === subject.pictureAt ? [stop.says, PICTURE_MARK] : [stop.says]));
+
+export const clockLine = (subject: Case): string => clockParts(subject).join(' ');
 
 /** The sentence a fact says. Only the clock arm is derived; the rest are stated. */
 export const factText = (subject: Case, fact: Fact): string =>
@@ -551,9 +558,14 @@ export const readout = (standing: Standing): string => {
   return `${spent} ${standing.cases} of ${CASES.length} cases decided.`;
 };
 
-/** What the guide says once the unasked questions are face-up. */
-export const closingLine = (subject: Case): string =>
-  subject.settles ? subject.closing : `${subject.closing} You still do not know.`;
+/** Added after the closing of a case the three facts cannot settle. */
+export const STILL = 'You still do not know.';
+
+/** The closing shown once the unasked questions are face-up, one sentence group per part. */
+export const closingParts = (subject: Case): readonly string[] =>
+  subject.settles ? [subject.closing] : [subject.closing, STILL];
+
+export const closingLine = (subject: Case): string => closingParts(subject).join(' ');
 
 export interface Decided {
   readonly caseId: string;
@@ -604,3 +616,80 @@ export const sheetRows = (records: readonly Decided[]): readonly SheetRow[] =>
 
 export const sheetHeight = (records: readonly Decided[]): number =>
   SHEET.top + Math.max(1, Math.min(records.length, 8)) * SHEET.rowHeight + SHEET.foot;
+
+/* -------------------------------------------------------------- listen -- */
+
+/** The question rack's label, before and after a decision. */
+export const RACK_LABEL = {
+  open: 'Spend a question, or decide without spending any.',
+  closed: 'The rack is closed for this one.',
+} as const;
+
+/** The choice tray's label, before and after a decision. */
+export const CHOICE_TRAY_LABEL = {
+  open: 'Decide whenever you like.',
+  closed: 'What you did.',
+} as const;
+
+export const rackLabel = (decided: boolean): string => (decided ? RACK_LABEL.closed : RACK_LABEL.open);
+
+export const choiceTrayLabel = (decided: boolean): string => (decided ? CHOICE_TRAY_LABEL.closed : CHOICE_TRAY_LABEL.open);
+
+/** A fact stated as a sentence: every arm but the clock, which is drawn as a timeline. */
+export type StatedFact = Exclude<Fact, { readonly kind: 'clock' }>;
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per data string, in screen order. Nothing is spoken unless the child presses
+ * the button (advisor a9); a tap on a chip, a choice or the turn-over is silent.
+ * The component reads only through these and draws the fact card and the strip
+ * from the same parts, and `listenLines` enumerates them, so a button cannot ask
+ * for a clip the build did not make.
+ */
+export const LISTEN = {
+  /** L1, beside the title. The grown-up note is not read. */
+  title: (): readonly string[] => [BEFORE_YOU_DECIDE_META.title],
+  /** L2, under the picture: its caption. */
+  setup: (subject: Case): readonly string[] => [subject.setup],
+  /** L3, in the question rack: its label, then the three questions in rack order. */
+  questions: (subject: Case, decided: boolean): readonly string[] => [
+    rackLabel(decided),
+    ...QUESTION_KINDS.map((kind) => factFor(subject, kind).question),
+  ],
+  /** L4, on a fact card: its first line (the question, or once turned over, what was not asked), then the fact. */
+  card: (fact: StatedFact, prefix?: string): readonly [string, string] => [prefix ?? fact.question, fact.fact],
+  /** L4c, beside the strip: what was not asked if it was turned over, the question, then the stops as drawn. */
+  timeline: (subject: Case, prefix?: string): readonly string[] => [
+    ...(prefix === undefined ? [] : [prefix]),
+    factFor(subject, 'clock').question,
+    ...clockParts(subject),
+  ],
+  /** L5, in the choice tray: its label, then every choice in tray order. */
+  choices: (subject: Case, decided: boolean): readonly string[] => [
+    choiceTrayLabel(decided),
+    ...subject.choices.map((choice) => choice.label),
+  ],
+  /** L6, beside what happened. */
+  outcome: (choice: Choice): readonly string[] => [choice.outcome],
+  /** L7, beside the closing. */
+  closing: (subject: Case): readonly string[] => closingParts(subject),
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all: string[] = [...LISTEN.title()];
+  for (const subject of CASES) {
+    all.push(...LISTEN.setup(subject));
+    for (const decided of [false, true]) {
+      all.push(...LISTEN.questions(subject, decided), ...LISTEN.choices(subject, decided));
+    }
+    for (const fact of subject.facts) {
+      for (const prefix of [undefined, unaskedLine(fact.kind)]) {
+        all.push(...(fact.kind === 'clock' ? LISTEN.timeline(subject, prefix) : LISTEN.card(fact, prefix)));
+      }
+    }
+    for (const choice of subject.choices) all.push(...LISTEN.outcome(choice));
+    all.push(...LISTEN.closing(subject));
+  }
+  return [...new Set(all)];
+}

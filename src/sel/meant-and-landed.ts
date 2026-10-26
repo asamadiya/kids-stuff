@@ -338,6 +338,60 @@ export function assemble(
 
 export const sentenceText = (clauses: readonly string[]): string => clauses.join(' ');
 
+/* -------------------------------------------------------------- tray heads */
+
+/** A person in the middle of a sentence: "you", or the name as it is. */
+const named = (voice: Voice): string => (voice.isYou ? 'you' : voice.subject);
+
+/** The label over the thought chips: "What Ben meant", "What you meant". */
+export const trayHeadMeant = (side: Side): string => `What ${named(side.actor)} meant`;
+
+/** The label over the portraits: "How it landed on you", "How it landed on Ben". */
+export const trayHeadLanded = (side: Side): string => `How it landed on ${named(side.receiver)}`;
+
+/* -------------------------------------------------------------- read aloud */
+
+/**
+ * What each read-aloud button on the bench plays, in order, one visible line
+ * per clip. The bench builds every button from these and nothing else, so a
+ * button cannot ask for a line that `listenLines` does not list.
+ */
+export const LISTEN = {
+  /** Beside the title. The note under it is written for the grown-up and is not read. */
+  title: (): readonly string[] => [MEANT_AND_LANDED_META.title],
+  /** Beside the ask: the caption under the picture, then the ask. */
+  ask: (moment: Moment, side: Side): readonly string[] => [moment.caption, side.ask],
+  /** The thought tray: its label, then every chip. */
+  meant: (side: Side): readonly string[] => [trayHeadMeant(side), ...THOUGHTS.map((t) => t.label)],
+  /** The portrait tray: its label, then every word. */
+  landed: (side: Side): readonly string[] => [trayHeadLanded(side), ...LANDINGS.map((l) => l.word)],
+  /** Beside the join plate once both rails are set: the three clauses it shows. */
+  joined: (side: Side, thought: Thought, landing: Landing): readonly string[] =>
+    assemble(side, thought, landing),
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const lines = new Set<string>([
+    MEANT_AND_LANDED_META.title,
+    ...THOUGHTS.map((t) => t.label),
+    ...LANDINGS.map((l) => l.word),
+    THIRD_CLAUSE,
+  ]);
+  for (const moment of MOMENTS) {
+    lines.add(moment.caption);
+    for (const key of SIDE_KEYS) {
+      const side = sideOf(moment, key);
+      lines.add(side.ask);
+      lines.add(trayHeadMeant(side));
+      lines.add(trayHeadLanded(side));
+      for (const thought of THOUGHTS) lines.add(meantClause(side, thought));
+      for (const landing of LANDINGS) lines.add(landedClause(side, landing));
+    }
+  }
+  return [...lines];
+}
+
 /* ---------------------------------------------------------------- coverage */
 
 /** What he has set so far, for one side of one moment. */
