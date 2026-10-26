@@ -18,6 +18,18 @@ import { LANG_BOOKS, MOMENTS, RHYMES, WORDS } from '../../src/languages';
 import { activityLead, activityStep, ideaLead, ideaStep, pageReading } from '../../src/audio/lines';
 import { gameLines, SHELL_LINES } from '../../src/audio/gameLines';
 import { textKey } from '../../src/audio/readAloud';
+import { listenLines as whatHappensNext } from '../../src/sel/what-happens-next';
+import { listenLines as theWideView } from '../../src/sel/the-wide-view';
+import { listenLines as borrowedEyes } from '../../src/sel/borrowed-eyes';
+import { listenLines as meantAndLanded } from '../../src/sel/meant-and-landed';
+import { listenLines as beforeYouDecide } from '../../src/sel/before-you-decide';
+import { listenLines as holdTheLine } from '../../src/sel/hold-the-line';
+import { listenLines as oneSwingTwoKids } from '../../src/sel/one-swing-two-kids';
+import { listenLines as fiveCookies } from '../../src/sel/five-cookies';
+import { listenLines as notTheSameRule } from '../../src/sel/not-the-same-rule';
+import { listenLines as bodyCheck } from '../../src/sel/body-check';
+import { listenLines as putItBackTogether } from '../../src/sel/put-it-back-together';
+import { listenLines as theFeelingRule } from '../../src/sel/the-feeling-rule';
 
 const en = new Set<string>();
 const te = new Set<string>();
@@ -35,6 +47,8 @@ for (const x of IDEAS) {
 }
 for (const g of [...MATHS_GAMES, ...SCIENCE_GAMES]) add(en, gameLines(g));
 add(en, SHELL_LINES);
+// The twelve "Try a situation" exercises: each module lists every line its read buttons can play.
+for (const lines of [whatHappensNext, theWideView, borrowedEyes, meantAndLanded, beforeYouDecide, holdTheLine, oneSwingTwoKids, fiveCookies, notTheSameRule, bodyCheck, putItBackTogether, theFeelingRule]) add(en, lines());
 
 // Telugu & Tamil: every line that has a speaker button (computer fallback).
 const pairs = [...MOMENTS.flatMap((m) => [...m.grownUp, ...m.child]), ...WORDS];
