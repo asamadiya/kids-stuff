@@ -12,7 +12,7 @@ export function ReaderSwitch() {
   return (
     <div className="readerswitch" role="radiogroup" aria-label="Computer reader">
       <span className="readerswitch__name" aria-hidden="true">
-        Reader
+        Computer reader
       </span>
       {(['mom', 'dad'] as const satisfies readonly Reader[]).map((r) => (
         <button
@@ -24,7 +24,7 @@ export function ReaderSwitch() {
           onClick={() => setReader(r)}
           title={`${READER_LABEL[r]}: a computer voice reads aloud`}
         >
-          {r === 'mom' ? 'Mom' : 'Dad'}
+          {r === 'mom' ? 'Mom voice' : 'Dad voice'}
         </button>
       ))}
     </div>

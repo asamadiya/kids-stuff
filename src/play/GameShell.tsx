@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import type { AnyGame, Level } from './types';
 import { ROUNDS } from './types';
@@ -9,6 +9,7 @@ import { HomeLink } from '../learn/PartNav';
 import { ReaderSwitch } from '../audio/ReaderSwitch';
 import { ReadAloud } from '../audio/ReadAloud';
 import { sentences } from '../audio/gameLines';
+import { stop as stopReading } from '../audio/readAloud';
 
 /**
  * The frame every game sits in. A board draws and answers; this owns the rest:
@@ -118,6 +119,10 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
     setRecord(next);
     saveRecord(game.id, next);
   };
+
+  // A new problem, a new stage or a level change replaces the words on screen:
+  // nothing read for the old ones may keep playing (advisor a9).
+  useEffect(() => stopReading(), [serial, stage, level, done]);
 
   const fresh = () => {
     setStage('answering');
@@ -286,7 +291,7 @@ export function GameShell({ game, backHref, backLabel }: GameShellProps) {
           </div>
 
           <div className="shell__feedback" aria-live="polite">
-            {feedback.length ? <ReadAloud key={`f${serial}${stage}`} id={`game/${game.id}/feedback`} texts={feedback} label="Read it" compact partial={stage === 'hint'} /> : null}
+            {feedback.length ? <ReadAloud key={`f${serial}${stage}`} id={`game/${game.id}/feedback`} texts={feedback} label="Read it" compact /> : null}
             {nudged && waiting ? <p className="feedback feedback--hint">First choose what you think will happen.</p> : null}
             {stage === 'hint' && hint ? <p className="feedback feedback--hint">{hint}</p> : null}
             {stage === 'worked' && game.kind === 'solve' ? <p className="feedback feedback--worked">Here is how it works.</p> : null}

@@ -8,7 +8,6 @@ import {
 import type { ChoiceId, Scenario, Thing, Who } from '../../sel/one-swing-two-kids';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -248,7 +247,6 @@ export function OneSwingTwoKids() {
     if (next === tried) return;
     setTried(next);
     const reply = replyOf(s, c);
-    pluck(step(reply.settled ? -7 : 2), reply.settled ? 0.6 : 0.22);
     if (reply.settled) setPlayed((p) => addPlayed(p, s.id));
   };
 

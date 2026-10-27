@@ -52,7 +52,7 @@
 .readerswitch__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
 
 @media (max-width: 620px) {
-  .readerswitch__name { display: none; }
+  .readerswitch__name { padding-left: var(--s2); }
   .readerswitch__btn { min-width: 44px; padding: 0 var(--s2); }
   /* The page-turn row keeps its two big arrows and the count; the read button gets its own row under them. */
   .book__nav { flex-wrap: wrap; row-gap: var(--s3); }
@@ -76,3 +76,11 @@
 /* The exercises' stage rule (.bench__stage svg: block, full width) would blow
    the speaker glyph up to the button's width; a read button's icon stays an icon. */
 .bench .readaloud svg, .bench__stage .readaloud svg { display: inline; width: 22px; height: 22px; max-width: none; flex: none; }
+
+/* "Say it together" is an invitation to the grown-up, not a disabled button. */
+.voice-invite { font-family: var(--font-ui); font-weight: 600; font-size: var(--t-xs); color: var(--ink-soft); padding: 0 var(--s2); }
+.voice--wait { min-width: 56px; justify-content: center; opacity: 0.5; }
+/* Language lines: when the column is narrow (tablet two-column, phone), the buttons go under the script. */
+@container (max-width: 520px) { .line:has(.voice-pair) { grid-template-columns: minmax(0, 1fr); } .line .voice-pair { justify-content: flex-start; } }
+.moment__lines, .words, .langbook { container-type: inline-size; }
+.idea__hook { font-family: var(--font-read); font-size: var(--t-md); margin: 0 0 var(--s2); }

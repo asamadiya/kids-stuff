@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { PAINT_ORDER, VIEW, regionPath } from '../../sel/body-figure';
 import { drawer } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -250,9 +249,7 @@ export function BodyCheck() {
 
   /** One half-breath done: the next still card comes up. */
   const breathed = () => {
-    const next = breathAt(breathTaps + 1);
     setBreathTaps(breathTaps + 1);
-    pluck(step(next.phase === 'in' ? -5 : 2), 0.3);
   };
 
   /** One number said out loud: the next dot fills. */
@@ -260,18 +257,15 @@ export function BodyCheck() {
     if (countThing === null || countDone) return;
     const next = countOne(counted, countTo);
     setCounted(next);
-    pluck(step(next % DOTS_PER_ROW === 0 ? 4 : -2), 0.2);
   };
 
   const tapBefore = (id: RegionId) => {
     const next = toggleRegion(before, id);
     setBefore(next);
-    pluck(step(-9), 0.22);
   };
   const tapAfter = (id: RegionId) => {
     const next = toggleRegion(after, id);
     setAfter(next);
-    pluck(step(-9), 0.22);
   };
 
   const keep = () => {
@@ -279,7 +273,6 @@ export function BodyCheck() {
     setKept(rack.list());
     setShown(made);
     setPhase('done');
-    pluck(step(-2), 0.4);
   };
 
   /* ------------------------------------------------------------------ stage */
@@ -533,7 +526,6 @@ export function BodyCheck() {
               aria-label={c.label}
               onClick={() => {
                 setChecks(toggleCheck(checks, c.id));
-                pluck(step(-4), 0.2);
               }}
             >
               <Glyph paths={c.glyph} />

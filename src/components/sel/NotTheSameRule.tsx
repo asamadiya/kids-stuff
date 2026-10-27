@@ -8,7 +8,6 @@ import {
 import type { ChipMark, ColumnId, Picks, Placements, RuleCard } from '../../sel/not-the-same-rule';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -83,12 +82,10 @@ export function NotTheSameRule() {
     setPlacements((p) => place(p, cardId, column));
     setHeld((h) => (h === cardId ? null : h));
     setTurned(null);
-    pluck(step(column === 'everyone' ? -5 : 2), 0.2);
   };
 
   const holdCard = (card: RuleCard) => {
     setHeld(card.id);
-    pluck(step(0), 0.16);
   };
 
   const turnOver = (card: RuleCard) => {
@@ -97,7 +94,6 @@ export function NotTheSameRule() {
 
   const takeChip = (chipId: string) => {
     setPicks((p) => pickChip(p, chipId));
-    pluck(step(4), 0.14);
   };
 
   const keepRule = () => {

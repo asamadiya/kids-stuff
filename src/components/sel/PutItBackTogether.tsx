@@ -6,7 +6,6 @@ import {
 import type { Frame, PanelRole, Scenario, Slots } from '../../sel/put-it-back-together';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -92,7 +91,6 @@ export function PutItBackTogether() {
     if (phase !== 'running') return;
     if (at + 1 < run.length) {
       setAt(at + 1);
-      pluck(step((at + 1) * 2 - 5), 0.28);
       return;
     }
     setPhase('done');
@@ -115,7 +113,6 @@ export function PutItBackTogether() {
     if (phase === 'running') return;
     backToBench();
     setSlots((s) => place(s, role));
-    pluck(step(2), 0.22);
   };
   const drop = (index: number, role: PanelRole) => {
     if (phase === 'running') return;
@@ -152,7 +149,6 @@ export function PutItBackTogether() {
     setRun(runOf(scenario, order));
     setAt(0);
     setPhase('running');
-    pluck(step(-5), 0.28);
   };
   const keep = () => {
     if (!order || phase !== 'done') return;

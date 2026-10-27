@@ -7,7 +7,6 @@ import {
 import type { Outcome, Scenario, Shares } from '../../sel/five-cookies';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -71,7 +70,6 @@ export function FiveCookies() {
   const bump = (index: number, delta: number) => {
     if (served) return;
     setShares((cur) => adjust(scenario, cur, index, delta));
-    pluck(step(delta > 0 ? 4 : -3), 0.18);
   };
 
   const serve = () => {

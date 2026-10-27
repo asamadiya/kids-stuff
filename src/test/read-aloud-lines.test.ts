@@ -6,7 +6,7 @@ import { IDEAS } from '../together';
 import { MATHS_GAMES } from '../maths/registry';
 import { SCIENCE_GAMES } from '../science/registry';
 import { LANG_BOOKS, MOMENTS, RHYMES, WORDS } from '../languages';
-import { activityLead, activityStep, ideaLead, ideaStep, pageReading } from '../audio/lines';
+import { activityLead, activityStep, ideaLead, pageReading } from '../audio/lines';
 import { gameLines, SHELL_LINES } from '../audio/gameLines';
 import { textKey } from '../audio/readAloud';
 import type { Manifest } from '../audio/readAloud';
@@ -22,7 +22,7 @@ const manifest: Manifest | null = existsSync(MANIFEST) ? (JSON.parse(readFileSyn
 const english: string[] = [
   ...BOOKS.flatMap((b) => b.pages.flatMap((_, i) => pageReading(b, i))),
   ...ACTIVITIES.flatMap((a) => [...activityLead(a), ...a.steps.flatMap((_, i) => activityStep(a, i))]),
-  ...IDEAS.flatMap((x) => [...ideaLead(x), ...x.steps.flatMap((_, i) => ideaStep(x, i))]),
+  ...IDEAS.flatMap((x) => ideaLead(x)),
   ...[...MATHS_GAMES, ...SCIENCE_GAMES].flatMap(gameLines),
   ...SHELL_LINES,
 ];
@@ -46,9 +46,10 @@ describe('read-aloud lines', () => {
     expect(pageReading(b, 1)).not.toContain(b.title);
   });
 
-  it('never reads the grown-up notes, safety lines or sources', () => {
+  it('never reads the grown-up notes or sources (Make & Do safety lines, shown on the card, are read)', () => {
     const adult = new Set(
-      [...BOOKS.map((b) => b.note), ...ACTIVITIES.map((a) => a.note), ...IDEAS.map((x) => x.note)].flatMap((n) => Object.values(n).map((v) => textKey(String(v)))),
+      [...BOOKS.map((b) => b.note), ...ACTIVITIES.map((a) => ({ ...a.note, safety: undefined })), ...IDEAS.map((x) => x.note)]
+        .flatMap((n) => Object.values(n).filter(Boolean).map((v) => textKey(String(v)))),
     );
     const leaked = english.map(textKey).filter((l) => adult.has(l));
     expect(leaked).toEqual([]);

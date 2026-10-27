@@ -24,7 +24,6 @@ import {
 import type { Panel, Road, RoadId, Strip } from '../../sel/what-happens-next';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -125,13 +124,11 @@ export function WhatHappensNext() {
       roadRack.add({ key });
       setWalked((w) => [...w, key]);
     }
-    pluck(step(-5));
   };
 
   const extend = () => {
     if (!chosen) return;
     setExtended(true);
-    pluck(step(-12), 0.6);
   };
 
   const goToStrip = (id: string) => {

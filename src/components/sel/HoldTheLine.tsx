@@ -8,7 +8,6 @@ import {
 import type { ChipId, GlyphId, Outcome, Pick, Scenario, SlotKind } from '../../sel/hold-the-line';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -73,7 +72,6 @@ export function HoldTheLine() {
     setPick(next);
     // A changed line is a new line: it is said again from the first part.
     setSaid(0);
-    if (next[slot]) pluck(step(slot === 'name' ? -5 : slot === 'ask' ? -1 : 2));
   };
 
   const goTo = (s: Scenario) => {
@@ -85,11 +83,9 @@ export function HoldTheLine() {
     if (!sayingSlot) return;
     const next = sayPart(said);
     setSaid(next);
-    pluck(step(SLOTS.indexOf(sayingSlot) * 3 - 2), 0.3);
     if (!allSaid(next)) return;
     setPhase('said'); setRuns((r) => r + 1);
     setSpoken((s) => (s.includes(scenario.id) ? s : [...s, scenario.id]));
-    pluck(step(4), 0.6);
   };
 
   const runAgain = () => {

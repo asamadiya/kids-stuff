@@ -7,7 +7,6 @@ import {
 import type { Case, Decided, QuestionKind, StatedFact } from '../../sel/before-you-decide';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -143,7 +142,6 @@ export function BeforeYouDecide() {
   const spend = (kind: QuestionKind) => {
     if (asked.includes(kind) || chosen) return;
     setAsked([...asked, kind]);
-    pluck(step(asked.length * 3 - 4), 0.22);
   };
 
   const decide = (id: string) => {

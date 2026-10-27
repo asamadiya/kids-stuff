@@ -9,7 +9,6 @@ import {
 import type { FeelingRule, Pin } from '../../sel/the-feeling-rule';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -52,7 +51,6 @@ export function TheFeelingRule() {
   const svgRef = useRef<SVGSVGElement>(null);
   const benchRef = useRef<HTMLElement>(null);
   useStopOnInteraction(benchRef);
-  const pluckedRef = useRef(0);
 
   const rule: FeelingRule = useMemo(() => ruleById(ruleId), [ruleId]);
   const card = useMemo(() => cardAt(ruleId, cursor), [ruleId, cursor]);
@@ -69,16 +67,10 @@ export function TheFeelingRule() {
 
   /* --------------------------------------------------------------- moving */
 
-  /** A note for each stop as the marker passes under it; sound is incidental, and nothing is spoken. */
+  /** Move the marker. Silent: no tone marks a stop (design review, round 4: contingent sounds read as judgement). */
   const land = useCallback(
-    (next: number, sounded: boolean) => {
-      const p = clampPos(rule, next);
-      setPos(p);
-      const i = nearestStop(rule, p);
-      if (sounded && i !== pluckedRef.current) {
-        pluckedRef.current = i;
-        pluck(step(-4 + i * 3), 0.28);
-      }
+    (next: number) => {
+      setPos(clampPos(rule, next));
     },
     [rule],
   );
@@ -100,7 +92,7 @@ export function TheFeelingRule() {
     else if (e.key === 'End') next = rule.stops.length - 1;
     if (next === null) return;
     e.preventDefault();
-    land(next, true);
+    land(next);
   };
 
   /* --------------------------------------------------------------- working */
@@ -110,7 +102,6 @@ export function TheFeelingRule() {
     setPos(0);
     setPins([]);
     setCursor(0);
-    pluckedRef.current = 0;
   };
 
   const dropPin = (): void => {
@@ -118,7 +109,6 @@ export function TheFeelingRule() {
     setPins(next);
     setTold(true);
     setCursor((c) => c + 1);
-    pluck(step(2 + here * 2), 0.36);
   };
 
   const dealAnother = (): void => {
@@ -180,7 +170,7 @@ export function TheFeelingRule() {
               className={`bench-part${i === here ? ' is-set' : ''}`}
               style={{ opacity: faceStrength(i, pos) }}
               aria-label={`Move the marker to ${s.label}`}
-              onClick={() => land(i, true)}
+              onClick={() => land(i)}
             >
               <img
                 src={`${BASE}${facePath(s)}`}
@@ -263,17 +253,17 @@ export function TheFeelingRule() {
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               setDragging(true);
-              land(posFromFraction(rule, fractionFrom(e.clientX)), true);
+              land(posFromFraction(rule, fractionFrom(e.clientX)));
             }}
             onPointerMove={(e) => {
-              if (dragging) land(posFromFraction(rule, fractionFrom(e.clientX)), true);
+              if (dragging) land(posFromFraction(rule, fractionFrom(e.clientX)));
             }}
             onPointerUp={(e) => {
               e.currentTarget.releasePointerCapture(e.pointerId);
               setDragging(false);
-              land(nearestStop(rule, posFromFraction(rule, fractionFrom(e.clientX))), false);
+              land(nearestStop(rule, posFromFraction(rule, fractionFrom(e.clientX))));
             }}
-            onPointerCancel={() => { setDragging(false); land(here, false); }}
+            onPointerCancel={() => { setDragging(false); land(here); }}
           />
         </svg>
       </div>

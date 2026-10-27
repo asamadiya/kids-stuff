@@ -15,7 +15,7 @@ import { IDEAS } from '../../src/together';
 import { MATHS_GAMES } from '../../src/maths/registry';
 import { SCIENCE_GAMES } from '../../src/science/registry';
 import { LANG_BOOKS, MOMENTS, RHYMES, WORDS } from '../../src/languages';
-import { activityLead, activityStep, ideaLead, ideaStep, pageReading } from '../../src/audio/lines';
+import { activityLead, activityStep, ideaLead, pageReading } from '../../src/audio/lines';
 import { gameLines, SHELL_LINES } from '../../src/audio/gameLines';
 import { textKey } from '../../src/audio/readAloud';
 import { listenLines as whatHappensNext } from '../../src/sel/what-happens-next';
@@ -41,10 +41,7 @@ for (const a of ACTIVITIES) {
   add(en, activityLead(a));
   a.steps.forEach((_, i) => add(en, activityStep(a, i)));
 }
-for (const x of IDEAS) {
-  add(en, ideaLead(x));
-  x.steps.forEach((_, i) => add(en, ideaStep(x, i)));
-}
+for (const x of IDEAS) add(en, ideaLead(x));
 for (const g of [...MATHS_GAMES, ...SCIENCE_GAMES]) add(en, gameLines(g));
 add(en, SHELL_LINES);
 // The twelve "Try a situation" exercises: each module lists every line its read buttons can play.

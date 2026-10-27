@@ -8,7 +8,6 @@ import {
 import type { ChipId, Moment, Other, Placed, PlateChip, View } from '../../sel/borrowed-eyes';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
@@ -194,12 +193,10 @@ export function BorrowedEyes() {
 
   const turn = (to: number) => {
     setNotch(to);
-    pluck(step(to === 0 ? -5 : 2), 0.3);
   };
 
   const place = (id: ChipId) => {
     setPlaced({ ...placed, [slotKey(moment.id, view.id)]: id });
-    pluck(step(0), 0.25);
   };
 
   const keep = () => {

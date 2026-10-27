@@ -38,7 +38,7 @@ export function ActivityPage({ id, back }: { readonly id: string; readonly back:
         )}
         <div>
           <p className="activity__invite">{a.hook}</p>
-          <ReadAloud id={`make/${a.id}/lead`} texts={activityLead(a)} />
+          <ReadAloud id={`make/${a.id}/lead`} texts={activityLead(a)} label={a.note.safety ? 'Read it and the safety line' : 'Read it to me'} />
           <p className="activity__when">{a.span ?? `About ${a.minutes} minutes`}</p>
           <nav className="activity__jumps" aria-label="On this page">
             <a className="jumps__link" href="#need" onClick={(e) => jump(e, 'need')}>

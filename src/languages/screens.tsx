@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Card, CardGroup, GroupJumps, Page } from '../learn/Page';
 import { useStored } from '../learn/scroll';
+import { stop as stopReading } from '../audio/readAloud';
 import { cardSrc } from '../learn/catalog';
 import type { GrownUpNote } from '../notes/types';
 import type { Lang, Pair, Said } from './types';
@@ -24,7 +25,7 @@ const BASE = import.meta.env.BASE_URL;
 
 export const LANGS_NOTE: GrownUpNote = {
   what: 'Things to say and sing in Telugu and Tamil, for Nanna and Amma to use with the children every day: short routine and play moments, traditional rhymes, two shared picture books, a few picture words, and a guide for this family.',
-  expect: 'Pick Telugu or Tamil at the top; the page shows that language only. The script is beside each picture, and "For the grown-up" opens the romanisation and meaning. The speaker buttons play YOUR recordings: record them once under Record voices. With no recording, the line says "Say it together", and a "Computer voice" button reads it instead (on a rhyme it says "Listen to the words": the computer speaks it, it does not sing it), with the reader you chose at the top.',
+  expect: 'Pick Telugu or Tamil at the top; the page shows that language only. The script is beside each picture, and "For the grown-up" opens the romanisation and meaning. The speaker buttons play YOUR recordings: record them once under Record voices. With no recording, the line says "Say it together", and a "Computer voice" button reads it instead (on a rhyme "Computer voice: the words": it speaks the rhyme, it does not sing it), with the reader you chose at the top.',
   practising: 'Hearing and using Telugu and Tamil in real moments with the people who speak them, which is what keeps a heritage language alive. Recognising the scripts in passing.',
   ask: 'Use the phrases during the day, not as a quiz: say Nanna’s line at bath time, sing the rhyme at bedtime.',
   next: 'Read the guide once: what helps, what to do when he answers in English, and how Mia fits in.',
@@ -33,7 +34,9 @@ export const LANGS_NOTE: GrownUpNote = {
 
 /** The chosen language, remembered for the session. Defaults to whichever parent the child is with is unknown, so Telugu first. */
 function useLang(): [Lang, (l: Lang) => void] {
-  return useStored<Lang>('langs/lang', 'te');
+  const [lang, set] = useStored<Lang>('langs/lang', 'te');
+  // Switching language changes every line on the screen: stop what is reading.
+  return [lang, (l: Lang) => { stopReading(); set(l); }];
 }
 
 function LangToggle({ lang, onLang }: { readonly lang: Lang; readonly onLang: (l: Lang) => void }) {
@@ -56,7 +59,7 @@ function Line({ id, lang, said, big = false, sung = false }: { readonly id: stri
       <p className="line__script" lang={lang}>
         {said.script}
       </p>
-      <Voice id={id} lang={lang} script={said.script} label={said.means} computerLabel={sung ? 'Listen to the words' : undefined} />
+      <Voice id={id} lang={lang} script={said.script} label={said.means} computerLabel={sung ? 'Computer voice: the words' : undefined} />
       <details className="line__aid">
         <summary>For the grown-up</summary>
         <p className="line__roman">{said.roman}</p>
@@ -275,7 +278,7 @@ export function WordsPage() {
               ))}
             </div>
             {picked ? (
-              <button type="button" className="btn btn--primary" onClick={() => { setPicked(null); setRound(round + 1); }}>
+              <button type="button" className="btn btn--primary" onClick={() => { stopReading(); setPicked(null); setRound(round + 1); }}>
                 Another one
               </button>
             ) : null}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ReadLang } from './readAloud';
-import { READER_LABEL, play, stop, usePlaying, useReader } from './readAloud';
+import { READER_LABEL, getPlaying, play, stop, usePlaying, useReader } from './readAloud';
 
 /**
  * The child's speaker button: press to hear the words, press again to stop.
@@ -17,7 +17,6 @@ export function ReadAloud({
   lang = 'en',
   label = 'Read it to me',
   compact = false,
-  partial = false,
 }: {
   readonly id: string;
   readonly texts: readonly string[];
@@ -25,8 +24,6 @@ export function ReadAloud({
   readonly label?: string;
   /** Icon only, for a button beside a single short line (a step, an answer choice). */
   readonly compact?: boolean;
-  /** Read the lines that have a clip and skip the others (see `play`). */
-  readonly partial?: boolean;
 }) {
   const playing = usePlaying();
   const reader = useReader();
@@ -34,8 +31,14 @@ export function ReadAloud({
   const on = playing?.id === id;
   const key = texts.join('');
 
-  // A different line under the same button, or another reader: clear the old problem.
-  useEffect(() => setProblem(''), [key, reader]);
+  // A different line under the same button, or another reader: clear the old
+  // problem, and stop this button's clip — it no longer matches the screen.
+  useEffect(() => {
+    setProblem('');
+    return () => {
+      if (getPlaying()?.id === id) stop();
+    };
+  }, [key, reader, id, lang]);
 
   const press = async () => {
     if (on) {
@@ -43,7 +46,7 @@ export function ReadAloud({
       return;
     }
     setProblem('');
-    const r = await play(id, texts, lang, undefined, partial);
+    const r = await play(id, texts, lang);
     if (r === 'missing' || r === 'failed') setProblem(r);
   };
 

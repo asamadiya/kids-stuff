@@ -2,7 +2,6 @@ import { useMemo, useRef, useState, type ReactElement, type RefObject } from 're
 import { ReadAloud } from '../../audio/ReadAloud';
 import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 import { drawer } from '../../lib/drawer';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import {
   LANDINGS,
@@ -206,30 +205,22 @@ export function MeantAndLanded(): ReactElement {
   const set = (part: Partial<Pick>): void => {
     const next: Pick = { ...pick, ...part };
     setPicks({ ...picks, [key]: next });
-    const t = thoughtById(next.thought);
-    const l = landingById(next.landing);
-    if (t && l) pluck(step(4), 0.5);
-    else if (t) pluck(step(-3));
-    else if (l) pluck(step(2));
   };
 
   const goTo = (next: number): void => {
     const wrapped = (next + MOMENTS.length) % MOMENTS.length;
     setIndex(wrapped);
     setSideKey('front');
-    pluck(step(-8), 0.3);
   };
 
   const flip = (): void => {
     const next: SideKey = sideKey === 'front' ? 'turned' : 'front';
     setSideKey(next);
-    pluck(step(next === 'turned' ? 7 : -5), 0.35);
   };
 
   const keepPlate = (): void => {
     store.add({ title: moment.title, lines: bothSides });
     setKept(store.list());
-    pluck(step(9), 0.5);
   };
 
   const dropPlate = (id: string): void => {

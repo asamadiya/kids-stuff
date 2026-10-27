@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { GrownUpNote } from '../notes/types';
 import { NOTE_FIELDS } from '../notes/types';
+import { stop as stopReading } from '../audio/readAloud';
 
 /**
  * "For grown-ups": the same button, top-right, on every screen.
@@ -37,7 +38,17 @@ export function GrownUps({ note, title }: GrownUpsProps) {
 
   return (
     <>
-      <button type="button" className="grownups-btn" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-label="For grown-ups">
+      <button
+        type="button"
+        className="grownups-btn"
+        onClick={() => {
+          // The panel covers the read button, so nothing may keep playing under it.
+          stopReading();
+          setOpen(true);
+        }}
+        aria-haspopup="dialog"
+        aria-label="For grown-ups"
+      >
         <span className="grownups-btn__icon" aria-hidden="true">i</span>
         <span className="grownups-btn__label">For grown-ups</span>
       </button>

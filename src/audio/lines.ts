@@ -18,9 +18,19 @@ export function pageReading(book: Book, page: number): string[] {
   return page === 0 ? [book.title, ...paras] : paras;
 }
 
-/** A Make & Do card's opening line: what he is going to do. */
+/**
+ * A Make & Do card's opening: what he is going to do, then the safety line
+ * shown straight under it — the boundary he must hear too once he can listen
+ * on his own (design review, round 4; advisor a9: "spoken activity
+ * instructions must preserve adult-supervision boundaries").
+ */
 export function activityLead(a: Activity): string[] {
-  return [a.title, a.hook];
+  return [a.title, a.hook, ...(a.note.safety ? ['Safety.', ...splitSentences(a.note.safety)] : [])];
+}
+
+/** One clip per sentence, so a long safety note is never a single over-long clip. */
+function splitSentences(text: string): string[] {
+  return text.split(/(?<=[.!?])\s+(?=[A-Z“"])/).map((x) => x.trim()).filter(Boolean);
 }
 
 /** One Make & Do step. */
@@ -28,12 +38,11 @@ export function activityStep(a: Activity, i: number): string[] {
   return [a.steps[i].text];
 }
 
-/** One step of a play-together idea. */
-export function ideaStep(x: PlayIdea, i: number): string[] {
-  return [x.steps[i]];
-}
-
-/** A play-together idea's opening line. */
+/**
+ * A play-together idea's opening line. Its steps are not read: they are
+ * written to the grown-up who plays ("Give him just enough resistance…"), not
+ * to the child (design review, round 4).
+ */
 export function ideaLead(x: PlayIdea): string[] {
   return [x.title, x.hook];
 }

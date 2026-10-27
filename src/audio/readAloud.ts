@@ -185,8 +185,6 @@ export async function play(
   texts: readonly string[],
   lang: ReadLang = 'en',
   make: () => HTMLAudioElement = () => new Audio(),
-  /** Read the lines that have a clip and skip the rest (a hint's number sentence, which the board draws). */
-  skipMissing = false,
 ): Promise<PlayResult> {
   stop();
   const mine = run;
@@ -200,8 +198,7 @@ export async function play(
     return 'failed';
   }
   if (mine !== run) return 'stopped';
-  const all = texts.map((t) => clipUrl(m, reader, lang, t));
-  const urls = skipMissing ? all.filter((u) => u !== null) : all;
+  const urls = texts.map((t) => clipUrl(m, reader, lang, t));
   if (!urls.length || urls.some((u) => u === null)) {
     stop();
     return 'missing';
@@ -225,6 +222,44 @@ export function hasAll(m: Manifest, who: Reader, lang: ReadLang, texts: readonly
 }
 
 /**
+ * The playback volume that brings a family recording to about the level of the
+ * generated clips (loudness-normalised to -18 LUFS at build time): measured
+ * once per recording from its RMS, never above 1 (the element cannot amplify),
+ * so a loud phone recording is turned down and a quiet one is left as loud as
+ * it can be. The stored recording is never changed.
+ */
+const GEN_RMS = 0.125; // RMS of -18 LUFS speech, about -18 dBFS
+const volumes = new Map<string, number>();
+async function volumeFor(url: string): Promise<number> {
+  const known = volumes.get(url);
+  if (known !== undefined) return known;
+  let v = 1;
+  try {
+    const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (Ctor) {
+      const ctx = new Ctor();
+      const buf = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+      const d = buf.getChannelData(0);
+      let sum = 0;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 1) {
+        if (Math.abs(d[i]) > 0.01) {
+          sum += d[i] * d[i];
+          n += 1;
+        }
+      }
+      const rms = n ? Math.sqrt(sum / n) : GEN_RMS;
+      v = Math.min(1, GEN_RMS / rms);
+      void ctx.close();
+    }
+  } catch {
+    v = 1;
+  }
+  volumes.set(url, v);
+  return v;
+}
+
+/**
  * Play one URL through the same single player: a family recording in the
  * Telugu & Tamil part, so it and a computer clip can never sound at once.
  */
@@ -233,7 +268,13 @@ export async function playUrl(id: string, url: string, make: () => HTMLAudioElem
   const mine = run;
   playing = { id };
   emit();
-  const ok = await one(url, make);
+  const volume = typeof window !== 'undefined' && 'AudioContext' in window ? await volumeFor(url) : 1;
+  if (mine !== run) return 'stopped';
+  const ok = await one(url, () => {
+    const a = make();
+    a.volume = volume;
+    return a;
+  });
   if (mine !== run) return 'stopped';
   stop();
   return ok ? 'played' : 'failed';
