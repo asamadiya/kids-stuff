@@ -76,18 +76,24 @@ export function Voice({
       </span>
     );
   }
-  if (current.state === 'none' || current.state === 'failed') {
+  if (current.state === 'failed') {
+    // Not known to be absent: a family recording may exist, so no computer voice stands in for it.
+    return (
+      <span className="voice-pair">
+        <span className="voice-invite">Say it together</span>
+        <span className="readaloud__problem" role="status">
+          Family recordings could not be read on this device.
+        </span>
+      </span>
+    );
+  }
+  if (current.state === 'none') {
     return (
       <span className="voice-pair">
         <span className="voice-invite" title={`${LANG_PARENT[lang]} can record it under For grown-ups → Record voices.`}>
           Say it together
         </span>
         <ReadAloud id={`pc/${uid}/${lang}`} texts={[script]} lang={lang} label={computerLabel} />
-        {current.state === 'failed' ? (
-          <span className="readaloud__problem" role="status">
-            Family recordings could not be read on this device.
-          </span>
-        ) : null}
       </span>
     );
   }

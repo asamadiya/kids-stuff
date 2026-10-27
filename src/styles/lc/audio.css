@@ -67,8 +67,10 @@
   /* The game title takes the whole second line, the switch the third. */
   .shell__bar .shell__title { order: 8; flex-basis: 100%; }
   .lc-top { flex-wrap: wrap; row-gap: var(--s2); }
-  .lc-top__tools { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--s2); }
-  .lc-top__tools .readerswitch { order: 9; }
+  .lc-top__tools { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--s2); flex: 1 1 auto; min-width: 0; }
+  /* The reader switch gets its own row, right-aligned, so it can never push the bar wider than the phone. */
+  .lc-top__tools .readerswitch { order: 9; flex-basis: 100%; justify-content: flex-end; max-width: 100%; }
+  .readerswitch { flex-wrap: wrap; }
 }
 @media print { .readaloud, .readerswitch { display: none; } }
 .shell__boardread { display: flex; justify-content: flex-end; margin: calc(-1 * var(--s2)) 0 var(--s2); }
@@ -84,3 +86,15 @@
 @container (max-width: 520px) { .line:has(.voice-pair) { grid-template-columns: minmax(0, 1fr); } .line .voice-pair { justify-content: flex-start; } }
 .moment__lines, .words, .langbook { container-type: inline-size; }
 .idea__hook { font-family: var(--font-read); font-size: var(--t-md); margin: 0 0 var(--s2); }
+/* Phone: the switch fits only as "Mom / Dad" beside the name, so on home it
+   takes its own full-width row, and its label shrinks to "Reader". */
+@media (max-width: 620px) {
+  .lc-top--home { flex-wrap: wrap !important; }
+  .lc-top--home .lc-top__tools { flex: 1 1 100% !important; display: flex; flex-wrap: wrap; justify-content: flex-end; }
+  .lc-top--home .readerswitch { order: 9; flex: 0 1 auto; }
+  .readerswitch__name, .readerswitch__btn { white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .readerswitch__name { font-size: 0; padding: 0 var(--s1) 0 var(--s2); }
+  .readerswitch__name::after { content: 'Reader'; font-size: var(--t-xs); }
+}

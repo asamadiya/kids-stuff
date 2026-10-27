@@ -249,6 +249,8 @@ async function volumeFor(url: string): Promise<number> {
         }
       }
       const rms = n ? Math.sqrt(sum / n) : GEN_RMS;
+      // Turn a loud recording down; a quiet one cannot be raised by the element,
+      // so the generated clips are the ones the family hears as the reference.
       v = Math.min(1, GEN_RMS / rms);
       void ctx.close();
     }
