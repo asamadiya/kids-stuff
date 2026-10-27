@@ -45,8 +45,9 @@ LOCALE = {'en': 'en-IN', 'te': 'te-IN', 'ta': 'ta-IN'}
 
 
 def key() -> str:
+    # The Speech resource is kids-speech-eus2 (personal subscription, sites-rg, eastus2).
     k = os.environ.get('AZURE_SPEECH_KEY')
-    return k or (Path.home() / '.config/kids-art/key').read_text().strip()
+    return k or (Path.home() / '.config/kids-audio/speech-key').read_text().strip()
 
 
 def ffmpeg() -> str:
@@ -141,6 +142,8 @@ _lock = threading.Lock()
 
 
 def synth(doc: str, attempts: int = 8) -> bytes:
+    if os.environ.get('KIDS_AUDIO_SOCKS'):
+        return synth_curl(doc, os.environ['KIDS_AUDIO_SOCKS'], attempts)
     req = urllib.request.Request(
         'https://eastus2.tts.speech.microsoft.com/cognitiveservices/v1', data=doc.encode(), method='POST',
         headers={'Ocp-Apim-Subscription-Key': key(), 'Content-Type': 'application/ssml+xml',
@@ -159,6 +162,29 @@ def synth(doc: str, attempts: int = 8) -> bytes:
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             last = repr(e)
             time.sleep(min(60, 2 * 2 ** i))
+    raise RuntimeError(last)
+
+
+def synth_curl(doc: str, socks: str, attempts: int) -> bytes:
+    """The same request through curl over a SOCKS proxy (KIDS_AUDIO_SOCKS=host:port),
+    for a box whose direct egress to Azure is blocked; urllib has no SOCKS support."""
+    last = ''
+    for i in range(attempts):
+        p = subprocess.run(
+            ['curl', '-s', '-m', '120', '--socks5-hostname', socks, '-X', 'POST',
+             'https://eastus2.tts.speech.microsoft.com/cognitiveservices/v1',
+             '-H', f'Ocp-Apim-Subscription-Key: {key()}', '-H', 'Content-Type: application/ssml+xml',
+             '-H', 'X-Microsoft-OutputFormat: riff-24khz-16bit-mono-pcm', '-H', 'User-Agent: kids-stuff-audio',
+             '--data-binary', '@-', '-w', '\n%{http_code}'],
+            input=doc.encode(), capture_output=True)
+        body, _, code = p.stdout.rpartition(b'\n')
+        code = code.decode() or '000'
+        if p.returncode == 0 and code == '200':
+            return body
+        last = f'{code} curl={p.returncode} {body[:200]!r}'
+        if code in ('401', '403', '400'):
+            raise RuntimeError(last)
+        time.sleep(min(60, 2 * 2 ** i))
     raise RuntimeError(last)
 
 
