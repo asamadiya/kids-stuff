@@ -21,7 +21,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-KEY = (Path.home() / '.config/kids-art/key').read_text().strip()
+KEY = (Path.home() / '.config/kids-audio/speech-key').read_text().strip()
 LOC = {'en': 'en-IN', 'te': 'te-IN', 'ta': 'ta-IN'}
 ONES = 'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split()
 TENS = 'twenty thirty forty fifty sixty seventy eighty ninety'.split()
@@ -64,11 +64,17 @@ def cer(a: str, b: str) -> float:
 
 
 def stt(mp3: Path, lang: str) -> str:
+    import os
     wav = subprocess.run([ffmpeg(), '-hide_banner', '-loglevel', 'error', '-i', str(mp3), '-af', 'adelay=500|500,apad=pad_dur=0.6',
                           '-ar', '16000', '-ac', '1', '-f', 'wav', 'pipe:1'], capture_output=True, check=True).stdout
-    req = urllib.request.Request(
-        f'https://eastus2.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language={LOC[lang]}&format=simple',
-        data=wav, method='POST', headers={'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000'})
+    url = f'https://eastus2.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language={LOC[lang]}&format=simple'
+    if os.environ.get('KIDS_AUDIO_SOCKS'):
+        p = subprocess.run(['curl', '-s', '-m', '120', '--socks5-hostname', os.environ['KIDS_AUDIO_SOCKS'], '-X', 'POST', url,
+                            '-H', f'Ocp-Apim-Subscription-Key: {KEY}', '-H', 'Content-Type: audio/wav; codecs=audio/pcm; samplerate=16000',
+                            '--data-binary', '@-'], input=wav, capture_output=True)
+        return json.loads(p.stdout or b'{}').get('DisplayText', '')
+    req = urllib.request.Request(url, data=wav, method='POST',
+                                 headers={'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000'})
     return json.loads(urllib.request.urlopen(req, timeout=120).read()).get('DisplayText', '')
 
 
