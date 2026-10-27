@@ -52,6 +52,8 @@ export interface Answer {
   readonly picked: boolean;
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
 /** Cells in one ten-frame. */
 const CELLS = 10;
 
@@ -137,14 +139,33 @@ function explain(round: Round): string {
   return `${A} + ${B} = ${A} + ${F} + ${R} = ${W} + ${R} = ${W + R}. The ${B} splits into ${F} and ${R}; the ${F} ${made}.`;
 }
 
+/** A board with `inFirst` counters from the pile in the first frame's gap and `second` in the second frame. */
+const build = (round: Round, inFirst: number, second: number): Answer => ({
+  cells: [...Array.from({ length: inFirst }, (_, i) => round.a + i), ...Array.from({ length: second }, (_, i) => CELLS + i)],
+  picked: false,
+});
+
 /** The finished board: the gap in the first frame filled, the rest from the second frame's first cell. */
 export function solution(round: Round): Answer {
   const { fill, rest } = split(round);
-  const cells = [
-    ...Array.from({ length: fill }, (_, i) => round.a + i),
-    ...Array.from({ length: rest }, (_, i) => CELLS + i),
-  ];
-  return { cells, picked: false };
+  return build(round, fill, rest);
+}
+
+/**
+ * Read-aloud: every hint `check` can give for this round. `check` reads only
+ * how many counters sit in each frame, and the board lets him put any number
+ * of the pile's counters into the first frame's gap and any number of the rest
+ * into the second frame, so this walks every such pair.
+ */
+function hints(round: Round): readonly string[] {
+  const out = new Set<string>();
+  for (let inFirst = 0; inFirst <= Math.min(CELLS - round.a, round.b); inFirst += 1) {
+    for (let second = 0; second <= Math.min(CELLS, round.b - inFirst); second += 1) {
+      const { hint } = check(round, build(round, inFirst, second));
+      if (hint) out.add(hint);
+    }
+  }
+  return [...out];
 }
 
 // ------------------------------------------------------------------ drawing --
@@ -306,6 +327,15 @@ const sumStyle: CSSProperties = {
   textAlign: 'center',
 };
 
+/** The board stops taking taps on 'worked' and 'solved', and draws its equation. */
+const locks = (stage: Stage) => stage === 'worked' || stage === 'solved';
+
+/** The line under the full-frame picture: what one counter (or rod) is, and what a full frame holds. */
+function caption(round: Round): string {
+  if (round.unit === 10) return 'Each rod is ten. A full frame holds 10 tens: 100.';
+  return round.tens > 0 ? 'Each rod is ten. Each counter is one. A full frame holds 10.' : 'Each counter is one. A full frame holds 10.';
+}
+
 /** The board's equation, drawn on 'worked' and 'solved': 8 + 5 = 8 + 2 + 3 = 10 + 3 = 13. */
 function sentence(round: Round): string {
   const u = round.unit;
@@ -317,7 +347,7 @@ function sentence(round: Round): string {
 
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const { unit } = round;
-  const locked = stage === 'worked' || stage === 'solved';
+  const locked = locks(stage);
   const worked = stage === 'worked';
   const counted = stage !== 'answering';
   // The worked answer is drawn ON the frames: the gap filled, the rest from the second frame's first cell.
@@ -403,18 +433,11 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </div>
     ) : null;
 
-  const caption =
-    unit === 10
-      ? 'Each rod is ten. A full frame holds 10 tens: 100.'
-      : round.tens > 0
-        ? 'Each rod is ten. Each counter is one. A full frame holds 10.'
-        : 'Each counter is one. A full frame holds 10.';
-
   return (
     <div className="board">
       <div style={frameWrap}>
         <FullFrameIs unit={unit} />
-        <p className="board-caption">{caption}</p>
+        <p className="board-caption">{caption(round)}</p>
       </div>
       <div className="board-row" style={{ alignItems: 'flex-start', gap: 'var(--s5)' }}>
         {rods}
@@ -443,6 +466,16 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   );
 }
 
+/**
+ * Read-aloud: the caption under the full-frame picture, then, once the board
+ * is locked, the equation it draws (on 'worked' that equation is the worked
+ * answer). Left to the picture: the count tags, the pile's label, the pile's
+ * "The pile is empty." / "All placed.", and the picture's "10 ones" / "1 ten".
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return locks(stage) ? [caption(round), sentence(round)] : [caption(round)];
+}
+
 export const makeATen: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'make-a-ten',
@@ -455,7 +488,9 @@ export const makeATen: SolveGame<Round, Answer> = {
   emptyAnswer: () => ({ cells: [], picked: false }),
   Board,
   check,
+  hints,
   explain,
+  board,
   cover: 'art/games/make-a-ten.png',
   note: {
     what: 'Two ten-frames. The first number already sits in the first frame (at level 3 its tens stand beside it as rods); the second number waits in a pile. He picks up a counter, taps a cell to place it, and finishes when the first frame is full and the pile is empty.',

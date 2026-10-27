@@ -51,6 +51,8 @@ export interface Answer {
 
 type Place = 'h' | 't' | 'o';
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
 interface PlaceInfo {
   readonly key: Place;
   readonly name: string;
@@ -113,8 +115,11 @@ export function generate(level: Level, index: number): Round {
   return { target, places: 3, aligned: false, ref };
 }
 
+/** Level 3's line over the built neighbour, and the start of its prompt. */
+const thisIs = (n: number) => `This is ${n}.`;
+
 function prompt(round: Round): string {
-  return round.ref === undefined ? `Build ${round.target} on the mat.` : `This is ${round.ref}. Build ${round.target}.`;
+  return round.ref === undefined ? `Build ${round.target} on the mat.` : `${thisIs(round.ref)} Build ${round.target}.`;
 }
 
 /** The highest place where the mat and the target disagree. */
@@ -122,6 +127,14 @@ const firstMismatch = (round: Round, answer: Answer) => {
   const want = split(round.target);
   return placesOf(round).find((p) => answer[p.key] !== want[p.key]);
 };
+
+const EMPTY_MAT = 'The mat is empty.';
+
+/** A hint's first sentence: what the blocks on the mat add up to. */
+const lead = (made: number) => (made === 0 ? EMPTY_MAT : `The blocks make ${made}.`);
+
+/** A hint's second sentence: one place, in the number and on the mat. */
+const compare = (target: number, p: PlaceInfo, k: number) => `${target} has ${count(split(target)[p.key], p)}; the mat has ${count(k, p)}.`;
 
 /**
  * A miss names one place, the highest one that differs: a fact about the
@@ -131,9 +144,22 @@ function check(round: Round, answer: Answer): Verdict {
   const made = valueOf(answer);
   if (made === round.target) return { ok: true };
   const p = firstMismatch(round, answer) as PlaceInfo;
-  const want = split(round.target)[p.key];
-  const lead = made === 0 ? 'The mat is empty.' : `The blocks make ${made}.`;
-  return { ok: false, hint: `${lead} ${round.target} has ${count(want, p)}; the mat has ${count(answer[p.key], p)}.` };
+  return { ok: false, hint: `${lead(made)} ${compare(round.target, p, answer[p.key])}` };
+}
+
+/**
+ * Read-aloud: every hint sentence `check` can give for this round, split as
+ * the shell splits it. The second sentence names the highest place that
+ * differs and its count on the mat, 0 to MAX, any of which the tray can make:
+ * finite, so all of them are listed. The first is "The mat is empty." or
+ * "The blocks make N." with N up to 999; the board draws N at 'hint' ("The
+ * blocks on the mat make N:" over the mat's digits), so only the empty-mat
+ * sentence is listed and the number sentence is left to the board.
+ */
+function hints(round: Round): readonly string[] {
+  const want = split(round.target);
+  const counts = Array.from({ length: MAX + 1 }, (_, k) => k);
+  return [EMPTY_MAT, ...placesOf(round).flatMap((p) => counts.filter((k) => k !== want[p.key]).map((k) => compare(round.target, p, k)))];
 }
 
 /** "The 0 marks the empty tens place" / "The 0s mark the empty tens and ones places". */
@@ -231,6 +257,19 @@ function Heading({ p }: { readonly p: PlaceInfo }) {
   );
 }
 
+/** The label on an empty place: "no tens". */
+const none = (p: PlaceInfo) => `no ${p.name}`;
+
+/** The places of n with no blocks, leading ones included (13 has no hundreds). */
+const emptyPlaces = (n: number, places: readonly PlaceInfo[]) => places.filter((p) => split(n)[p.key] === 0);
+
+/**
+ * Does the arrow to the 0 stand in place p, holding k blocks? After Check, in
+ * an empty place the target writes as 0, unless that place is flagged.
+ */
+const pointsAt = (round: Round, p: PlaceInfo, k: number, stage: Stage, flags?: ReadonlySet<Place>) =>
+  k === 0 && stage !== 'answering' && written(round.target, p) === '0' && !flags?.has(p.key);
+
 /**
  * In an empty place after Check: an arrow from the emptiness up to the 0
  * written over it. No outline of a missing block — zero does not get a block.
@@ -242,7 +281,7 @@ function PointsTo0({ p }: { readonly p: PlaceInfo }) {
         <line x1="16" y1="60" x2="16" y2="8" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
         <path d="M4 20 L16 5 L28 20" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      <span style={{ fontWeight: 700, fontSize: 'var(--t-xs)' }}>no {p.name}</span>
+      <span style={{ fontWeight: 700, fontSize: 'var(--t-xs)' }}>{none(p)}</span>
     </span>
   );
 }
@@ -326,16 +365,17 @@ function mismatches(round: Round, answer: Answer): ReadonlySet<Place> {
 /** Level 3: the neighbour, already built and written, for comparison. */
 function Neighbour({ n, places }: { readonly n: number; readonly places: readonly PlaceInfo[] }) {
   const k = split(n);
+  const gaps = emptyPlaces(n, places);
   return (
     <section
       aria-label={`This is ${n}: ${describe(n)}.`}
       style={{ display: 'grid', gap: 'var(--s2)', padding: 'var(--s3)', borderRadius: 'var(--radius-sm)', background: 'var(--paper-2)', border: '2px solid var(--rule-strong)' }}
     >
-      {caption(`This is ${n}.`)}
+      {caption(thisIs(n))}
       <DigitRow n={n} places={places} label={`${n} written in places`} />
       <div style={grid(places.length)} aria-hidden="true">
         {places.map((p) => {
-          const empty = k[p.key] === 0;
+          const empty = gaps.includes(p);
           return (
             <div
               key={p.key}
@@ -349,7 +389,7 @@ function Neighbour({ n, places }: { readonly n: number; readonly places: readonl
                 border: `2px ${empty ? 'dashed' : 'solid'} ${DEEP[p.key]}`,
               }}
             >
-              {empty ? <span style={{ color: DEEP[p.key], fontWeight: 600, fontSize: 'var(--t-xs)' }}>no {p.name}</span> : <Stack k={k[p.key]} place={p.key} />}
+              {empty ? <span style={{ color: DEEP[p.key], fontWeight: 600, fontSize: 'var(--t-xs)' }}>{none(p)}</span> : <Stack k={k[p.key]} place={p.key} />}
             </div>
           );
         })}
@@ -441,7 +481,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
                   <BlockIcon place={p.key} />
                 </Piece>
               ))}
-              {k === 0 && stage !== 'answering' && written(round.target, p) === '0' && !flags?.has(p.key) ? <PointsTo0 p={p} /> : null}
+              {pointsAt(round, p, k, stage, flags) ? <PointsTo0 p={p} /> : null}
             </div>
           );
         })}
@@ -467,6 +507,23 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   );
 }
 
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order. Level 3:
+ * the line over the built neighbour and the label on each of its empty
+ * places. On 'worked' and 'solved': the label under each arrow to a 0. The mat
+ * then holds exactly the target's blocks (drawn on 'worked'; the only answer
+ * that solves), so the arrows depend on the round alone. On 'hint' the arrows
+ * and "The blocks on the mat make N:" follow his blocks, and the column names,
+ * digits, tray label and block values are left to the picture.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const places = placesOf(round);
+  const neighbour = round.ref === undefined ? [] : [thisIs(round.ref), ...emptyPlaces(round.ref, places).map(none)];
+  if (stage !== 'worked' && stage !== 'solved') return neighbour;
+  const built = split(round.target);
+  return [...neighbour, ...places.filter((p) => pointsAt(round, p, built[p.key], stage)).map(none)];
+}
+
 export const whatIsZeroDoingThere: SolveGame<Round, Answer> = {
   kind: 'solve',
   id: 'what-is-zero-doing-there',
@@ -478,7 +535,9 @@ export const whatIsZeroDoingThere: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => ({ h: 0, t: 0, o: 0 }),
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/what-is-zero-doing-there.png',
   note: {

@@ -210,6 +210,83 @@ function wordExplain(b: Bag, c: Colour): string {
   }
 }
 
+/* ------------------------------------------------------ words on boards -- */
+
+/** Level 1's setup, under the unseen marble. */
+const DRAW_LINE = 'one comes out, unseen';
+/** Level 2's setup, beside the asked colour over the chance line. */
+const askLine = (ask: Colour) => `${ask}: how likely?`;
+/** A streak's setup, under the run. */
+const RUN_LINE = 'each put back in the bag';
+/** A tally's setup, over the ten-frame. */
+const TALLY_LINE = '10 draws, each put back';
+/** Beside the ten-frame's rows, from the hint on, for a bag of 5. */
+const HALVES = ['first 5', 'next 5'] as const;
+/** Under the ten-frame in the worked answer: the likeliest tally. */
+const aboutLine = (red: number) => `about ${red} red, ${10 - red} blue`;
+/** Over the counted rows, from the hint on. */
+const COUNTED = 'In the bag, counted:';
+/** In the gap of the shorter counted row in the worked comparison, or nothing at the same chance. */
+function moreLine(b: Bag): string | null {
+  const more = likelier(b);
+  return more === 'same' ? null : `${Math.abs(b.red - b.blue)} more ${more}`;
+}
+
+/** The word under each answer picture, in button order. */
+function choiceWords(round: Round): readonly string[] {
+  switch (round.kind) {
+    case 'compare':
+    case 'streak':
+      return ['Red', 'Blue', 'Same chance'];
+    case 'word':
+      return WORDS.map(cap);
+    case 'tally':
+      return round.options.map((r) => `${r} red, ${10 - r} blue`);
+  }
+}
+
+/** The hint ignores the answer: one per round, whatever was tapped. */
+function hints(round: Round): readonly string[] {
+  return [hintLine(round)];
+}
+
+/**
+ * The words the board shows, in screen order: the setup label, the hint's
+ * evidence labels (halves of the ten-frame, the counted-rows caption) and the
+ * worked labels (likeliest tally, the unpaired extras), then the answer words,
+ * then the worked caption. The chance line's four tick words are left out:
+ * the answer buttons under it say the same words in the same order. Counts,
+ * draw numbers and "?" are numbers or marks only.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] {
+  const evidence = stage !== 'answering';
+  const worked = stage === 'worked';
+  const b = round.bag;
+  const scene: string[] = [];
+  switch (round.kind) {
+    case 'compare':
+      scene.push(DRAW_LINE);
+      break;
+    case 'word':
+      scene.push(askLine(round.ask));
+      break;
+    case 'streak':
+      scene.push(RUN_LINE);
+      break;
+    case 'tally':
+      scene.push(TALLY_LINE);
+      if (evidence && size(b) === 5) scene.push(...HALVES);
+      if (worked) scene.push(aboutLine(expectedRed(b)));
+      break;
+  }
+  if (evidence) {
+    scene.push(COUNTED);
+    const more = moreLine(b);
+    if (worked && (round.kind === 'compare' || round.kind === 'streak') && more) scene.push(more);
+  }
+  return [...scene, ...choiceWords(round), ...(worked ? [explain(round)] : [])];
+}
+
 /* --------------------------------------------------------------- drawing -- */
 
 const INK = '#2b1d14';
@@ -309,14 +386,14 @@ function SortedRows({ b, extra, pair }: { readonly b: Bag; readonly extra?: Colo
             <rect key={`p${i}`} x={395 + 26 * i} y={ROW_Y[0] - 14} width="26" height={ROW_Y[1] - ROW_Y[0] + 28} rx="13" fill="none" stroke={GOLD} strokeWidth="3" />
           ))
         : null}
+      <text x="352" y="160" fontSize="16" fill={SOFT}>
+        {COUNTED}
+      </text>
       {pair && more !== 'same' ? (
         <text x={404 + 26 * lo} y={more === 'red' ? ROW_Y[1] : ROW_Y[0]} dominantBaseline="central" fontSize="15" fontWeight="700" fill={HUE[more]}>
-          {`${Math.abs(b.red - b.blue)} more ${more}`}
+          {moreLine(b)}
         </text>
       ) : null}
-      <text x="352" y="160" fontSize="16" fill={SOFT}>
-        In the bag, counted:
-      </text>
       {colours.map((c, row) => {
         const n = countOf(b, c);
         const y = ROW_Y[row];
@@ -394,7 +471,7 @@ function OneDraw({ pick }: { readonly pick: Pick | null }) {
         ?
       </text>
       <text x="486" y="138" textAnchor="middle" fontSize="16" fill={SOFT}>
-        one comes out, unseen
+        {DRAW_LINE}
       </text>
       <PickSpot x={580} y={86} w={88} h={60} filled={pick !== null} />
       {pick ? <PickMarbles x={580} y={86} r={pick === 'same' ? 11 : 18} pick={pick} /> : null}
@@ -425,7 +502,7 @@ function ChanceLine({ ask, mark }: { readonly ask: Colour; readonly mark: Chance
     <g>
       <Marble x={372} y={26} r={14} c={ask} />
       <text x="396" y="32" fontSize="18" fontWeight="700" fill={HUE[ask]}>
-        {ask}: how likely?
+        {askLine(ask)}
       </text>
       <line x1={TICK_X[0]} y1="86" x2={TICK_X[3]} y2="86" stroke={INK} strokeWidth="4" strokeLinecap="round" />
       {WORDS.map((w, i) => {
@@ -472,7 +549,7 @@ function Run({ drawn, run, pick }: { readonly drawn: 'red' | 'blue'; readonly ru
       )}
       <Arrow d="M372 56 Q 320 18 262 54" tip="M256 58 l8 -16 l9 13 z" />
       <text x="372" y="116" fontSize="16" fill={SOFT}>
-        each put back in the bag
+        {RUN_LINE}
       </text>
     </g>
   );
@@ -495,7 +572,7 @@ function TallyFrame({ b, show, red, worked }: { readonly b: Bag; readonly show: 
   return (
     <g>
       <text x={FRAME_X} y="34" fontSize="16" fill={SOFT}>
-        10 draws, each put back
+        {TALLY_LINE}
       </text>
       {([0, 1] as const).map((row) =>
         Array.from({ length: 5 }, (_, i) => (
@@ -512,16 +589,16 @@ function TallyFrame({ b, show, red, worked }: { readonly b: Bag; readonly show: 
         <g>
           <line x1={FRAME_X - 6} y1={FRAME_Y + CELL} x2={FRAME_X + CELL * 5 + 6} y2={FRAME_Y + CELL} stroke={INK} strokeWidth="5" />
           <text x={FRAME_X + CELL * 5 + 12} y={FRAME_Y + CELL / 2} dominantBaseline="central" fontSize="14" fill={SOFT}>
-            first 5
+            {HALVES[0]}
           </text>
           <text x={FRAME_X + CELL * 5 + 12} y={FRAME_Y + CELL * 1.5} dominantBaseline="central" fontSize="14" fill={SOFT}>
-            next 5
+            {HALVES[1]}
           </text>
         </g>
       ) : null}
       {worked && red !== null ? (
         <text x={FRAME_X + CELL * 2.5} y={FRAME_Y + CELL * 2 + 24} textAnchor="middle" fontSize="18" fontWeight="700" fill={INK}>
-          {`about ${red} red, ${10 - red} blue`}
+          {aboutLine(red)}
         </text>
       ) : null}
     </g>
@@ -589,23 +666,22 @@ interface Option {
   readonly body: ReactNode;
 }
 
+const PICKS: readonly Pick[] = ['red', 'blue', 'same'];
+
 function options(round: Round): readonly Option[] {
+  const words = choiceWords(round);
   switch (round.kind) {
     case 'compare':
     case 'streak':
-      return [
-        { id: 'red', label: 'Red', body: <Pictured word="Red"><ComesOut pick="red" /></Pictured> },
-        { id: 'blue', label: 'Blue', body: <Pictured word="Blue"><ComesOut pick="blue" /></Pictured> },
-        { id: 'same', label: 'Same chance', body: <Pictured word="Same chance"><ComesOut pick="same" /></Pictured> },
-      ];
+      return PICKS.map((p, i) => ({ id: p, label: words[i], body: <Pictured word={words[i]}><ComesOut pick={p} /></Pictured> }));
     case 'word':
-      return WORDS.map((w) => ({ id: w, label: cap(w), body: <Pictured word={cap(w)}><BagOfFour word={w} c={round.ask} /></Pictured> }));
+      return WORDS.map((w, i) => ({ id: w, label: words[i], body: <Pictured word={words[i]}><BagOfFour word={w} c={round.ask} /></Pictured> }));
     case 'tally':
-      return round.options.map((r) => ({
+      return round.options.map((r, i) => ({
         id: tallyId(r),
         label: `${r} red and ${10 - r} blue`,
         body: (
-          <Pictured word={`${r} red, ${10 - r} blue`}>
+          <Pictured word={words[i]}>
             <TenFrame red={r} />
           </Pictured>
         ),
@@ -686,7 +762,9 @@ export const whichColourMightComeOut: SolveGame<Round, Answer> = {
   emptyAnswer: () => null,
   Board,
   check,
+  hints,
   explain,
+  board,
   cover: 'art/games/which-colour-might-come-out.png',
   note: {
     what: 'A cloth bag of red and blue marbles, every marble drawn so he can count them. One marble comes out without looking and always goes back. He taps an answer: the likelier colour, a chance word, or a tally of ten draws.',

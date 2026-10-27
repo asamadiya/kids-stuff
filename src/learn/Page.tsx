@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { GrownUpNote } from '../notes/types';
 import { GrownUps } from './GrownUps';
+import { ReaderSwitch } from '../audio/ReaderSwitch';
 import { HomeLink, PartNav } from './PartNav';
 import type { Part } from './catalog';
 
@@ -40,6 +41,7 @@ export function Page({ title, back, note, expect, part, lede, children }: PagePr
         ) : null}
         <h1 className="lc-top__title">{title}</h1>
         <div className="lc-top__tools">
+          <ReaderSwitch />
           <EverythingLink />
           <GrownUps note={expect ? { ...note, expect: `${expect} ${note.expect}` } : note} title={title} />
         </div>

@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Piece, Tray } from '../../play/parts';
+import { sentences } from '../../audio/gameLines';
 
 /**
  * Can You Pay Exactly? — coin values differ from coin counts.
@@ -210,17 +211,21 @@ function trade(answer: Answer): Trade | null {
   return null;
 }
 
+/** The fixed sentence after a change total that misses: what the count-up has to reach. */
+const DOLLAR_LINE = `A dollar is ${cents(DOLLAR)}.`;
+/** The round's fixed sentence after a paid total that misses, and after an empty counter. */
+const costsLine = (round: Round) => `The ${LABEL[round.item]} costs ${cents(round.price)}.`;
+
 function check(round: Round, answer: Answer): Verdict {
   const total = sum(answer);
   const n = answer.length;
-  const thing = LABEL[round.item];
-  const costs = `The ${thing} costs ${cents(round.price)}.`;
+  const costs = costsLine(round);
 
   if (round.mode === 'change') {
     const want = target(round);
     if (total === want) return { ok: true };
     if (n === 0) return { ok: false, hint: `The counter is empty. The change takes ${cents(round.price)} up to 100¢.` };
-    return { ok: false, hint: `${cents(round.price)} and your ${cents(total)} make ${cents(round.price + total)}. A dollar is 100¢.` };
+    return { ok: false, hint: `${cents(round.price)} and your ${cents(total)} make ${cents(round.price + total)}. ${DOLLAR_LINE}` };
   }
 
   if (n === 0) return { ok: false, hint: `The counter is empty. ${costs}` };
@@ -234,6 +239,37 @@ function check(round: Round, answer: Answer): Verdict {
     return { ok: false, hint: `${cents(total)} in ${coinsWord(n)}. ${trade(answer)?.text ?? ''}`.trim() };
   }
   return { ok: true };
+}
+
+/**
+ * Read-aloud: the hint sentences that do not depend on the coins he chose —
+ * the empty counter, the price, the dollar, the "That is the price…" line and
+ * every swap. A sentence that restates his own total ("Your 4 coins make
+ * 19¢.") is left to the board, which draws it.
+ */
+function hints(round: Round): string[] {
+  const out = new Set<string>([`The counter is empty. ${costsLine(round)}`, costsLine(round)]);
+  if (round.mode === 'change') {
+    out.add(`The counter is empty. The change takes ${cents(round.price)} up to 100¢.`);
+    out.add(DOLLAR_LINE);
+  }
+  if (round.mode === 'count') {
+    for (let n = 1; n <= MAX_COINS; n += 1) if (n !== round.exactly) out.add(`That is the price, in ${coinsWord(n)}, not ${round.exactly}.`);
+  }
+  if (round.mode === 'fewest') {
+    for (const t of [[1, 1, 1, 1, 1], [5, 5], [10, 10, 5], [10, 10, 10]] as const) {
+      const text = trade(t as unknown as Answer)?.text;
+      if (text) out.add(text);
+    }
+  }
+  return [...out].flatMap(sentences);
+}
+
+/** Read-aloud: the worked caption, the one board line that names the coins of the answer in words. */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): string[] {
+  if (stage !== 'worked') return [];
+  const s = solution(round);
+  return [`${tallyWords(s)}: ${coinsWord(s.length)}.`];
 }
 
 function explain(round: Round): string {
@@ -688,7 +724,9 @@ export const canYouPayExactly: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => [],
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/can-you-pay-exactly.png',
   note: {

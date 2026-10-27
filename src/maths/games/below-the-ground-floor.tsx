@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Choice } from '../../play/parts';
+import { sentences } from '../../audio/gameLines';
 
 /**
  * Below the Ground Floor — negative numbers extend below zero.
@@ -46,6 +47,8 @@ export interface Round {
 
 /** The floor he has tapped, or nothing yet. */
 export type Answer = number | null;
+
+type Stage = BoardProps<Round, Answer>['stage'];
 
 export const TOP = 5;
 export const BOTTOM = -3;
@@ -134,9 +137,37 @@ function check(r: Round, answer: Answer): Verdict {
   return { ok: false, hint: hintLine(r, answer) };
 }
 
+/**
+ * Every hint sentence `check` can return for this round, for read-aloud. The
+ * board can only answer nothing or one of its floors, so the whole set is the
+ * hint for each of those that is not the solution, split as the shell splits it.
+ */
+function hints(r: Round): string[] {
+  const all = [null, ...FLOORS].filter((a) => a !== solution(r)).flatMap((a) => sentences(hintLine(r, a)));
+  return [...new Set(all)];
+}
+
 /** The trip as a number sentence: −2 + 3 = 1, 2 − 4 = −2. */
 export const sentence = (r: Round) =>
   `${fmt(r.start)} ${r.move > 0 ? '+' : '−'} ${Math.abs(r.move)} = ${fmt(target(r))}`;
+
+/**
+ * The caption under the building once the trip is worked or solved, one entry
+ * per line: the number sentence, then where a 'back' trip started or where the
+ * fossils are. The board draws these and read-aloud reads the same strings.
+ */
+export function caption(r: Round): string[] {
+  return [
+    sentence(r),
+    ...(r.find === 'start' ? [`It started on floor ${fmt(r.start)}.`] : []),
+    ...(r.fossils ? [`The fossil room is floor ${fmt(target(r))}.`] : []),
+  ];
+}
+
+/** Read-aloud: the board's only words a non-reader needs are the worked caption; floor plates are numbers. */
+function board(r: Round, _level: Level, stage: Stage): string[] {
+  return stage === 'worked' || stage === 'solved' ? caption(r) : [];
+}
 
 function explain(r: Round): string {
   const e = target(r);
@@ -277,7 +308,6 @@ const CARD_H = 82;
 /** Arrows sit on the track line, level with the middle of the two floor plates. */
 const ROW = 60;
 
-type Stage = BoardProps<Round, Answer>['stage'];
 type PlateLook = 'known' | 'unknown' | 'chosen' | 'arrived';
 type Top = 'car' | 'ghost' | 'bone' | null;
 
@@ -451,9 +481,15 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </div>
       {locked ? (
         <p className="board-caption">
-          <strong style={{ fontSize: 'var(--t-lg)', color: 'var(--ink)' }}>{sentence(round)}</strong>
-          {round.find === 'start' ? <span>{`  It started on floor ${fmt(round.start)}.`}</span> : null}
-          {round.fossils ? <span>{`  The fossil room is floor ${fmt(end)}.`}</span> : null}
+          {caption(round).map((line, i) =>
+            i === 0 ? (
+              <strong key={line} style={{ fontSize: 'var(--t-lg)', color: 'var(--ink)' }}>
+                {line}
+              </strong>
+            ) : (
+              <span key={line}>{`  ${line}`}</span>
+            ),
+          )}
         </p>
       ) : null}
     </div>
@@ -471,7 +507,9 @@ export const belowTheGroundFloor: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/below-the-ground-floor.png',
   note: {

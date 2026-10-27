@@ -177,6 +177,9 @@ function prompt(round: Round): string {
   return `Show ${n} with ${askFor(round)}.`;
 }
 
+/** A tie round's hint opens with the amount it started from: the one sentence of it that names no piece of his. */
+const began = (n: number) => `The mat began with ${n}.`;
+
 function check(round: Round, answer: Answer) {
   const want = solution(round);
   if (same(answer, want)) return { ok: true };
@@ -189,7 +192,7 @@ function check(round: Round, answer: Answer) {
   if (v !== n) {
     return {
       ok: false,
-      hint: round.kind === 'tie' ? `The mat began with ${n}. ${shown} ${makes(answer)} ${v}.` : `${shown} ${makes(answer)} ${v}, not ${n}.`,
+      hint: round.kind === 'tie' ? `${began(n)} ${shown} ${makes(answer)} ${v}.` : `${shown} ${makes(answer)} ${v}, not ${n}.`,
     };
   }
   if (round.kind === 'untie') {
@@ -205,6 +208,46 @@ function check(round: Round, answer: Answer) {
   };
 }
 
+/** At this many in one place the tray piece greys out: room for 243 as 24 bundles. */
+const MAX_PER_PLACE = 30;
+
+/**
+ * Every mat the board can hold that makes `n`: no place above MAX_PER_PLACE
+ * (the tray stops there, and every starting pile is under it), and no flats
+ * below level 3, where the mat has no flats column.
+ */
+function matsMaking(round: Round, n: number): Mat[] {
+  const out: Mat[] = [];
+  for (let h = 0; h <= (round.flats ? MAX_PER_PLACE : 0); h++) {
+    for (let t = 0; t <= MAX_PER_PLACE; t++) {
+      const o = n - h * 100 - t * 10;
+      if (o >= 0 && o <= MAX_PER_PLACE) out.push(mat(h, t, o));
+    }
+  }
+  return out;
+}
+
+/**
+ * Read-aloud: every hint sentence check() can give on this round. The empty
+ * mat's hint, and every hint for a mat that makes the target (the usual-mat
+ * rounds' "That makes 14. Ten of the 14 loose sticks can be one bundle." and
+ * the untie rounds' "3 bundles and 4 loose sticks make 34. The task asks for
+ * 2 bundles."), are listed whole: the board holds finitely many such mats.
+ * A mat that makes some other amount gets "<its pieces> make <v>, not <n>."
+ * (or, on a tie round, "The mat began with <n>. <its pieces> make <v>."): its
+ * pieces and v range over every mat he can build, so only the tie round's
+ * fixed first sentence is listed; the board's count under each column carries
+ * the rest.
+ */
+function hints(round: Round): readonly string[] {
+  const out = new Set<string>();
+  for (const m of [EMPTY, ...matsMaking(round, round.target)]) {
+    const v = check(round, m);
+    if (!v.ok && v.hint) out.add(v.hint);
+  }
+  if (round.kind === 'tie') out.add(began(round.target));
+  return [...out];
+}
 
 function explain(round: Round): string {
   const n = round.target;
@@ -340,6 +383,12 @@ const NAMES: Record<Place, readonly [string, string]> = {
   hundreds: ['flat', 'flats'],
 };
 
+/** Under a swap picture: "10 loose sticks = 1 bundle". */
+const swapLine = (from: Place) => `10 ${NAMES[from][1]} = 1 ${NAMES[UP[from] as Place][0]}`;
+
+/** The swap pictures under the tray, in screen order: loose to bundle, and at level 3 bundle to flat. */
+const swapsOf = (round: Round): readonly Place[] => (round.flats ? ['ones', 'tens'] : ['ones']);
+
 /**
  * Permanently on the board: ten separate pieces, equals, the same ten tied
  * into one bigger piece. The fact the game teaches, shown rather than said.
@@ -348,7 +397,7 @@ function Swap({ from }: { readonly from: Place }) {
   const to = UP[from] as Place;
   const [ten, w] = tenTiles(from, 0);
   const W = w + 16 + 30 + 16 + tileW(to);
-  const say = `10 ${NAMES[from][1]} = 1 ${NAMES[to][0]}`;
+  const say = swapLine(from);
   return (
     <figure style={KEY_ITEM}>
       <svg viewBox={`0 0 ${W} 52`} style={{ width: W * 0.7, height: 'auto', aspectRatio: `${W} / 52`, maxWidth: '100%' }} role="img" aria-label={say}>
@@ -384,6 +433,9 @@ function RingTag({ place, size, text }: { readonly place: Place; readonly size: 
   );
 }
 
+/** An untie column's goal, as its words read: "use 2 bundles", "use no flats". */
+const goalLine = (place: Place, n: number) => `use ${n ? plural(n, NAMES[place][0], NAMES[place][1]) : `no ${NAMES[place][1]}`}`;
+
 /**
  * Untie rounds: how many of this piece the answer must use, as that many
  * outlined pieces at the top of the column, so the count he is matching sits
@@ -400,11 +452,11 @@ function Goal({ place, n }: { readonly place: Place; readonly n: number }) {
       {struck ? <line x1="4" y1="48" x2={w - 4} y2="4" stroke="#24170f" strokeWidth="6" strokeLinecap="round" /> : null}
     </svg>
   );
-  const say = n ? plural(n, NAMES[place][0], NAMES[place][1]) : `no ${NAMES[place][1]}`;
+  const say = goalLine(place, n);
   return (
-    <div style={GOAL} role="img" aria-label={`Use ${say}`}>
+    <div style={GOAL} role="img" aria-label={cap(say)}>
       {n ? fives(n, (i) => ghost(i)) : ghost(0, true)}
-      <span style={SMALL}>use {say}</span>
+      <span style={SMALL}>{say}</span>
     </div>
   );
 }
@@ -414,9 +466,6 @@ const COLUMN: Record<Place, { readonly name: string; readonly one: string; reado
   tens: { name: 'Bundles', one: 'bundle', art: BundleArt },
   ones: { name: 'Loose sticks', one: 'loose stick', art: StickArt },
 };
-
-/** At this many in one place the tray piece greys out: room for 243 as 24 bundles. */
-const MAX_PER_PLACE = 30;
 
 /* --------------------------------------------------------------- styles -- */
 
@@ -582,13 +631,58 @@ function ringFor(round: Round, m: Mat): { readonly place: Place; readonly size: 
   return null;
 }
 
+/** The mat's columns, left to right: flats only at level 3. */
+const placesOf = (round: Round): readonly Place[] => (round.flats ? PLACES : PLACES.slice(1));
+
+/** Untie rounds: how many of this piece the answer must use (the flats and bundles columns only). */
+const goalOf = (round: Round, k: Place): number | null => (round.kind === 'untie' && k !== 'ones' ? solution(round)[k] : null);
+
+/** The tray's label: the one instruction on the board. */
+const TRAY = 'Tap to put on the mat';
+
+/**
+ * The caption under the worked mat, sentence by sentence: the tyings or
+ * untyings that got there, then the finished mat and what it adds up to.
+ * "1 bundle untied into 10 loose sticks." "2 bundles and 14 loose sticks make 20 + 14 = 34."
+ */
+function workedLines(round: Round): string[] {
+  const w = solution(round);
+  const steps = round.kind === 'tie' ? tyings(round.start) : round.kind === 'untie' ? untyings(round) : [];
+  const sum = worth(w).includes('+') ? `${worth(w)} = ` : '';
+  return [...(steps.length ? [`${cap(steps.join('; '))}.`] : []), `${cap(sticks(w))} ${makes(w)} ${sum}${round.target}.`];
+}
+
+/**
+ * Read-aloud: the board's words in screen order. The untie goals at the top
+ * of the flats and bundles columns ("use no flats", "use 15 bundles"); the
+ * worked caption at 'worked'; the tray's instruction while the tray takes
+ * taps (not at 'worked' or 'solved', where it is greyed out); the swap
+ * pictures' captions under the tray. Left out: the column names and their
+ * "10 sticks" tags (each sits beside its piece's picture), the counts and the
+ * total after Check, "none yet" and the hint ring's tag ("10 loose = 1 bundle"),
+ * which depend on the mat he made.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] {
+  const locked = stage === 'worked' || stage === 'solved';
+  const goals = placesOf(round).flatMap((k) => {
+    const n = goalOf(round, k);
+    return n === null ? [] : [goalLine(k, n)];
+  });
+  return [
+    ...goals,
+    ...(stage === 'worked' ? workedLines(round) : []),
+    ...(locked ? [] : [TRAY]),
+    ...swapsOf(round).map(swapLine),
+  ];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const worked = stage === 'worked';
   const locked = stage === 'solved' || worked;
   const shown = worked ? solution(round) : answer;
   const facts = stage !== 'answering';
   const ring = stage === 'hint' ? ringFor(round, shown) : null;
-  const places = round.flats ? PLACES : PLACES.slice(1);
+  const places = placesOf(round);
 
   const put = (k: Place, d: number) => setAnswer({ ...answer, [k]: Math.max(0, answer[k] + d) });
 
@@ -609,7 +703,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </Piece>
     );
     const ringed = ring && ring.place === k ? Math.min(ring.size, n) : 0;
-    const goal = round.kind === 'untie' && k !== 'ones' ? solution(round)[k] : null;
+    const goal = goalOf(round, k);
     return (
       <section key={k} style={{ ...COL, ...GROW[k] }} aria-label={`${name}: ${n}`}>
         <h3 style={{ ...COL_HEAD, color: HUE[k] }}>
@@ -644,8 +738,6 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
     );
   };
 
-  const steps = worked ? (round.kind === 'tie' ? tyings(round.start) : round.kind === 'untie' ? untyings(round) : []) : [];
-
   return (
     <div className="board board--bundles">
       <div style={MAT} role="group" aria-label="The mat">
@@ -653,14 +745,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       </div>
 
       {facts ? <Numeral n={value(shown)} label={worked ? 'The mat shows' : 'The mat makes'} /> : null}
-      {worked ? (
-        <p className="board-caption">
-          {steps.length ? `${cap(steps.join('; '))}. ` : ''}
-          {cap(sticks(shown))} {makes(shown)} {worth(shown).includes('+') ? `${worth(shown)} = ` : ''}{round.target}.
-        </p>
-      ) : null}
+      {worked ? <p className="board-caption">{workedLines(round).join(' ')}</p> : null}
 
-      <Tray label="Tap to put on the mat">
+      <Tray label={TRAY}>
         {places.map((k) => {
           const { one, art: Art } = COLUMN[k];
           const full = answer[k] >= MAX_PER_PLACE;
@@ -680,8 +767,9 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
         })}
       </Tray>
       <div style={KEY}>
-        <Swap from="ones" />
-        {round.flats ? <Swap from="tens" /> : null}
+        {swapsOf(round).map((from) => (
+          <Swap key={from} from={from} />
+        ))}
       </div>
     </div>
   );
@@ -698,7 +786,9 @@ export const tenLooseOneBundle: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: (round) => round.start,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/ten-loose-one-bundle.png',
   note: {

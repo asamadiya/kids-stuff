@@ -233,6 +233,25 @@ function check(round: Round, answer: Answer): Verdict {
     : { ok: false, hint: `${fact} The ${name} row has ${pics(got(open))}: ${votesOf(got(open) * 2)}.` };
 }
 
+/**
+ * Every hint `check` can give for this round. The board's add and take-off
+ * pieces put 0 to `cells` pictures in an open row and never touch a drawn one,
+ * and a build round's hint names the first row that is off, so each row is
+ * tried at every count with the rows above it right.
+ */
+function hints(round: Round): readonly string[] {
+  const want = target(round);
+  const out = new Set<string>();
+  round.fruits.forEach((_, i) => {
+    if (!isOpen(round, i)) return;
+    for (let n = 0; n <= round.cells; n += 1) {
+      const v = check(round, want.map((w, j) => (j === i ? n : isOpen(round, j) ? w : 0)));
+      if (!v.ok && v.hint) out.add(v.hint);
+    }
+  });
+  return [...out];
+}
+
 function explain(round: Round): string {
   if (round.mode === 'build') {
     const hi = extreme(round.votes, true);
@@ -526,10 +545,26 @@ function Key({ round }: { readonly round: Round }) {
   );
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * The only words under the chart: the worked answer spelled out, at stage
+ * worked. The header words, fruit names, key and vote numbers are left out
+ * of read-aloud: each sits beside the picture or tally it names.
+ */
+const caption = (round: Round, stage: Stage): string | null => (stage === 'worked' ? explain(round) : null);
+
+/** Read-aloud: the board's words at this stage, from the helper the board draws them with. */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const words = caption(round, stage);
+  return words ? [words] : [];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const want = target(round);
   const counted = stage !== 'answering';
   const worked = stage === 'worked';
+  const words = caption(round, stage);
   const locked = stage === 'worked' || stage === 'solved';
   const gx = GRID_X;
   const width = rowW(round);
@@ -658,7 +693,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Fragment>
         ))}
       </div>
-      {worked ? <p className="board-caption">{explain(round)}</p> : null}
+      {words ? <p className="board-caption">{words}</p> : null}
     </div>
   );
 }
@@ -675,7 +710,9 @@ export const whatDidOurClassChoose: SolveGame<Round, Answer> = {
   emptyAnswer: (round) => round.fruits.map(() => 0),
   Board,
   check,
+  hints,
   explain,
+  board,
   cover: 'art/games/what-did-our-class-choose.png',
   note: {
     what: "A class voted for its favourite fruit. He turns each tally into a row of fruit pictures by tapping the fruit at the end of its row, and later finds a missing row from a clue such as '2 more votes than mango'.",

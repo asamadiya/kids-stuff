@@ -747,6 +747,21 @@ function caption(round: Round, stage: BoardProps<Round, Answer>['stage']): strin
     : `${cap1(left)} faces ${right}: ${rule}.`;
 }
 
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order — the
+ * thing's label on the table (the material is the clue), the two choice
+ * words, then the Help caption or the worked rule. Pole letters and track
+ * marks are left to the picture.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): string[] {
+  const line = caption(round, stage);
+  return [
+    ...(round.setup === 'pick' ? [LABEL[round.thing]] : []),
+    ...CHOICES[round.setup].map(([, text]) => text),
+    ...(line ? [line] : []),
+  ];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
   const line = caption(round, stage);
@@ -783,6 +798,7 @@ export const willTheMagnetPickItUp: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === round.result,
   why,

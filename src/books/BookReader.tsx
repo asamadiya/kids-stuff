@@ -2,6 +2,9 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { Book, BookPage } from './types';
 import { GrownUps } from '../learn/GrownUps';
 import { HomeLink } from '../learn/PartNav';
+import { ReaderSwitch } from '../audio/ReaderSwitch';
+import { ReadAloud } from '../audio/ReadAloud';
+import { pageReading } from '../audio/lines';
 import { StoryFigure } from '../components/StoryFigure';
 import '../styles/lc/book-figure.css';
 
@@ -104,6 +107,7 @@ export function BookReader({ book, page, onPage, backHref, backLabel, onFinished
           <span aria-hidden="true">←</span> {backLabel}
         </a>
         <h1 className="book__title">{book.title}</h1>
+        <ReaderSwitch />
         <GrownUps note={book.note} title={book.title} />
       </header>
 
@@ -131,6 +135,7 @@ export function BookReader({ book, page, onPage, backHref, backLabel, onFinished
         <span className="book__count" aria-hidden="true">
           {atEnd ? 'The end' : `${page + 1} / ${count}`}
         </span>
+        {current ? <ReadAloud key={`${book.slug}/${page}`} id={`book/${book.slug}/${page}`} texts={pageReading(book, page)} /> : null}
         <button
           ref={nextRef}
           type="button"

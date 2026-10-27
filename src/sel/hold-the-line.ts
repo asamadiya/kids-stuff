@@ -2,7 +2,7 @@
  * Hold the Line — assertion and boundaries.
  *
  * Something is being taken, touched, teased or pressed. He builds a sentence
- * out of wordless chips in a three-part frame, says it out loud one part at a
+ * out of picture chips in a three-part frame, says it out loud one part at a
  * time — tapping a still dot under each part as he says it, so nothing on the
  * screen moves by itself — and the other person either stops or does not.
  * Nothing here is scored: there is no correct sentence, only a stronger and a
@@ -58,7 +58,7 @@ export interface Chip {
   readonly slot: SlotKind;
   /** How much of a push the chip carries. Never a mark out of anything. */
   readonly force: number;
-  /** What the guide says when the chip lands. Scenarios may say it differently. */
+  /** The words under the chip's mark, read by its tray's read button. Scenarios may say it differently. */
   readonly words: string;
   readonly glyph: GlyphId;
   /** Only the third slot carries a kind: pushing on, leaving, or stopping there. */
@@ -468,11 +468,16 @@ export function isComplete(pick: Pick): boolean {
   return pick.name !== null && pick.ask !== null && pick.next !== null;
 }
 
-export function lineOf(scenario: Scenario, pick: Pick): string {
-  return [pick.name, pick.ask, pick.next]
+/** The line's parts in the order the frame holds them, the empty ones left out. */
+export function lineParts(scenario: Scenario, pick: Pick): readonly string[] {
+  return SLOTS
+    .map((slot) => pick[slot])
     .map((id) => (id ? wordsFor(scenario, id) : ''))
-    .filter((w) => w.length > 0)
-    .join(' ');
+    .filter((w) => w.length > 0);
+}
+
+export function lineOf(scenario: Scenario, pick: Pick): string {
+  return lineParts(scenario, pick).join(' ');
 }
 
 export function strengthOf(scenario: Scenario, pick: Pick): number {
@@ -496,6 +501,11 @@ export function outcomeOf(scenario: Scenario, pick: Pick): Outcome | null {
 
 export function panelFor(scenario: Scenario, outcome: Outcome): Panel {
   return outcome === 'stops' ? scenario.stops : outcome === 'goes-on' ? scenario.goesOn : scenario.left;
+}
+
+/** The plate drawn now: the setup until the line has been said, then what the other person did. */
+export function shownPanel(scenario: Scenario, outcome: Outcome | null): Panel {
+  return outcome ? panelFor(scenario, outcome) : scenario.setup;
 }
 
 /** Every line this place allows. Used to check a place has real room in it. */
@@ -587,4 +597,71 @@ export function plateLines(
 /** The title on a kept plate. */
 export function plateTitle(scenario: Scenario): string {
   return `${HOLDTHELINE_META.title} — ${scenario.where}`;
+}
+
+/* ------------------------------------------------------------- read aloud -- */
+
+/** Beside the third tray's label once the line has been said here: leaving is still there to pick. */
+export const DOORWAY_NOTE = 'the doorway chip is on the rack now';
+/** The primary button until every part of the frame holds a chip. */
+export const PICK_FIRST = 'Pick one picture for each part first';
+/** The primary button once the frame is full, before the words of the part to say next. */
+export const SAY_IT = 'Say it out loud, then tap:';
+
+/** Only the third tray carries the doorway note, and only after the line has been said here. */
+export const showsDoorwayNote = (slot: SlotKind, runs: number): boolean => slot === 'next' && runs > 0;
+
+/** The primary button's words: pick first, or the part to say next, in quotes. */
+export function promptText(scenario: Scenario, sayingId: ChipId | null): string {
+  return sayingId ? `${SAY_IT} “${wordsFor(scenario, sayingId)}”` : PICK_FIRST;
+}
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per sentence, label or chip, in screen order. Nothing is spoken unless he
+ * presses that button (advisor a9). Not read: the note written to the grown-up,
+ * the places-count readout, the shelf, the print plate, the "I said it" cards
+ * and the place pictures (a grown-up usually picks the place). The component
+ * reads only through these, and `listenLines` enumerates them, so a button
+ * cannot ask for a clip the build did not make.
+ */
+export const LISTEN = {
+  /** L1, beside the title. */
+  title: (): readonly string[] => [HOLDTHELINE_META.title],
+  /** L2, under the picture: where, then what the plate drawn now shows. */
+  picture: (scenario: Scenario, outcome: Outcome | null): readonly string[] =>
+    [scenario.where, shownPanel(scenario, outcome).says],
+  /** L3, after each tray's label: the label, the doorway note when shown, then every chip's words in tray order. */
+  tray: (scenario: Scenario, slot: SlotKind, runs: number): readonly string[] => [
+    SLOT_LABELS[slot],
+    ...(showsDoorwayNote(slot, runs) ? [DOORWAY_NOTE] : []),
+    ...chipsFor(scenario, slot).map((c) => wordsFor(scenario, c.id)),
+  ],
+  /** L4, "Say the line back to me": the line in the frame, one part per clip. */
+  line: (scenario: Scenario, pick: Pick): readonly string[] => lineParts(scenario, pick),
+  /** L5, beside the primary button: its words, with the part to say as its own clip. */
+  prompt: (scenario: Scenario, sayingId: ChipId | null): readonly string[] =>
+    (sayingId ? [SAY_IT, wordsFor(scenario, sayingId)] : [PICK_FIRST]),
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.title(),
+    ...SCENARIOS.flatMap((s) => {
+      const picks = allPicks(s);
+      const outcomes = [...new Set(picks.map((p) => outcomeOf(s, p)))].filter((o): o is Outcome => o !== null);
+      // The trays come back after the line is said only by "Change the last part and say it again", offered after goes-on.
+      const runsInBuild = outcomes.includes('goes-on') ? [0, 1] : [0];
+      return [
+        ...LISTEN.picture(s, null),
+        ...outcomes.flatMap((o) => LISTEN.picture(s, o)),
+        ...runsInBuild.flatMap((runs) => SLOTS.flatMap((slot) => LISTEN.tray(s, slot, runs))),
+        ...picks.flatMap((p) => LISTEN.line(s, p)),
+        ...LISTEN.prompt(s, null),
+        ...SLOTS.flatMap((slot) => chipsFor(s, slot).flatMap((c) => LISTEN.prompt(s, c.id))),
+      ];
+    }),
+  ];
+  return [...new Set(all)];
 }

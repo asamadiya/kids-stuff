@@ -1,0 +1,100 @@
+/* Read-aloud (src/audio): the speaker button and the Mom / Dad reader switch.
+ * The button is a gold pill like the family-recording button (.voice), so a
+ * speaker always looks like a speaker; the playing one turns to a dark Stop. */
+
+.readaloud { display: inline-flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.readaloud__btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 48px; min-width: 48px; padding: 0 var(--s4);
+  border-radius: var(--pill); border: var(--line) solid var(--ink);
+  background: var(--gold); color: var(--ink);
+  font-family: var(--font-ui); font-weight: 700; font-size: var(--t-xs);
+  cursor: pointer;
+}
+.readaloud__btn:hover { background: var(--gold-tint); }
+.readaloud__btn.is-on { background: var(--ink); color: var(--paper); }
+.readaloud__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.readaloud--compact .readaloud__btn { padding: 0; width: 48px; }
+.readaloud__problem { font-family: var(--font-ui); font-size: var(--t-xs); color: var(--ink-soft); }
+
+/* Where the buttons sit. */
+.book__nav .readaloud { order: 0; }
+.shell__ask { display: flex; align-items: flex-start; gap: var(--s3); margin-bottom: var(--s4); }
+.shell__ask .shell__prompt { margin-bottom: 0; flex: 1; }
+.shell__feedback .readaloud { float: right; margin-left: var(--s3); }
+.activity__step { position: relative; }
+.activity__step .readaloud { position: absolute; right: var(--s3); bottom: var(--s3); }
+.activity__step p { padding-right: calc(48px + var(--s5)); }
+.idea__steps li { position: relative; }
+.idea__steps li .readaloud { margin-left: auto; align-self: center; }
+.idea__read { margin-top: var(--s3); }
+.activity__lead .readaloud { margin-top: var(--s3); }
+.voice-pair { display: inline-flex; flex-wrap: wrap; gap: var(--s2); align-items: center; justify-content: flex-end; }
+/* Two buttons beside a line leave the script no room on a phone: the buttons go under it. */
+@media (max-width: 620px) {
+  .line:has(.voice-pair) { grid-template-columns: minmax(0, 1fr); }
+  .line .voice-pair { justify-content: flex-start; }
+}
+.voice.is-on { background: var(--ink); color: var(--paper); }
+
+/* The reader switch: a two-way toggle in the top bar. */
+.readerswitch {
+  display: inline-flex; align-items: center; gap: 2px; padding: 3px;
+  border: var(--line) solid var(--ink); border-radius: var(--pill); background: var(--raised);
+  font-family: var(--font-ui); font-size: var(--t-xs);
+}
+.readerswitch__name { padding: 0 var(--s2) 0 var(--s3); font-weight: 700; color: var(--ink-soft); }
+.readerswitch__btn {
+  min-height: 40px; min-width: 52px; padding: 0 var(--s3); border: 0; border-radius: var(--pill);
+  background: transparent; color: var(--ink); font: inherit; font-weight: 700; cursor: pointer;
+}
+.readerswitch__btn.is-on { background: var(--ink); color: var(--paper); }
+.readerswitch__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+
+@media (max-width: 620px) {
+  .readerswitch__name { padding-left: var(--s2); }
+  .readerswitch__btn { min-width: 44px; padding: 0 var(--s2); }
+  /* The page-turn row keeps its two big arrows and the count; the read button gets its own row under them. */
+  .book__nav { flex-wrap: wrap; row-gap: var(--s3); }
+  .book__nav .readaloud { order: 3; flex-basis: 100%; justify-content: center; }
+  .readaloud__label { white-space: nowrap; }
+}
+@media (max-width: 520px) {
+  /* A phone's top bar has room for Home, Back and For grown-ups only: the
+     reader switch drops to its own line under them, at the right. */
+  .book__bar, .shell__bar { flex-wrap: wrap; row-gap: var(--s2); }
+  .book__bar .readerswitch, .shell__bar .readerswitch { order: 9; margin-left: auto; }
+  /* The game title takes the whole second line, the switch the third. */
+  .shell__bar .shell__title { order: 8; flex-basis: 100%; }
+  .lc-top { flex-wrap: wrap; row-gap: var(--s2); }
+  .lc-top__tools { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--s2); flex: 1 1 auto; min-width: 0; }
+  /* The reader switch gets its own row, right-aligned, so it can never push the bar wider than the phone. */
+  .lc-top__tools .readerswitch { order: 9; flex-basis: 100%; justify-content: flex-end; max-width: 100%; }
+  .readerswitch { flex-wrap: wrap; }
+}
+@media print { .readaloud, .readerswitch { display: none; } }
+.shell__boardread { display: flex; justify-content: flex-end; margin: calc(-1 * var(--s2)) 0 var(--s2); }
+
+/* The exercises' stage rule (.bench__stage svg: block, full width) would blow
+   the speaker glyph up to the button's width; a read button's icon stays an icon. */
+.bench .readaloud svg, .bench__stage .readaloud svg { display: inline; width: 22px; height: 22px; max-width: none; flex: none; }
+
+/* "Say it together" is an invitation to the grown-up, not a disabled button. */
+.voice-invite { font-family: var(--font-ui); font-weight: 600; font-size: var(--t-xs); color: var(--ink-soft); padding: 0 var(--s2); }
+.voice--wait { min-width: 56px; justify-content: center; opacity: 0.5; }
+/* Language lines: when the column is narrow (tablet two-column, phone), the buttons go under the script. */
+@container (max-width: 520px) { .line:has(.voice-pair) { grid-template-columns: minmax(0, 1fr); } .line .voice-pair { justify-content: flex-start; } }
+.moment__lines, .words, .langbook { container-type: inline-size; }
+.idea__hook { font-family: var(--font-read); font-size: var(--t-md); margin: 0 0 var(--s2); }
+/* Phone: the switch fits only as "Mom / Dad" beside the name, so on home it
+   takes its own full-width row, and its label shrinks to "Reader". */
+@media (max-width: 620px) {
+  .lc-top--home { flex-wrap: wrap !important; }
+  .lc-top--home .lc-top__tools { flex: 1 1 100% !important; display: flex; flex-wrap: wrap; justify-content: flex-end; }
+  .lc-top--home .readerswitch { order: 9; flex: 0 1 auto; }
+  .readerswitch__name, .readerswitch__btn { white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .readerswitch__name { font-size: 0; padding: 0 var(--s1) 0 var(--s2); }
+  .readerswitch__name::after { content: 'Reader'; font-size: var(--t-xs); }
+}

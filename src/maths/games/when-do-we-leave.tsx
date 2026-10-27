@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import type { BoardProps, Level, SolveGame, Verdict } from '../../play/types';
 import { Stepper } from '../../play/parts';
 
@@ -353,6 +353,77 @@ function shortLine(t: number): string {
 function longLine(t: number): string {
   const m = minuteOf(t);
   return m === 0 ? 'Long hand on 12: 0 minutes past.' : `Long hand ${SHARE[m]}: ${m} minutes past.`;
+}
+
+/* ------------------------------------------------- words on the board --- */
+
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * The caption under the board on a hint, one sentence per entry. Level 3
+ * writes his own clock's time into it: `his` is that time, or null to leave
+ * that sentence out (read-aloud may not depend on his answer, and the hint
+ * line over the board says the same time).
+ */
+function hintCaption(round: Round, his: number | null): readonly string[] {
+  if (round.task !== 'later') return ['Orange: the hour the short hand is in.', 'Blue: the minutes the long hand has swept.'];
+  return [
+    `Now ${digital(round.now ?? 0)}.`,
+    ...(his === null ? [] : [`Your clock ${digital(his)}.`]),
+    'Dashed hands: where Now is.',
+    'Orange: the hour.',
+    'Blue: the minutes.',
+  ];
+}
+
+/** The worked caption, one sentence per entry: the jump from Now (level 3), the time in numbers and words, then each hand. */
+function workedCaption(round: Round): readonly string[] {
+  const t = round.target;
+  return [
+    ...(round.task === 'later' ? [`Now ${digital(round.now ?? 0)}, ${GAP_WORDS[round.gap ?? 60]} later ${digital(t)}.`] : []),
+    `${digital(t)} is ${spoken(t)}.`,
+    shortLine(t),
+    longLine(t),
+  ];
+}
+
+/**
+ * Read-aloud: the board's words a non-reader needs, in screen order. Only its
+ * two captions: the hint caption at 'hint' (less his own clock's time) and the
+ * worked caption at 'worked'. The place sign, the Now / We-leave tags, the gap
+ * words under the arrow and the stepper labels name what the picture and the
+ * prompt already give; the numerals and his reading are numbers.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  if (stage === 'hint') return hintCaption(round, null);
+  if (stage === 'worked') return workedCaption(round);
+  return [];
+}
+
+/**
+ * Every time his clock can show. Both steppers always take a press and wrap
+ * round the face, one in hours and one in `step` minutes, and every answer
+ * starts at 12:00: so every multiple of `step` round the face, and no other.
+ */
+const reachable = (round: Round): readonly Answer[] => Array.from({ length: DAY / round.step }, (_, i) => i * round.step);
+
+/** Read-aloud: every hint check() gives on this round, over every time his clock can show. */
+function hints(round: Round): readonly string[] {
+  return [...new Set(reachable(round).flatMap((t) => check(round, t).hint ?? []))];
+}
+
+/** A caption as the board writes it: one line, its sentences a space apart, each in its own span. */
+function Caption({ lines }: { readonly lines: readonly string[] }) {
+  return (
+    <p className="board-caption">
+      {lines.map((line, i) => (
+        <Fragment key={i}>
+          {i ? ' ' : null}
+          <span>{line}</span>
+        </Fragment>
+      ))}
+    </p>
+  );
 }
 
 interface PieProps {
@@ -755,20 +826,8 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           <MinuteKey minutes={minuteValue} step={round.step} />
         </div>
       </div>
-      {stage === 'hint' && round.task === 'later' ? (
-        <p className="board-caption">
-          Now {digital(now)}. Your clock {digital(norm(answer))}. Dashed hands: where Now is. Orange: the hour. Blue: the minutes.
-        </p>
-      ) : null}
-      {stage === 'hint' && round.task !== 'later' ? (
-        <p className="board-caption">Orange: the hour the short hand is in. Blue: the minutes the long hand has swept.</p>
-      ) : null}
-      {worked ? (
-        <p className="board-caption">
-          {round.task === 'later' ? `Now ${digital(now)}, ${GAP_WORDS[round.gap ?? 60]} later ${digital(round.target)}. ` : ''}
-          {digital(round.target)} is {spoken(round.target)}. {shortLine(round.target)} {longLine(round.target)}
-        </p>
-      ) : null}
+      {stage === 'hint' ? <Caption lines={hintCaption(round, norm(answer))} /> : null}
+      {worked ? <Caption lines={workedCaption(round)} /> : null}
     </div>
   );
 }
@@ -784,7 +843,9 @@ export const whenDoWeLeave: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => 0,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/when-do-we-leave.png',
   note: {

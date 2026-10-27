@@ -561,7 +561,10 @@ function ModelTag() {
 
 /* ----------------------------------------------------------------- board -- */
 
+const PICKS = ['a', 'b', 'same'] as const;
 const PICK_LABEL: Record<Pick, string> = { a: 'Car A', b: 'Car B', same: 'Same tile' };
+/** The word under a level-3 answer picture: a tile on the floor, or a height in blocks. */
+const optionWord = (ask: 'tile' | 'height', n: number) => (ask === 'tile' ? `Tile ${n}` : blocks(n));
 
 /*
  * The answer buttons are pictures of the outcome, drawn with the board's own
@@ -669,9 +672,26 @@ function caption(round: Round, show: Show): string | null {
   return null;
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/** What the scene draws at a board stage: 'solved' (the Before pane) is the plain setup. */
+const showAt = (stage: Stage): Show => (stage === 'hint' ? 'hint' : stage === 'worked' ? 'worked' : 'setup');
+
+/**
+ * Read-aloud: the words the board shows at this stage, in screen order — the
+ * word under each answer picture, then the hint or worked caption. The setup
+ * sentence is the scene's aria-label only, and the lane letters and tile and
+ * block numbers are drawn, so they are left out.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const words = round.kind === 'scale' ? round.options.map((n) => optionWord(round.ask, n)) : PICKS.map((p) => PICK_LABEL[p]);
+  const note = caption(round, showAt(stage));
+  return note ? [...words, note] : words;
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
-  const show: Show = stage === 'hint' ? 'hint' : stage === 'worked' ? 'worked' : 'setup';
+  const show = showAt(stage);
   const note = caption(round, show);
   return (
     <div className="board board--ramp">
@@ -679,14 +699,14 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       <div className="choices" role="group" aria-label="Your guess">
         {round.kind === 'scale'
           ? round.options.map((n) => {
-              const text = round.ask === 'tile' ? `Tile ${n}` : blocks(n);
+              const text = optionWord(round.ask, n);
               return (
                 <Choice key={n} selected={answer === n} onTap={() => setAnswer(n)} disabled={locked} ariaLabel={text}>
                   <Pictured word={text}>{round.ask === 'tile' ? <TilePicture n={n} /> : <HeightPicture n={n} />}</Pictured>
                 </Choice>
               );
             })
-          : (['a', 'b', 'same'] as const).map((p) => (
+          : PICKS.map((p) => (
               <Choice key={p} selected={answer === p} onTap={() => setAnswer(p)} disabled={locked} ariaLabel={PICK_LABEL[p]}>
                 <Pictured word={PICK_LABEL[p]}>
                   <PickPicture pick={p} />
@@ -716,6 +736,7 @@ export const startHigherRollFarther: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === rightAnswer(round),
   why,

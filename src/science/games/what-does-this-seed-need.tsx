@@ -865,6 +865,24 @@ function hintFor(round: Round): { readonly hot: readonly Factor[]; readonly capt
   return { hot: d, caption: `The two cups differ in one thing only: ${d.map((f) => FACTOR_WORD[f]).join(', ')}.` };
 }
 
+/**
+ * Read-aloud: the board's words at this stage, in screen order, from the same
+ * helpers the drawing uses. The Before picture's day caption (the setup), the
+ * word under each answer picture, then the hint caption on 'hint' or the why
+ * caption on 'worked'. Left out: the "Day N" tag, the ruler's numbers and
+ * "cm", the place labels and the strip's one-word cells (the picture and its
+ * icons carry them), the "?" bubble, and on 'worked' the pane titles and the
+ * result line, which `why` says at more length.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] {
+  return [
+    footFor(round, false),
+    ...optionsFor(round).map(([, word]) => word),
+    ...(stage === 'hint' ? [hintFor(round).caption] : []),
+    ...(stage === 'worked' ? [why(round)] : []),
+  ];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
   const hint = stage === 'hint' || stage === 'worked' ? hintFor(round) : null;
@@ -916,6 +934,7 @@ export const whatDoesThisSeedNeed: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches,
   why,

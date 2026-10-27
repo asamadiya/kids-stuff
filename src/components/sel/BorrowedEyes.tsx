@@ -1,16 +1,16 @@
 import { useMemo, useRef, useState } from 'react';
 import {
-  BORROWED_EYES_META, CHIPS, MOMENTS,
-  bothSentences, chipAt, chipById, chipClause, chipWord, coneIn, coverageLine, earlierChip,
+  BORROWED_EYES_META, CHIPS, LISTEN, MOMENTS,
+  bothSentences, chipAt, chipById, chipClause, chipTrayHead, chipWord, coneIn, coverageLine, earlierChip,
   eyeFor, eyeLineIn, hiddenFrom, momentComplete, nextNotch, notchAngle, plateChips, plateLines,
-  readingFor, seesIn, sentenceFor, slotKey, spotsIn, wrapWords,
+  readingParts, seesIn, sentenceFor, slotKey, spotsIn, wrapWords,
 } from '../../sel/borrowed-eyes';
 import type { ChipId, Moment, Other, Placed, PlateChip, View } from '../../sel/borrowed-eyes';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptPlate extends Kept {
   readonly moment: string;
@@ -22,6 +22,9 @@ const rack = drawer<KeptPlate>('borrowed-eyes');
 const PAPER = '#f4f0e6', RAISED = '#fbf9f4', SUNKEN = '#eae4d5';
 const INK = '#22211b', FAINT = '#6b6757', RULE = '#ddd6c4';
 const OCHRE = '#8a6416', TEAL = '#2a5957', SLATE = '#3c566f';
+
+/** Read-aloud button ids, unique on this screen. */
+const READ = 'sel/borrowed-eyes';
 
 /* ------------------------------------------------------------------ chips -- */
 
@@ -169,6 +172,8 @@ export function BorrowedEyes() {
   const [placed, setPlaced] = useState<Placed>({});
   const [kept, setKept] = useState<KeptPlate[]>(() => rack.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const moment: Moment = MOMENTS[momentIndex];
   const views = moment.views;
@@ -184,29 +189,20 @@ export function BorrowedEyes() {
   const goTo = (index: number, next = 0) => {
     setMomentIndex(index);
     setNotch(next);
-    say(seesIn(MOMENTS[index], MOMENTS[index].views[next]));
   };
 
   const turn = (to: number) => {
     setNotch(to);
-    pluck(step(to === 0 ? -5 : 2), 0.3);
-    say(seesIn(moment, views[to]));
   };
 
   const place = (id: ChipId) => {
-    const key = slotKey(moment.id, view.id);
-    const next: Placed = { ...placed, [key]: id };
-    setPlaced(next);
-    pluck(step(0), 0.25);
-    if (momentComplete(moment, next)) say(bothSentences(moment).join(' '));
-    else say(chipWord(chipById(id), other));
+    setPlaced({ ...placed, [slotKey(moment.id, view.id)]: id });
   };
 
   const keep = () => {
     if (!complete) return;
     rack.add({ moment: moment.id, title: moment.title, chips: plateChips(moment, placed) });
     setKept(rack.list());
-    say('kept');
   };
 
   const lines = plateLines(moment, placed);
@@ -224,12 +220,13 @@ export function BorrowedEyes() {
   });
 
   return (
-    <section className="bench" aria-labelledby="borrowed-eyes-title">
+    <section ref={benchRef} className="bench" aria-labelledby="borrowed-eyes-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{BORROWED_EYES_META.eyebrow}</p>
           <h2 id="borrowed-eyes-title" className="bench__title">{BORROWED_EYES_META.title}</h2>
           <p className="bench__note">{BORROWED_EYES_META.note}</p>
+          <ReadAloud id={`${READ}/head`} texts={LISTEN.head()} />
         </div>
         <p className="bench__readout">{coverageLine(placed)}</p>
       </div>
@@ -250,6 +247,7 @@ export function BorrowedEyes() {
           <figure className="bench__figure" style={{ margin: 0, flex: '1 1 20rem' }}>
             <RoomPlan moment={moment} view={view} />
             <figcaption className="bench__figure-caption">{seesIn(moment, view)}</figcaption>
+            <ReadAloud id={`${READ}/room`} texts={LISTEN.room(moment, view)} />
           </figure>
         </div>
 
@@ -275,24 +273,27 @@ export function BorrowedEyes() {
             <circle cx="60" cy="52" r="4" fill={OCHRE} />
           </svg>
           {views.map((v, i) => (
-            <button
-              key={v.id}
-              type="button"
-              className={`bench-part${i === notch ? ' is-set' : ''}`}
-              aria-pressed={i === notch}
-              onClick={() => turn(i)}
-            >
-              {v.whose}
-              <span className="bench__figure-caption" style={{ display: 'block' }}>{eyeLineIn(moment, v)}</span>
-            </button>
+            <span key={v.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <button
+                type="button"
+                className={`bench-part${i === notch ? ' is-set' : ''}`}
+                aria-pressed={i === notch}
+                onClick={() => turn(i)}
+              >
+                {v.whose}
+                <span className="bench__figure-caption" style={{ display: 'block' }}>{eyeLineIn(moment, v)}</span>
+              </button>
+              <ReadAloud id={`${READ}/position/${v.id}`} texts={LISTEN.position(moment, v)} compact />
+            </span>
           ))}
         </div>
       </div>
 
       <div className="bench__tray">
         <p className="bench__tray-label">
-          A chip for this position — {view.whose.toLowerCase()}. {sentenceFor(view)}
+          {chipTrayHead(view)} {sentenceFor(view)}
         </p>
+        <ReadAloud id={`${READ}/tray`} texts={LISTEN.tray(moment, view)} label="Read these out" />
         {CHIPS.map((c) => {
           const set = chipAt(placed, moment.id, view.id) === c.id;
           return (
@@ -370,9 +371,6 @@ export function BorrowedEyes() {
         <button type="button" className="bench-btn bench-btn--primary" onClick={() => turn(nextNotch(notch, views.length))}>
           Turn the dial
         </button>
-        <button type="button" className="bench-btn" onClick={() => say(bothSentences(moment).join(' '))}>
-          Read both out loud
-        </button>
         <button type="button" className="bench-btn" aria-disabled={!complete} onClick={keep}>
           Keep this plate
         </button>
@@ -407,16 +405,13 @@ export function BorrowedEyes() {
       <div className="bench__shelf">
         <p className="bench__shelf-title">Both readings</p>
         <ul className="bench__shelf-list" style={{ display: 'block' }}>
-          {views.map((v) => {
-            const id = chipAt(placed, moment.id, v.id);
-            return (
-              <li key={v.id} className="bench__kept-meta" style={{ display: 'block', marginTop: '0.35rem' }}>
-                {sentenceFor(v)}
-                {id ? ` ${readingFor(moment, v, chipById(id))}` : ''}
-              </li>
-            );
-          })}
+          {views.map((v) => (
+            <li key={v.id} className="bench__kept-meta" style={{ display: 'block', marginTop: '0.35rem' }}>
+              {readingParts(moment, v, placed).join(' ')}
+            </li>
+          ))}
         </ul>
+        <ReadAloud id={`${READ}/readings`} texts={LISTEN.readings(moment, placed)} label="Read both out loud" />
       </div>
 
       <div className="bench__shelf">

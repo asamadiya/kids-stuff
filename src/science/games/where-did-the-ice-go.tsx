@@ -1139,6 +1139,29 @@ function GuessSlot({ round, answer }: { readonly round: Round; readonly answer: 
   );
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * The captions under the choices, one paragraph each: Help's fact about the
+ * evidence at 'hint'; the rule that decides it and the evidence at 'worked'.
+ */
+function captions(round: Round, stage: Stage): readonly string[] {
+  const s = spec(round);
+  return stage === 'hint' ? [s.look] : stage === 'worked' ? [s.rule, s.why] : [];
+}
+
+/**
+ * Read-aloud: the board's words in screen order — the word under each answer
+ * picture, then the captions. Left out: the setup and guess-slot descriptions,
+ * which are aria-labels only; the thermometer readings and ticks, numbers the
+ * picture draws; and the picture tags ("Start", the after picture's time tag,
+ * "a drawn model", "tiny drops", the worked panes' titles), which the prompt
+ * and `why` already say.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [...options(round).map(([, word]) => word), ...captions(round, stage)];
+}
+
 /**
  * Help once ('hint'): a gold frame round the evidence and one fact about it.
  * Help twice ('worked'): the shell offers only Next, so the board itself shows
@@ -1146,7 +1169,6 @@ function GuessSlot({ round, answer }: { readonly round: Round; readonly answer: 
  * scale, with the rule and the evidence under it.
  */
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
-  const s = spec(round);
   const worked = stage === 'worked';
   const locked = stage === 'solved' || worked;
   const help = stage === 'hint' || worked;
@@ -1181,9 +1203,11 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Choice>
         ))}
       </div>
-      {stage === 'hint' ? <p className="board-caption">{s.look}</p> : null}
-      {worked ? <p className="board-caption">{s.rule}</p> : null}
-      {worked ? <p className="board-caption">{s.why}</p> : null}
+      {captions(round, stage).map((line) => (
+        <p key={line} className="board-caption">
+          {line}
+        </p>
+      ))}
     </div>
   );
 }
@@ -1203,6 +1227,7 @@ export const whereDidTheIceGo: InvestigateGame<Round, Answer> = {
   prompt: (round) => spec(round).prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === round.result,
   why: (round) => spec(round).why,

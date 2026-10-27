@@ -1,15 +1,15 @@
 import { useMemo, useRef, useState } from 'react';
 import {
-  FIVE_COOKIES_META, SCENARIOS,
-  adjust, claimLines, compareLines, emptyShares, isComplete, outcomes,
-  placed, plateLines, plateTitle, remaining, scenarioById, servedLines, splitLine, word,
+  FIVE_COOKIES_META, LISTEN, SCENARIOS,
+  adjust, compareLines, emptyShares, isComplete, outcomes,
+  placed, plateLines, plateTitle, remaining, scenarioById, splitLine, wayIndex, word,
 } from '../../sel/five-cookies';
 import type { Outcome, Scenario, Shares } from '../../sel/five-cookies';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptServing extends Kept {
   readonly scenario: string;
@@ -28,6 +28,9 @@ const faceArt = (id: string) => `${import.meta.env.BASE_URL}games/faces/${id}.pn
 
 const ROWS = 2, ROW_H = 158, HEAD_H = 58, SUM_W = 720;
 
+/** A line on screen is its read-aloud atoms joined, so what he sees is what the button reads. */
+const shown = (atoms: readonly string[]): string => atoms.join(' ');
+
 /** The ink mark under a portrait on the exported plate: up, flat, or down. */
 function markPath(o: Outcome, x: number, y: number): string {
   if (o === 'met') return `M ${x - 13} ${y + 4} Q ${x} ${y - 9} ${x + 13} ${y + 4}`;
@@ -44,12 +47,16 @@ export function FiveCookies() {
   const [servings, setServings] = useState(0);
   const [kept, setKept] = useState<KeptServing[]>(() => rack.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const scenario: Scenario = useMemo(() => scenarioById(scenarioId), [scenarioId]);
   const left = remaining(scenario, shares);
   const done = isComplete(scenario, shares);
   const state = served ? outcomes(scenario, shares) : null;
-  const attempt = first === null ? 'First way' : 'Second way';
+  const way = wayIndex(first, second, served);
+  const captionAtoms = LISTEN.caption(scenario, shares, way, served);
+  const trayAtoms = LISTEN.tray(scenario, left, served);
   const totalServings = SCENARIOS.length * ROWS;
 
   const openBoard = (s: Scenario) => {
@@ -58,13 +65,11 @@ export function FiveCookies() {
     setServed(false);
     setFirst(null);
     setSecond(null);
-    say(claimLines(s).join(' '));
   };
 
   const bump = (index: number, delta: number) => {
     if (served) return;
     setShares((cur) => adjust(scenario, cur, index, delta));
-    pluck(step(delta > 0 ? 4 : -3), 0.18);
   };
 
   const serve = () => {
@@ -73,21 +78,18 @@ export function FiveCookies() {
     if (first === null) setFirst(shares);
     else setSecond(shares);
     setServings((n) => n + 1);
-    say(servedLines(scenario, shares).join(' '));
   };
 
   const again = () => {
     if (!served || second !== null) return;
     setShares(emptyShares(scenario));
     setServed(false);
-    say(`The same table again. ${scenario.setting}`);
   };
 
   const keep = () => {
     if (first === null) return;
     rack.add({ scenario: scenario.id, title: plateTitle(scenario), first, second });
     setKept(rack.list());
-    say('kept');
   };
 
   const rows: { label: string; shares: Shares }[] = [];
@@ -98,12 +100,15 @@ export function FiveCookies() {
   const caption = plateLines(scenario, first ?? shares, second);
 
   return (
-    <section className="bench" aria-labelledby="five-cookies-title">
+    <section ref={benchRef} className="bench" aria-labelledby="five-cookies-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{FIVE_COOKIES_META.eyebrow}</p>
           <h2 id="five-cookies-title" className="bench__title">{FIVE_COOKIES_META.title}</h2>
           <p className="bench__note">{FIVE_COOKIES_META.note}</p>
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <ReadAloud id="sel/five-cookies/head" texts={LISTEN.head()} />
+          </div>
         </div>
         <p className="bench__readout">
           {servings} of {totalServings} servings laid out
@@ -117,9 +122,20 @@ export function FiveCookies() {
           style={{ display: 'block', width: '100%', maxWidth: '640px', margin: '0 auto',
             border: `1px solid ${RULE}`, background: RAISED }}
         />
-        <p className="bench__figure-caption" style={{ textAlign: 'center', marginTop: '0.6rem' }}>
-          {attempt}. {served ? splitLine(shares) : `${word(left)} ${left === 1 ? scenario.unit : scenario.unitPlural} still to hand out.`}
-        </p>
+        <div className="bench__row" style={{ justifyContent: 'center', marginTop: '0.6rem', flexWrap: 'nowrap' }}>
+          <p style={{ margin: 0, fontSize: 'var(--step-0)', color: 'var(--ink)', maxWidth: '40rem' }}>
+            {shown(LISTEN.setting(scenario))}
+          </p>
+          <ReadAloud id="sel/five-cookies/setting" texts={LISTEN.setting(scenario)}
+            label="Read what is happening" compact />
+        </div>
+        <div className="bench__row" style={{ justifyContent: 'center', marginTop: '0.4rem', flexWrap: 'nowrap' }}>
+          <p className="bench__figure-caption" style={{ textAlign: 'center', margin: 0 }}>
+            {shown(captionAtoms)}
+          </p>
+          <ReadAloud id="sel/five-cookies/caption" texts={captionAtoms}
+            label="Read how it is laid out" compact />
+        </div>
 
         <div className="bench__row" style={{ justifyContent: 'center', marginTop: '0.9rem', alignItems: 'flex-start' }}>
           {scenario.claimants.map((c, i) => {
@@ -168,9 +184,13 @@ export function FiveCookies() {
                     onClick={() => bump(i, 1)}>+</button>
                 </div>
                 {served && state && (
-                  <p className="bench__kept-meta" style={{ textAlign: 'center' }}>
-                    {c.reaction[state[i]]}
-                  </p>
+                  <>
+                    <p className="bench__kept-meta" style={{ textAlign: 'center' }}>
+                      {shown(LISTEN.reaction(c, state[i]))}
+                    </p>
+                    <ReadAloud id={`sel/five-cookies/reaction/${c.id}`} texts={LISTEN.reaction(c, state[i])}
+                      label={c.isYou ? 'Read what happened to you' : `Read what happened to ${c.name}`} compact />
+                  </>
                 )}
               </div>
             );
@@ -179,11 +199,10 @@ export function FiveCookies() {
       </div>
 
       <div className="bench__tray">
-        <p className="bench__tray-label">
-          {served
-            ? 'Served. Nothing left to move on this one.'
-            : `Drag a ${scenario.unit} onto a plate, or use plus and minus. ${word(left)} left.`}
-        </p>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>{shown(trayAtoms)}</p>
+          <ReadAloud id="sel/five-cookies/tray" texts={trayAtoms} label="Read this" compact />
+        </div>
         {!served && Array.from({ length: left }, (_, k) => (
           <span key={k} draggable aria-hidden="true"
             onDragStart={(e) => e.dataTransfer.setData('text/plain', scenario.unit)}
@@ -195,8 +214,13 @@ export function FiveCookies() {
       <div className="bench__tray" style={{ marginTop: 'var(--space-4)' }}>
         <p className="bench__tray-label">What each person says</p>
         {scenario.claimants.map((c) => (
-          <button key={c.id} type="button" className="bench-part bench-part--wide"
-            onClick={() => say(c.claim)}>{c.claim}</button>
+          <div key={c.id} className="bench-part--wide"
+            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: '0.4rem 0.4rem 0.4rem 1rem',
+              border: `1px solid ${RULE}`, borderRadius: 'var(--radius)', background: RAISED }}>
+            <p style={{ margin: 0, flex: '1 1 auto' }}>{shown(LISTEN.claim(c))}</p>
+            <ReadAloud id={`sel/five-cookies/claim/${c.id}`} texts={LISTEN.claim(c)}
+              label={c.isYou ? 'Read your reason' : `Read ${c.name}'s reason`} compact />
+          </div>
         ))}
       </div>
 

@@ -688,3 +688,66 @@ export function wrapWords(text: string, max: number): string[] {
   if (line) lines.push(line);
   return lines;
 }
+
+/* ----------------------------------------------------------------- listen -- */
+
+/**
+ * The chip tray's label for a position: `A chip for this position — Mia’s eyes.`
+ * Only the child's own "Your" drops to lower case; a name keeps its capital.
+ */
+export function chipTrayHead(view: View): string {
+  return `A chip for this position — ${view.whose.replace(/^Your\b/, 'your')}.`;
+}
+
+/**
+ * One line of the "Both readings" shelf, as its parts: the world-state
+ * sentence, then the chip reading once a chip sits on that position.
+ */
+export function readingParts(moment: Moment, view: View, placed: Placed): string[] {
+  const id = chipAt(placed, moment.id, view.id);
+  return id ? [sentenceFor(view), readingFor(moment, view, chipById(id))] : [sentenceFor(view)];
+}
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, one atom
+ * per caption or sentence, in screen order. Nothing here is spoken unless the
+ * child presses that button (advisor a9). The component reads only through
+ * these, and `listenLines` enumerates them, so a button cannot ask for a clip
+ * the build did not make.
+ */
+export const LISTEN = {
+  /** L1, under the note. */
+  head: (): readonly string[] => [BORROWED_EYES_META.title, BORROWED_EYES_META.note],
+  /** L2, under the plan: the painting's caption, then what this position can see. */
+  room: (moment: Moment, view: View): readonly string[] => [moment.where, seesIn(moment, view)],
+  /** L3, beside each position on the dial. */
+  position: (moment: Moment, view: View): readonly string[] => [view.whose, eyeLineIn(moment, view)],
+  /** L4, the chip tray: its label, then the six chip words. */
+  tray: (moment: Moment, view: View): readonly string[] => [
+    chipTrayHead(view),
+    sentenceFor(view),
+    ...CHIPS.map((c) => chipWord(c, moment.other)),
+  ],
+  /** L5, the "Both readings" shelf, exactly as it stands. */
+  readings: (moment: Moment, placed: Placed): readonly string[] =>
+    moment.views.flatMap((v) => readingParts(moment, v, placed)),
+} as const;
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const all = [
+    ...LISTEN.head(),
+    ...MOMENTS.flatMap((m) =>
+      m.views.flatMap((v) => [
+        ...LISTEN.room(m, v),
+        ...LISTEN.position(m, v),
+        ...LISTEN.tray(m, v),
+        // `readings` is each position's parts in turn, so every chip (and none)
+        // on every position covers every sequence it can play.
+        ...readingParts(m, v, {}),
+        ...CHIP_IDS.flatMap((c) => readingParts(m, v, { [slotKey(m.id, v.id)]: c })),
+      ]),
+    ),
+  ];
+  return [...new Set(all)];
+}

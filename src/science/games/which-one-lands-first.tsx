@@ -233,13 +233,23 @@ function prompt(round: Round): string {
   return `Dropped together: ${name(round.left)} and ${name(round.right)}. Which lands first?`;
 }
 
-/** The Help sentence: a fact about what the board now shows (grams and widths), never the answer. */
-function hintFact(round: Round): string {
+/**
+ * The Help caption: a fact about what the board now shows (grams and widths),
+ * never the answer. One sentence per entry; the caption joins them with a space.
+ */
+function hintLines(round: Round): readonly string[] {
   const [a, b] = [round.left, round.right];
-  if (grams(a) === grams(b)) return `Same weight, ${grams(a)} g each. The ${name(a)} is ${across(a)} cm wide; the ${name(b)} is ${across(b)} cm.`;
-  if (across(a) === across(b)) return `Same width, ${across(a)} cm each. The ${name(a)} is ${grams(a)} g; the ${name(b)} is ${grams(b)} g.`;
-  return `The ${name(a)} is ${grams(a)} g and ${across(a)} cm wide; the ${name(b)} is ${grams(b)} g and ${across(b)} cm wide.`;
+  if (grams(a) === grams(b)) return [`Same weight, ${grams(a)} g each.`, `The ${name(a)} is ${across(a)} cm wide; the ${name(b)} is ${across(b)} cm.`];
+  if (across(a) === across(b)) return [`Same width, ${across(a)} cm each.`, `The ${name(a)} is ${grams(a)} g; the ${name(b)} is ${grams(b)} g.`];
+  return [`The ${name(a)} is ${grams(a)} g and ${across(a)} cm wide; the ${name(b)} is ${grams(b)} g and ${across(b)} cm wide.`];
 }
+
+/** The three guesses in button order, each with the word under its picture. */
+const options = (round: Round): readonly (readonly [Lands, string])[] => [
+  ['left', `${cap(name(round.left))} first`],
+  ['together', 'Together'],
+  ['right', `${cap(name(round.right))} first`],
+];
 
 
 /* --------------------------------------------------------------- drawing -- */
@@ -445,6 +455,14 @@ function ThingShape({ t, x, y, ghost }: { readonly t: Thing; readonly x: number;
 const LETGO: Record<Round['height'], string> = { 50: '50 cm', 100: '1 m' };
 const MID = (X.left + X.right) / 2;
 
+/** The line across the top of the scene: the setup before, what the model shows after. */
+const sceneHead = (round: Round, after: boolean): string =>
+  !after
+    ? `Both let go together from ${LETGO[round.height]}.`
+    : round.lands === 'together'
+      ? 'Model: both reach the floor together.'
+      : 'Model: the instant the first one lands.';
+
 /**
  * The child's guess, drawn on the setup: a gold arrow down to a gold spot on
  * the floor under each thing the guess says lands first (both, for Together).
@@ -492,11 +510,7 @@ function Scene({
   const lagging = (s: Side) => after && round.lands !== 'together' && round.lands !== s;
   const at = (s: Side) => (!after ? start : lagging(s) ? yAt(round.behind ?? 0) : FLOOR);
   const slow = SIDES.find(lagging);
-  const head = !after
-    ? `Both let go together from ${LETGO[round.height]}.`
-    : round.lands === 'together'
-      ? 'Model: both reach the floor together.'
-      : 'Model: the instant the first one lands.';
+  const head = sceneHead(round, after);
   const label = after
     ? round.lands === 'together'
       ? `The ${name(round.left)} and the ${name(round.right)} land together.`
@@ -683,13 +697,30 @@ function Balance({ round }: { readonly round: Round }) {
   );
 }
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * Read-aloud: the board's words at this stage, in screen order, from the same
+ * helpers the drawing uses. The setup line across the top of the scene; on
+ * 'worked' the after pane's model line too; the word under each guess picture;
+ * then the Help caption at 'hint', sentence by sentence, or the why at
+ * 'worked'. Left out: the thing names under each column (the prompt and the
+ * guess words say them), the ruler's numbers and "cm", the widths, the grams
+ * under the balance, the "60 cm / still to fall" tag (numbers the picture
+ * draws), the pane titles, and the scene's description and his guess, which
+ * are aria-labels only. None of it depends on his guess.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return [
+    sceneHead(round, false),
+    ...(stage === 'worked' ? [sceneHead(round, true)] : []),
+    ...options(round).map(([, word]) => word),
+    ...(stage === 'hint' ? hintLines(round) : stage === 'worked' ? [round.why] : []),
+  ];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
-  const options: readonly [Lands, string][] = [
-    ['left', `${cap(name(round.left))} first`],
-    ['together', 'Together'],
-    ['right', `${cap(name(round.right))} first`],
-  ];
   return (
     <div className="board board--drop">
       {stage === 'worked' ? (
@@ -708,7 +739,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
       )}
       <Balance round={round} />
       <div className="choices" role="group" aria-label="Your guess">
-        {options.map(([value, text]) => (
+        {options(round).map(([value, text]) => (
           <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={text}>
             <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <GuessPicture round={round} value={value} />
@@ -717,7 +748,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Choice>
         ))}
       </div>
-      {stage === 'hint' ? <p className="board-caption">{hintFact(round)}</p> : null}
+      {stage === 'hint' ? <p className="board-caption">{hintLines(round).join(' ')}</p> : null}
       {stage === 'worked' ? <p className="board-caption">{round.why}</p> : null}
     </div>
   );
@@ -738,6 +769,7 @@ export const whichOneLandsFirst: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches: (round, prediction) => prediction === round.lands,
   why: (round) => round.why,

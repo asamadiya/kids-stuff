@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import {
   CHOICES, GROWN_UP_LABEL, ONE_SWING_TWO_KIDS_META, PLANS, SCENARIOS,
   addPlayed, choiceLabel, choose, coverageText, framesOf, isSettled, pathText, pictureOf,
-  plateLines, replyOf, saidLine, scenarioById, storyLines,
+  listenLines, plateLines, replyOf, saidLine, scenarioById, storyLines,
 } from '../sel/one-swing-two-kids';
 import type { ChoiceId, Scenario } from '../sel/one-swing-two-kids';
 
@@ -240,6 +240,8 @@ describe('nothing about him is scored, and nothing is moralised', () => {
       for (const path of everyPath(s)) text.push(...plateLines(s, path), pathText(s, path));
     }
     text.push(coverageText([]), coverageText(['swing', 'swing', 'tablet']));
+    // Every line a read button can play, the tray lines included.
+    text.push(...listenLines());
     return text;
   };
 

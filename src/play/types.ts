@@ -73,6 +73,15 @@ interface GameCommon<R, A> {
    */
   readonly emptyAnswer: (round: R) => A;
   readonly Board: ComponentType<BoardProps<R, A>>;
+  /**
+   * Read-aloud: the words the board itself shows at this stage that a child
+   * who cannot read yet needs — answer choices in words, a setup line, the
+   * hint or worked caption — in screen order, one sentence or label per entry.
+   * Depends on the round, level and stage only, never on the child's answer,
+   * so the clip builder can list every one in advance (see src/audio/gameLines.ts).
+   * Numbers-only tags, units and axis ticks are left out: the picture carries them.
+   */
+  readonly board?: (round: R, level: Level, stage: BoardProps<R, A>['stage']) => readonly string[];
   readonly note: GrownUpNote;
   /** Optional picture for the card, from public/. */
   readonly cover?: string;
@@ -81,6 +90,14 @@ interface GameCommon<R, A> {
 export interface SolveGame<R, A> extends GameCommon<R, A> {
   readonly kind: 'solve';
   readonly check: (round: R, answer: A) => Verdict;
+  /**
+   * Read-aloud: every hint sentence `check` can return for this round, for the
+   * clip builder (a hint depends on the answer, so it cannot be found by
+   * walking rounds alone). Where a hint's numbers are unbounded, list its
+   * fixed sentences only: the shell reads the sentences that have a clip and
+   * leaves the number sentence to the board, which draws it.
+   */
+  readonly hints?: (round: R) => readonly string[];
   /** One sentence restating the mathematics when the answer is right. */
   readonly explain: (round: R) => string;
 }

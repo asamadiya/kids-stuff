@@ -627,6 +627,32 @@ const CHOICES: ReadonlyArray<readonly [Exclude<Answer, null>, string]> = [
   ['orange', 'More orange'],
 ];
 
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/** The line written under the board: the whole answer, on 'worked' only. */
+function caption(round: Round, stage: Stage): string | null {
+  return stage === 'worked' ? workedFact(round) : null;
+}
+
+/**
+ * Read-aloud: the board's words in screen order, the caption and then the
+ * three choices. The picture's own words are left out: "Before", "Blue" and
+ * "Orange" name what the dashed strip and the colours already show, and the
+ * rest are counts the picture draws.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const line = caption(round, stage);
+  return [...(line ? [line] : []), ...CHOICES.map(([, label]) => label)];
+}
+
+/** Every answer the board can produce: nothing chosen yet, or one of the three choices. */
+const ANSWERS: readonly Answer[] = [null, ...CHOICES.map(([value]) => value)];
+
+/** Read-aloud: every hint `check` gives for this round, over every answer the board can produce. */
+function hints(round: Round): readonly string[] {
+  return [...new Set(ANSWERS.flatMap((a) => check(round, a).hint ?? []))];
+}
+
 /** How many of each colour an answer's picture draws: one extra for "more", none for "the same". */
 const OUTCOME: Record<Exclude<Answer, null>, Record<Colour, number>> = {
   blue: { blue: 3, orange: 2 },
@@ -668,10 +694,11 @@ const CHOICE_WORD = { fontSize: 'var(--t-sm)', fontWeight: 600, color: 'var(--in
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
   const right = correct(round);
+  const line = caption(round, stage);
   return (
     <div className="board board--spread">
       <Picture round={round} stage={stage} />
-      {stage === 'worked' ? <p className="board-caption">{workedFact(round)}</p> : null}
+      {line ? <p className="board-caption">{line}</p> : null}
       <div className="choices" role="group" aria-label="Which has more?">
         {CHOICES.map(([value, label]) => (
           <Choice
@@ -703,7 +730,9 @@ export const spreadThemOut: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  hints,
   explain,
   cover: 'art/games/spread-them-out.png',
   note: {

@@ -29,9 +29,9 @@ export interface Column {
   readonly id: ColumnId;
   /** Heading over the column. */
   readonly label: string;
-  /** How the column is named inside a sentence. */
+  /** How the column is named inside "in the … column". */
   readonly inline: string;
-  /** Read aloud when the column is offered. */
+  /** The column as a plain sentence. Not shown on the bench, so never read aloud. */
   readonly note: string;
 }
 
@@ -39,7 +39,7 @@ export const COLUMNS: readonly Column[] = [
   {
     id: 'everyone',
     label: 'The same for everyone',
-    inline: 'the same for everyone',
+    inline: 'same for everyone',
     note: 'This one is the same for everyone.',
   },
   {
@@ -58,7 +58,7 @@ export const columnById = (id: ColumnId): Column =>
 export interface RuleCard {
   /** Also the image id: public/games/sel/<id>.png */
   readonly id: string;
-  /** The rule, in the words it would be said in. Read aloud on pick-up. */
+  /** The rule, in the words it would be said in. Shown under the picture in the rack; its speaker reads it. */
   readonly front: string;
   /** Two or three words for the printed key. */
   readonly short: string;
@@ -195,12 +195,23 @@ export const divergenceLine = (placements: Placements): string => {
 
 export const KEY_STANDS = 'Your key is your key.';
 
+export const REASON_SAYS = 'The reason on the back says:';
+export const STANDS = 'Your column stands.';
+
+/** His column, restated. Twelve values: six cards by two columns. */
+export const youPut = (card: RuleCard, column: ColumnId): string =>
+  `You put "${card.front}" in the ${columnById(column).inline} column.`;
+
 /**
- * What is said when a placed card is turned over. His column is restated
- * first, the reason follows, and the card stays where he put it.
+ * What a placed card shows when turned over, one sentence or lead-in per
+ * part. His column is restated first, the reason follows, and the card stays
+ * where he put it.
  */
+export const reverseParts = (card: RuleCard, column: ColumnId): readonly string[] =>
+  [youPut(card, column), REASON_SAYS, card.reverse, STANDS];
+
 export const reverseLine = (card: RuleCard, column: ColumnId): string =>
-  `You put "${card.front}" in the ${columnById(column).inline} column. The reason on the back says: ${card.reverse} Your column stands.`;
+  reverseParts(card, column).join(' ');
 
 /* ------------------------------------------------------- the rule he builds */
 
@@ -213,7 +224,7 @@ export interface Slot {
   readonly id: SlotId;
   /** The tray label above the row of chips. */
   readonly label: string;
-  /** Read aloud when the row is reached. */
+  /** The question beside the label. The row's speaker reads it, then the chips. */
   readonly ask: string;
 }
 
@@ -287,16 +298,23 @@ const phrase = (picks: Picks, slot: SlotId): string | null => {
   return chip ? chip.phrase : null;
 };
 
-/** The rule as one sentence. Null until every slot holds a chip. */
-export const ruleSentence = (picks: Picks): string | null => {
+/**
+ * The rule in its two parts: the rule itself (81 ways) and what happens if
+ * not (3 ways). Null until every slot holds a chip.
+ */
+export const ruleParts = (picks: Picks): readonly [string, string] | null => {
   if (!picksComplete(picks)) return null;
   const where = phrase(picks, 'place') as string;
   const who = phrase(picks, 'who') as string;
   const what = phrase(picks, 'what') as string;
   const when = phrase(picks, 'when') as string;
   const ifnot = phrase(picks, 'ifnot') as string;
-  return `At ${where}, ${who} ${what}, ${when}. If not: ${ifnot}.`;
+  return [`At ${where}, ${who} ${what}, ${when}.`, `If not: ${ifnot}.`];
 };
+
+/** The rule as one sentence. Null until every slot holds a chip. */
+export const ruleSentence = (picks: Picks): string | null =>
+  ruleParts(picks)?.join(' ') ?? null;
 
 /* --------------------------------------------------------- the printed key */
 
@@ -340,3 +358,78 @@ export const describeKey = (placements: Placements, sentence: string | null): st
   const rule = sentence ? ` His own rule: ${sentence}` : '';
   return `A rule key on ruled paper. The same for everyone: ${same}. Different, for a reason: ${diff}.${rule}`;
 };
+
+/* ------------------------------------------------------------------ listen */
+
+export const RACK_OPEN = 'Take a card, then drop it in a column. Drag it, or tap it and tap a column.';
+export const RACK_DONE = 'Every card is in a column. Turn one over to read the reason on the back.';
+export const WHERE_PROMPT = 'Where does this one go?';
+export const BUILDER_HEAD = 'The last card is blank. Build a rule of your own.';
+
+/** The label over the rack: how to sort while cards are left, how to turn them once none are. */
+export const rackLabel = (placements: Placements): string =>
+  rackCards(placements).length > 0 ? RACK_OPEN : RACK_DONE;
+
+/** The notice shown once the rack empties: the divergence, then that his key stands. */
+export const noticeParts = (placements: Placements): readonly string[] =>
+  [divergenceLine(placements), KEY_STANDS];
+
+/**
+ * What each read-aloud button reads: the words on screen beside it, in screen
+ * order. Nothing is spoken unless the child presses that button (advisor a9).
+ * The component reads only through these, and `listenLines` enumerates them,
+ * so a button cannot ask for a clip the build did not make. The note is for
+ * the grown-up and is not read.
+ */
+export const LISTEN = {
+  /** L1, beside the title. */
+  head: (): readonly string[] => [NOT_THE_SAME_RULE_META.title],
+  /** L2, beside the rack label. */
+  rack: (placements: Placements): readonly string[] => [rackLabel(placements)],
+  /** L3, beside each card in the rack: the rule written under its picture. */
+  card: (card: RuleCard): readonly string[] => [card.front],
+  /** L4, the tray that asks where a held card goes, and its two columns. */
+  where: (): readonly string[] => [WHERE_PROMPT, ...COLUMNS.map((c) => c.label)],
+  /** L5, the back of a turned card. */
+  back: (card: RuleCard, column: ColumnId): readonly string[] => reverseParts(card, column),
+  /** L6, the notice when the rack empties. */
+  notice: (placements: Placements): readonly string[] => noticeParts(placements),
+  /** L7, beside the builder heading. */
+  builder: (): readonly string[] => [BUILDER_HEAD],
+  /** L8, each slot row: its question, then its chips. */
+  slot: (slot: Slot): readonly string[] => [slot.ask, ...chipsFor(slot.id).map((c) => c.label)],
+  /** L9, beside the finished rule. */
+  rule: (picks: Picks): readonly string[] => ruleParts(picks) ?? [],
+} as const;
+
+/** Every way the six cards can sit in the two columns, rack empty. */
+const everySort = (): readonly Placements[] =>
+  RULE_CARDS.reduce<Placements[]>(
+    (acc, card) => acc.flatMap((p) => COLUMNS.map((col) => place(p, card.id, col.id))),
+    [{}],
+  );
+
+/** Every finished set of picks: one chip in each of the five slots. */
+const everyRule = (): readonly Picks[] =>
+  SLOTS.reduce<Picks[]>(
+    (acc, slot) => acc.flatMap((p) => chipsFor(slot.id).map((c) => ({ ...p, [slot.id]: c.id }))),
+    [{}],
+  );
+
+/** Every line a read-aloud button in this exercise can play, for the clip builder. */
+export function listenLines(): string[] {
+  const sorts = everySort();
+  const all = [
+    ...LISTEN.head(),
+    ...LISTEN.rack({}),
+    ...LISTEN.rack(sorts[0]),
+    ...RULE_CARDS.flatMap((card) => LISTEN.card(card)),
+    ...LISTEN.where(),
+    ...RULE_CARDS.flatMap((card) => COLUMNS.flatMap((col) => LISTEN.back(card, col.id))),
+    ...sorts.flatMap((p) => LISTEN.notice(p)),
+    ...LISTEN.builder(),
+    ...SLOTS.flatMap((slot) => LISTEN.slot(slot)),
+    ...everyRule().flatMap((p) => LISTEN.rule(p)),
+  ];
+  return [...new Set(all)];
+}

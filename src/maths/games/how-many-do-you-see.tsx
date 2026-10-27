@@ -428,8 +428,22 @@ function sentence(round: Round): string {
   return m > 0 ? `${a} + ${b} = 10 + ${b - m} = ${round.total}` : `${a} + ${b} = ${round.total}`;
 }
 
+/** The caption under the card at this stage: the worked answer's number sentence, and only then. */
+const caption = (round: Round, stage: BoardProps<Round, Answer>['stage']): string | null =>
+  stage === 'worked' ? sentence(round) : null;
+
+/**
+ * Read the board: the caption is the only words the board shows. The four
+ * choices and the part labels by the dots are bare digits the card carries.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] {
+  const line = caption(round, stage);
+  return line ? [line] : [];
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved' || stage === 'worked';
+  const line = caption(round, stage);
   return (
     <div className="board board--dots">
       <DotCard round={round} stage={stage} />
@@ -447,7 +461,7 @@ function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
           </Choice>
         ))}
       </div>
-      {stage === 'worked' ? <p className="board-caption">{sentence(round)}</p> : null}
+      {line ? <p className="board-caption">{line}</p> : null}
     </div>
   );
 }
@@ -463,7 +477,10 @@ export const howManyDoYouSee: SolveGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   check,
+  // Every wrong answer gets the same parts line, so the round alone fixes the hint.
+  hints: (round) => [partsLine(round)],
   explain,
   cover: 'art/games/how-many-do-you-see.png',
   note: {

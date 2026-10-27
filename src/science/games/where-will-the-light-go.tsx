@@ -606,6 +606,50 @@ const TARGET_LABEL: Record<Target, string> = { mango: 'Mango', ball: 'Ball', din
 
 type Stage = BoardProps<Round, Answer>['stage'];
 
+/*
+ * The board's words, one sentence or label per entry. The JSX draws these
+ * same strings (a caption's sentences joined by a space), and `board()`
+ * reads them, so the clip for a line is always the line on screen.
+ */
+
+/** Under the shadow picture: what stays put, and what the dashed cutout is. */
+function shadowFooter(r: ShadowRound): readonly string[] {
+  return ['Torch and wall stay put.', r.from.size !== r.to.size ? `Dashed: the ${r.to.size} one, instead.` : 'Dashed: where it moves to.'];
+}
+
+/** The caption under the choices: the straight-line hint at 'hint', the drawn answer read off at 'worked'. */
+function shadowCaption(r: ShadowRound, stage: Stage): readonly string[] {
+  if (stage === 'hint') return ['Light goes in straight lines: from the torch, past the dashed dinosaur’s head, on to the wall.'];
+  if (stage === 'worked') return [`The dashed line meets the wall at the top of the new shadow: ${shadowCm(r.to)} cm.`, `Before, ${shadowCm(r.from)} cm.`];
+  return [];
+}
+
+/** The caption under the choices: the slant on the way down at 'hint', the same slant back up at 'worked'. */
+function mirrorCaption(r: MirrorRound, stage: Stage): readonly string[] {
+  const dx = Math.abs(r.dir[0]);
+  const dy = r.dir[1];
+  if (stage === 'hint') return [`On the way down the light goes ${squares(dx)} across for every ${dy} down.`];
+  if (stage === 'worked') return [`It leaves at the same slant, ${dx} across for every ${dy} up, and reaches the ${TARGET_NAME[r.reaches]}.`];
+  return [];
+}
+
+/**
+ * Read-aloud: the board's words in screen order. On shadow rounds the setup
+ * line under the picture, sentence by sentence; the word under each choice
+ * picture; then the caption at 'hint' and 'worked', sentence by sentence.
+ * Left out: the "wall" and "flat mirror" names (the picture draws them, and
+ * the prompt names the mirror); the centimetre ticks and "cm"; the cutout
+ * heights ("10 cm") and shadow heights ("shadow 20 cm", "new shadow: 60 cm"),
+ * which the bands and blocks draw and the worked caption says; and the
+ * setup's description and his guess, which are aria-labels only. None of the
+ * board's words depend on his guess.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  return round.kind === 'shadow'
+    ? [...shadowFooter(round), ...CHANGES.map(([, text]) => text), ...shadowCaption(round, stage)]
+    : [...TARGETS.map((t) => TARGET_LABEL[t]), ...mirrorCaption(round, stage)];
+}
+
 interface PartProps<R> {
   readonly round: R;
   readonly answer: Answer;
@@ -619,11 +663,12 @@ function ShadowBoard({ round, answer, setAnswer, stage }: PartProps<ShadowRound>
   const swap = from.size !== to.size;
   const guess = isChange(answer) ? guessPx(shadowPx(from), answer) : 0;
   const guessText = isChange(answer) ? ` Your guess, dashed blue on the wall: ${CHANGES.find(([c]) => c === answer)![1].toLowerCase()}.` : '';
+  const caption = shadowCaption(round, stage);
   return (
     <div className="board board--light">
       <ShadowFrame
         label={`A ${HEIGHT_CM[from.size]} cm dinosaur at the ${from.at} cm mark makes a ${shadowCm(from)} cm shadow on the wall. A dashed ${HEIGHT_CM[to.size]} cm dinosaur stands at the ${to.at} cm mark.${guessText}`}
-        footer={swap ? `Torch and wall stay put. Dashed: the ${to.size} one, instead.` : 'Torch and wall stay put. Dashed: where it moves to.'}
+        footer={shadowFooter(round).join(' ')}
       >
         <Shadow stand={from} />
         <Ray stand={from} />
@@ -650,13 +695,7 @@ function ShadowBoard({ round, answer, setAnswer, stage }: PartProps<ShadowRound>
           </Choice>
         ))}
       </div>
-      {help ? (
-        <p className="board-caption">
-          {stage === 'hint'
-            ? 'Light goes in straight lines: from the torch, past the dashed dinosaur’s head, on to the wall.'
-            : `The dashed line meets the wall at the top of the new shadow: ${shadowCm(to)} cm. Before, ${shadowCm(from)} cm.`}
-        </p>
-      ) : null}
+      {caption.length ? <p className="board-caption">{caption.join(' ')}</p> : null}
     </div>
   );
 }
@@ -681,9 +720,8 @@ function MirrorBoard({ round, answer, setAnswer, stage }: PartProps<MirrorRound>
   const help = stage === 'hint' || stage === 'worked';
   const hit = hitPoint(round);
   const end = round.targets[round.reaches];
-  const dx = Math.abs(round.dir[0]);
-  const dy = round.dir[1];
   const guess = isTarget(answer) ? answer : null;
+  const caption = mirrorCaption(round, stage);
   return (
     <div className="board board--light">
       <MirrorFrame
@@ -712,13 +750,7 @@ function MirrorBoard({ round, answer, setAnswer, stage }: PartProps<MirrorRound>
           </Choice>
         ))}
       </div>
-      {help ? (
-        <p className="board-caption">
-          {stage === 'hint'
-            ? `On the way down the light goes ${squares(dx)} across for every ${dy} down.`
-            : `It leaves at the same slant, ${dx} across for every ${dy} up, and reaches the ${TARGET_NAME[round.reaches]}.`}
-        </p>
-      ) : null}
+      {caption.length ? <p className="board-caption">{caption.join(' ')}</p> : null}
     </div>
   );
 }
@@ -783,6 +815,7 @@ export const whereWillTheLightGo: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches,
   why,

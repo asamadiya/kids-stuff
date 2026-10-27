@@ -425,6 +425,71 @@ function check(round: Round, answer: Answer): Verdict {
   return { ok: false, hint: hintFor(round, answer) };
 }
 
+/* ------------------------------------------------------ words on boards -- */
+
+/** The words under a judge round's two answer pictures: yes, equal pieces; no. */
+const judgeChoices = (round: Extract<Round, { kind: 'judge' }>) => [`Yes, ${PLURAL[round.n]}`, 'No, not equal'] as const;
+
+/** The labels under the two dosas when an unfair cut's worked answer puts a fair one beside it. */
+const fairCaptions = (round: Extract<Round, { kind: 'judge' }>) => [`${CUTTER[round.n]}'s cut`, `Equal ${PLURAL[round.n]}`] as const;
+
+/** The words under a compare round's three answer pictures. */
+const COMPARE_CHOICES = [...WHO, 'The same'] as const;
+
+/** The label under the two loose quarters in the join round. */
+const MIAS_CAPTION = 'Mia’s two quarters';
+
+/** How many answer buttons the round's board has. */
+function choiceCount(round: Round): number {
+  switch (round.kind) {
+    case 'pick':
+    case 'join':
+      return round.options.length;
+    case 'judge':
+      return judgeChoices(round).length;
+    case 'compare':
+      return COMPARE_CHOICES.length;
+    case 'cover':
+      return round.choices.length;
+  }
+}
+
+/** Every hint `check` gives for this round: with nothing chosen, and for each button. */
+function hints(round: Round): readonly string[] {
+  const answers: Answer[] = [null, ...Array.from({ length: choiceCount(round) }, (_, i) => i)];
+  const out = new Set<string>();
+  for (const a of answers) {
+    const v = check(round, a);
+    if (!v.ok && v.hint) out.add(v.hint);
+  }
+  return [...out];
+}
+
+/**
+ * The words each board shows, in screen order: the join round's label over
+ * Mia's quarters, the judge round's labels under its two dosas (worked, unfair
+ * cut only), the answer words (judge and compare; the cut, cover and plate
+ * buttons are pictures and numbers only), then the worked caption. The
+ * children's names under the compare plates are left out: the answer buttons
+ * under them say the same names with the same faces.
+ */
+function board(round: Round, _level: Level, stage: BoardProps<Round, Answer>['stage']): readonly string[] {
+  const worked = stage === 'worked' ? [explain(round)] : [];
+  switch (round.kind) {
+    case 'pick':
+    case 'cover':
+      return worked;
+    case 'judge': {
+      const fair = stage === 'worked' && !cutDosa(round.cut).equal;
+      return [...(fair ? fairCaptions(round) : []), ...judgeChoices(round), ...worked];
+    }
+    case 'compare':
+      return [...COMPARE_CHOICES, ...worked];
+    case 'join':
+      return [MIAS_CAPTION, ...worked];
+  }
+}
+
 function explain(round: Round): string {
   switch (round.kind) {
     case 'pick':
@@ -816,28 +881,30 @@ function JudgeBoard(p: Sub<'judge'>) {
   // The worked answer for an unfair cut puts a fair one beside it, same size.
   const fair = worked && !equal;
   const w = fair ? 640 : 320;
+  const [theirs, fairName] = fairCaptions(round);
+  const [yes, no] = judgeChoices(round);
   return (
     <div className="board board--dosa">
       <Svg w={w} h={330} width={fair ? 560 : 280} label={`${CUTTER[round.n]}'s dosa, cut into ${WORD[round.n]} pieces.`}>
         <CutView cut={round.cut} c={[160, 150]} R={120} fold={stage === 'hint' || worked} fractions={worked && equal} />
         {fair ? (
           <>
-            <Caption x={160} y={318}>{`${CUTTER[round.n]}'s cut`}</Caption>
+            <Caption x={160} y={318}>{theirs}</Caption>
             <CutView cut={FAIR[round.n](round.cut.turn)} c={[480, 150]} R={120} fractions />
-            <Caption x={480} y={318}>{`Equal ${PLURAL[round.n]}`}</Caption>
+            <Caption x={480} y={318}>{fairName}</Caption>
           </>
         ) : null}
       </Svg>
       <div className="choices">
         <Choice {...choose(0, right, p)}>
-          <Pic label={`Yes, ${PLURAL[round.n]}`}>
+          <Pic label={yes}>
             <Svg w={110} h={110} width={96}>
               <Apart cut={FAIR[round.n](0)} c={[55, 55]} R={38} />
             </Svg>
           </Pic>
         </Choice>
         <Choice {...choose(1, right, p)}>
-          <Pic label="No, not equal">
+          <Pic label={no}>
             <Svg w={110} h={110} width={96}>
               <Apart cut={UNEQUAL[round.n]} c={[55, 55]} R={38} />
             </Svg>
@@ -884,21 +951,21 @@ function CompareBoard(p: Sub<'compare'>) {
       </Svg>
       <div className="choices">
         <Choice {...choose(0, right, p)} ariaLabel="Arjun has more">
-          <Pic label="Arjun">
+          <Pic label={COMPARE_CHOICES[0]}>
             <Svg w={60} h={60} width={72}>
               <Kid who={0} />
             </Svg>
           </Pic>
         </Choice>
         <Choice {...choose(1, right, p)} ariaLabel="Mia has more">
-          <Pic label="Mia">
+          <Pic label={COMPARE_CHOICES[1]}>
             <Svg w={60} h={60} width={72}>
               <Kid who={1} />
             </Svg>
           </Pic>
         </Choice>
         <Choice {...choose(2, right, p)} ariaLabel="The same">
-          <Pic label="The same">
+          <Pic label={COMPARE_CHOICES[2]}>
             <Svg w={150} h={60} width={150}>
               <BothKids />
             </Svg>
@@ -974,7 +1041,7 @@ function LooseQuarters() {
       </g>
       <Dosa c={[170, 115]} R={R} pieces={piece} whole={false} />
       <Dosa c={[330, 115]} R={R} pieces={piece} whole={false} />
-      <Caption x={250} y={158}>Mia&rsquo;s two quarters</Caption>
+      <Caption x={250} y={158}>{MIAS_CAPTION}</Caption>
     </Svg>
   );
 }
@@ -1035,7 +1102,9 @@ export const shareTheDosa: SolveGame<Round, Answer> = {
   emptyAnswer: () => null,
   Board,
   check,
+  hints,
   explain,
+  board,
   cover: 'art/games/share-the-dosa.png',
   note: {
     what: 'Dosas on steel plates, cut in different ways. He taps the cut that makes equal halves, thirds or quarters, says whether a given cut is fair, and at level 3 compares shares (a half with a quarter, two thirds with three quarters) and finds how many quarters cover a half.',

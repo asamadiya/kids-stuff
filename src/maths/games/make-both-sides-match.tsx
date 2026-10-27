@@ -83,6 +83,20 @@ function check(round: Round, answer: Answer) {
   return { ok: false, hint: `Left pan ${leftTotal}, right pan ${rightTotal}.` };
 }
 
+/**
+ * Read-aloud. The hint is one sentence of two numbers, the pan totals, and the
+ * open pan takes any number of weights, so it is unbounded and has no fixed
+ * sentence to list. The board draws both totals under the pans from the hint
+ * stage on, so that sentence is left to the picture. (The empty-pan hint still
+ * gets a clip: gameLines probes `check` with the empty answer.)
+ *
+ * No `board`: its only words are the tray label "Weights" and number tags
+ * (the numeral under each weight, the pan totals), which the dots carry.
+ */
+function hints(): readonly string[] {
+  return [];
+}
+
 function explain(round: Round): string {
   const l = round.left.join(' + ');
   const r = round.right.join(' + ');
@@ -267,6 +281,7 @@ export const makeBothSidesMatch: SolveGame<Round, Answer> = {
   emptyAnswer: () => [],
   Board,
   check,
+  hints,
   explain,
   cover: 'art/games/make-both-sides-match.png',
   note: {

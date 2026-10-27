@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState, type ReactElement, type RefObject } from 'react';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 import { drawer } from '../../lib/drawer';
-import { say } from '../../lib/say';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
 import {
   LANDINGS,
+  LISTEN,
   MEANT_AND_LANDED_META,
   MOMENTS,
   SIDE_KEYS,
@@ -21,6 +22,8 @@ import {
   sideId,
   sideOf,
   thoughtById,
+  trayHeadLanded,
+  trayHeadMeant,
   type Landing,
   type MeantRecord,
   type Moment,
@@ -174,6 +177,8 @@ export function MeantAndLanded(): ReactElement {
   const [picks, setPicks] = useState<Readonly<Record<string, Pick>>>({});
   const [kept, setKept] = useState<MeantRecord[]>(() => store.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const moment = MOMENTS[index];
   const side = sideOf(moment, sideKey);
@@ -183,7 +188,7 @@ export function MeantAndLanded(): ReactElement {
   const landing = landingById(pick.landing);
 
   const clauses = useMemo(
-    () => (thought && landing ? assemble(side, thought, landing) : []),
+    () => (thought && landing ? LISTEN.joined(side, thought, landing) : []),
     [side, thought, landing],
   );
 
@@ -200,39 +205,22 @@ export function MeantAndLanded(): ReactElement {
   const set = (part: Partial<Pick>): void => {
     const next: Pick = { ...pick, ...part };
     setPicks({ ...picks, [key]: next });
-    const t = thoughtById(next.thought);
-    const l = landingById(next.landing);
-    if (t && l) {
-      pluck(step(4), 0.5);
-      say(sentenceText(assemble(side, t, l)));
-    } else if (t) {
-      pluck(step(-3));
-      say(t.label);
-    } else if (l) {
-      pluck(step(2));
-      say(l.word);
-    }
   };
 
   const goTo = (next: number): void => {
     const wrapped = (next + MOMENTS.length) % MOMENTS.length;
     setIndex(wrapped);
     setSideKey('front');
-    pluck(step(-8), 0.3);
-    say(MOMENTS[wrapped].caption);
   };
 
   const flip = (): void => {
     const next: SideKey = sideKey === 'front' ? 'turned' : 'front';
     setSideKey(next);
-    pluck(step(next === 'turned' ? 7 : -5), 0.35);
-    say(sideOf(moment, next).ask);
   };
 
   const keepPlate = (): void => {
     store.add({ title: moment.title, lines: bothSides });
     setKept(store.list());
-    pluck(step(9), 0.5);
   };
 
   const dropPlate = (id: string): void => {
@@ -247,13 +235,16 @@ export function MeantAndLanded(): ReactElement {
   };
 
   return (
-    <section className="bench" aria-labelledby="meant-and-landed-title">
+    <section ref={benchRef} className="bench" aria-labelledby="meant-and-landed-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{MEANT_AND_LANDED_META.eyebrow}</p>
-          <h2 id="meant-and-landed-title" className="bench__title">
-            {MEANT_AND_LANDED_META.title}
-          </h2>
+          <div className="bench__row">
+            <h2 id="meant-and-landed-title" className="bench__title">
+              {MEANT_AND_LANDED_META.title}
+            </h2>
+            <ReadAloud id="sel/meant-and-landed/title" texts={LISTEN.title()} compact />
+          </div>
           <p className="bench__note">{MEANT_AND_LANDED_META.note}</p>
         </div>
         <p className="bench__readout">{coverageReadout(picks)}</p>
@@ -266,12 +257,17 @@ export function MeantAndLanded(): ReactElement {
             <figcaption className="bench__figure-caption">{moment.caption}</figcaption>
           </figure>
           <Join svgRef={svgRef} moment={moment} sideKey={sideKey} thought={thought} landing={landing} clauses={clauses} />
+          {clauses.length ? <ReadAloud id="sel/meant-and-landed/join" texts={clauses} /> : null}
         </div>
-        <p className="bench__note">{side.ask}</p>
+        <div className="bench__row">
+          <p className="bench__note">{side.ask}</p>
+          <ReadAloud id="sel/meant-and-landed/situation" texts={LISTEN.ask(moment, side)} />
+        </div>
       </div>
 
       <div className="bench__tray">
-        <p className="bench__tray-label">{`What ${side.actor.subject === 'You' ? 'you' : side.actor.subject} meant`}</p>
+        <p className="bench__tray-label">{trayHeadMeant(side)}</p>
+        <ReadAloud id="sel/meant-and-landed/meant-tray" texts={LISTEN.meant(side)} label="Read these out" />
         {THOUGHTS.map((t) => (
           <button
             key={t.id}
@@ -287,7 +283,8 @@ export function MeantAndLanded(): ReactElement {
       </div>
 
       <div className="bench__tray">
-        <p className="bench__tray-label">{`How it landed on ${side.receiver.subject === 'You' ? 'you' : side.receiver.subject}`}</p>
+        <p className="bench__tray-label">{trayHeadLanded(side)}</p>
+        <ReadAloud id="sel/meant-and-landed/landed-tray" texts={LISTEN.landed(side)} label="Read these out" />
         {LANDINGS.map((l) => (
           <button
             key={l.id}

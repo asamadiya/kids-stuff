@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { BoardProps, InvestigateGame, Level } from '../../play/types';
 import { Choice } from '../../play/parts';
+import { sentences } from '../../audio/gameLines';
 
 /**
  * One Push. Then What?
@@ -296,13 +297,31 @@ function Chevrons({ push, x, y }: { readonly push: Push; readonly x: number; rea
   );
 }
 
+/* ---------------------------------------------------- words on the board -- */
+
+/** Beside the chevrons: "Strong push", or on level 3 "Same strong push on both". */
+const pushWords = (round: Round): string => (round.test === 'pair' ? `Same ${round.push} push on both` : PUSH_LABEL[round.push]);
+
+/** Top right of a one-lane strip: "Floor: carpet". */
+const floorWords = (round: Round): string => `Floor: ${NAME[round.lanes[0].surface]}`;
+
+/** Over a level-3 lane: "Top: Wood, then towel from 3". */
+const laneTitle = (ln: Lane, i: number): string => `${i === 0 ? 'Top' : 'Bottom'}: ${laneText(ln)}`;
+
+/** Under the strip: the setup before, the model's stopping mark after. */
+function footWords(round: Round, after: boolean): string {
+  if (!after) return 'The hand lets go. The front of the car is at 0.';
+  if (round.test === 'pair') return `Model result: top car ${round.lanes[0].stop}, bottom car ${round.lanes[1].stop}.`;
+  return `Model result: stops at ${round.lanes[0].stop}.`;
+}
+
 /** "Strong push" with one to three chevrons before it, top left. */
-function PushLabel({ push, pair }: { readonly push: Push; readonly pair: boolean }) {
+function PushLabel({ round }: { readonly round: Round }) {
   return (
     <g>
-      <Chevrons push={push} x={32} y={14} />
+      <Chevrons push={round.push} x={32} y={14} />
       <text x="74" y="27" fontSize="15" fontWeight="700" fill={INK}>
-        {pair ? `Same ${push} push on both` : PUSH_LABEL[push]}
+        {pushWords(round)}
       </text>
     </g>
   );
@@ -394,13 +413,9 @@ function ariaFor(round: Round, after: boolean): string {
 function Frame({ round, after, answer = null, flags }: FrameProps) {
   const pair = round.test === 'pair';
   const h = pair ? 336 : 200;
-  let foot: string;
-  if (!after) foot = 'The hand lets go. The front of the car is at 0.';
-  else if (pair) foot = `Model result: top car ${round.lanes[0].stop}, bottom car ${round.lanes[1].stop}.`;
-  else foot = `Model result: stops at ${round.lanes[0].stop}.`;
   return (
     <svg className="board-svg" viewBox={`0 0 400 ${h}`} role="img" aria-label={ariaFor(round, after)}>
-      <PushLabel push={round.push} pair={pair} />
+      <PushLabel round={round} />
       {pair ? (
         round.lanes.map((ln, i) => (
           <LaneView
@@ -408,7 +423,7 @@ function Frame({ round, after, answer = null, flags }: FrameProps) {
             ln={ln}
             y={PAIR_Y[i]}
             after={after}
-            title={`${i === 0 ? 'Top' : 'Bottom'}: ${laneText(ln)}`}
+            title={laneTitle(ln, i)}
             chosen={!after && (answer === 'same' || answer === (i === 0 ? 'top' : 'bottom'))}
             flags={flags?.[i]}
             push={round.push}
@@ -417,7 +432,7 @@ function Frame({ round, after, answer = null, flags }: FrameProps) {
       ) : (
         <>
           <text x="390" y="27" fontSize="15" fontWeight="700" textAnchor="end" fill={INK}>
-            Floor: {NAME[round.lanes[0].surface]}
+            {floorWords(round)}
           </text>
           <LaneView
             ln={round.lanes[0]}
@@ -429,7 +444,7 @@ function Frame({ round, after, answer = null, flags }: FrameProps) {
         </>
       )}
       <text x="200" y={h - 12} fontSize="15" fontWeight={after ? 700 : 400} textAnchor="middle" fill={after ? '#075c46' : '#5a4636'}>
-        {foot}
+        {footWords(round, after)}
       </text>
     </svg>
   );
@@ -459,7 +474,7 @@ function laneStory(push: Push, ln: Lane, which: string): string {
 }
 
 /** The extra evidence drawn on the strip: a reference on 'hint', the whole model on 'worked'. */
-function evidence(round: Round, stage: BoardProps<Round, Answer>['stage']): { flags?: Flag[][]; caption?: string } {
+function evidence(round: Round, stage: Stage): { flags?: Flag[][]; caption?: string } {
   if (stage !== 'hint' && stage !== 'worked') return {};
   const ln = round.lanes[0];
   if (round.test === 'let-go') {
@@ -597,16 +612,40 @@ function Face({ value, word }: { readonly value: Zone | Side; readonly word: str
   );
 }
 
+/** The answer buttons in button order: each one's value and the word under its picture. */
+const choices = (round: Round): ReadonlyArray<readonly [Zone | Side, string]> =>
+  round.test === 'pair' ? PAIR_CHOICES : ZONES.map(([z, label]) => [z, label] as const);
+
+type Stage = BoardProps<Round, Answer>['stage'];
+
+/**
+ * Read-aloud: the board's words in screen order, one sentence or label each.
+ * The push over the strip; the floor (one lane) or each lane's floors (level
+ * 3); the line under the strip; the answer words; then the caption, which is
+ * the hint itself at 'hint' (an investigation's shell shows no hint sentence
+ * of its own) and the model at 'worked'. Left out: the ruler's numbers and
+ * the one- or two-word flags on the strip ("strong", "on wood", "stops
+ * here"), which the caption under them says in full.
+ */
+function board(round: Round, _level: Level, stage: Stage): readonly string[] {
+  const { caption } = evidence(round, stage);
+  return [
+    pushWords(round),
+    ...(round.test === 'pair' ? round.lanes.map(laneTitle) : [floorWords(round)]),
+    footWords(round, false),
+    ...choices(round).map(([, word]) => word),
+    ...(caption ? [caption] : []),
+  ].flatMap(sentences);
+}
+
 function Board({ round, answer, setAnswer, stage }: BoardProps<Round, Answer>) {
   const locked = stage === 'solved';
   const { flags, caption } = evidence(round, stage);
-  const options: ReadonlyArray<readonly [Zone | Side, string]> =
-    round.test === 'pair' ? PAIR_CHOICES : ZONES.map(([z, label]) => [z, label] as const);
   return (
     <div className="board board--push">
       <Frame round={round} after={false} answer={answer} flags={flags} />
       <div className="choices" role="group" aria-label={round.test === 'pair' ? 'Which car goes farther?' : 'Where will the car stop?'}>
-        {options.map(([value, label]) => (
+        {choices(round).map(([value, label]) => (
           <Choice key={value} selected={answer === value} onTap={() => setAnswer(value)} disabled={locked} ariaLabel={label}>
             <Face value={value} word={label} />
           </Choice>
@@ -667,6 +706,7 @@ export const onePushThenWhat: InvestigateGame<Round, Answer> = {
   prompt,
   emptyAnswer: () => null,
   Board,
+  board,
   Outcome,
   matches,
   why,

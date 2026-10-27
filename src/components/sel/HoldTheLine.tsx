@@ -1,15 +1,16 @@
 import { useMemo, useRef, useState } from 'react';
 import {
-  CHIPS, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, SCENARIOS, SLOTS, SLOT_LABELS,
+  CHIPS, DOORWAY_NOTE, EMPTY_PICK, GLYPHS, HOLDTHELINE_META, LISTEN, SCENARIOS, SLOTS, SLOT_LABELS,
   allSaid, chipById, chipsFor, isComplete, lineOf, nextKindOf, outcomeOf,
-  panelFor, plateLines, plateTitle, readout, saidLabel, sayPart, wordsFor, wrapText,
+  panelFor, plateLines, plateTitle, promptText, readout, saidLabel, sayPart, showsDoorwayNote,
+  shownPanel, wordsFor, wrapText,
 } from '../../sel/hold-the-line';
 import type { ChipId, GlyphId, Outcome, Pick, Scenario, SlotKind } from '../../sel/hold-the-line';
 import { drawer } from '../../lib/drawer';
 import type { Kept } from '../../lib/drawer';
-import { say } from '../../lib/say';
-import { pluck, step } from '../../lib/tone';
 import { exportPlate, printPlate } from '../../lib/plate';
+import { ReadAloud } from '../../audio/ReadAloud';
+import { useStopOnInteraction } from '../../audio/useStopOnInteraction';
 
 interface KeptLine extends Kept {
   readonly scenario: string;
@@ -54,11 +55,13 @@ export function HoldTheLine() {
   const [spoken, setSpoken] = useState<string[]>([]);
   const [kept, setKept] = useState<KeptLine[]>(() => rack.list());
   const svgRef = useRef<SVGSVGElement>(null);
+  const benchRef = useRef<HTMLElement>(null);
+  useStopOnInteraction(benchRef);
 
   const line = lineOf(scenario, pick);
   const full = isComplete(pick);
   const outcome: Outcome | null = phase === 'said' ? outcomeOf(scenario, pick) : null;
-  const shown = outcome ? panelFor(scenario, outcome) : scenario.setup;
+  const shown = shownPanel(scenario, outcome);
   const leaving = nextKindOf(pick) === 'exit';
   const sayingSlot: SlotKind | null = full && phase === 'build' && !allSaid(said) ? SLOTS[said] : null;
   const sayingId = sayingSlot ? pick[sayingSlot] : null;
@@ -69,16 +72,10 @@ export function HoldTheLine() {
     setPick(next);
     // A changed line is a new line: it is said again from the first part.
     setSaid(0);
-    if (next[slot]) {
-      say(wordsFor(scenario, id));
-      pluck(step(slot === 'name' ? -5 : slot === 'ask' ? -1 : 2));
-    }
-    if (isComplete(next)) say(lineOf(scenario, next));
   };
 
   const goTo = (s: Scenario) => {
     setScenario(s); setPick(EMPTY_PICK); setPhase('build'); setSaid(0); setRuns(0);
-    say(s.setup.says);
   };
 
   /** He said the next part out loud; its dot fills. After the third, the other person answers. */
@@ -86,13 +83,9 @@ export function HoldTheLine() {
     if (!sayingSlot) return;
     const next = sayPart(said);
     setSaid(next);
-    pluck(step(SLOTS.indexOf(sayingSlot) * 3 - 2), 0.3);
     if (!allSaid(next)) return;
     setPhase('said'); setRuns((r) => r + 1);
     setSpoken((s) => (s.includes(scenario.id) ? s : [...s, scenario.id]));
-    pluck(step(4), 0.6);
-    const o = outcomeOf(scenario, pick);
-    if (o) say(panelFor(scenario, o).says);
   };
 
   const runAgain = () => {
@@ -113,11 +106,14 @@ export function HoldTheLine() {
   );
 
   return (
-    <section className="bench" aria-labelledby="hold-the-line-title">
+    <section ref={benchRef} className="bench" aria-labelledby="hold-the-line-title">
       <div className="bench__head">
         <div>
           <p className="bench__eyebrow">{HOLDTHELINE_META.eyebrow}</p>
-          <h2 id="hold-the-line-title" className="bench__title">{HOLDTHELINE_META.title}</h2>
+          <div className="bench__row">
+            <h2 id="hold-the-line-title" className="bench__title">{HOLDTHELINE_META.title}</h2>
+            <ReadAloud id="sel/hold-the-line/title" texts={LISTEN.title()} compact />
+          </div>
           <p className="bench__note">{HOLDTHELINE_META.note}</p>
         </div>
         <p className="bench__readout">{readout(spoken)}</p>
@@ -131,6 +127,11 @@ export function HoldTheLine() {
             style={{ display: 'block', width: '100%', maxWidth: '360px', height: 'auto', border: `1px solid ${RULE}` }}
           />
           <p className="bench__figure-caption">{scenario.where}</p>
+          {/* The setup used to be spoken and never shown. Once the line is said, what
+              happened is in the frame (and on the phone cards), so it is not set twice. */}
+          {outcome ? null : <p className="bench__figure-caption">{shown.says}</p>}
+          <ReadAloud id="sel/hold-the-line/picture" texts={LISTEN.picture(scenario, outcome)}
+            label="Read out what is happening" />
         </div>
 
         {/* Phones: the same frame as readable cards with a full-size button.
@@ -252,21 +253,26 @@ export function HoldTheLine() {
 
       {phase !== 'said' && SLOTS.map((slot) => (
         <div className="bench__tray" key={slot} style={{ marginTop: 'var(--space-3)' }}>
-          <p className="bench__tray-label">
-            {SLOT_LABELS[slot]}
-            {slot === 'next' && runs > 0 ? ' — the doorway chip is on the rack now' : ''}
-          </p>
+          <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <p className="bench__tray-label" style={{ width: 'auto', flex: '1 1 auto' }}>
+              {SLOT_LABELS[slot]}
+              {showsDoorwayNote(slot, runs) ? ` — ${DOORWAY_NOTE}` : ''}
+            </p>
+            <ReadAloud id={`sel/hold-the-line/tray/${slot}`} texts={LISTEN.tray(scenario, slot, runs)}
+              label="Read these out" />
+          </div>
+          {/* Each chip shows its words beside its mark: the tray's read button reads them, in this order. */}
           {chipsFor(scenario, slot).map((chip) => (
             <button key={chip.id} type="button"
               className={`bench-part${pick[slot] === chip.id ? ' is-set' : ''}`}
               aria-pressed={pick[slot] === chip.id}
-              aria-label={wordsFor(scenario, chip.id)}
-              title={wordsFor(scenario, chip.id)}
+              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', maxWidth: '16rem', textAlign: 'left' }}
               onClick={() => place(slot, chip.id)}>
               <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true" focusable="false"
-                style={{ display: 'block' }}>
+                style={{ display: 'block', flex: 'none' }}>
                 {mark(chip.glyph, pick[slot] === chip.id ? TEAL : INK)}
               </svg>
+              <span>{wordsFor(scenario, chip.id)}</span>
             </button>
           ))}
         </div>
@@ -277,12 +283,11 @@ export function HoldTheLine() {
           <button type="button" className="bench-btn bench-btn--primary"
             aria-disabled={!full} onClick={sayNext}
             style={{ minHeight: '3.5rem' }}>
-            {!full
-              ? 'Pick one picture for each part first'
-              : sayingId
-                ? `Say it out loud, then tap: “${wordsFor(scenario, sayingId)}”`
-                : 'Say it out loud'}
+            {promptText(scenario, sayingId)}
           </button>
+        )}
+        {phase !== 'said' && (
+          <ReadAloud id="sel/hold-the-line/prompt" texts={LISTEN.prompt(scenario, sayingId)} compact />
         )}
         {phase === 'said' && outcome === 'goes-on' && (
           <button type="button" className="bench-btn bench-btn--primary" onClick={runAgain}>
@@ -292,13 +297,9 @@ export function HoldTheLine() {
         {phase === 'said' && (
           <button type="button" className="bench-btn" onClick={keep}>Keep this line</button>
         )}
-        <button type="button" className="bench-btn" onClick={() => say(scenario.setup.says)}>
-          Read out what is happening
-        </button>
-        <button type="button" className="bench-btn" onClick={() => { if (full) say(line); }}
-          aria-disabled={!full}>
-          Say the line back to me
-        </button>
+        {full && (
+          <ReadAloud id="sel/hold-the-line/line" texts={LISTEN.line(scenario, pick)} label="Say the line back to me" />
+        )}
         <button type="button" className="bench-btn"
           onClick={() => {
             if (svgRef.current) {
